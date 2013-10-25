@@ -1,0 +1,52 @@
+[{
+  "type": "nominal",
+  "name": "Creative Type"
+}, {
+  "type": "unknown",
+  "name": "Director"
+}, {
+  "type": "nominal",
+  "name": "Distributor"
+}, {
+  "type": "numeric",
+  "name": "IMDB Rating"
+}, {
+  "type": "numeric",
+  "name": "IMDB Votes"
+}, {
+  "type": "nominal",
+  "name": "MPAA Rating"
+}, {
+  "type": "nominal",
+  "name": "Major Genre"
+}, {
+  "type": "numeric",
+  "name": "Production Budget"
+}, {
+  "type": "nominal",
+  "name": "Release Location"
+}, {
+  "type": "date",
+  "name": "Release Date"
+}, {
+  "type": "numeric",
+  "name": "Rotten Tomatoes Rating"
+}, {
+  "type": "numeric",
+  "name": "Running Time (min)"
+}, {
+  "type": "nominal",
+  "name": "Source"
+}, {
+  "type": "text",
+  "name": "Title"
+}, {
+  "type": "numeric",
+  "name": "US DVD Sales"
+}, {
+  "type": "numeric",
+  "name": "US Gross"
+}, {
+  "type": "numeric",
+  "name": "Worldwide Gross"
+}]
