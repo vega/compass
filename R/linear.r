@@ -7,8 +7,12 @@ require(plyr)
 # WARNING this line is specific to only Kanitw's computer
 setwd("~/Dropbox/_Projects/_idl/vis-rec/R")
 
-json <- "../data/rows/movies.json"
-metajson <- "../data/rows/movies_meta.json"
+DATASET <- "movies"
+output_path = paste("../data/r-output/",DATASET,"/",sep="")
+# DATASET <- "coffee"
+
+json <- paste("../data/rows/", DATASET, ".json", sep="")
+metajson <- paste("../data/rows/", DATASET, "_meta.json", sep="")
 
 # Create a data frame from json
 dataFrameFromJSON = function(json_file){
@@ -24,94 +28,75 @@ not <- function(f){ return(function(x) !f(x))} # create not(f(x)) = !f(x)
 
 df <- dataFrameFromJSON(paste(readLines(json), collapse="")) 
 meta_df <- dataFrameFromJSON(paste(readLines(metajson), collapse=""))
-
-## kanitw: these two lines somehow doesn't work 
-# nominal_indices = which(meta_df$type=="nominal")
-# numeric_indices = which(meta_df$type=="numeric")
-
-non_numeric_indices = which(sapply(df,is.factor))
-numeric_indices = which(sapply(df,not(is.factor)))
-
-#scale all numerical data so it makes sense
-lapply(numeric_indices, function(i){ df[i] = scale(df[i]) })
-
+names_df <- names(df)
 N <- length(df)
 
-## get formula X_i ~ X_1 + ...+ X_{i-1} + X_{i+1}+ ... X_n
-get_long_linear_formula <- function(i){
-  ## get {1:N} - {1}
-  x_indices = setdiff(numeric_indices,c(i)) 
-#   print(paste(c("x_id",x_indices)))
-  x_names <- names(df)[x_indices]
-  f <- as.formula(paste(names(df)[i], " ~ ", paste(x_names, collapse=" + ")))
-  print(paste(i,",",N,":"))
-#   print(f)
-  return (f)
+cat_ids = which(sapply(df,is.factor))
+num_ids = which(sapply(df,not(is.factor)))
+
+## special treatment for each data set
+if(DATASET == "movies"){
+  ## remove title from the list as it's just the key of the data
+  title_index = grep("Title", colnames(df))
+  cat_ids = setdiff(cat_ids, c(title_index))   
 }
 
-## get a collection of formula {X_i ~ X_j | j≠i \forall j ∈ 1:N }
-get_simple_linear_formulas <- function(i){
-  formulas <- c()
-  x_indices = setdiff(numeric_indices,c(i)) 
-  #cat(x_indices)
-  for (j in x_indices){
-    if(j !=i){
-      f <- paste(names(df)[i], " ~ ", paste(names(df)[j]))
-      print(paste(j,f))
-      formulas <- c(formulas, f)
-    }
-  }
-  return(formulas)
+num_vars = names_df[num_ids]
+cat_vars = names_df[cat_ids]
+
+##scale all numerical data so it coefficient in the models can be compared
+l_ply(num_ids, function(i){ df[i] = scale(df[i]) })
+
+## get "y ~ X_1 + X_2 + ..."
+## also remove y from X
+get_linear_formula <- function(y, X) paste(
+  y, "~", paste(X[X!=y], collapse= " + ")
+)
+
+## Get Linear Formulae with one independent variable
+get_simple_linear_formulae <- function(y, Xs) lapply(
+  Xs[Xs!=y], function(X) get_linear_formula(y,X)
+)
+
+## Get All Simple Linear Formulae with given Y and Xs
+get_all_simple_linear_formulae <- function(Y,Xs) unlist(
+  lapply(Y, function(y) get_simple_linear_formulae(y,Xs))
+)
+
+# Get set of {\forall y \in Y | "y ~ sum_{x≠y} x"}
+get_all_long_linear_formulae <- function(Y, X) unlist(
+  lapply(Y, function(y) get_linear_formula(y, X))
+)
+
+#export all results of a given formula to a file name
+export_json <- function(summaries, filename){
+  attr <- c("fstatistic","r.squared", "df")
+  coef_colnames <- colnames(summaries[[1]]$coefficients)
+  
+  to_export <- lapply(summaries, function(s){
+    ex_s = list()
+    ex_s$coefs <- lapply(coef_colnames, function(col) unlist(s$coefficients[,col])) 
+    names(ex_s$coefs) <- coef_colnames
+    
+    for(a in attr) ex_s[a] <- s[a]
+    return(ex_s)
+  })
+  
+  sink(paste(output_path, filename,sep=""))
+  cat(toJSON(to_export))
+  sink() #"close file"  
 }
 
-## Test a simple formula from one i
-# i = which(df_names=="US.Gross")
-# simple_formulas = get_simple_linear_formulas(i)
-# rs = lm(as.formula(simple_formulas[1]),df)
-# summary(rs)
+run_and_sum_all <- function(formulae, fn=lm){
+  names(formulae) <- formulae
+  return(lapply(formulae, function(f) summary(fn(f, data=df))) )
+}
 
-## Test all formulas from one i 
-# i = which(df_names=="US.Gross")
-# simple_formulas = get_simple_linear_formulas(i)
-# lapply(simple_formulas, function(formula){
-#   rs = lm(as.formula(formula),df)
-#   return (summary(rs))
-# })
+simple_num_num = get_all_simple_linear_formulae(num_vars, num_vars)
+long_num_num = get_all_long_linear_formulae(num_vars,num_vars)
 
-## run all of these on each numeric index
+sum_simple_num_num = run_and_sum_all(simple_num_num)
+sum_long_num_num = run_and_sum_all(long_num_num)
 
-formulae_matrix <- lapply(numeric_indices, get_simple_linear_formulas)
-formulae <- unlist(formulae_matrix)
-names(formulae) <- formulae
-
-summaries <- lapply(formulae, function(f){return(summary(lm(f, data=df)))}) 
-
-#coeffs <- lapply(summaries, coef)
-## export each coefficient table to tsv files
-# path <- "../data/r-output/movies/"
-# mapply(function(name,s){
-#   cat(names(s))
-# #   write.table(coef(s),paste0(path,"coeff_",gsub("~","--",name),".tsv"),sep="\t", col.names=NA)
-# }, names(summaries),summaries)
-# 
-# attrs <- c("fstatistic","r.squared")
-
-## export all of these to one json file
-
-to_export <- list()
-to_export$coef_colnames <- colnames(summaries[[1]]$coefficients)
-to_export$coef_rownames <- lapply(summaries, function(s) rownames(s$coefficients))
-to_export$coefs <- lapply(summaries, function(s) s$coefficients)
-to_export$fstats <- lapply(summaries, function(s) s$fstatistic)
-to_export$r.squared <- lapply(summaries, function(s) s$r.squared)
-to_export$df <- lapply(summaries, function(s) s$df)
-
-sink(paste(path,"simple_linear.json",sep=""))
-cat(toJSON(to_export))
-sink() #"close file"
-# 
-# mapply(function(name, s){
-#   cat(name)
-#   mapply(function())
-#   write.table(coef(s),paste0(path,"coeff_",name,".tsv"),sep="\t")
-# },names(summaries), summaries)
+export_json(sum_simple_num_num, "simple_linear.json")
+export_json(sum_long_num_num, "long_linear.json")
