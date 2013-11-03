@@ -43,9 +43,12 @@ if(DATASET == "movies"){
 
 num_vars = names_df[num_ids]
 cat_vars = names_df[cat_ids]
+all_vars = c(num_vars, cat_vars)
+
 
 ##scale all numerical data so it coefficient in the models can be compared
-l_ply(num_ids, function(i){ df[i] = scale(df[i]) })
+l_ply(num_ids, function(i){ df[i] <- scale(df[i]) })
+
 
 ## get "y ~ X_1 + X_2 + ..."
 ## also remove y from X
@@ -74,11 +77,10 @@ export_json <- function(summaries, filename){
   coef_colnames <- colnames(summaries[[1]]$coefficients)
   
   to_export <- lapply(summaries, function(s){
-    ex_s = list()
-    ex_s$coefs <- lapply(coef_colnames, function(col) unlist(s$coefficients[,col])) 
-    names(ex_s$coefs) <- coef_colnames
-    
-    for(a in attr) ex_s[a] <- s[a]
+    #put all attribute in ex_s
+    ex_s = sapply(attr, function(a) s[a], USE.NAMES=TRUE) 
+    #then convert coefficient table to nested list format (for JSON export)
+    ex_s$coefs <- sapply(coef_colnames, function(col) list(s$coefficients[,col]), USE.NAMES=T) 
     return(ex_s)
   })
   
