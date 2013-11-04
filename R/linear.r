@@ -2,6 +2,7 @@
 ## and export to a JSON file
 
 require(rjson)
+require(nnet)
 require(plyr)
 
 # WARNING this line is specific to only Kanitw's computer
@@ -27,6 +28,9 @@ dataFrameFromJSON = function(json_file){
 not <- function(f){ return(function(x) !f(x))} # create not(f(x)) = !f(x)
 
 df <- dataFrameFromJSON(paste(readLines(json), collapse="")) 
+
+
+
 meta_df <- dataFrameFromJSON(paste(readLines(metajson), collapse=""))
 names_df <- names(df)
 N <- length(df)
@@ -105,3 +109,77 @@ sum_long_num_num = run_and_sum_all(long_num_num)
 
 export_json(sum_simple_num_num, "simple_linear.json")
 export_json(sum_long_num_num, "long_linear.json")
+
+
+
+## ANALYSIS OF SIMPLE NUM ~ NUM
+function analyse_simple_num_num(sum_simple_num_num){
+  estimate <- sapply(sum_simple_num_num, function(s) s$coefficients[1,2])
+  s_estimate <- estimate[sort.list(estimate, decreasing=T)]   
+}
+
+## ANALYSIS OF LONG NUM ~ NUM
+function analyse_long_num_num(sum_long_num_num){
+  
+  estimate <- lapply(sum_long_num_num, function(s) s$coefficients[,1])
+  max_estimate <- apply(estimate, 2, max)
+  s_estimate <- estimate[sort.list(estimate, decreasing=T)]   
+  head(s_estimate)
+  
+  ## recreate table with NA values (since the extracted estimates
+  ## won't include depedent variable in coefficients.
+  est_table <- sapply(c("(Intercept)",num_vars), function(var) lapply(
+    1:length(estimate), function(i) estimate[[i]][var], USE.NAMES=T)
+  )
+  names(est_table) <- c("(Intercept)",num_vars)  ## assign the right name for each variable
+  ## write to table so we can easily 
+  write.table(est_table, paste(output_path,"/est.tsv",sep=""), sep="\t", col.names=NA)
+}
+
+### ANALYSIS OF NUM ~ ALL  (ALL = Both Cat, Num)
+simple_num_all = get_all_simple_linear_formulae(num_vars, all_vars)
+long_num_all = get_all_long_linear_formulae(num_vars, all_vars)
+
+sum_simple_num_all = run_and_sum_all(simple_num_all)
+sum_long_num_all = run_and_sum_all(long_num_all)
+
+export_json(sum_simple_num_all, "simple_linear_all.json")
+export_json(sum_long_num_all, "long_linear_all.json")
+
+
+# copied from above but still haven't make good use of it.
+
+# function analyse_long_num_all(sum_long_num_all){
+#   estimate <- lapply(sum_long_num_all, function(s) s$coefficients[,1])
+#   max_estimate <- apply(estimate, 2, max)
+#   s_estimate <- estimate[sort.list(estimate, decreasing=T)]   
+#   head(s_estimate)
+#   
+#   ## recreate table with NA values (since the extracted estimates
+#   ## won't include depedent variable in coefficients.
+#   est_table <- sapply(c("(Intercept)",num_vars), function(var) lapply(
+#     1:length(estimate), function(i) estimate[[i]][var], USE.NAMES=T)
+#   )
+#   names(est_table) <- c("(Intercept)",num_vars) ## assign the right name for each variable
+#   ## write to table so we can easily 
+#   write.table(est_table, paste(output_path,"/sum_long_num_all.tsv",sep=""), sep="\t", col.names=NA)
+# }
+
+
+## ANALYSIS OF CAT ~ NUM
+#still have some bugs below
+simple_cat_num = get_all_simple_linear_formulae(cat_vars, num_vars)
+sum_simple_cat_num = run_and_sum_all(simple_cat_num, fn=multinom)
+
+models_simple_cat_num = list()
+for(i in 1:length(simple_cat_num)){
+  cat(i)
+  models_simple_cat_num[i]<- multinom(formula=simple_cat_num[[i]],data=df)
+}
+
+summary(multinom(formula=simple_cat_num[[1]],data=df))
+
+# long_cat_num = get_all_long_linear_formulae(cat_vars, num_vars)
+#sum_simple_num_num = run_and_sumall(simple_num_num, fn=glm, family=binomial())
+# sum_long_num_num = run_and_sum_all(long_num_num, fn=glm)
+
