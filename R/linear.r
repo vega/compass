@@ -85,7 +85,7 @@ export_json <- function(summaries, filename){
   
   to_export <- lapply(summaries, function(s){
     #put all attribute in ex_s
-    ex_s = sapply(attr, function(a) s[a], USE.NAMES=TRUE) 
+    ex_s = sapply(attr, function(a) s[a], USE.NAMES=F) 
     #then convert coefficient table to nested list format (for JSON export)
     ex_s$coefs <- sapply(coef_colnames, function(col) list(s$coefficients[,col]), USE.NAMES=T) 
     return(ex_s)
@@ -107,7 +107,7 @@ long_num_num = get_all_long_linear_formulae(num_vars,num_vars)
 sum_simple_num_num = run_and_sum_all(simple_num_num)
 sum_long_num_num = run_and_sum_all(long_num_num)
 
-export_json(sum_simple_num_num, "simple_linear.json")
+export_json(sum_simple_num_num, "simple_linear.json") 
 export_json(sum_long_num_num, "long_linear.json")
 
 
