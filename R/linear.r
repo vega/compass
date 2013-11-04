@@ -45,9 +45,12 @@ num_vars = names_df[num_ids]
 cat_vars = names_df[cat_ids]
 all_vars = c(num_vars, cat_vars)
 
-
 ##scale all numerical data so it coefficient in the models can be compared
-l_ply(num_ids, function(i){ df[i] <- scale(df[i]) })
+unscaled_df <- df 
+df[,num_ids] <- scale(df[,num_ids])
+
+
+
 
 
 ## get "y ~ X_1 + X_2 + ..."
@@ -62,13 +65,13 @@ get_simple_linear_formulae <- function(y, Xs) lapply(
 )
 
 ## Get All Simple Linear Formulae with given Y and Xs
-get_all_simple_linear_formulae <- function(Y,Xs) unlist(
-  lapply(Y, function(y) get_simple_linear_formulae(y,Xs))
+get_all_simple_linear_formulae <- function(Y,Xs) sapply(
+  Y, function(y) get_simple_linear_formulae(y,Xs)
 )
 
 # Get set of {\forall y \in Y | "y ~ sum_{x≠y} x"}
-get_all_long_linear_formulae <- function(Y, X) unlist(
-  lapply(Y, function(y) get_linear_formula(y, X))
+get_all_long_linear_formulae <- function(Y, X) sapply(
+  Y, function(y) get_linear_formula(y, X)
 )
 
 #export all results of a given formula to a file name
@@ -89,9 +92,9 @@ export_json <- function(summaries, filename){
   sink() #"close file"  
 }
 
-run_and_sum_all <- function(formulae, fn=lm){
+run_and_sum_all <- function(formulae, fn=lm, ...){
   names(formulae) <- formulae
-  return(lapply(formulae, function(f) summary(fn(f, data=df))) )
+  return(lapply(formulae, function(f) summary(fn(formula=f, data=df, ...))) )
 }
 
 simple_num_num = get_all_simple_linear_formulae(num_vars, num_vars)
