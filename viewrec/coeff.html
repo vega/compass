@@ -16,48 +16,48 @@
 var datafile = "data/movies.json",
     data, table;
   d3.json(datafile, function(err, json) {
-  if (err) {
-    console.log(err);
-    alert(err);
-    return;
-  }
-  data = json;
-
-
-  //create data table
-  table = dv.table();
-  var idx = 0;
-  data.forEach(function(c, i) {
-    makeColumns(c).forEach(function(c) {
-      console.log((idx++) + ": " + c.name + " | " + c.vals.lut.length);
-      table.addColumn(c.name, c.vals, null, true);
-    });
-  });
-
-  console.log("TABLE", table.rows());
-
-  var i, j, N = table.cols(), dist = [];
-  for (i=0; i<N; ++i) {
-    for (j=i+1; j<N; ++j) {
-      dist.push({
-        idx1:  i,
-        idx2:  j,
-        name1: table[i].name,
-        name2: table[j].name,
-        dist:  distance(table, i, j)
-      });
+    if (err) {
+      console.log(err);
+      alert(err);
+      return;
     }
-  }
+    data = json;
 
-  var matrix = dist.reduce(function(a, d) {
-    // make symmetric
-    a.push(d);
-    a.push({idx1:d.idx2, idx2:d.idx1, name1:d.name2, name2:d.name1, dist:d.dist});
-    return a;
-  }, []);
-  self.matrix = matrix;
-  show(matrix);
-});
+
+    //create data table
+    table = dv.table();
+    var idx = 0;
+    data.forEach(function(c, i) {
+      makeColumns(c).forEach(function(c) {
+        console.log((idx++) + ": " + c.name + " | " + c.vals.lut.length);
+        table.addColumn(c.name, c.vals, null, true);
+      });
+    });
+
+    console.log("TABLE", table.rows());
+
+    var i, j, N = table.cols(), dist = [];
+    for (i=0; i<N; ++i) {
+      for (j=i+1; j<N; ++j) {
+        dist.push({
+          idx1:  i,
+          idx2:  j,
+          name1: table[i].name,
+          name2: table[j].name,
+          dist:  distance(table, i, j)
+        });
+      }
+    }
+
+    var matrix = dist.reduce(function(a, d) {
+      // make symmetric
+      a.push(d);
+      a.push({idx1:d.idx2, idx2:d.idx1, name1:d.name2, name2:d.name1, dist:d.dist});
+      return a;
+    }, []);
+    self.matrix = matrix;
+    show(matrix);
+  });
 
 function makeColumns(col) {
   var name = col.name,
@@ -320,7 +320,7 @@ function show(mat) {
     .style("font", "9px Helvetica Neue");
 }
     </script>
-    <select>
+    <select id="vartype">
       <option>Y ~ Xc</option>
       <option>Y ~ Xc_1 + Xc_2 + ... + X_n</option>
       <option>Y ~ X</option>
