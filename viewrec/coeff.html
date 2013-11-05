@@ -2,6 +2,7 @@
 <html>
   <head>
     <title>View Recommender</title>
+    <script src="lib/jquery.min.js"></script>
     <script src="lib/d3.v3.min.js"></script>
     <script src="lib/dv.js"></script>
     <script src="lib/lodash.js"></script>
@@ -15,15 +16,21 @@
     </style>
   </head>
   <body>
-    <script type="text/javascript">
-
-    </script>
+    Variable:
     <select id="vartype">
       <option value="D">D</option>
-      <option value="sl">Y ~ Xc</option>
-      <option value="ll"> Y ~ Xc_1 + Xc_2 + ... + X_n</option>
-      <option value="sla">Y ~ X</option>
+      <option value="sl">Y ~ Xq_i</option>
+      <option value="ll"> Y ~ Xq_1 + Xq_2 + ... + Xq_n</option>
+      <option value="sla">Y ~ X_i</option>
       <option value="lla">Y ~ X_1 + X_2 + ... + X_n</option>
+    </select>
+    Property Type
+    <select id="proptype">
+      <option>coefs->Estimate</option>
+      <option>df</option>
+      <option>fstatistic</option>
+      <option>r.squared</option>
+      <option>coefs->Pr(>|t|)</option>
     </select>
     <div id="left">
     </div>

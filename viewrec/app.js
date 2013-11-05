@@ -1,33 +1,59 @@
 "use strict";
 
-/* global _, console, queue, d3, dv */
+/* global _, console, queue, d3, dv, alert, $ */
 
-var datafile = "data/movies.json",data, table;
+if (typeof String.prototype.startsWith != 'function') {
+  String.prototype.startsWith = function (str){
+    return this.slice(0, str.length) == str;
+  };
+}
+
+var datafile = "data/movies.json", table;
+
+var self = {};
+
+function range(start, end) {
+    var foo = [];
+    for (var i = start; i < end; i++) {
+        foo.push(i);
+    }
+    return foo;
+}
 
 var concat = function(a,b){return a.concat(b);};
-var getRColNames = function(formulae){
-  var keys = _(formulae).map(function(f){
-    var split = f.split("~");
-    var all = split[1].split("+");
-    all.push(split[0]);
-    return all;
-  }).reduce(concat).map(function(a){return a.trim();});
-  return _.uniq(keys);
-};
+// var getRColNames = function(formulae){
+//   var keys = _(formulae).map(function(f){
+//     var split = f.split("~");
+//     var all = split[1].split("+");
+//     all.push(split[0]);
+//     return all;
+//   }).reduce(concat).map(function(a){return a.trim();});
+//   return _.uniq(keys);
+// };
 
 /**
  * Convert column names into R format's column names.
  * @param  {String} column name
  * @return {String} formatted name
  */
-var convertName = function(c){
-  return c.name.replace(/\ /g,".").replace(/\(/g,".").replace(/\)/g,".");
+var convertName = function(name){
+  return name.replace(/\ /g,".").replace(/\(/g,".").replace(/\)/g,".");
 };
 
-var getValue = function(summary, prop, extra_prop){
+var getValue = function(summary, prop, extra_prop, isCat){
   var out = summary;
-  for(var i=0; i<prop.length ; ++i) out= out[prop[i]];
-  if(extra_prop) out = out[extra_prop];
+  for(var i=0; i<prop.length && out ; ++i) out = out[prop[i]];
+  if(out && extra_prop){
+    if(isCat){
+      var outKeys = _.keys(out).filter(function(s){return s.startsWith(extra_prop)});
+      var oldOut = out;
+      out = {}
+      for(var j=0;j<outKeys.length ; j++){
+        out[outKeys[j]] = oldOut[outKeys[j]];
+      }
+    }else
+      out = out[extra_prop];
+  }
   return out;
 };
 /**
@@ -35,43 +61,65 @@ var getValue = function(summary, prop, extra_prop){
  * @param  {String(Json)} json
  * @param  {dv.table()} table
  * @param  {String} prop properties name e.g. ['coefs','Estimate'], ['df.df']
- * @param  {enum} type SIMPLE/ALL
+ * @param  {enum} type
  * @return Table Values
  */
-var getValueTable = function(summariesMap, table, prop, type){
-  var type = type || "SIMPLE"; //assign default values
+var getValueTable = function(summariesMap, data, prop, type){
+  var type = type || "sl"; //assign default values
+  self.data= data;
 
-  var formulae = _.keys(json);
+  var formulae = _.keys(summariesMap);
   var formulaeByDepVar = _.groupBy(formulae, function(f){ return f.split("~")[0].trim();});
 
   //kanitw: This part can be improve in terms of performance.
-  if(type=="SIMPLE"){
+  if(type[0]=="s"){
     // for simple output table
-    formulaeByDepVar.each(function(formulae,ind_var, map){
+    _(formulaeByDepVar).each(function(formulae,ind_var, map){
       var obj = {};
       _.each(formulae, function(f){ obj[f.split("~")[1].trim()] = f;});
       map[ind_var] = obj;
     });
   }
-  var i, j, N=table.cols(), valueTable = [];
-
-  for(i=0; i<N ; ++i){
-    for(j=0; j<N; ++j){
-      var formula = formulaeByDepVar[table[i].rName][table[j].rName];
-      var extra_prop  = (prop[0] === "coefs" && type=="ALL") ? table[j].rName : null;
-      var value = getValue(summariesMap[formula],prop, extra_prop);
-
-      valueTable.push(_.merge({
-        idx1: i,
-        idx2: j,
-        name1: table[i].name,
-        name2: table[j].name,
-        value: value
-      }));
-    }
+  var i, j, N=data.length, valueTable = [];
+  var cols = range(0,N-1);
+  var rows = range(0,N-1);
+  rows = _.filter(rows, function(i){ return data[i].type==="numeric"; });
+  if(type==="sl"||type==="ll"){
+    cols = _.filter(cols, function(i){ return data[i].type==="numeric"; });
   }
 
+  if(prop[0] === "coefs"){
+    for(var ii=0; ii< rows.length ; ++ii){
+      i = rows[ii];
+      for(var jj=0; jj<cols.length; ++jj){
+        j = cols[jj];
+        if(i==j) continue;
+        var iName = data[i].rName, jName=data[j].rName;
+        var formula = (formulaeByDepVar[iName]||{});
+        if(type[0]=="s") formula = formula[jName];
+        else formula = formula[0];
+        if(formula){
+          var extra_prop  = (prop[0] === "coefs" && type[0]=="l") ? jName : null;
+          var isCat = data[j].type!="numeric";
+          var value = getValue(summariesMap[formula],prop, extra_prop,isCat);
+          if(!value && i!=j && formula && extra_prop != "Title"){
+            console.log("value null!",type, formula, prop, extra_prop, isCat);
+          }
 
+          valueTable.push({
+            idx1: j,
+            idx2: i,
+            name1: data[j].name,
+            type1: data[j].type,
+            name2: data[i].name,
+            type2: data[i].type,
+            value: value
+          });
+        }else if (i!=j) console.log("formula null!", type, iName, jName);
+      }
+    }
+  }
+  return valueTable;
 };
 
 queue()
@@ -88,11 +136,15 @@ queue()
     }
     // var rColNames = getRColNames(Object.keys(sla));
 
+    var models = {sl:sl, sla:sla, ll:ll, lla:lla};
+
     //create data table
     table = dv.table();
     var idx = 0;
-    data.forEach(function(c, i) {
-      c.rName = convertName(c.name); // Add R format column name
+    data.forEach(function(c, i, data){
+      console.log(c);
+      data[i].rName = convertName(c.name);
+      // self.rNameMap[c.name] = convertName(c.name); // Add R format column name
       makeColumns(c).forEach(function(c) {
         console.log((idx++) + ": " + c.name + " | " + c.vals.lut.length);
         table.addColumn(c.name, c.vals, null, true);
@@ -122,6 +174,19 @@ queue()
     }, []);
     self.matrix = matrix;
     show(matrix);
+
+    self.valueTables = {};
+    _.each(models, function(model_data, model){
+      self.valueTables[model] = {};
+      _.each(["coefs->Estimate", "fstatistic", "r.squared", "df"], function(propName){
+        var prop = propName.split("->");
+
+        self.valueTables[model][propName] = getValueTable(model_data, data, prop, model);
+      });
+    });
+
+
+
   });
 
 function makeColumns(col) {
@@ -175,7 +240,7 @@ function column(values) {
   for (var i=0, map=dict(vals.lut); i < values.length; ++i) {
     vals.push(map[values[i]]);
   }
-  vals.get = function(idx) { return this.lut[this[idx]]; }
+  vals.get = function(idx) { return this.lut[this[idx]]; };
   return vals;
 }
 
@@ -231,7 +296,7 @@ function bin(values, bins, min, max, step) {
   var range = def[1] - def[0],
       step  = def[2],
       uniq  = Math.ceil(range / step),
-      i, v, a = [], N = values.length;
+      i, v, a = [], N = values.length, idx;
   for (i=0; i<N; ++i) {
     v = values[i];
     if (v == null) {
@@ -250,7 +315,7 @@ function bin(values, bins, min, max, step) {
 }
 
 function minval(x) {
-  var m = Infinity, i=0, l=x.length;
+  var m = Infinity, i=0, l=x.length, v;
   for (; i<l; ++i){
     v = x[i];
     if (v < m) m = v;
@@ -259,7 +324,7 @@ function minval(x) {
 }
 
 function maxval(x) {
-  var m = -Infinity, i=0, l=x.length;
+  var m = -Infinity, i=0, l=x.length, v;
   for (; i<l; ++i){
     v = x[i];
     if (v > m) m = v;
@@ -325,21 +390,50 @@ function entropy(x) {
 // -- VISUALIZE
 // Show a distance matrix
 
-function show(mat) {
+
+function getTableValue(d, tableType, selectedVar){
+  if(tableType=="D"){
+    return d.dist;
+  }else if(tableType=="sl" || tableType=="sla"){
+    return _.values(d.value)[1];
+  }else{
+    if(d.type1=="numeric"){
+      return d.value;
+    }
+    return _.max(_.values(d.value),0);
+  }
+}
+
+function show(mat, tableType, selectedVar) {
+  self.mat = mat;//FIXME remove this after debugging!
+  tableType = tableType || "D";
+
+  console.log("mat=",mat ,'tableType=', tableType, "selectedVar=", selectedVar);
+
   var N = d3.max(mat, function(d) { return d.idx1; }) + 1,
       s = 10,
       w = N*s,
       h = N*s,
       m = 160;
 
-  var c = d3.scale.pow()
-    .exponent(6)
-    .domain([
-      d3.min(mat, function(d) { return d.dist; }),
-      d3.max(mat, function(d) { return d.dist; }),
-    ])
-    .range(["steelblue", "#efefef"]);
 
+
+  var cmin = tableType ==="D" ? d3.min(mat, function(d) { return getTableValue(d, tableType, selectedVar); }) :0;
+  var cmax = d3.max(mat, function(d) { return getTableValue(d, tableType, selectedVar); });
+
+  console.log("cmin=",cmin, " cmax=", cmax);
+
+  var c;
+  if(tableType=="D"){
+    c = d3.scale.pow()
+    .exponent(6)
+    .domain([cmin, cmax])
+    .range(["steelblue", "#efefef"]);
+  }else{
+    c = d3.scale.linear().domain([cmin, cmax]).range(["#efefef","steelblue"]);
+  }
+
+  d3.select("#left svg").remove();
   var svg = d3.select("#left").append("svg")
     .attr("width", w+m)
     .attr("height", h+m);
@@ -354,33 +448,56 @@ function show(mat) {
     .attr("y", function(d) { return d.idx2 * s; })
     .attr("width", s)
     .attr("height", s)
-    .style("fill", function(d) { return c(d.dist); })
+    .style("fill", function(d) { return c(getTableValue(d, tableType, selectedVar)); })
    .append("title")
-    .text(function(d) { return d.dist.toFixed(4) + " " + d.name1 + " x " + d.name2; })
-    .on("click", function(x){
+    .text(function(d) {
+      var tableValue = getTableValue(d, tableType, selectedVar);
+      if(!tableValue) console.log("-",d.value, d.type2);
+      return (tableValue || "-")+ " " + d.name2 + " ~ " + d.name1;
+    });
 
-    }); 
+  var cols;
+  // if(tableType=="D"){
+  //   cols = mat.filter(function(d) { return d.idx1 === 0 || d.idx1 == 1 && d.idx2 === 0; });
+  // }else{
+    cols = _.map(_.groupBy(mat, "idx1"), 0); //select on per each col
+  // }
 
   g.selectAll("text.left")
-    .data(mat.filter(function(d) { return d.idx1 == 0 || d.idx1 == 1 && d.idx2 == 0; }))
+    .data(cols)
    .enter().append("text")
     .attr("x", 0)
-    .attr("y", function(d) { return d.idx2 * s; })
+    .attr("y", function(d) { return d.idx1 * s; })
     .attr("dx", -2)
     .attr("dy", "0.78em")
     .attr("text-anchor", "end")
-    .text(function(d) { return d.name2; })
+    .text(function(d) { return d.name1; })
     .style("font", "9px Helvetica Neue");
 
   g.selectAll("text.top")
-    .data(mat.filter(function(d) { return d.idx1 == 0 || d.idx1 == 1 && d.idx2 == 0; }))
+    .data(cols)
    .enter().append("g")
-    .attr("transform", function(d) { return "translate("+(d.idx2*s)+",0)"; })
+    .attr("transform", function(d) { return "translate("+(d.idx1*s)+",0)"; })
    .append("text")
     .attr("dx", 2)
     .attr("dy", "0.78em")
     .attr("text-anchor", "start")
     .attr("transform", "rotate(-90)")
-    .text(function(d) { return d.name2; })
+    .text(function(d) { return d.name1; })
     .style("font", "9px Helvetica Neue");
 }
+$(function(){
+  var onChange = function(){
+    var type = $("#vartype").val();
+    var propName = $("#proptype").val();
+    if(type=="D"){
+      show(self.matrix)
+    }else{
+      console.log("onChange", type, propName);
+
+      show(self.valueTables[type][propName], type, propName);
+    }
+  };
+  $("#vartype").on("change", onChange);
+  $("#proptype").on("change", onChange);
+});
