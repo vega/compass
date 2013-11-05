@@ -1,6 +1,6 @@
 "use strict";
 
-/* global _, console, queue, d3, dv, alert, $ */
+/* global _, console, queue, d3, dv, alert, $, vg */
 
 if (typeof String.prototype.startsWith != 'function') {
   String.prototype.startsWith = function (str){
@@ -9,6 +9,57 @@ if (typeof String.prototype.startsWith != 'function') {
 }
 
 var datafile = "data/movies.json", table;
+
+function getSpec(titleX,titleY){
+  return {
+    "width": 200,
+    "height": 200,
+    "data": [
+      {"name":"datatable"}
+    ],
+    "scales": [
+      {
+        "name": "x",
+        "nice": true,
+        "range": "width",
+        "domain": {"data": "datatable", "field":"data.x"}
+      },
+      {
+        "name": "y",
+        "nice": true,
+        "range": "height",
+        "domain": {"data": "datatable", "field":"data.y"}
+      }
+    ],
+    "axes": [
+      {"type": "x", "scale": "x", "offset": 5, "ticks": 5, "title": titleX},
+      {"type": "y", "scale": "y", "offset": 5, "ticks": 5, "title": titleY}
+    ],
+    "marks": [
+      {
+        "type": "symbol",
+        "from": {"data": "datatable"},
+        "properties": {
+          "enter": {
+            "x": {"scale": "x", "field": "data.x"},
+            "y": {"scale": "y", "field": "data.y"},
+            "fill": "black",
+            "fillOpacity": {"value": 0.5}
+          },
+          "update": {
+            "size": {"value": 20},
+            "stroke": {"value": "transparent"}
+          },
+          "hover": {
+            "size": {"value": 300},
+            "stroke": {"value": "white"}
+          }
+        }
+      }
+    ]
+  };
+}
+
 
 var self = {};
 
@@ -140,6 +191,7 @@ queue()
 
     //create data table
     table = dv.table();
+    self.data = data;
     var idx = 0;
     data.forEach(function(c, i, data){
       console.log(c);
@@ -430,7 +482,7 @@ function show(mat, tableType, selectedVar) {
     .domain([cmin, cmax])
     .range(["steelblue", "#efefef"]);
   }else{
-    c = d3.scale.linear().domain([cmin, cmax]).range(["#efefef","steelblue"]);
+    c = d3.scale.pow().exponent(0.5).domain([cmin, cmax]).range(["#efefef","steelblue"]);
   }
 
   d3.select("#left svg").remove();
@@ -449,6 +501,7 @@ function show(mat, tableType, selectedVar) {
     .attr("width", s)
     .attr("height", s)
     .style("fill", function(d) { return c(getTableValue(d, tableType, selectedVar)); })
+    .on("click", function(d){ showChart(d,tableType);})
    .append("title")
     .text(function(d) {
       var tableValue = getTableValue(d, tableType, selectedVar);
@@ -486,6 +539,31 @@ function show(mat, tableType, selectedVar) {
     .text(function(d) { return d.name1; })
     .style("font", "9px Helvetica Neue");
 }
+
+function showChart(d, tableType){
+  var i, datatable=[];
+  if(tableType == "D"){
+    for(i=0; i<table[d.idx1].length ; i++){
+      datatable.push({x: table.get(d.idx1, i), y: table.get(d.idx2, i)});
+    }
+  }else{
+    for(i=0; i<self.data[d.idx1].values.length ; i++){
+      datatable.push({x: self.data[d.idx1].values[i], y: self.data[d.idx2].values[i]});
+    }
+  }
+  var spec = getSpec(d.name1, d.name2);
+  console.log("spec=",spec, "datatable=", datatable);
+  vg.parse.spec(spec, function(chart) {
+    chart({
+      el:"#right",
+      data: {datatable: datatable}
+    }).update();
+  });
+
+
+}
+
+
 $(function(){
   var onChange = function(){
     var type = $("#vartype").val();
