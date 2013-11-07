@@ -1,11 +1,11 @@
 $iconSpritePath: "../images/glyphicons-halflings.png";
 $iconWhiteSpritePath: "../images/glyphicons-halflings-white.png";
 
-@import "bootstrap-sass/lib/bootstrap";
-
+//@import "bootstrap-sass/lib/bootstrap";
+@import "pure/base.css";
 /* Put your CSS here */
 html, body {
-  margin: 20px;
+  margin: 0px;
 }
 
 body {
