@@ -1,7 +1,7 @@
 $iconSpritePath: "../images/glyphicons-halflings.png";
 $iconWhiteSpritePath: "../images/glyphicons-halflings-white.png";
 
-//@import "bootstrap-sass/lib/bootstrap";
+@import "bootstrap-sass/lib/bootstrap";
 @import "pure/base.css";
 /* Put your CSS here */
 html, body {
@@ -30,3 +30,36 @@ body {
     line-height: 1;
     letter-spacing: -1px;
 }
+
+
+.bar rect {
+  fill: steelblue;
+  shape-rendering: crispEdges;
+}
+
+.bar text {
+  fill: #fff;
+}
+
+.axis path, .axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.tick text{
+  font-size: 8px;
+}
+
+.block-1d{
+
+  .block-histogram{
+
+    .chart-name{
+      font-size: 12px;
+    }
+  }
+
+}
+
+

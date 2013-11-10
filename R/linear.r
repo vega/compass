@@ -27,7 +27,7 @@ dataFrameFromJSON = function(json_file){
 
 not <- function(f){ return(function(x) !f(x))} # create not(f(x)) = !f(x)
 
-df <- dataFrameFromJSON(paste(readLines(json), collapse="")) 
+df <- dataFrameFromJSON(paste(readLines(json), collapse=""))
 
 
 
@@ -42,7 +42,7 @@ num_ids = which(sapply(df,not(is.factor)))
 if(DATASET == "movies"){
   ## remove title from the list as it's just the key of the data
   title_index = grep("Title", colnames(df))
-  cat_ids = setdiff(cat_ids, c(title_index))   
+  cat_ids = setdiff(cat_ids, c(title_index))
 }
 
 num_vars = names_df[num_ids]
@@ -50,7 +50,7 @@ cat_vars = names_df[cat_ids]
 all_vars = c(num_vars, cat_vars)
 
 ##scale all numerical data so it coefficient in the models can be compared
-unscaled_df <- df 
+unscaled_df <- df
 df[,num_ids] <- scale(df[,num_ids])
 
 
@@ -82,18 +82,18 @@ get_all_long_linear_formulae <- function(Y, X) sapply(
 export_json <- function(summaries, filename){
   attr <- c("fstatistic","r.squared", "df")
   coef_colnames <- colnames(summaries[[1]]$coefficients)
-  
+
   to_export <- lapply(summaries, function(s){
     #put all attribute in ex_s
-    ex_s = sapply(attr, function(a) s[a], USE.NAMES=F) 
+    ex_s = sapply(attr, function(a) s[a], USE.NAMES=F)
     #then convert coefficient table to nested list format (for JSON export)
-    ex_s$coefs <- sapply(coef_colnames, function(col) list(s$coefficients[,col]), USE.NAMES=T) 
+    ex_s$coefs <- sapply(coef_colnames, function(col) list(s$coefficients[,col]), USE.NAMES=T)
     return(ex_s)
   })
-  
+
   sink(paste(output_path, filename,sep=""))
   cat(toJSON(to_export))
-  sink() #"close file"  
+  sink() #"close file"
 }
 
 run_and_sum_all <- function(formulae, fn=lm, ...){
@@ -107,7 +107,7 @@ long_num_num = get_all_long_linear_formulae(num_vars,num_vars)
 sum_simple_num_num = run_and_sum_all(simple_num_num)
 sum_long_num_num = run_and_sum_all(long_num_num)
 
-export_json(sum_simple_num_num, "simple_linear.json") 
+export_json(sum_simple_num_num, "simple_linear.json")
 export_json(sum_long_num_num, "long_linear.json")
 
 
@@ -115,24 +115,24 @@ export_json(sum_long_num_num, "long_linear.json")
 ## ANALYSIS OF SIMPLE NUM ~ NUM
 function analyse_simple_num_num(sum_simple_num_num){
   estimate <- sapply(sum_simple_num_num, function(s) s$coefficients[1,2])
-  s_estimate <- estimate[sort.list(estimate, decreasing=T)]   
+  s_estimate <- estimate[sort.list(estimate, decreasing=T)]
 }
 
 ## ANALYSIS OF LONG NUM ~ NUM
 function analyse_long_num_num(sum_long_num_num){
-  
+
   estimate <- lapply(sum_long_num_num, function(s) s$coefficients[,1])
   max_estimate <- apply(estimate, 2, max)
-  s_estimate <- estimate[sort.list(estimate, decreasing=T)]   
+  s_estimate <- estimate[sort.list(estimate, decreasing=T)]
   head(s_estimate)
-  
+
   ## recreate table with NA values (since the extracted estimates
   ## won't include depedent variable in coefficients.
   est_table <- sapply(c("(Intercept)",num_vars), function(var) lapply(
     1:length(estimate), function(i) estimate[[i]][var], USE.NAMES=T)
   )
   names(est_table) <- c("(Intercept)",num_vars)  ## assign the right name for each variable
-  ## write to table so we can easily 
+  ## write to table so we can easily
   write.table(est_table, paste(output_path,"/est.tsv",sep=""), sep="\t", col.names=NA)
 }
 
@@ -152,16 +152,16 @@ export_json(sum_long_num_all, "long_linear_all.json")
 # function analyse_long_num_all(sum_long_num_all){
 #   estimate <- lapply(sum_long_num_all, function(s) s$coefficients[,1])
 #   max_estimate <- apply(estimate, 2, max)
-#   s_estimate <- estimate[sort.list(estimate, decreasing=T)]   
+#   s_estimate <- estimate[sort.list(estimate, decreasing=T)]
 #   head(s_estimate)
-#   
+#
 #   ## recreate table with NA values (since the extracted estimates
 #   ## won't include depedent variable in coefficients.
 #   est_table <- sapply(c("(Intercept)",num_vars), function(var) lapply(
 #     1:length(estimate), function(i) estimate[[i]][var], USE.NAMES=T)
 #   )
 #   names(est_table) <- c("(Intercept)",num_vars) ## assign the right name for each variable
-#   ## write to table so we can easily 
+#   ## write to table so we can easily
 #   write.table(est_table, paste(output_path,"/sum_long_num_all.tsv",sep=""), sep="\t", col.names=NA)
 # }
 

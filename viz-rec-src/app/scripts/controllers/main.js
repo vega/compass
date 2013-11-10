@@ -1,10 +1,12 @@
 'use strict';
 
 angular.module('vizRecSrcApp')
-  .controller('MainCtrl', function ($scope) {
-    $scope.awesomeThings = [
-      'HTML5 Boilerplate',
-      'AngularJS',
-      'Karma'
-    ];
+  .controller('MainCtrl', function ($scope, dataManager) {
+    dataManager.load("data/movies.json", "movies", function callback(data){
+      console.log("data loaded!");
+      $scope.data = data.raw_data;
+    });
+
+
+
   });
