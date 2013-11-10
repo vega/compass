@@ -61,7 +61,7 @@ angular.module('vizRecSrcApp')
       //Code modified from http://bl.ocks.org/mbostock/3048450
 
       var formatCount = d3.format(",.0f");
-      var values = field.values;
+      var values = field;
       var isNumeric = field.type=="numeric";
 
       var margin = {top: 5, right: 5, bottom: isNumeric ? 15 : 8, left: 5},

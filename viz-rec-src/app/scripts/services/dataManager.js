@@ -21,15 +21,11 @@ angular.module('vizRecSrcApp')
 
         key = key || _.last(path.split("/")).split(".")[0];
         $http.get(path).success(function loadData(data){
+          data = self._[key] = dv.table(data);
           for(var i=0; i<data.length; i++){
-            data[i].count = count(data[i].values);
+            data[i].count = count(data[i]);
           }
-
-          self._[key] = {
-            raw_data: data,
-            table: dv.table(data),
-          };
-          if(callback) callback(self._[key]);
+          if(callback) callback(data);
         });
       },
       get: function(key){
