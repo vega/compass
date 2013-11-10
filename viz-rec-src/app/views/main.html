@@ -1,8 +1,9 @@
 <div class="pure-g">
     <div class="pure-u-1-3">
+        <!--<div class="block-1d">-->
         <div ng-repeat="col in data" class="block-1d">
             <span class="chart-name">{{col.name}}</span>
-            <histogram field="col" width="100" height="50"></histogram>
+            <histogram field="col" bin="20" width="100" height="50"></histogram>
 
         </div>
 
