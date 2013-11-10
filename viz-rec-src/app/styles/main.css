@@ -1,4 +1,5 @@
-@import url(pure/base.css);
+@import url(../bower_components/pure/base.css);
+@import url(../bower_components/pure/grids-min.css);
 /* Put your CSS here */
 html, body {
   margin: 0px; }
@@ -45,3 +46,5 @@ body {
 .block-1d .chart-name {
   font-size: 10px;
   text-align: center; }
+.block-1d:hover {
+  background-color: #eeeeee; }
