@@ -62,10 +62,16 @@ angular.module('vizRecSrcApp')
 
       var formatCount = d3.format(",.0f");
       var values = field.values;
+      var isNumeric = field.type=="numeric";
 
-      var margin = {top: 15, right: 15, bottom: 15, left: 15},
-        width = attrs.width || 100 - margin.left - margin.right,
+      var margin = {top: 5, right: 5, bottom: isNumeric ? 15 : 8, left: 5},
+        width = (attrs.width || 100) - margin.left - margin.right,
         height = (attrs.height || 50) - margin.top - margin.bottom;
+
+      var isXNull = function(d){ return d.x ===null || d.x =="";};
+      var titleText = function (d) {
+        return d.x + "(" + formatCount(d.y) + ")";
+      };
 
       var x, y,data,yMax, xAxis, yAxis, bar;
 
@@ -79,7 +85,7 @@ angular.module('vizRecSrcApp')
 
       //TODO here scale should be flexible between linear and ordinal
 
-      if(field.type=="numeric"){
+      if(isNumeric){
         x = d3.scale.linear().domain([d3.min(values), d3.max(values)]).nice().range([0, width]);
 
         // Generate a histogram using twenty uniformly-spaced bins.
@@ -119,17 +125,17 @@ angular.module('vizRecSrcApp')
 //            .attr("y", 6)
 //            .attr("x", x(data[0].dx) / 2)
 //            .attr("text-anchor", "middle")
-          .text(function (d) {
-            //TODO(kanitw): add bin name
-            return formatCount(d.y);
-          });
+          .text(titleText);
 
         svg.append("g")
           .attr("class", "x axis")
           .attr("transform", "translate(0," + height + ")")
           .call(xAxis);
       }else{
-        data = _(field.count).sortBy(1).map(function(d){return{x: d[0], y:d[1]};}).value();
+        data = _(field.count).sortBy(1)
+          .last(width/2) //reduce problem for categorical value that has more than width/2
+          .reverse()
+          .map(function(d){return{x: d[0], y:d[1]};}).value();
         x = d3.scale.ordinal().domain(_.pluck(data,'x')).rangeBands([0, width]);
 
         yMax = d3.max(data, function (d) {
@@ -142,7 +148,11 @@ angular.module('vizRecSrcApp')
           : d3.scale.linear().domain([0, yMax]).range([height, 0])
         ;
 
-        xAxis = d3.svg.axis().scale(x).orient("bottom")
+        xAxis = d3.svg.axis()
+          .scale(x).orient("bottom")
+          .innerTickSize(1)
+          .tickFormat(function(x){return "";}); // no label for categorical
+
 
 
         bar = svg.selectAll(".bar")
@@ -159,15 +169,13 @@ angular.module('vizRecSrcApp')
           .attr("height", function (d) {
             return height - y(d.y);
           })
+          .classed("null", isXNull)
           .append("svg:title")
 //            .attr("dy", ".75em")
 //            .attr("y", 6)
 //            .attr("x", x(data[0].dx) / 2)
 //            .attr("text-anchor", "middle")
-          .text(function (d) {
-            //TODO(kanitw): add bin name
-            return formatCount(d.y);
-          });
+          .text(titleText);
 
         svg.append("g")
           .attr("class", "x axis")

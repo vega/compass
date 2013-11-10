@@ -26,6 +26,10 @@ body {
 .bar rect {
   fill: steelblue;
   shape-rendering: crispEdges; }
+  .bar rect:hover {
+    fill: orange; }
+  .bar rect.null {
+    fill: red; }
 
 .bar text {
   fill: #fff; }
@@ -39,4 +43,5 @@ body {
   font-size: 8px; }
 
 .block-1d .chart-name {
-  font-size: 10px; }
+  font-size: 10px;
+  text-align: center; }

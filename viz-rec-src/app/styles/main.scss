@@ -35,6 +35,14 @@ body {
 .bar rect {
   fill: steelblue;
   shape-rendering: crispEdges;
+
+  &:hover{
+    fill: orange;
+  }
+
+  &.null{
+    fill: red;
+  }
 }
 
 .bar text {
@@ -54,6 +62,7 @@ body {
 .block-1d{
   .chart-name{
     font-size: 10px;
+    text-align: center;
   }
   .block-histogram{
 
