@@ -57,7 +57,7 @@ angular.module('vizRecSrcApp')
       };
     }
 
-    function redrawHistogram(field, attrs, element) {
+    function redrawHistogram(field, attrs, svgParent) {
       //Code modified from http://bl.ocks.org/mbostock/3048450
 
       var formatCount = d3.format(",.0f");
@@ -76,7 +76,7 @@ angular.module('vizRecSrcApp')
       var x, y,data,yMax, xAxis, yAxis, bar;
 
       //TODO(kanitw): take care of enter/exit here.
-      var svg = d3.select(element[0]).append("svg")
+      var svg = d3.select(svgParent).append("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
         .append("g")
@@ -133,9 +133,12 @@ angular.module('vizRecSrcApp')
           .call(xAxis);
       }else{
         data = _(field.count).sortBy(1)
+          //TODO(kanitw): deal with the next line better
           .last(width/2) //reduce problem for categorical value that has more than width/2
           .reverse()
           .map(function(d){return{x: d[0], y:d[1]};}).value();
+
+        //TODO(kanitw) pluck here is not good for performance
         x = d3.scale.ordinal().domain(_.pluck(data,'x')).rangeBands([0, width]);
 
         yMax = d3.max(data, function (d) {
@@ -203,10 +206,11 @@ angular.module('vizRecSrcApp')
 //            });
             // A formatter for counts.
 
-            redrawHistogram(field, attrs, element);
+            redrawHistogram(field, attrs, element[0]);
 
           }
         });
+        //TODO(kanitw): take care of redraw
 //        if(scope.field){
 //          redrawHistogram(scope.field, attrs, element);
 //        }
