@@ -9,7 +9,7 @@ angular.module('vizRecSrcApp')
       if(xField.type != "nominal" || xField.type != "nominal")
         return;
 
-      console.log(xField.count.length, yField.count.length);
+      console.log(xField.countTable.length, yField.countTable.length);
       console.log("type of x,y =", xField.type, yField.type);
 
       var counts = scope.dataTable.query({dims: [yField.index, xField.index], vals:[dv.count()]});
@@ -26,12 +26,12 @@ angular.module('vizRecSrcApp')
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-      var x, y,data,yMax, xAxis, yAxis, rect, c;
+      var x, y,data, yMax, xAxis, yAxis, rect, c;
 
 
       //TODO pluck, last is not efficient here, cutting top stuff is not that great
-      var xDomain = _(xField.count).sortBy(1).last(width/2).reverse()
-        .pluck(0).value();
+      var xDomain = _(xField.countTable).sortBy("count").last(width/2).reverse()
+        .pluck("val").value();
       var makeIndicesMap = function(array){
         return array.reduce(function(map, cur, index){
 //          console.log(array, map, cur, index);
@@ -41,8 +41,8 @@ angular.module('vizRecSrcApp')
       };
 
       //TODO pluck, last is not efficient here, cutting top stuff is not that great
-      var yDomain = _(yField.count).sortBy(1).last(height/2).reverse()
-        .pluck(0).value();
+      var yDomain = _(yField.countTable).sortBy("count").last(height/2).reverse()
+        .pluck("val").value();
       var xDomainMap = makeIndicesMap(xDomain), yDomainMap = makeIndicesMap(yDomain);
 
 //      console.log("domains: ", xDomain, yDomain);
@@ -57,10 +57,10 @@ angular.module('vizRecSrcApp')
 
 //      console.log("rangeBand", x.rangeBand(), y.rangeBand());
 
-      xAxis = d3.svg.axis()
-        .scale(x).orient("bottom")
-        .innerTickSize(1)
-        .tickFormat(function(x){return "";}); // no label for categorical
+//      xAxis = d3.svg.axis()
+//        .scale(x).orient("bottom")
+//        .innerTickSize(1)
+//        .tickFormat(function(x){return "";}); // no label for categorical
 
       rect = svg.selectAll(".rect")
         .data(d3.range(0,counts[0].length))
@@ -83,10 +83,10 @@ angular.module('vizRecSrcApp')
 //            .attr("text-anchor", "middle")
         .text(function(i){ return counts[0][i] +","+ counts[1][i] +","+ counts[2][i]; });
 
-      svg.append("g")
-        .attr("class", "x axis")
-        .attr("transform", "translate(0," + height + ")")
-        .call(xAxis);
+//      svg.append("g")
+//        .attr("class", "x axis")
+//        .attr("transform", "translate(0," + height + ")")
+//        .call(xAxis);
 
     }
 
