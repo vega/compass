@@ -2,13 +2,15 @@ $iconSpritePath: "../images/glyphicons-halflings.png";
 $iconWhiteSpritePath: "../images/glyphicons-halflings-white.png";
 
 //@import "bootstrap-sass/lib/bootstrap";
-@import "pure/base.css";
+@import "../bower_components/pure/base.css";
+@import "../bower_components/pure/grids-min.css";
 /* Put your CSS here */
 html, body {
   margin: 0px;
 }
 
 body {
+  font-size: 12px;
     background: #fafafa;
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     color: #333;

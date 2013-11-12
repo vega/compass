@@ -1,5 +1,8 @@
 <div class="pure-g">
     <div class="pure-u-1-5">
+        <select>
+            <option>Normality of the Distribution</option>
+        </select>
         <!--<div class="block-1d" ng-init="col=data[0]">-->
         <div ng-repeat="col in dataTable" class="block-1d">
             <a ng-click="select(col)">
@@ -9,6 +12,9 @@
         </div>
     </div>
     <div class="pure-u-4-5">
+        <select>
+            <option>Distance Metric</option>
+        </select>
         <div ng-repeat="pair in colPairs" class="block-2d">
             <heatmap pair="pair"/>
         </div>
