@@ -6,8 +6,7 @@
         <!--<div class="block-1d" ng-init="col=data[0]">-->
         <div ng-repeat="col in dataTable" class="block-1d">
             <a ng-click="select(col)">
-                <span class="chart-name">{{col.name}}</span>
-                <histogram field="col" width="120" height="40" yScale=""></histogram>
+                <chart1d col="col">
             </a>
         </div>
     </div>
@@ -16,7 +15,7 @@
             <option>Distance Metric</option>
         </select>
         <div ng-repeat="pair in colPairs" class="block-2d">
-            <heatmap pair="pair"/>
+            <chart2d pair="pair"/>
         </div>
     </div>
 </div>

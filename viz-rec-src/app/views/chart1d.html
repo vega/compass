@@ -1,0 +1,13 @@
+<div>
+    <span class="chart-name">
+        <a ng-click="select(col);">{{col.name}}</a>
+    </span>
+    <span class="pull-right" ng-show="col.type!='numeric'">
+        <a href="" ng-click="toggleChartType()">T</a>
+    </span>
+</div>
+<div class="chart" ng-switch="col.type">
+    <svg><g></g></svg>
+    <!--<histogram field="col" width="120" height="40" yScale="" ng-switch-when="numeric"></histogram>-->
+    <!--<stack1d  field="col" width="120" height="20" ng-switch-default></stack1d>-->
+</div>

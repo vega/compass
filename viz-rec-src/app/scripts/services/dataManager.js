@@ -17,21 +17,32 @@ angular.module('vizRecSrcApp')
     var dataManager = {
       /** data arrays */
       _: [],
-      load: function(path,key, callback){
+      currentData: null,
+      load: function(path,key, saveData, callback){
         var self=this;
+        var bin20 = dv.bin(20);
 
         key = key || _.last(path.split("/")).split(".")[0];
         $http.get(path).success(function loadData(data){
           data = self._[key] = dv.table(data);
-          for(var i=0; i<data.length; i++){
+          if(saveData) self.currentData = data;
+
+          var originalDataLength = data.length;
+
+          for(var i=0; i<originalDataLength; i++){
             data[i].countTable = countTable(data[i]);
-//            data[i].bin20 = dv.bin()
+
+            if (data[i].type == dv.type.numeric){
+              var binned = dv.bin(20).array(data[i]);
+              data[i].bin20 = data.addColumn(data[i].name+":bin20", binned, dv.type.ordinal);
+              data[i].bin20.countTable = countTable(data[i].bin20);
+            }
           }
           if(callback) callback(data);
         });
       },
       get: function(key){
-        return _[key];
+        return key ? _[key] : this.currentData;
       },
       remove: function(key){
         delete _[key];
