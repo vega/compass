@@ -170,7 +170,7 @@ function bin(values, bins, min, max, step) {
   for (i=0; i<N; ++i) {
     v = values[i];
     if (v == null) {
-      idx = unique;
+      idx = uniq;
     } else if (v < def[0] || v > def[1])
       idx = -1;
     else if (v == def[1]) {
