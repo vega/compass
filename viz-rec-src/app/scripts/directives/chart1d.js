@@ -7,31 +7,27 @@ angular.module('vizRecSrcApp')
       stack1d: "stack1d"
     }
 
-    function updateChart(chart, col, attrs, scope) {
-      if(col.type == dv.type.numeric || scope.chartType == chartType.histogram)
-        drawHistogram(chart, col, attrs);
-      else
-        drawStack1d(chart, col, attrs);
-    }
+    //TODO(kanitw): move these to helper class
+    var formatCount = d3.format(",.0f");
+    var isFieldNull = function(field){
+      return function (d) {
+        return d[field] === null || d[field] == "";
+      };
+    };
+    var titleText = function (xField, yField) {
+      return function (d) {
+        return d[xField || "x"] + "(" + formatCount(d[yField || "y"]) + ")";
+      }
+    };
+
 
     function drawHistogram(chart, col, attrs) {
       //Code modified from http://bl.ocks.org/mbostock/3048450
-
-      var formatCount = d3.format(",.0f");
       var isNumeric = col.type == "numeric";
 
       var margin = {top: 5, right: 5, bottom: isNumeric ? 15 : 8, left: 5},
         width = (attrs.width || 120) - margin.left - margin.right,
         height = (attrs.height || 50) - margin.top - margin.bottom;
-
-      var isXNull = function (d) {
-        return d.x === null || d.x == "";
-      };
-      var titleText = function (xField, yField) {
-        return function (d) {
-          return d[xField || "x"] + "(" + formatCount(d[yField || "y"]) + ")";
-        }
-      };
 
       var x, y, data, yMax, xAxis, yAxis, bar;
 
@@ -52,7 +48,7 @@ angular.module('vizRecSrcApp')
           return d.y;
         });
 
-        y = attrs.yScale == "log" ?
+        y = attrs.yScaleLog ?
           d3.scale.log().domain([1, yMax]).range([height, 0])
           : d3.scale.linear().domain([0, yMax]).range([height, 0])
         ;
@@ -80,6 +76,7 @@ angular.module('vizRecSrcApp')
           .attr("height", function (d) {
             return height - y(d.y);
           })
+          .classed("null", isFieldNull("x"))
           .append("svg:title")
 //            .attr("dy", ".75em")
 //            .attr("y", 6)
@@ -108,7 +105,7 @@ angular.module('vizRecSrcApp')
 //          return "(" + d.val + "," + d.count + ")";
 //        }).join(","), yMax);
 
-        y = attrs.yScale == "log" ?
+        y = attrs.yScaleLog ?
           d3.scale.log().domain([1, yMax]).range([height, 0])
           : d3.scale.linear().domain([0, yMax]).range([height, 0])
         ;
@@ -134,7 +131,7 @@ angular.module('vizRecSrcApp')
           .attr("height", function (d) {
             return height - y(d.count);
           })
-          .classed("null", isXNull)
+          .classed("null", isFieldNull("val"))
           .append("svg:title")
 //            .attr("dy", ".75em")
 //            .attr("y", 6)
@@ -154,21 +151,11 @@ angular.module('vizRecSrcApp')
     function drawStack1d(chart, col, attrs) {
       //Code modified from http://bl.ocks.org/mbostock/3048450
 
-      var formatCount = d3.format(",.0f");
       var isNumeric = col.type == "numeric";
 
       var margin = {top: 5, right: 5, bottom: isNumeric ? 15 : 8, left: 5},
         width = (attrs.width || 120) - margin.left - margin.right,
         height = (attrs.height || 30) - margin.top - margin.bottom;
-
-      var isXNull = function (d) {
-        return d.x === null || d.x == "";
-      };
-      var titleText = function (xField, yField) {
-        return function (d) {
-          return d[xField || "x"] + "(" + formatCount(d[yField || "y"]) + ")";
-        }
-      };
 
       var x, y, data, yMax, xAxis, yAxis, bar;
 
@@ -214,13 +201,21 @@ angular.module('vizRecSrcApp')
         .style("fill", function (d) {
           return c(d.count);
         })
-        .classed("null", isXNull)
+        .classed("null", isFieldNull("val"))
         .append("svg:title")
 //            .attr("dy", ".75em")
 //            .attr("y", 6)
 //            .attr("x", x(data[0].dx) / 2)
 //            .attr("text-anchor", "middle")
         .text(titleText("val", "count"));
+    }
+
+
+    function updateChart(chart, col, attrs, scope) {
+      if(col.type == dv.type.numeric || scope.chartType == chartType.histogram)
+        drawHistogram(chart, col, attrs);
+      else
+        drawStack1d(chart, col, attrs);
     }
 
     return {
@@ -247,6 +242,13 @@ angular.module('vizRecSrcApp')
           }
           updateChart(element.find(".chart")[0], scope.col, attrs, scope);
         }
+
+        scope.toggleLogTransform = function(){
+          attrs.yScaleLog = !attrs.yScaleLog;
+          console.log("log", attrs.yScaleLog);
+          updateChart(element.find(".chart")[0], scope.col, attrs, scope);
+        }
+
       },
       scope: {
         col: "=",
