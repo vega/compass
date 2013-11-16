@@ -20,8 +20,11 @@ angular.module('vizRecSrcApp')
       }
     };
 
+    function drawHorizontalHistogram(chart, col, attrs){
 
-    function drawHistogram(chart, col, attrs) {
+    }
+
+    function drawVerticalHistogram(chart, col, attrs) {
       //Code modified from http://bl.ocks.org/mbostock/3048450
       var isNumeric = col.type == "numeric";
 
@@ -30,121 +33,76 @@ angular.module('vizRecSrcApp')
         height = (attrs.height || 50) - margin.top - margin.bottom;
 
       var x, y, data, yMax, xAxis, yAxis, bar;
+      var yField, xField, xAxisTickFormat, barWidth, innerTickSize=6;
 
-      //TODO(kanitw): take care of enter/exit here.
       var svg =  d3.select(chart).select("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
         .select("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-      if (isNumeric) {
+      if (isNumeric){
+        xField = "x"; yField="y";
         x = d3.scale.linear().domain([d3.min(col), d3.max(col)]).nice().range([0, width]);
-
-        // Generate a histogram using twenty uniformly-spaced bins.
         data = d3.layout.histogram().bins(x.ticks(20))(col);
+        xAxisTickFormat = function (d) {
+          return _.isNumber(d) && d > 10000 ? d.toPrecision(2) : d;
+        }
+        barWidth = x(data[0].dx) - 1;
+      }else{
+        xField = "val"; yField="count";
 
-        yMax = d3.max(data, function (d) {
-          return d.y;
-        });
-
-        y = attrs.yScaleLog ?
-          d3.scale.log().domain([1, yMax]).range([height, 0])
-          : d3.scale.linear().domain([0, yMax]).range([height, 0])
-        ;
-
-        xAxis = d3.svg.axis()
-          .scale(x)
-          .orient("bottom")
-          .ticks(2)
-          .tickFormat(function (d) {
-            return _.isNumber(d) && d > 10000 ? d.toPrecision(2) : d;
-          });
-
-        bar = svg.selectAll(".bar").data(data);
-
-        bar.exit().remove();
-
-        bar.enter().append("g")
-          .attr("class", "bar")
-          .attr("transform", function (d) {
-            return "translate(" + x(d.x) + "," + y(d.y) + ")";
-          })
-          .append("rect")
-          .attr("x", 1)
-          .attr("width", x(data[0].dx) - 1)
-          .attr("height", function (d) {
-            return height - y(d.y);
-          })
-          .classed("null", isFieldNull("x"))
-          .append("svg:title")
-//            .attr("dy", ".75em")
-//            .attr("y", 6)
-//            .attr("x", x(data[0].dx) / 2)
-//            .attr("text-anchor", "middle")
-          .text(titleText());
-
-        svg.append("g")
-          .attr("class", "x axis")
-          .attr("transform", "translate(0," + height + ")")
-          .call(xAxis);
-      } else {
         //TODO(kanitw): please please use datavore to query these
         data = _(col.countTable).sortBy("count")
           .last(width / 2) //reduce problem for categorical value that has more than width/2
           .reverse()
           .value();
-
-//        //TODO(kanitw) pluck here is not good for performance
         x = d3.scale.ordinal().domain(_.pluck(data, 'val')).rangeBands([0, width]);
+        xAxisTickFormat = function(x){return "";};
+        barWidth = x.rangeBand() -1;
+        innerTickSize = 1
+      }
 
-        yMax = d3.max(data, function (d) {
-          return d.count;
-        });
-//        console.log(_.map(data,function (d) {
-//          return "(" + d.val + "," + d.count + ")";
-//        }).join(","), yMax);
+//      yMax = _.max(data, yField);
+      yMax = d3.max(data, function(d){ return d[yField]; });
+      y = attrs.yScaleLog ?
+        d3.scale.log().domain([1, yMax]).range([height, 0])
+        : d3.scale.linear().domain([0, yMax]).range([height, 0])
+      ;
 
-        y = attrs.yScaleLog ?
-          d3.scale.log().domain([1, yMax]).range([height, 0])
-          : d3.scale.linear().domain([0, yMax]).range([height, 0])
-        ;
+      xAxis = d3.svg.axis().scale(x).orient("bottom").ticks(2).innerTickSize(innerTickSize)
+        .tickFormat(xAxisTickFormat);
 
-        xAxis = d3.svg.axis()
-          .scale(x).orient("bottom")
-          .innerTickSize(1)
-          .tickFormat(function (x) {
-            return "";
-          }); // no label for categorical
+      bar = svg.selectAll(".bar").data(data);
+      bar.exit().remove();
 
-
-        bar = svg.selectAll(".bar").data(data);
-        bar.exit().remove();
-        bar.enter().append("g")
+      _.each([bar, bar.enter()], function(b){
+        b.append("g")
           .attr("class", "bar")
           .attr("transform", function (d) {
-            return "translate(" + x(d.val) + "," + y(d.count) + ")";
+            return "translate(" + x(d[xField]) + "," + y(d[yField]) + ")";
           })
           .append("rect")
           .attr("x", 1)
-          .attr("width", x.rangeBand() - 1)
+          .attr("width", barWidth)
           .attr("height", function (d) {
-            return height - y(d.count);
+            return height - y(d[yField]);
           })
-          .classed("null", isFieldNull("val"))
+          .classed("null", isFieldNull(xField))
           .append("svg:title")
 //            .attr("dy", ".75em")
 //            .attr("y", 6)
 //            .attr("x", x(data[0].dx) / 2)
 //            .attr("text-anchor", "middle")
-          .text(titleText);
+          .text(titleText(xField, yField));
+      });
 
-        svg.append("g")
-          .attr("class", "x axis")
-          .attr("transform", "translate(0," + height + ")")
-          .call(xAxis);
+      svg.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + height + ")")
+        .call(xAxis);
 
-      }
+
 
     }
 
@@ -176,44 +134,42 @@ angular.module('vizRecSrcApp')
         return d;
       }).value();
 
-//        for(var i = 0, countCum = 0 ; i<field.countTable.length ; i++){
-//          field.countTable[i].countCum = countCum = countCum + field.countTable[i].count;
-//        }
-
-
       x = d3.scale.linear().domain([0, col.length]).range([0, width]);
       var c = d3.scale.pow().exponent(0.5).domain([0, maxCount]).range(["#efefef", "steelblue"]);
       bar = svg.selectAll(".bar").data(data);
 
       bar.exit().remove()
 
-      bar.enter().append("g")
-        .attr("class", "bar")
-        .attr("transform", function (d) {
-          return "translate(" + x(d.countCum) + "," + 0 + ")";
-        })
-        .append("rect")
-        .attr("x", 0)
-        .attr("width", function (d) {
-          return x(d.count);
-        })
-        .attr("height", 10)
-        .style("fill", function (d) {
-          return c(d.count);
-        })
-        .classed("null", isFieldNull("val"))
-        .append("svg:title")
+
+      _.each([bar, bar.enter()], function(b){
+        b.append("g")
+          .attr("class", "bar")
+          .attr("transform", function (d) {
+            return "translate(" + x(d.countCum) + "," + 0 + ")";
+          })
+          .append("rect")
+          .attr("x", 0)
+          .attr("width", function (d) {
+            return x(d.count);
+          })
+          .attr("height", 10)
+          .style("fill", function (d) {
+            return c(d.count);
+          })
+          .classed("null", isFieldNull("val"))
+          .append("svg:title")
 //            .attr("dy", ".75em")
 //            .attr("y", 6)
 //            .attr("x", x(data[0].dx) / 2)
 //            .attr("text-anchor", "middle")
-        .text(titleText("val", "count"));
+          .text(titleText("val", "count"));
+      })
     }
 
 
     function updateChart(chart, col, attrs, scope) {
       if(col.type == dv.type.numeric || scope.chartType == chartType.histogram)
-        drawHistogram(chart, col, attrs);
+        drawVerticalHistogram(chart, col, attrs);
       else
         drawStack1d(chart, col, attrs);
     }
