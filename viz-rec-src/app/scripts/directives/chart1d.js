@@ -82,7 +82,7 @@ angular.module('vizRecSrcApp')
 //      console.log("Enter:", bar.enter());
 //      console.log("Bar:", bar);
 
-      bar.enter().append("g").attr("class","bar").append("rect");
+      bar.enter().append("g").attr("class","bar").append("rect").append("title");
       bar.attr("transform", function (d) {
           return "translate(" + x(d[xField]) + "," + pos(y(d[yField])) + ")";
         })
@@ -94,7 +94,7 @@ angular.module('vizRecSrcApp')
         })
         .style("fill", null)
         .classed("null", isFieldNull(xField))
-        .append("svg:title")
+        .select("title")
 //            .attr("dy", ".75em")
 //            .attr("y", 6)
 //            .attr("x", x(data[0].dx) / 2)
@@ -117,7 +117,7 @@ angular.module('vizRecSrcApp')
 
       var margin = {top: 5, right: 5, bottom: isNumeric ? 15 : 8, left: 5},
         width = (attrs.width || 120) - margin.left - margin.right,
-        height = (attrs.height || 30) - margin.top - margin.bottom;
+        height = (attrs.height || 20) - margin.top - margin.bottom;
 
       var x, y, data, yMax, xAxis, yAxis, bar;
 
@@ -139,7 +139,7 @@ angular.module('vizRecSrcApp')
       var c = d3.scale.pow().exponent(0.5).domain([0, maxCount]).range(["#efefef", "steelblue"]);
       bar = svg.selectAll(".bar").data(data);
 
-      bar.enter().append("g").attr("class","bar").append("rect");
+      bar.enter().append("g").attr("class","bar").append("rect").append("title");
       bar.attr("class", "bar")
         .attr("transform", function (d) {
           return "translate(" + x(d.countCum) + "," + 0 + ")";
@@ -154,38 +154,15 @@ angular.module('vizRecSrcApp')
           return c(d.count);
         })
         .classed("null", isFieldNull("val"))
-        .append("svg:title")
+        .select("title")
 //            .attr("dy", ".75em")
 //            .attr("y", 6)
 //            .attr("x", x(data[0].dx) / 2)
 //            .attr("text-anchor", "middle")
         .text(titleText("val", "count"));
-//      _.each([, bar], function(b){
-//        bar.attr("class", "bar")
-//          .attr("transform", function (d) {
-//            return "translate(" + x(d.countCum) + "," + 0 + ")";
-//          })
-//          .append("rect")
-//          .attr("x", 0)
-//          .attr("width", function (d) {
-//            return x(d.count);
-//          })
-//          .attr("height", 10)
-//          .style("fill", function (d) {
-//            return c(d.count);
-//          })
-//          .classed("null", isFieldNull("val"))
-//          .append("svg:title")
-////            .attr("dy", ".75em")
-////            .attr("y", 6)
-////            .attr("x", x(data[0].dx) / 2)
-////            .attr("text-anchor", "middle")
-//          .text(titleText("val", "count"));
-//      });
 
       bar.exit().remove();
       svg.selectAll(".x.axis").remove();
-
     }
 
 
