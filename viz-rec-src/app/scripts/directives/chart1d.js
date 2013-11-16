@@ -20,6 +20,8 @@ angular.module('vizRecSrcApp')
       }
     };
 
+    var pos = function(x){ return x>=0 ? x: 0;};
+
     function drawHorizontalHistogram(chart, col, attrs){
 
     }
@@ -70,40 +72,42 @@ angular.module('vizRecSrcApp')
         : d3.scale.linear().domain([0, yMax]).range([height, 0])
       ;
 
+
       xAxis = d3.svg.axis().scale(x).orient("bottom").ticks(2).innerTickSize(innerTickSize)
         .tickFormat(xAxisTickFormat);
 
       bar = svg.selectAll(".bar").data(data);
-      bar.exit().remove();
 
-      _.each([bar, bar.enter()], function(b){
-        b.append("g")
-          .attr("class", "bar")
-          .attr("transform", function (d) {
-            return "translate(" + x(d[xField]) + "," + y(d[yField]) + ")";
-          })
-          .append("rect")
-          .attr("x", 1)
-          .attr("width", barWidth)
-          .attr("height", function (d) {
-            return height - y(d[yField]);
-          })
-          .classed("null", isFieldNull(xField))
-          .append("svg:title")
+//      console.log("Exit:", bar.exit());
+//      console.log("Enter:", bar.enter());
+//      console.log("Bar:", bar);
+
+      bar.enter().append("g").attr("class","bar").append("rect");
+      bar.attr("transform", function (d) {
+          return "translate(" + x(d[xField]) + "," + pos(y(d[yField])) + ")";
+        })
+        .select("rect")
+        .attr("x", 1)
+        .attr("width", barWidth)
+        .attr("height", function (d) {
+          return height - pos(y(d[yField]));
+        })
+        .style("fill", null)
+        .classed("null", isFieldNull(xField))
+        .append("svg:title")
 //            .attr("dy", ".75em")
 //            .attr("y", 6)
 //            .attr("x", x(data[0].dx) / 2)
 //            .attr("text-anchor", "middle")
-          .text(titleText(xField, yField));
-      });
+        .text(titleText(xField, yField));
+
+
+      bar.exit().remove();
 
       svg.append("g")
         .attr("class", "x axis")
         .attr("transform", "translate(0," + height + ")")
         .call(xAxis);
-
-
-
     }
 
     function drawStack1d(chart, col, attrs) {
@@ -117,14 +121,11 @@ angular.module('vizRecSrcApp')
 
       var x, y, data, yMax, xAxis, yAxis, bar;
 
-      //TODO(kanitw): take care of enter/exit here.
-
       var svg = d3.select(chart).select("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
         .select("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
 
       var countCum = 0, maxCount = 0;
       data = _(col.countTable).sortBy("count").map(function (d) {
@@ -138,32 +139,53 @@ angular.module('vizRecSrcApp')
       var c = d3.scale.pow().exponent(0.5).domain([0, maxCount]).range(["#efefef", "steelblue"]);
       bar = svg.selectAll(".bar").data(data);
 
-      bar.exit().remove()
-
-
-      _.each([bar, bar.enter()], function(b){
-        b.append("g")
-          .attr("class", "bar")
-          .attr("transform", function (d) {
-            return "translate(" + x(d.countCum) + "," + 0 + ")";
-          })
-          .append("rect")
-          .attr("x", 0)
-          .attr("width", function (d) {
-            return x(d.count);
-          })
-          .attr("height", 10)
-          .style("fill", function (d) {
-            return c(d.count);
-          })
-          .classed("null", isFieldNull("val"))
-          .append("svg:title")
+      bar.enter().append("g").attr("class","bar").append("rect");
+      bar.attr("class", "bar")
+        .attr("transform", function (d) {
+          return "translate(" + x(d.countCum) + "," + 0 + ")";
+        })
+        .select("rect")
+        .attr("x", 0)
+        .attr("width", function (d) {
+          return x(d.count);
+        })
+        .attr("height", 10)
+        .style("fill", function (d) {
+          return c(d.count);
+        })
+        .classed("null", isFieldNull("val"))
+        .append("svg:title")
 //            .attr("dy", ".75em")
 //            .attr("y", 6)
 //            .attr("x", x(data[0].dx) / 2)
 //            .attr("text-anchor", "middle")
-          .text(titleText("val", "count"));
-      })
+        .text(titleText("val", "count"));
+//      _.each([, bar], function(b){
+//        bar.attr("class", "bar")
+//          .attr("transform", function (d) {
+//            return "translate(" + x(d.countCum) + "," + 0 + ")";
+//          })
+//          .append("rect")
+//          .attr("x", 0)
+//          .attr("width", function (d) {
+//            return x(d.count);
+//          })
+//          .attr("height", 10)
+//          .style("fill", function (d) {
+//            return c(d.count);
+//          })
+//          .classed("null", isFieldNull("val"))
+//          .append("svg:title")
+////            .attr("dy", ".75em")
+////            .attr("y", 6)
+////            .attr("x", x(data[0].dx) / 2)
+////            .attr("text-anchor", "middle")
+//          .text(titleText("val", "count"));
+//      });
+
+      bar.exit().remove();
+      svg.selectAll(".x.axis").remove();
+
     }
 
 
@@ -201,7 +223,6 @@ angular.module('vizRecSrcApp')
 
         scope.toggleLogTransform = function(){
           attrs.yScaleLog = !attrs.yScaleLog;
-          console.log("log", attrs.yScaleLog);
           updateChart(element.find(".chart")[0], scope.col, attrs, scope);
         }
 
