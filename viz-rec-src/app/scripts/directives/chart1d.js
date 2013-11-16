@@ -22,11 +22,11 @@ angular.module('vizRecSrcApp')
 
     var pos = function(x){ return x>=0 ? x: 0;};
 
-    function drawHorizontalHistogram(chart, col, attrs){
+    function drawHorizontalHistogram(chart, col, attrs, scope){
 
     }
 
-    function drawVerticalHistogram(chart, col, attrs) {
+    function drawVerticalHistogram(chart, col, attrs, scope) {
       //Code modified from http://bl.ocks.org/mbostock/3048450
       var isNumeric = col.type == "numeric";
 
@@ -67,7 +67,7 @@ angular.module('vizRecSrcApp')
 
 //      yMax = _.max(data, yField);
       yMax = d3.max(data, function(d){ return d[yField]; });
-      y = attrs.yScaleLog ?
+      y = scope.yScaleLog ?
         d3.scale.log().domain([1, yMax]).range([height, 0])
         : d3.scale.linear().domain([0, yMax]).range([height, 0])
       ;
@@ -191,9 +191,9 @@ angular.module('vizRecSrcApp')
 
     function updateChart(chart, col, attrs, scope) {
       if(col.type == dv.type.numeric || scope.chartType == chartType.histogram)
-        drawVerticalHistogram(chart, col, attrs);
+        drawVerticalHistogram(chart, col, attrs, scope);
       else
-        drawStack1d(chart, col, attrs);
+        drawStack1d(chart, col, attrs, scope);
     }
 
     return {
@@ -222,7 +222,7 @@ angular.module('vizRecSrcApp')
         }
 
         scope.toggleLogTransform = function(){
-          attrs.yScaleLog = !attrs.yScaleLog;
+          scope.yScaleLog = !scope.yScaleLog;
           updateChart(element.find(".chart")[0], scope.col, attrs, scope);
         }
 
