@@ -2,9 +2,8 @@
     <span class="chart-name">
         <a ng-click="select(col);">{{col.name}}</a>
     </span>
-    <span class="pull-right" ng-show="col.type!='numeric'">
-        <a href="" ng-click="toggleChartType()">T</a>
-    </span>
+    <a href="" class="pull-right"  ng-show="col.type!='numeric'" ng-click="toggleChartType()">T</a>
+    <a href="" ng-click="toggleLogTransform()" ng-show="col.type == 'numeric' || chartType == 'histogram'">L</a>
 </div>
 <div class="chart" ng-switch="col.type">
     <svg><g></g></svg>
