@@ -9,11 +9,19 @@ angular.module('vizRecSrcApp')
 
     //TODO(kanitw): move these to helper class
     var formatCount = d3.format(",.0f");
+    var isNull = function(x){ return x===null || x === "";};
+    var isNotNull = function(x){ return !isNull(x);};
     var isFieldNull = function(field){
       return function (d) {
-        return d[field] === null || d[field] == "";
+        return isNull(d[field]);
       };
     };
+    var isFieldNotNull = function(field){
+      return function(d){
+        return !isNull(d[field]);
+      };
+    };
+
     var titleText = function (xField, yField) {
       return function (d) {
         return d[xField || "x"] + "(" + formatCount(d[yField || "y"]) + ")";
@@ -44,9 +52,10 @@ angular.module('vizRecSrcApp')
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
       if (isNumeric){
+        var colData = scope.filterNull ? _.filter(col, isNotNull) : col;
         xField = "x"; yField="y";
-        x = d3.scale.linear().domain([d3.min(col), d3.max(col)]).nice().range([0, width]);
-        data = d3.layout.histogram().bins(x.ticks(20))(col);
+        x = d3.scale.linear().domain([Math.min(0,d3.min(colData)), d3.max(colData)]).nice().range([0, width]);
+        data = d3.layout.histogram().bins(x.ticks(20))(colData);
         xAxisTickFormat = function (d) {
           return _.isNumber(d) && d > 10000 ? d.toPrecision(2) : d;
         }
@@ -55,7 +64,8 @@ angular.module('vizRecSrcApp')
         xField = "val"; yField="count";
 
         //TODO(kanitw): please please use datavore to query these
-        data = _(col.countTable).sortBy("count")
+        data = (scope.filterNull ? _(col.countTable).filter(isFieldNotNull(xField)) :  _(col.countTable))
+          .sortBy("count")
           .last(width / 2) //reduce problem for categorical value that has more than width/2
           .reverse()
           .value();
@@ -83,17 +93,22 @@ angular.module('vizRecSrcApp')
 //      console.log("Bar:", bar);
 
       bar.enter().append("g").attr("class","bar").append("rect").append("title");
-      bar.attr("transform", function (d) {
+
+      d3.timer(function(){
+        bar.select("rect").classed("null", isFieldNull(xField));
+      },500);
+
+      bar.transition().duration(500)
+        .attr("transform", function (d) {
           return "translate(" + x(d[xField]) + "," + pos(y(d[yField])) + ")";
         })
         .select("rect")
         .attr("x", 1)
         .attr("width", barWidth)
         .attr("height", function (d) {
-          return height - pos(y(d[yField]));
+          return Math.max(0,height - y(d[yField]));
         })
         .style("fill", null)
-        .classed("null", isFieldNull(xField))
         .select("title")
 //            .attr("dy", ".75em")
 //            .attr("y", 6)
@@ -110,7 +125,7 @@ angular.module('vizRecSrcApp')
         .call(xAxis);
     }
 
-    function drawStack1d(chart, col, attrs) {
+    function drawStack1d(chart, col, attrs, scope) {
       //Code modified from http://bl.ocks.org/mbostock/3048450
 
       var isNumeric = col.type == "numeric";
@@ -127,20 +142,28 @@ angular.module('vizRecSrcApp')
         .select("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-      var countCum = 0, maxCount = 0;
-      data = _(col.countTable).sortBy("count").map(function (d) {
-        d.countCum = countCum;
-        countCum += d.count;
-        if (maxCount < d.count) maxCount = d.count;
-        return d;
-      }).value();
+      var countCum = 0, maxCount = 0, maxX=0;
+      data = (scope.filterNull ? _(col.countTable).filter(isFieldNotNull("val")) :  _(col.countTable))
+        .sortBy("count").map(function (d) {
+          d.countCum = countCum;
+          countCum += d.count;
+          if (maxCount < d.count) maxCount = d.count;
+          return d;
+        })
+        .value();
 
-      x = d3.scale.linear().domain([0, col.length]).range([0, width]);
+      var maxX = scope.filterNull ? countCum : col.length;
+
+      x = d3.scale.linear().domain([0, maxX]).range([0, width]);
       var c = d3.scale.pow().exponent(0.5).domain([0, maxCount]).range(["#efefef", "steelblue"]);
       bar = svg.selectAll(".bar").data(data);
 
       bar.enter().append("g").attr("class","bar").append("rect").append("title");
-      bar.attr("class", "bar")
+      d3.timer(function(){
+        bar.select("rect").classed("null", isFieldNull("val"));
+      },500);
+      bar.transition().duration(500)
+        .attr("class", "bar")
         .attr("transform", function (d) {
           return "translate(" + x(d.countCum) + "," + 0 + ")";
         })
@@ -153,7 +176,6 @@ angular.module('vizRecSrcApp')
         .style("fill", function (d) {
           return c(d.count);
         })
-        .classed("null", isFieldNull("val"))
         .select("title")
 //            .attr("dy", ".75em")
 //            .attr("y", 6)
@@ -179,15 +201,17 @@ angular.module('vizRecSrcApp')
       link: function postLink(scope, element, attrs) {
         scope.chartType = "null";
 
+        function _updateChart(){
+          updateChart(element.find(".chart")[0], scope.col, attrs, scope);
+        }
+
         scope.$watch("col", function (newCol, oldCol) {
           if (newCol != oldCol) {
-            updateChart(element.find(".chart")[0], newCol, attrs, scope);
+            _updateChart();
           }
         });
 
-        if (scope.col) {
-          updateChart(element.find(".chart")[0], scope.col, attrs, scope);
-        }
+        if (scope.col) _updateChart();
 
         scope.toggleChartType = function(){
           if(scope.chartType == chartType.histogram){
@@ -195,12 +219,17 @@ angular.module('vizRecSrcApp')
           }else{
             scope.chartType = chartType.histogram;
           }
-          updateChart(element.find(".chart")[0], scope.col, attrs, scope);
+          _updateChart();
         }
 
         scope.toggleLogTransform = function(){
           scope.yScaleLog = !scope.yScaleLog;
-          updateChart(element.find(".chart")[0], scope.col, attrs, scope);
+          _updateChart();
+        }
+
+        scope.toggleFilterNull = function(){
+          scope.filterNull = !scope.filterNull;
+          _updateChart();
         }
 
       },

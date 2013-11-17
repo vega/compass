@@ -1,13 +1,17 @@
-<div>
-    <span class="chart-name">
-        <a ng-click="select(col);">{{col.name}}</a>
-    </span>
-    <a href="" class="pull-right"  ng-show="col.type!='numeric'" ng-click="toggleChartType()">T</a>
-    <a href="" ng-click="toggleLogTransform()" ng-show="col.type == 'numeric' || chartType == 'histogram'">L</a>
-    <span ng-show="yScaleLog">(log)</span>
-</div>
-<div class="chart" ng-switch="col.type">
-    <svg><g></g></svg>
-    <!--<histogram field="col" width="120" height="40" yScale="" ng-switch-when="numeric"></histogram>-->
-    <!--<stack1d  field="col" width="120" height="20" ng-switch-default></stack1d>-->
+<div class="chart-1d chart">
+    <div>
+        <span class="chart-name">
+            <a ng-click="select(col);">{{col.name}}</a>
+        </span>
+        <a href="" class="pull-right"  ng-show="col.type!='numeric'" ng-click="toggleChartType()">T</a>
+        <a href="" class="pull-right"  ng-click="toggleFilterNull()">N</a>
+        <a href="" ng-click="toggleLogTransform()" ng-show="col.type == 'numeric' || chartType == 'histogram'">L</a>
+        <span ng-show="yScaleLog">(log)</span>
+        <span ng-show="filterNull">(no-null)</span>
+    </div>
+    <div class="chart" ng-switch="col.type">
+        <svg><g></g></svg>
+        <!--<histogram field="col" width="120" height="40" yScale="" ng-switch-when="numeric"></histogram>-->
+        <!--<stack1d  field="col" width="120" height="20" ng-switch-default></stack1d>-->
+    </div>
 </div>

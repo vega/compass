@@ -39,11 +39,11 @@ body {
   shape-rendering: crispEdges;
 
   &:hover{
-    fill: orange;
+    fill: orange !important;
   }
 
   &.null{
-    fill: red;
+    fill: red !important;
   }
 }
 
@@ -61,7 +61,8 @@ body {
   font-size: 8px;
 }
 
-.block-1d{
+.chart-1d{
+  padding: 3px 10px;
   .chart-name{
     font-size: 10px;
     text-align: center;
