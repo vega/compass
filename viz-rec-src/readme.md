@@ -1,0 +1,1 @@
+This source code repository is generated using [yeoman](http://yeoman.io).

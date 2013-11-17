@@ -142,7 +142,7 @@ angular.module('vizRecSrcApp')
         .select("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-      var countCum = 0, maxCount = 0, maxX=0;
+      var countCum = 0, maxCount = 0;
       data = (scope.filterNull ? _(col.countTable).filter(isFieldNotNull("val")) :  _(col.countTable))
         .sortBy("count").map(function (d) {
           d.countCum = countCum;
