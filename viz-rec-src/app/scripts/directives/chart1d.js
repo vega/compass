@@ -22,6 +22,10 @@ angular.module('vizRecSrcApp')
       };
     };
 
+    var getKey = function(xField){
+      return function(d){ return d[xField];};
+    };
+
     var titleText = function (xField, yField) {
       return function (d) {
         return d[xField || "x"] + "(" + formatCount(d[yField || "y"]) + ")";
@@ -86,7 +90,7 @@ angular.module('vizRecSrcApp')
       xAxis = d3.svg.axis().scale(x).orient("bottom").ticks(2).innerTickSize(innerTickSize)
         .tickFormat(xAxisTickFormat);
 
-      bar = svg.selectAll(".bar").data(data);
+      bar = svg.selectAll(".bar").data(data, getKey(xField));
 
 //      console.log("Exit:", bar.exit());
 //      console.log("Enter:", bar.enter());
@@ -156,7 +160,7 @@ angular.module('vizRecSrcApp')
 
       x = d3.scale.linear().domain([0, maxX]).range([0, width]);
       var c = d3.scale.pow().exponent(0.5).domain([0, maxCount]).range(["#efefef", "steelblue"]);
-      bar = svg.selectAll(".bar").data(data);
+      bar = svg.selectAll(".bar").data(data, getKey("val"));
 
       bar.enter().append("g").attr("class","bar").append("rect").append("title");
       d3.timer(function(){
