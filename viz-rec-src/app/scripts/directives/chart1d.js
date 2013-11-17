@@ -42,7 +42,7 @@ angular.module('vizRecSrcApp')
       //Code modified from http://bl.ocks.org/mbostock/3048450
       var isNumeric = col.type == "numeric";
 
-      var margin = {top: 5, right: 5, bottom: isNumeric ? 15 : 8, left: 5},
+      var margin = {top: 5, right: 5, bottom: isNumeric ? 20 : 10, left: 5},
         width = (attrs.width || 120) - margin.left - margin.right,
         height = (attrs.height || 50) - margin.top - margin.bottom;
 
@@ -52,7 +52,8 @@ angular.module('vizRecSrcApp')
       var svg =  d3.select(chart).select("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
-        .select("g")
+
+      var main = svg.select("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
       if (isNumeric){
@@ -90,7 +91,7 @@ angular.module('vizRecSrcApp')
       xAxis = d3.svg.axis().scale(x).orient("bottom").ticks(2).innerTickSize(innerTickSize)
         .tickFormat(xAxisTickFormat);
 
-      bar = svg.selectAll(".bar").data(data, getKey(xField));
+      bar = main.selectAll(".bar").data(data, getKey(xField));
 
 //      console.log("Exit:", bar.exit());
 //      console.log("Enter:", bar.enter());
@@ -107,7 +108,7 @@ angular.module('vizRecSrcApp')
           return "translate(" + x(d[xField]) + "," + pos(y(d[yField])) + ")";
         })
         .select("rect")
-        .attr("x", 1)
+        .attr("x", -barWidth/2)
         .attr("width", barWidth)
         .attr("height", function (d) {
           return Math.max(0,height - y(d[yField]));
@@ -120,12 +121,10 @@ angular.module('vizRecSrcApp')
 //            .attr("text-anchor", "middle")
         .text(titleText(xField, yField));
 
-
       bar.exit().remove();
 
-      svg.append("g")
-        .attr("class", "x axis")
-        .attr("transform", "translate(0," + height + ")")
+      svg.select("g.x.axis")
+        .attr("transform", "translate("+margin.left+"," + (margin.top + height) + ")")
         .call(xAxis);
     }
 
