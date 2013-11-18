@@ -28,6 +28,11 @@ angular.module('vizRecSrcApp')
       };
     };
 
+    this.ellipsis = function(maxLength){
+      maxLength = maxLength || 15; //set default
+      return function(d){ return d.length > maxLength ?  d.substr(0,maxLength) +"..." : d; };
+    };
+
 
     this.pos = function(x){ return x>=0 ? x: 0;};
 

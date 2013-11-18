@@ -72,7 +72,7 @@ angular.module('vizRecSrcApp')
         .range(["#efefef", "steelblue"]);
 
 
-      var ellipsis = function(d){ return d.substr(0,20); };
+
       var xAxisGroup=svg.select("g.x.axis")
         .attr("transform","translate("+margin.left+","+(margin.top-3)+")")
         .selectAll("text");
@@ -84,7 +84,7 @@ angular.module('vizRecSrcApp')
         xAxisGroup.enter().append("text");
         xAxisGroup.attr("x", getX)
           .style("text-anchor","start")
-          .text(ellipsis);
+          .text(helper.ellipsis());
         //rotate only if needed!
         if(!_.all(xDomain, function(d){ return d.toString().length < 3;})){
           xAxisGroup.attr("transform",function(d,i){ return "rotate(270,"+getX(d, i)+",0)";})
@@ -101,7 +101,7 @@ angular.module('vizRecSrcApp')
         yAxisGroup.enter().append("text");
         yAxisGroup.attr("y", function(d, i){return  (i+0.7)* y.rangeBand(); })
           .style("text-anchor","end")
-          .text(ellipsis);
+          .text(helper.ellipsis());
 
       }
 
