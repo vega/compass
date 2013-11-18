@@ -7,16 +7,15 @@ angular.module('vizRecSrcApp')
       var xField = pair[1], yField = pair[0];
 
       if(xField.type == dv.type.numeric){
-        if(xField.countTable.length > 20) //if has high cardinality
-          xField = xField.bin20;
+
+        xField = xField.bin20;
       }else if(xField.type != dv.type.nominal && xField.type != dv.type.ordinal){
         console.log("xField", xField.type, "doesn't qualify");
         return;
       }
 
       if(yField.type== dv.type.numeric){
-        if(xField.countTable.length > 20)
-          yField = xField.bin20;
+        yField = yField.bin20;
       }else if(yField.type != dv.type.nominal && yField.type!= dv.type.ordinal){
         console.log("yField", yField.type, "doesn't qualify");
         return;
