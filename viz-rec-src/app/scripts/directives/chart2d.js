@@ -1,8 +1,9 @@
 'use strict';
 
 angular.module('vizRecSrcApp')
-  .directive('chart2d', function (dataManager) {
-    function drawHeatMap(pair, attrs, svgParent, scope){
+  .directive('chart2d', function (dataManager, chartHelper) {
+    var helper= chartHelper;
+    function drawHeatMap(pair, attrs, chart, scope){
       var xField = pair[1], yField = pair[0];
 
       if(xField.type == dv.type.numeric){
@@ -35,7 +36,7 @@ angular.module('vizRecSrcApp')
         width = (attrs.width || 120) - margin.left - margin.right,
         height = (attrs.height || 120) - margin.top - margin.bottom;
 
-      var svg = d3.select(svgParent).select("svg")
+      var svg = d3.select(chart).select("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom);
 
@@ -122,12 +123,8 @@ angular.module('vizRecSrcApp')
         .attr("width", x.rangeBand()-1)
         .attr("height", y.rangeBand()-1)
         .style("fill", function(i){ return c(counts[i]);})
-        .append("svg:title")
-//            .attr("dy", ".75em")
-//            .attr("y", 6)
-//            .attr("x", x(data[0].dx) / 2)
-//            .attr("text-anchor", "middle")
-        .text(function(i){ return xArray[i] +","+ yArray[i] +")="+ counts[i]; });
+        .on('mouseover', helper.onMouseOver(chart, function(i){ return "("+xArray[i] +","+ yArray[i] +")="+ counts[i]; }))
+        .on('mouseout', helper.onMouseOut(chart));
 
 //      svg.append("g")
 //        .attr("class", "x axis")
