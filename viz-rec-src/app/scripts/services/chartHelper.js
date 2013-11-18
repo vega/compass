@@ -4,6 +4,9 @@ angular.module('vizRecSrcApp')
   .service('chartHelper', function chartHelper() {
     var self = this;
 
+    /** identity function **/
+    this.I = function(d){return d;};
+
     this.formatCount = d3.format(",.0f"); 
     this.isNull = function(x){ return x===null || x === "";};
     this.isNotNull = function(x){ return !self.isNull(x);};

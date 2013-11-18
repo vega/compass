@@ -84,11 +84,14 @@ angular.module('vizRecSrcApp')
         xAxisGroup.enter().append("text");
         xAxisGroup.attr("x", getX)
           .style("text-anchor","start")
-          .text(helper.ellipsis());
+          .text(helper.ellipsis())
+          .on("mouseover", helper.onMouseOver(chart, helper.I))
+          .on("mouseout", helper.onMouseOut(chart));
         //rotate only if needed!
         if(!_.all(xDomain, function(d){ return d.toString().length < 3;})){
           xAxisGroup.attr("transform",function(d,i){ return "rotate(270,"+getX(d, i)+",0)";})
         }
+
       }
 
       var yAxisGroup=svg.select("g.y.axis")
@@ -101,7 +104,9 @@ angular.module('vizRecSrcApp')
         yAxisGroup.enter().append("text");
         yAxisGroup.attr("y", function(d, i){return  (i+0.7)* y.rangeBand(); })
           .style("text-anchor","end")
-          .text(helper.ellipsis());
+          .text(helper.ellipsis())
+          .on("mouseover", helper.onMouseOver(chart, helper.I))
+          .on("mouseout", helper.onMouseOut(chart));
 
       }
 
