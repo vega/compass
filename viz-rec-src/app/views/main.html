@@ -12,8 +12,8 @@
         <select>
             <option>Distance Metric</option>
         </select>
-        <div ng-repeat="pair in colPairs" class="block-2d">
-            <chart2d pair="pair"/>
+        <div ng-repeat="pair in colPairs | limitTo: 5" class="block-2d">
+            <chart2d pair="pair" width="250" height="250"/>
         </div>
     </div>
 </div>
