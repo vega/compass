@@ -1,15 +1,23 @@
-<div class="chart-1d chart">
-    <div>
+<div class="chart-1d chart-container">
+    <div class="name-row">
         <span class="chart-name">
-            <a ng-click="select(col);">{{col.name}}</a>
+            <a href="" ng-click="select(col);">{{col.name}}</a>
         </span>
-        <a href="" class="pull-right"  ng-show="col.type!='numeric'" ng-click="toggleChartType()">T</a>
-        <a href="" class="pull-right"  ng-click="toggleFilterNull()">N</a>
-        <a href="" ng-click="toggleLogTransform()" ng-show="col.type == 'numeric' || chartType == 'histogram'">L</a>
+        <span class="pull-right mini-btn-grp">
+            <a href="" ng-show="col.type!='numeric'" ng-click="toggleChartType()">T</a>
+            <a href="" ng-click="toggleFilterNull()">N</a>
+            <a href="" ng-click="toggleLogTransform()" ng-show="col.type == 'numeric' || chartType == 'histogram'">L</a>
+
+
+        </span>
         <span ng-show="yScaleLog">(log)</span>
         <span ng-show="filterNull">(no-null)</span>
     </div>
     <div class="chart" ng-switch="col.type">
-        <svg><g></g></svg>
+        <svg>
+            <g class="main"></g>
+            <g class="x axis"></g>
+        </svg>
+        <div class="tooltip"></div>
     </div>
 </div>
