@@ -1,0 +1,3 @@
+[submodule "viz-rec-src/app/lib/datavore"]
+	path = viz-rec-src/app/lib/datavore
+	url = https://github.com/StanfordHCI/datavore.git
