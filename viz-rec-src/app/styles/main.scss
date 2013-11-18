@@ -1,7 +1,7 @@
 $iconSpritePath: "../images/glyphicons-halflings.png";
 $iconWhiteSpritePath: "../images/glyphicons-halflings-white.png";
 
-//@import "bootstrap-sass/lib/bootstrap";
+@import "../bower_components/bootstrap-sass/lib/bootstrap";
 @import "../bower_components/pure/base.css";
 @import "../bower_components/pure/grids-min.css";
 /* Put your CSS here */
@@ -34,7 +34,7 @@ body {
 }
 
 
-.bar rect {
+.bar rect, .rect rect{
   fill: steelblue;
   shape-rendering: crispEdges;
 
@@ -58,23 +58,37 @@ body {
 }
 
 .tick text{
-  font-size: 8px;
+  font-size: 9px;
 }
 
-.chart-1d{
-  padding: 3px 10px;
-  .chart-name{
-    font-size: 10px;
-    text-align: center;
-  }
-  .block-histogram{
-
-
-  }
-  &:hover{
-    background-color: #eeeeee;
+.chart-container{
+  .name-row{
+    padding: 2px;
+    border-top: 1px solid #dddddd;
+    .chart-name{
+      font-size: 12px;
+      font-weight: bold;
+      text-align: center;
+    }
   }
 
+  .chart{
+    padding: 3px 10px;
+  }
+  .tooltip{
+    opacity: 0;
+    position: absolute;
+    text-align: left;
+    padding: 8px;
+    font: 12px;
+    background: #000;
+    color: #ddd;
+    border: solid 1px #aaa;
+    border-radius: 4px;
+    pointer-events: none;
+  }
 }
+
+
 
 

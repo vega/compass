@@ -1,59 +1,15 @@
 'use strict';
 
 angular.module('vizRecSrcApp')
-  .directive('chart1d', function () {
+  .directive('chart1d', function (chartHelper) {
+    var helper = chartHelper;
     var chartType = {
       histogram: "histogram",
       stack1d: "stack1d"
     };
 
     //TODO(kanitw): move these to helper class
-    var formatCount = d3.format(",.0f");
-    var isNull = function(x){ return x===null || x === "";};
-    var isNotNull = function(x){ return !isNull(x);};
-    var isFieldNull = function(field){
-      return function (d) {
-        return isNull(d[field]);
-      };
-    };
-    var isFieldNotNull = function(field){
-      return function(d){
-        return !isNull(d[field]);
-      };
-    };
-
-    var getKey = function(xField){
-      return function(d){ return d[xField];};
-    };
-
-    var titleTextFromXY = function (xField, yField) {
-      return function (d) {
-        return d[xField || "x"] + "(" + formatCount(d[yField || "y"]) + ")";
-      };
-    };
-
-    var pos = function(x){ return x>=0 ? x: 0;};
-
-    var onMouseOver = function(chart, titleText){
-      return function(d){
-        d3.select(chart).select(".tooltip")
-          .style({
-            "opacity": 0.8,
-            "left": (d3.event.pageX + 8) + "px",
-            "top": (d3.event.pageY + 8) +"px"
-          })
-          .text(titleText(d));
-      };
-    };
-
-    var onMouseOut = function(chart){
-      return function(){
-        d3.select(chart).select(".tooltip")
-          .style("opacity",0)
-      };
-    };
-
-
+    
     function drawHorizontalHistogram(chart, col, attrs, scope){
 
     }
@@ -77,7 +33,7 @@ angular.module('vizRecSrcApp')
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
       if (isNumeric){
-        var colData = scope.filterNull ? _.filter(col, isNotNull) : col;
+        var colData = scope.filterNull ? _.filter(col, helper.isNotNull) : col;
         xField = "x"; yField="y";
         x = d3.scale.linear().domain([Math.min(0,d3.min(colData)), d3.max(colData)]).nice().range([0, width]);
         data = d3.layout.histogram().bins(x.ticks(20))(colData);
@@ -89,7 +45,7 @@ angular.module('vizRecSrcApp')
         xField = "val"; yField="count";
 
         //TODO(kanitw): please please use datavore to query these
-        data = (scope.filterNull ? _(col.countTable).filter(isFieldNotNull(xField)) :  _(col.countTable))
+        data = (scope.filterNull ? _(col.countTable).filter(helper.isFieldNotNull(xField)) :  _(col.countTable))
           .sortBy("count")
           .last(width / 2) //reduce problem for categorical value that has more than width/2
           .reverse()
@@ -111,7 +67,7 @@ angular.module('vizRecSrcApp')
       xAxis = d3.svg.axis().scale(x).orient("bottom").ticks(2).innerTickSize(innerTickSize)
         .tickFormat(xAxisTickFormat);
 
-      bar = main.selectAll(".bar").data(data, getKey(xField));
+      bar = main.selectAll(".bar").data(data, helper.getKey(xField));
 
 //      console.log("Exit:", bar.exit());
 //      console.log("Enter:", bar.enter());
@@ -120,12 +76,12 @@ angular.module('vizRecSrcApp')
       bar.enter().append("g").attr("class","bar").append("rect").append("title");
 
       d3.timer(function(){
-        bar.select("rect").classed("null", isFieldNull(xField));
+        bar.select("rect").classed("null", helper.isFieldNull(xField));
       },500);
 
       bar.transition().duration(500)
         .attr("transform", function (d) {
-          return "translate(" + x(d[xField]) + "," + pos(y(d[yField])) + ")";
+          return "translate(" + x(d[xField]) + "," + helper.pos(y(d[yField])) + ")";
         })
         .select("rect")
         .attr("x", -barWidth/2)
@@ -137,8 +93,8 @@ angular.module('vizRecSrcApp')
 
 
       bar.select("rect")
-        .on('mouseover', onMouseOver(chart,titleTextFromXY(xField,yField)))
-        .on('mouseout', onMouseOut(chart));
+        .on('mouseover', helper.onMouseOver(chart,helper.titleTextFromXY(xField,yField)))
+        .on('mouseout', helper.onMouseOut(chart));
 
       bar.exit().remove();
 
@@ -166,7 +122,7 @@ angular.module('vizRecSrcApp')
 
       var countCum = 0, maxCount = 0;
       var xField = "val";
-      data = (scope.filterNull ? _(col.countTable).filter(isFieldNotNull(xField)) :  _(col.countTable))
+      data = (scope.filterNull ? _(col.countTable).filter(helper.isFieldNotNull(xField)) :  _(col.countTable))
         .sortBy("count").map(function (d) {
           d.countCum = countCum;
           countCum += d.count;
@@ -179,11 +135,11 @@ angular.module('vizRecSrcApp')
 
       x = d3.scale.linear().domain([0, maxX]).range([0, width]);
       var c = d3.scale.pow().exponent(0.5).domain([0, maxCount]).range(["#efefef", "steelblue"]);
-      bar = svg.selectAll(".bar").data(data, getKey(xField));
+      bar = svg.selectAll(".bar").data(data, helper.getKey(xField));
 
       bar.enter().append("g").attr("class","bar").append("rect").append("title");
       d3.timer(function(){
-        bar.select("rect").classed("null", isFieldNull("val"));
+        bar.select("rect").classed("null", helper.isFieldNull("val"));
       },500);
       bar.transition().duration(500)
         .attr("class", "bar")
@@ -202,8 +158,8 @@ angular.module('vizRecSrcApp')
 
 
       bar.select("rect")
-        .on('mouseover', onMouseOver(chart,titleTextFromXY(xField,"count")))
-        .on('mouseout', onMouseOut(chart));
+        .on('mouseover', helper.onMouseOver(chart,helper.titleTextFromXY(xField,"count")))
+        .on('mouseout', helper.onMouseOut(chart));
 
       bar.exit().remove();
       svg.selectAll(".x.axis").remove();
