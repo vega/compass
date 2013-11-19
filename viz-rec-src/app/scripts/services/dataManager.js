@@ -28,7 +28,7 @@ angular.module('vizRecSrcApp')
           data = self._[key] = dv.table(data);
           if (saveData) self.currentData = data;
 
-          var originalDataLength = data.length;
+          var originalDataLength = data.originalLength = data.length;
           var i,j;
           for (i = 0; i < originalDataLength; i++) {
             data[i].countTable = countTable(data[i]);
