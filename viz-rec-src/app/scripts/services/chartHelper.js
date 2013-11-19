@@ -8,7 +8,7 @@ angular.module('vizRecSrcApp')
     this.I = function(d){return d;};
 
     this.formatCount = d3.format(",.0f"); 
-    this.isNull = function(x){ return x===null || x === "";};
+    this.isNull = function(x){ return x===null || x === "" || x=="NaN";};
     this.isNotNull = function(x){ return !self.isNull(x);};
     this.isFieldNull = function(field){
       return function (d) {
