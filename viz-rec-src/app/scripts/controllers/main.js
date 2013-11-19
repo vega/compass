@@ -32,7 +32,7 @@ angular.module('vizRecSrcApp')
           .sortBy("metric")
           .reverse()
           .value();
-      }
+      };
 
       $scope.select(dataTable[0]);
     });
