@@ -78,9 +78,10 @@ angular.module('vizRecSrcApp')
                   continue;
               }
 
-              console.log(data[i].name, data[i].type, data[j].name, data[j].type);
+
+//              console.log(data[i].name, data[i].type, data[j].name, data[j].type);
               data.mi_distance[j][i] = data.mi_distance[i][j] = it.getDistance(data, _i, _j);
-              console.log("dist["+i+"]["+j+"]=", data.mi_distance[i][j]);
+//              console.log("dist["+i+"]["+j+"]=", data.mi_distance[i][j]);
             }
           }
           if (callback) callback(data);
