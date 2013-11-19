@@ -1,21 +1,24 @@
 'use strict';
 
 angular.module('vizRecSrcApp')
-  .directive('chart2d', function (dataManager) {
-    function drawHeatMap(pair, attrs, svgParent, scope){
+  .directive('chart2d', function (dataManager, chartHelper) {
+    var helper= chartHelper;
+    function drawHeatMap(pair, attrs, chart, scope){
       var xField = pair[1], yField = pair[0];
 
-      if(xField.type == dv.type.numeric){
-        if(xField.countTable.length > 20) //if has high cardinality
-          xField = xField.bin20;
+      var xIsNumeric = xField.type == dv.type.numeric,
+        yIsNumeric = yField.type == dv.type.numeric;
+
+      if(xIsNumeric){
+
+        xField = xField.bin20;
       }else if(xField.type != dv.type.nominal && xField.type != dv.type.ordinal){
         console.log("xField", xField.type, "doesn't qualify");
         return;
       }
 
-      if(yField.type== dv.type.numeric){
-        if(xField.countTable.length > 20)
-          yField = xField.bin20;
+      if(yIsNumeric){
+        yField = yField.bin20;
       }else if(yField.type != dv.type.nominal && yField.type!= dv.type.ordinal){
         console.log("yField", yField.type, "doesn't qualify");
         return;
@@ -35,7 +38,7 @@ angular.module('vizRecSrcApp')
         width = (attrs.width || 120) - margin.left - margin.right,
         height = (attrs.height || 120) - margin.top - margin.bottom;
 
-      var svg = d3.select(svgParent).select("svg")
+      var svg = d3.select(chart).select("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom);
 
@@ -71,7 +74,7 @@ angular.module('vizRecSrcApp')
         .range(["#efefef", "steelblue"]);
 
 
-      var ellipsis = function(d){ return d.substr(0,20); };
+
       var xAxisGroup=svg.select("g.x.axis")
         .attr("transform","translate("+margin.left+","+(margin.top-3)+")")
         .selectAll("text");
@@ -83,11 +86,15 @@ angular.module('vizRecSrcApp')
         xAxisGroup.enter().append("text");
         xAxisGroup.attr("x", getX)
           .style("text-anchor","start")
-          .text(ellipsis);
+          .text(helper.ellipsis())
+          .on("mouseover", helper.onMouseOver(chart, helper.I))
+          .on("mouseout", helper.onMouseOut(chart));
         //rotate only if needed!
         if(!_.all(xDomain, function(d){ return d.toString().length < 3;})){
           xAxisGroup.attr("transform",function(d,i){ return "rotate(270,"+getX(d, i)+",0)";})
+            .attr("dy",5);
         }
+
       }
 
       var yAxisGroup=svg.select("g.y.axis")
@@ -98,16 +105,23 @@ angular.module('vizRecSrcApp')
       }else{
         yAxisGroup = yAxisGroup.data(yDomain);
         yAxisGroup.enter().append("text");
-        yAxisGroup.attr("y", function(d, i){return  (i+0.7)* y.rangeBand(); })
+        yAxisGroup.attr("y", function(d, i){return  (i+0.5)* y.rangeBand(); })
+          .attr("dy",2.5)
           .style("text-anchor","end")
-          .text(ellipsis);
+          .text(helper.ellipsis())
+          .on("mouseover", helper.onMouseOver(chart, helper.I))
+          .on("mouseout", helper.onMouseOut(chart));
 
       }
 
-
+      //TODO improve way to filter indices shown
+      //use only indices that are selected (top k)
+      var indicesShown = _.filter(_.range(0, yArray.length), function(i){
+        return xDomainMap[xArray[i]] !== undefined && yDomainMap[yArray[i]] !== undefined;
+      });
 
       rect = main.selectAll(".rect")
-        .data(d3.range(0,yArray.length));
+        .data(indicesShown);
 
       rect.enter().append("g").append("rect");
 
@@ -122,19 +136,8 @@ angular.module('vizRecSrcApp')
         .attr("width", x.rangeBand()-1)
         .attr("height", y.rangeBand()-1)
         .style("fill", function(i){ return c(counts[i]);})
-        .append("svg:title")
-//            .attr("dy", ".75em")
-//            .attr("y", 6)
-//            .attr("x", x(data[0].dx) / 2)
-//            .attr("text-anchor", "middle")
-        .text(function(i){ return xArray[i] +","+ yArray[i] +")="+ counts[i]; });
-
-//      svg.append("g")
-//        .attr("class", "x axis")
-//        .attr("transform", "translate(0," + height + ")")
-//        .call(xAxis);
-
-
+        .on('mouseover', helper.onMouseOver(chart, function(i){ return "("+xArray[i] +","+ yArray[i] +")="+ counts[i]; }))
+        .on('mouseout', helper.onMouseOut(chart));
     }
 
     function updateChart(chart, pair, attrs, scope){

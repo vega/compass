@@ -4,6 +4,9 @@ angular.module('vizRecSrcApp')
   .service('chartHelper', function chartHelper() {
     var self = this;
 
+    /** identity function **/
+    this.I = function(d){return d;};
+
     this.formatCount = d3.format(",.0f"); 
     this.isNull = function(x){ return x===null || x === "";};
     this.isNotNull = function(x){ return !self.isNull(x);};
@@ -28,6 +31,13 @@ angular.module('vizRecSrcApp')
       };
     };
 
+    this.ellipsis = function(maxLength, textFormatter){
+      maxLength = maxLength || 15; //set default
+      return function(data){
+        var d = textFormatter ? textFormatter(data) : data;
+        return d.length > maxLength ?  d.substr(0,maxLength) +"..." : d;
+      };
+    };
 
     this.pos = function(x){ return x>=0 ? x: 0;};
 
