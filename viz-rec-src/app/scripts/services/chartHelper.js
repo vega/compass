@@ -31,11 +31,13 @@ angular.module('vizRecSrcApp')
       };
     };
 
-    this.ellipsis = function(maxLength){
+    this.ellipsis = function(maxLength, textFormatter){
       maxLength = maxLength || 15; //set default
-      return function(d){ return d.length > maxLength ?  d.substr(0,maxLength) +"..." : d; };
+      return function(data){
+        var d = textFormatter ? textFormatter(data) : data;
+        return d.length > maxLength ?  d.substr(0,maxLength) +"..." : d;
+      };
     };
-
 
     this.pos = function(x){ return x>=0 ? x: 0;};
 

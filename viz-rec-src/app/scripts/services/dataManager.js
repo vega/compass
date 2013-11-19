@@ -34,7 +34,7 @@ angular.module('vizRecSrcApp')
 
             if (data[i].type == dv.type.numeric) {
               var binned = dv.bin(20).array(data[i]);
-              data[i].bin20 = data.addColumn(data[i].name + ":bin20", binned, dv.type.ordinal);
+              data[i].bin20 = data.addColumn(data[i].name + ":bin20", binned, dv.type.ordinal, null, true);
               data[i].bin20.countTable = countTable(data[i].bin20);
               data[i].bin20.isBinCol = true;
             }

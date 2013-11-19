@@ -6,7 +6,10 @@ angular.module('vizRecSrcApp')
     function drawHeatMap(pair, attrs, chart, scope){
       var xField = pair[1], yField = pair[0];
 
-      if(xField.type == dv.type.numeric){
+      var xIsNumeric = xField.type == dv.type.numeric,
+        yIsNumeric = yField.type == dv.type.numeric;
+
+      if(xIsNumeric){
 
         xField = xField.bin20;
       }else if(xField.type != dv.type.nominal && xField.type != dv.type.ordinal){
@@ -14,7 +17,7 @@ angular.module('vizRecSrcApp')
         return;
       }
 
-      if(yField.type== dv.type.numeric){
+      if(yIsNumeric){
         yField = yField.bin20;
       }else if(yField.type != dv.type.nominal && yField.type!= dv.type.ordinal){
         console.log("yField", yField.type, "doesn't qualify");
@@ -89,6 +92,7 @@ angular.module('vizRecSrcApp')
         //rotate only if needed!
         if(!_.all(xDomain, function(d){ return d.toString().length < 3;})){
           xAxisGroup.attr("transform",function(d,i){ return "rotate(270,"+getX(d, i)+",0)";})
+            .attr("dy",5);
         }
 
       }
@@ -101,7 +105,8 @@ angular.module('vizRecSrcApp')
       }else{
         yAxisGroup = yAxisGroup.data(yDomain);
         yAxisGroup.enter().append("text");
-        yAxisGroup.attr("y", function(d, i){return  (i+0.7)* y.rangeBand(); })
+        yAxisGroup.attr("y", function(d, i){return  (i+0.5)* y.rangeBand(); })
+          .attr("dy",2.5)
           .style("text-anchor","end")
           .text(helper.ellipsis())
           .on("mouseover", helper.onMouseOver(chart, helper.I))
@@ -109,10 +114,14 @@ angular.module('vizRecSrcApp')
 
       }
 
-
+      //TODO improve way to filter indices shown
+      //use only indices that are selected (top k)
+      var indicesShown = _.filter(_.range(0, yArray.length), function(i){
+        return xDomainMap[xArray[i]] !== undefined && yDomainMap[yArray[i]] !== undefined;
+      });
 
       rect = main.selectAll(".rect")
-        .data(d3.range(0,yArray.length));
+        .data(indicesShown);
 
       rect.enter().append("g").append("rect");
 
@@ -129,13 +138,6 @@ angular.module('vizRecSrcApp')
         .style("fill", function(i){ return c(counts[i]);})
         .on('mouseover', helper.onMouseOver(chart, function(i){ return "("+xArray[i] +","+ yArray[i] +")="+ counts[i]; }))
         .on('mouseout', helper.onMouseOut(chart));
-
-//      svg.append("g")
-//        .attr("class", "x axis")
-//        .attr("transform", "translate(0," + height + ")")
-//        .call(xAxis);
-
-
     }
 
     function updateChart(chart, pair, attrs, scope){
