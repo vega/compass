@@ -14,6 +14,7 @@
         </select>
         <div ng-repeat="pair in colPairs | limitTo: 5" class="block-2d">
             <chart2d pair="pair" width="250" height="250"/>
+            {{ pair.metric }}
         </div>
     </div>
 </div>

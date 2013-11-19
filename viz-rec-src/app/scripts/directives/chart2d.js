@@ -90,7 +90,7 @@ angular.module('vizRecSrcApp')
           .on("mouseover", helper.onMouseOver(chart, helper.I))
           .on("mouseout", helper.onMouseOut(chart));
         //rotate only if needed!
-        if(!_.all(xDomain, function(d){ return d.toString().length < 3;})){
+        if(!_.all(xDomain, function(d){ return d.toString().length * 5 < x.rangeBand();})){
           xAxisGroup.attr("transform",function(d,i){ return "rotate(270,"+getX(d, i)+",0)";})
             .attr("dy",5);
         }
