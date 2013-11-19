@@ -59,6 +59,8 @@ angular.module('vizRecSrcApp')
             for(j=i+1 ; j< originalDataLength; j++){
               var _i = i, _j = j;
 
+              // for numeric and date use binned version instead
+              // for text and unknown, return null!
 
               switch(data[i].type){
                 case dv.type.numeric: _i = data[i].bin20.index; break;
