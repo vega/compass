@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('vizRecSrcApp')
-  .factory('dataManager', function ($http) {
+  .factory('dataManager', function ($http, it) {
     // Service logic
     // ...
 
@@ -50,6 +50,35 @@ angular.module('vizRecSrcApp')
                 data[i][level].countTable = countTable(data[i][level]);
                 data[i][level].binLevel = level;
               });
+            }
+          }
+          data.mi_distance = [];
+          for (i =0; i < originalDataLength; i++) data.mi_distance[i] = [];
+          for (i =0; i < originalDataLength; i++){
+            data.mi_distance[i][i] = 0;
+            for(j=i+1 ; j< originalDataLength; j++){
+              var _i = i, _j = j;
+
+
+              switch(data[i].type){
+                case dv.type.numeric: _i = data[i].bin20.index; break;
+                case dv.type.date: _i = data[i].month.index; break;
+                case dv.type.text:case dv.type.unknown:
+                  data.mi_distance[i][j] = data.mi_distance[j][i] = null;
+                  continue;
+              }
+
+              switch(data[j].type){
+                case dv.type.numeric: _j = data[j].bin20.index; break;
+                case dv.type.date: _j = data[j].month.index; break;
+                case dv.type.text:case dv.type.unknown:
+                  data.mi_distance[j][i] = data.mi_distance[i][j] = null;
+                  continue;
+              }
+
+              console.log(data[i].name, data[i].type, data[j].name, data[j].type);
+              data.mi_distance[j][i] = data.mi_distance[i][j] = it.getDistance(data, _i, _j);
+              console.log("dist["+i+"]["+j+"]=", data.mi_distance[i][j]);
             }
           }
           if (callback) callback(data);
