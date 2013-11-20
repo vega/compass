@@ -2,7 +2,29 @@
 
 angular.module('vizRecSrcApp')
   .directive('chart2d', function (dataManager, chartHelper) {
+    //noinspection UnnecessaryLocalVariableJS
     var helper= chartHelper;
+
+
+    function getFormattedData(field, maxLength) {
+      var domain = _(field.countTable);
+      //TODO(kanitw): options for sortBy methods here.
+      //TODO(kanitw): pluck, last is not efficient here, cutting top stuff is not that great
+      if (field.countTable.length > maxLength) {
+        //noinspection JSCheckFunctionSignatures
+        domain = domain.sortBy("count")
+          .last(maxLength).reverse();
+      }
+
+      if(field.type === dv.type.ordinal || field.type === dv.type.numeric){
+        domain = domain.sortBy(function(d){ return +d.val || d;});
+      }else{
+        domain = domain.sortBy("val");
+      }
+
+      return domain.pluck("val").value();
+    }
+
     function drawHeatMap(pair, attrs, chart, scope){
       var xField = pair[1], yField = pair[0];
 
@@ -50,21 +72,15 @@ angular.module('vizRecSrcApp')
 
       var x, y, yMax, rect, c;
 
-      //TODO pluck, last is not efficient here, cutting top stuff is not that great
-      var xDomain = _(xField.countTable).sortBy("count").last(width/2).reverse()
-        .pluck("val").value();
-      var makeIndicesMap = function(array){
-        return array.reduce(function(map, cur, index){
-//          console.log(array, map, cur, index);
-          map[cur] = index;
-          return map;
-        },{});
+      var xDomain = getFormattedData(xField, width/2);
+      var yDomain = getFormattedData(yField, height/2);
+
+      var reduceToMap = function(map, cur, index){
+        map[cur] = index;
+        return map;
       };
 
-      //TODO pluck, last is not efficient here, cutting top stuff is not that great
-      var yDomain = _(yField.countTable).sortBy("count").last(height/2).reverse()
-        .pluck("val").value();
-      var xDomainMap = makeIndicesMap(xDomain), yDomainMap = makeIndicesMap(yDomain);
+      var xDomainMap = xDomain.reduce(reduceToMap,{}), yDomainMap = yDomain.reduce(reduceToMap,{});
 
 //      console.log("domains: ", xDomain, yDomain);
 
