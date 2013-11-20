@@ -6,6 +6,9 @@ angular.module('vizRecSrcApp')
     function drawHeatMap(pair, attrs, chart, scope){
       var xField = pair[1], yField = pair[0];
 
+      /** textformatter (default Identify function aka do nothing) */
+      var xFormatter = helper.I, yFormatter = helper.I;
+
       var xIsNumeric = xField.type == dv.type.numeric,
         yIsNumeric = yField.type == dv.type.numeric;
 
@@ -13,6 +16,7 @@ angular.module('vizRecSrcApp')
         xField = xField.bin20;
       }else if (xField.type == dv.type.date){
         xField = xField.month;
+        xFormatter = chartHelper.getMonth;
       }else if(xField.type != dv.type.nominal && xField.type != dv.type.ordinal){
         console.log("xField", xField.type, "doesn't qualify");
         return;
@@ -22,6 +26,7 @@ angular.module('vizRecSrcApp')
         yField = yField.bin20;
       }else if(yField.type == dv.type.date){
         yField = yField.month;
+        yFormatter = chartHelper.getMonth;
       }else if(yField.type != dv.type.nominal && yField.type!= dv.type.ordinal){
         console.log("yField", yField.type, "doesn't qualify");
         return;
@@ -89,7 +94,7 @@ angular.module('vizRecSrcApp')
         xAxisGroup.enter().append("text");
         xAxisGroup.attr("x", getX)
           .style("text-anchor","start")
-          .text(helper.ellipsis())
+          .text(helper.ellipsis(15, xFormatter))
           .on("mouseover", helper.onMouseOver(chart, helper.I))
           .on("mouseout", helper.onMouseOut(chart));
         //rotate only if needed!
@@ -111,7 +116,7 @@ angular.module('vizRecSrcApp')
         yAxisGroup.attr("y", function(d, i){return  (i+0.5)* y.rangeBand(); })
           .attr("dy",2.5)
           .style("text-anchor","end")
-          .text(helper.ellipsis())
+          .text(helper.ellipsis(15, yFormatter))
           .on("mouseover", helper.onMouseOver(chart, helper.I))
           .on("mouseout", helper.onMouseOut(chart));
 
@@ -139,7 +144,9 @@ angular.module('vizRecSrcApp')
         .attr("width", x.rangeBand()-1)
         .attr("height", y.rangeBand()-1)
         .style("fill", function(i){ return c(counts[i]);})
-        .on('mouseover', helper.onMouseOver(chart, function(i){ return "("+xArray[i] +","+ yArray[i] +")="+ counts[i]; }))
+        .on('mouseover', helper.onMouseOver(chart, function(i){
+          return "("+ xFormatter(xArray[i]) +","+ yFormatter(yArray[i]) +")="+ counts[i];
+        }))
         .on('mouseout', helper.onMouseOut(chart));
     }
 

@@ -25,6 +25,39 @@ angular.module('vizRecSrcApp')
       return function(d){ return d[xField];};
     };
 
+    var month=new Array();
+    month[0]="January";
+    month[1]="February";
+    month[2]="March";
+    month[3]="April";
+    month[4]="May";
+    month[5]="June";
+    month[6]="July";
+    month[7]="August";
+    month[8]="September";
+    month[9]="October";
+    month[10]="November";
+    month[11]="December";
+
+    //TODO(kanitw): add variation of
+    this.getMonth = function(i){
+      return month[i];
+    };
+
+
+    var weekday=new Array(7);
+    weekday[0]="Sunday";
+    weekday[1]="Monday";
+    weekday[2]="Tuesday";
+    weekday[3]="Wednesday";
+    weekday[4]="Thursday";
+    weekday[5]="Friday";
+    weekday[6]="Saturday";
+
+    this.getWeekday = function(i){
+      return weekday[i];
+    };
+
     this.titleTextFromXY = function (xField, yField) {
       return function (d) {
         return d[xField || "x"] + "(" + self.formatCount(d[yField || "y"]) + ")";
@@ -35,7 +68,7 @@ angular.module('vizRecSrcApp')
       maxLength = maxLength || 15; //set default
       return function(data){
         var d = textFormatter ? textFormatter(data) : data;
-        return d.length > maxLength ?  d.substr(0,maxLength) +"..." : d;
+        return d && d.length > maxLength ?  d.substr(0,maxLength) +"..." : d;
       };
     };
 
