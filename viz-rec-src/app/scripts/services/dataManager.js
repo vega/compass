@@ -46,7 +46,7 @@ angular.module('vizRecSrcApp')
                 day: function(d){ return d.getDay();}
               };
               _.each(dateBinner, function(binner, level){
-                data[i][level] = data.addColumn(data[i].name+":"+level, dateData.map(binner), dv.type.ordinal);
+                data[i][level] = data.addColumn(data[i].name+":"+level, dateData.map(binner), dv.type.ordinal, null, true);
                 data[i][level].countTable = countTable(data[i][level]);
                 data[i][level].binLevel = level;
               });

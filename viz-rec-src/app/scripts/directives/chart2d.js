@@ -10,8 +10,9 @@ angular.module('vizRecSrcApp')
         yIsNumeric = yField.type == dv.type.numeric;
 
       if(xIsNumeric){
-
         xField = xField.bin20;
+      }else if (xField.type == dv.type.date){
+        xField = xField.month;
       }else if(xField.type != dv.type.nominal && xField.type != dv.type.ordinal){
         console.log("xField", xField.type, "doesn't qualify");
         return;
@@ -19,6 +20,8 @@ angular.module('vizRecSrcApp')
 
       if(yIsNumeric){
         yField = yField.bin20;
+      }else if(yField.type == dv.type.date){
+        yField = yField.month;
       }else if(yField.type != dv.type.nominal && yField.type!= dv.type.ordinal){
         console.log("yField", yField.type, "doesn't qualify");
         return;
