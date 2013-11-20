@@ -6,7 +6,7 @@ angular.module('vizRecSrcApp')
     function drawHeatMap(pair, attrs, chart, scope){
       var xField = pair[1], yField = pair[0];
 
-      /** textformatter (default Identify function aka do nothing) */
+      /** textformatter (default = Identify function aka do nothing) */
       var xFormatter = helper.I, yFormatter = helper.I;
 
       var xIsNumeric = xField.type == dv.type.numeric,
