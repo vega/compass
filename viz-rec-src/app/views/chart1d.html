@@ -4,14 +4,21 @@
             <a href="" ng-click="select(col);">{{col.name}}</a>
         </span>
         <span class="pull-right mini-btn-grp">
-            <a href="" ng-show="col.type!='numeric'" ng-click="toggleChartType()">T</a>
-            <a href="" ng-click="toggleFilterNull()">N</a>
-            <a href="" ng-click="toggleLogTransform()" ng-show="col.type == 'numeric' || chartType == 'histogram'">L</a>
-
-
+            <a href="" class="chart-option" ng-show="col.type!='numeric'" ng-click="toggleChartType()">
+                Type
+            </a>
+            <a href="" ng-click="toggleFilterNull()"
+               class="chart-option"
+               ng-class="{'chart-option-on':filterNull, strike:filterNull}">
+                Null
+            </a>
+            <a href="" ng-click="toggleLogTransform()"
+               class="chart-option"
+               ng-disabled="col.type != 'numeric' && chartType != 'histogram'"
+               ng-class="{'chart-option-on':yScaleLog, 'disable': col.type != 'numeric' && chartType != 'histogram'}">
+                Log
+            </a>
         </span>
-        <span ng-show="yScaleLog">(log)</span>
-        <span ng-show="filterNull">(no-null)</span>
     </div>
     <div class="chart" ng-switch="col.type">
         <svg>
