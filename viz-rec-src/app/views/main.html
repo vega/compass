@@ -9,8 +9,7 @@
         </div>
     </div>
     <div class="pure-u-4-5">
-        <select>
-            <option>Distance Metric</option>
+        <select ng-model="currentSorterType" ng-options="n for n in sorter2dTypes">
         </select>
         <div ng-repeat="pair in colPairs | limitTo: 5" class="block-2d">
             <chart2d pair="pair" width="250" height="250"/>
