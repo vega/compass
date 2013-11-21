@@ -25,7 +25,64 @@ angular.module('vizRecSrcApp')
       return domain.pluck("val").value();
     }
 
-    function drawHeatMap(pair, attrs, chart, scope){
+    function drawScatterPlot(chart, pair, attrs, scope){
+      var xField = pair[1], yField = pair[0];
+
+      var margin = { top: 15 || attrs.marginTop , right: 5 || attrs.marginLeft , bottom: 20 ||  attrs.marginBottom, left: 15 || attrs.marginLeft },
+        width = (attrs.width || 120) - margin.left - margin.right,
+        height = (attrs.height || 120) - margin.top - margin.bottom;
+
+      var svg = d3.select(chart).select("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom);
+
+      var main = svg.select("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+      var x, y, marks, innerTickSize=6;
+
+      x = d3.scale.linear().domain([0, d3.max(xField)]).range([0, width]);
+      y = d3.scale.linear().domain([0, d3.max(yField)]).range([0, height]);
+
+      var xAxis = d3.svg.axis().scale(x).orient("bottom").ticks(2).innerTickSize(innerTickSize)
+        .tickFormat(helper.defaultNumberFormatter);
+      var yAxis = d3.svg.axis().scale(y).orient("left").ticks(2).innerTickSize(innerTickSize)
+        .tickFormat(helper.defaultNumberFormatter);
+
+      var indicesShown = d3.range(0, xField.length);
+
+      marks = main.selectAll(".marks").data(indicesShown);
+
+      marks.enter().append("g").attr("class","marks").append("circle");
+
+      marks.attr("class","circle-plot")
+        .select("circle")
+        .attr("cx", function(i){
+          return x(xField[i]);
+        })
+        .attr("cy", function(i){
+          return y(yField[i]);
+        })
+        .attr("r", 3)
+        .style({
+          "fill": "steelblue",
+          "fill-opacity": "0.1"
+        })
+        .on("mouseover", helper.onMouseOver(chart,function(i){
+          return "("+ xField[i] +","+ yField[i] +")";
+        }))
+        .on("mouseout", helper.onMouseOut(chart));
+
+      svg.select("g.x.axis")
+        .attr("transform", "translate("+margin.left+"," + (margin.top + height) + ")")
+        .call(xAxis);
+
+      svg.select("g.y.axis")
+        .attr("transform", "translate("+margin.left+"," + (margin.top) + ")")
+        .call(yAxis);
+    }
+
+    function drawHeatMap(chart, pair, attrs, scope){
       var xField = pair[1], yField = pair[0];
 
       /** textformatter (default = Identify function aka do nothing) */
@@ -75,7 +132,7 @@ angular.module('vizRecSrcApp')
       var main = svg.select("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-      var x, y, yMax, rect, c;
+      var x, y, yMax, marks, c;
 
       var xDomain = getFormattedData(xField, width/2);
       var yDomain = getFormattedData(yField, height/2);
@@ -144,18 +201,18 @@ angular.module('vizRecSrcApp')
         return xDomainMap[xArray[i]] !== undefined && yDomainMap[yArray[i]] !== undefined;
       });
 
-      rect = main.selectAll(".rect")
+      marks = main.selectAll(".marks")
         .data(indicesShown);
 
-      rect.enter().append("g").append("rect");
+      marks.enter().append("g").append("rect");
 
-      rect.attr("class", "rect")
+      marks.attr("class", "marks")
         .attr("transform", function (i) {
           return "translate(" + x(xArray[i]) +
             "," + y(yArray[i]) + ")";
         });
 
-      rect.select("rect")
+      marks.select("rect")
         .attr("x", 1)
         .attr("width", x.rangeBand()-1)
         .attr("height", y.rangeBand()-1)
@@ -167,7 +224,11 @@ angular.module('vizRecSrcApp')
     }
 
     function updateChart(chart, pair, attrs, scope){
-      drawHeatMap(chart, pair, attrs, scope)
+      if(pair[0].type == dv.type.numeric && pair[1].type == dv.type.numeric){
+        drawScatterPlot(chart, pair, attrs, scope);
+      }else{
+        drawHeatMap(chart, pair, attrs, scope);
+      }
     }
 
     return {
@@ -179,7 +240,7 @@ angular.module('vizRecSrcApp')
         }
         scope.$watch("pair", function(pair){
           if(pair){
-            drawHeatMap(pair, attrs, element[0], scope);
+            _updateChart();
           }
         })
       },
