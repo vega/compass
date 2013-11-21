@@ -51,6 +51,10 @@ body {
   fill: #fff;
 }
 
+.strike{
+  text-decoration: line-through;
+}
+
 .axis path, .axis line {
   fill: none;
   stroke: #000;
@@ -69,6 +73,17 @@ body {
       font-size: 12px;
       font-weight: bold;
       text-align: center;
+    }
+  }
+
+  .chart-option{
+    font-size: 10px;
+    color: #aaa;
+    &.chart-option-on{
+      color: steelblue;
+    }
+    &.disable{
+      color:#ddd;
     }
   }
 
