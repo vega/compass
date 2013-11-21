@@ -104,6 +104,22 @@ body {
   }
 }
 
+/* TODO(kanitw): make compass works and use compass here instead #58*/
 
+.block-2d{
+  width: 300px;
+  height: 300px;
+  display: inline-block;
+}
 
+/* TODO(kanitw): these part are obviously unfinished work */
+
+.left-pane{
+  width:200px;
+  float:left;
+}
+
+.middle-pane{
+  padding-left: 220px;
+}
 
