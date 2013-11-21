@@ -54,6 +54,10 @@ angular.module('vizRecSrcApp')
     weekday[5]="Friday";
     weekday[6]="Saturday";
 
+    this.defaultNumberFormatter = function (d) {
+      return _.isNumber(d) && d > 10000 ? d.toPrecision(2) : d;
+    }
+
     this.getWeekday = function(i){
       return weekday[i];
     };

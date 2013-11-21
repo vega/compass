@@ -22,7 +22,7 @@ angular.module('vizRecSrcApp')
         width = (attrs.width || 120) - margin.left - margin.right,
         height = (attrs.height || 50) - margin.top - margin.bottom;
 
-      var x, y, data, yMax, xAxis, yAxis, bar;
+      var x, y, data, yMax, xAxis, yAxis, marks;
       var yField, xField, xAxisTickFormat, barWidth, innerTickSize=6;
 
       var svg =  d3.select(chart).select("svg")
@@ -37,9 +37,7 @@ angular.module('vizRecSrcApp')
         xField = "x"; yField="y";
         x = d3.scale.linear().domain([Math.min(0,d3.min(colData)), d3.max(colData)]).nice().range([0, width]);
         data = d3.layout.histogram().bins(x.ticks(20))(colData);
-        xAxisTickFormat = function (d) {
-          return _.isNumber(d) && d > 10000 ? d.toPrecision(2) : d;
-        }
+        xAxisTickFormat = helper.defaultNumberFormatter;
         barWidth = x(data[0].dx) - 1;
       }else{
         xField = "val"; yField="count";
@@ -67,19 +65,19 @@ angular.module('vizRecSrcApp')
       xAxis = d3.svg.axis().scale(x).orient("bottom").ticks(2).innerTickSize(innerTickSize)
         .tickFormat(xAxisTickFormat);
 
-      bar = main.selectAll(".bar").data(data, helper.getKey(xField));
+      marks = main.selectAll(".marks").data(data, helper.getKey(xField));
 
 //      console.log("Exit:", bar.exit());
 //      console.log("Enter:", bar.enter());
 //      console.log("Bar:", bar);
 
-      bar.enter().append("g").attr("class","bar").append("rect").append("title");
+      marks.enter().append("g").attr("class","marks").append("rect").append("title");
 
       d3.timer(function(){
-        bar.select("rect").classed("null", helper.isFieldNull(xField));
+        marks.select("rect").classed("null", helper.isFieldNull(xField));
       },500);
 
-      bar.transition().duration(500)
+      marks.transition().duration(500)
         .attr("transform", function (d) {
           return "translate(" + x(d[xField]) + "," + helper.pos(y(d[yField])) + ")";
         })
@@ -92,11 +90,11 @@ angular.module('vizRecSrcApp')
         .style("fill", null);
 
 
-      bar.select("rect")
+      marks.select("rect")
         .on('mouseover', helper.onMouseOver(chart,helper.titleTextFromXY(xField,yField)))
         .on('mouseout', helper.onMouseOut(chart));
 
-      bar.exit().remove();
+      marks.exit().remove();
 
       svg.select("g.x.axis")
         .attr("transform", "translate("+margin.left+"," + (margin.top + height) + ")")
@@ -112,7 +110,7 @@ angular.module('vizRecSrcApp')
         width = (attrs.width || 120) - margin.left - margin.right,
         height = (attrs.height || 20) - margin.top - margin.bottom;
 
-      var x, y, data, yMax, xAxis, yAxis, bar;
+      var x, y, data, yMax, xAxis, yAxis, marks;
 
       var svg = d3.select(chart).select("svg")
         .attr("width", width + margin.left + margin.right)
@@ -135,14 +133,14 @@ angular.module('vizRecSrcApp')
 
       x = d3.scale.linear().domain([0, maxX]).range([0, width]);
       var c = d3.scale.pow().exponent(0.5).domain([0, maxCount]).range(["#efefef", "steelblue"]);
-      bar = svg.selectAll(".bar").data(data, helper.getKey(xField));
+      marks = svg.selectAll(".marks").data(data, helper.getKey(xField));
 
-      bar.enter().append("g").attr("class","bar").append("rect").append("title");
+      marks.enter().append("g").attr("class","marks").append("rect").append("title");
       d3.timer(function(){
-        bar.select("rect").classed("null", helper.isFieldNull("val"));
+        marks.select("rect").classed("null", helper.isFieldNull("val"));
       },500);
-      bar.transition().duration(500)
-        .attr("class", "bar")
+      marks.transition().duration(500)
+        .attr("class", "marks")
         .attr("transform", function (d) {
           return "translate(" + x(d.countCum) + "," + 0 + ")";
         })
@@ -156,12 +154,11 @@ angular.module('vizRecSrcApp')
           return c(d.count);
         });
 
-
-      bar.select("rect")
+      marks.select("rect")
         .on('mouseover', helper.onMouseOver(chart,helper.titleTextFromXY(xField,"count")))
         .on('mouseout', helper.onMouseOut(chart));
 
-      bar.exit().remove();
+      marks.exit().remove();
       svg.selectAll(".x.axis").remove();
     }
 
