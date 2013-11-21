@@ -38,6 +38,7 @@ angular.module('vizRecSrcApp')
               data[i].bin20 = data.addColumn(data[i].name + ":bin20", binned, dv.type.ordinal, null, true);
               data[i].bin20.countTable = countTable(data[i].bin20);
               data[i].bin20.binLevel = 20;
+              data[i].bin20.isBinCol = true;
             }else if(data[i].type == dv.type.date){
               var dateData = data[i].map(function(v){ return new Date(v); });
               var dateBinner = {
@@ -49,6 +50,7 @@ angular.module('vizRecSrcApp')
                 data[i][level] = data.addColumn(data[i].name+":"+level, dateData.map(binner), dv.type.ordinal, null, true);
                 data[i][level].countTable = countTable(data[i][level]);
                 data[i][level].binLevel = level;
+                data[i][level].isBinCol = true;
               });
             }
           }
