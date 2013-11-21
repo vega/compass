@@ -22,7 +22,7 @@ angular.module('vizRecSrcApp')
         width = (attrs.width || 120) - margin.left - margin.right,
         height = (attrs.height || 50) - margin.top - margin.bottom;
 
-      var x, y, data, yMax, xAxis, yAxis, bar;
+      var x, y, data, yMax, xAxis, yAxis, marks;
       var yField, xField, xAxisTickFormat, barWidth, innerTickSize=6;
 
       var svg =  d3.select(chart).select("svg")
@@ -65,19 +65,19 @@ angular.module('vizRecSrcApp')
       xAxis = d3.svg.axis().scale(x).orient("bottom").ticks(2).innerTickSize(innerTickSize)
         .tickFormat(xAxisTickFormat);
 
-      bar = main.selectAll(".bar").data(data, helper.getKey(xField));
+      marks = main.selectAll(".marks").data(data, helper.getKey(xField));
 
 //      console.log("Exit:", bar.exit());
 //      console.log("Enter:", bar.enter());
 //      console.log("Bar:", bar);
 
-      bar.enter().append("g").attr("class","bar").append("rect").append("title");
+      marks.enter().append("g").attr("class","marks").append("rect").append("title");
 
       d3.timer(function(){
-        bar.select("rect").classed("null", helper.isFieldNull(xField));
+        marks.select("rect").classed("null", helper.isFieldNull(xField));
       },500);
 
-      bar.transition().duration(500)
+      marks.transition().duration(500)
         .attr("transform", function (d) {
           return "translate(" + x(d[xField]) + "," + helper.pos(y(d[yField])) + ")";
         })
@@ -90,11 +90,11 @@ angular.module('vizRecSrcApp')
         .style("fill", null);
 
 
-      bar.select("rect")
+      marks.select("rect")
         .on('mouseover', helper.onMouseOver(chart,helper.titleTextFromXY(xField,yField)))
         .on('mouseout', helper.onMouseOut(chart));
 
-      bar.exit().remove();
+      marks.exit().remove();
 
       svg.select("g.x.axis")
         .attr("transform", "translate("+margin.left+"," + (margin.top + height) + ")")
@@ -153,7 +153,6 @@ angular.module('vizRecSrcApp')
         .style("fill", function (d) {
           return c(d.count);
         });
-
 
       marks.select("rect")
         .on('mouseover', helper.onMouseOver(chart,helper.titleTextFromXY(xField,"count")))
