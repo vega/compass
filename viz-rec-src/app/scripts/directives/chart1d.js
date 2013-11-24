@@ -210,7 +210,8 @@ angular.module('vizRecSrcApp')
       },
       scope: {
         col: "=",
-        select:"&"
+        select:"&",
+        isSelectedField: "="
       }
     };
   });
