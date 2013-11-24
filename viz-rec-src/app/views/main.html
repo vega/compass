@@ -16,7 +16,16 @@
             <select ng-model="currentSorter2dType" ng-options="n for n in sorter2dTypes">
             </select>
         </div>
-        <div ng-repeat="pair in colPairs | limitTo: 10" class="block-2d">
+        <div>
+            <div><b>Quick Score Overview</b></div>
+            <span ng-repeat="pair in colPairs" style="margin-right:5px;">
+                {{ pair[1].name }}:
+                <span style="background-color: {{ metricColor(pair.metric)}}">
+                    {{ pair.metric.toFixed(2) }}
+                </span>
+            </span>
+        </div>
+        <div ng-repeat="pair in colPairs | limitTo: 6" class="block-2d">
             <chart2d pair="pair" width="250" height="250"/>
             {{ pair.metric }}
         </div>
