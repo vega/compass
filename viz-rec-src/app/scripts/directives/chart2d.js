@@ -28,7 +28,10 @@ angular.module('vizRecSrcApp')
     function drawScatterPlot(chart, pair, attrs, scope){
       var xField = pair[1], yField = pair[0];
 
-      var margin = { top: 15 || attrs.marginTop , right: 5 || attrs.marginLeft , bottom: 20 ||  attrs.marginBottom, left: 15 || attrs.marginLeft },
+      var margin = { top: 15 || attrs.marginTop ,
+          right: 5 || attrs.marginLeft ,
+          bottom: 35 ||  attrs.marginBottom,
+          left: 35 || attrs.marginLeft },
         width = (attrs.width || 120) - margin.left - margin.right,
         height = (attrs.height || 120) - margin.top - margin.bottom;
 
@@ -42,7 +45,7 @@ angular.module('vizRecSrcApp')
       var x, y, marks, innerTickSize=6;
 
       x = d3.scale.linear().domain([0, d3.max(xField)]).range([0, width]);
-      y = d3.scale.linear().domain([0, d3.max(yField)]).range([0, height]);
+      y = d3.scale.linear().domain([0, d3.max(yField)]).range([height, 0]);
 
       var xAxis = d3.svg.axis().scale(x).orient("bottom").ticks(2).innerTickSize(innerTickSize)
         .tickFormat(helper.defaultNumberFormatter);
