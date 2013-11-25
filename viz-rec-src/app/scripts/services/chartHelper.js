@@ -7,9 +7,15 @@ angular.module('vizRecSrcApp')
     /** identity function **/
     this.I = function(d){return d;};
 
+    this.NULL_VALUES = [null, "", "NaN"];
+
     this.formatCount = d3.format(",.0f"); 
-    this.isNull = function(x){ return x===null || x === "" || x=="NaN";};
-    this.isNotNull = function(x){ return !self.isNull(x);};
+    this.isNull = function(x){
+      return _.contains(self.NULL_VALUES,x);
+    };
+    this.isNonZero = function(x){return x !== 0;};
+
+    this.isNotNull = function(x){ return !_.contains(self.NULL_VALUES,x);};
     this.isFieldNull = function(field){
       return function (d) {
         return self.isNull(d[field]);
@@ -19,6 +25,12 @@ angular.module('vizRecSrcApp')
       return function(d){
         return !self.isNull(d[field]);
       };
+    };
+
+    this.checkField = function(field, fn){
+      return function(d){
+        return fn(d[field]);
+      }
     };
 
     this.getKey = function(xField){

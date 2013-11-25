@@ -2,22 +2,66 @@
     <div class="name-row">
         <span class="chart-name">
             <a href="" ng-click="select(col);">{{col.name}}</a>
+            <!--{{ col.hasZero }}-->
+            <!--{{ col.hasNull }}-->
         </span>
-        <span class="pull-right mini-btn-grp">
-            <a href="" class="chart-option" ng-show="col.type!='numeric'" ng-click="toggleChartType()">
-                Type
+        <span class="chart-option"
+              ng-show="col.type == 'numeric' && yScaleLog"
+              ng-class="{'chart-option-on': yScaleLog}">
+            <a href="" ng-click="toggleLogTransform()">
+            Log
             </a>
+        </span>
+        <span>
             <a href="" ng-click="toggleFilterNull()"
-               class="chart-option"
-               ng-class="{'chart-option-on':filterNull, strike:filterNull}">
+               class="chart-option strike chart-option-on"
+               ng-show="col.filterNull">
                 Null
             </a>
-            <a href="" ng-click="toggleLogTransform()"
-               class="chart-option"
-               ng-disabled="col.type != 'numeric' && chartType != 'histogram'"
-               ng-class="{'chart-option-on':yScaleLog, 'disable': col.type != 'numeric' && chartType != 'histogram'}">
-                Log
+            <a href="" ng-click="toggleFilterZero()"
+               class="chart-option strike chart-option-on"
+               ng-show="col.filterZero">
+                0
             </a>
+        </span>
+
+
+        <div class="btn-group btn-xs pull-right option-group">
+
+            <button type="button" class="btn btn-default btn-xxs dropdown-toggle" data-toggle="dropdown">
+                Opt
+                <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu" role="menu">
+                <li><a href="" ng-show="col.type!='numeric'" ng-click="toggleChartType()">
+                    Change Chart Type
+                </a></li>
+
+                <li ng-show="col.type=='numeric'">
+                    <a href="" ng-click="toggleLogTransform()">
+                        Log Transform
+                    </a>
+                </li>
+
+
+                <li ng-show="col.hasNull">
+                    <a href="" ng-click="toggleFilterNull()">
+                        Filter Null
+                    </a>
+                </li>
+                <li ng-show="col.hasZero">
+                    <a href="" ng-click="toggleIsZeroNull()">
+                        Filter 0
+                    </a>
+                </li>
+
+            </ul>
+
+        </div>
+        <span class="pull-right mini-btn-grp">
+
+
+
         </span>
     </div>
     <div class="chart" ng-switch="col.type">

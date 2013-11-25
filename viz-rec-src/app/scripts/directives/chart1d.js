@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('vizRecSrcApp')
-  .directive('chart1d', function (chartHelper) {
+  .directive('chart1d', function (chartHelper, dataManager) {
     var helper = chartHelper;
     var chartType = {
       histogram: "histogram",
@@ -33,7 +33,8 @@ angular.module('vizRecSrcApp')
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
       if (isNumeric){
-        var colData = scope.filterNull ? _.filter(col, helper.isNotNull) : col;
+        var colData = col.filterFn ? _.filter(col, col.filterFn) : col;
+
         xField = "x"; yField="y";
         x = d3.scale.linear().domain([Math.min(0,d3.min(colData)), d3.max(colData)]).nice().range([0, width]);
         data = d3.layout.histogram().bins(x.ticks(20))(colData);
@@ -42,8 +43,8 @@ angular.module('vizRecSrcApp')
       }else{
         xField = "val"; yField="count";
 
-        //TODO(kanitw): please please use datavore to query these
-        data = (scope.filterNull ? _(col.countTable).filter(helper.isFieldNotNull(xField)) :  _(col.countTable))
+        //TODO(kanitw): please please use datavore to query these/make datavore supports this
+        data = (col.filterFn ? _(col.countTable).filter(helper.checkField(xField,col.filterFn)) : _(col.countTable))
           .sortBy("count")
           .last(width / 2) //reduce problem for categorical value that has more than width/2
           .reverse()
@@ -120,7 +121,7 @@ angular.module('vizRecSrcApp')
 
       var countCum = 0, maxCount = 0;
       var xField = "val";
-      data = (scope.filterNull ? _(col.countTable).filter(helper.isFieldNotNull(xField)) :  _(col.countTable))
+      data = (col.filterFn ? _(col.countTable).filter(helper.checkField(xField, col.filterFn)) :  _(col.countTable))
         .sortBy("count").map(function (d) {
           d.countCum = countCum;
           countCum += d.count;
@@ -129,7 +130,7 @@ angular.module('vizRecSrcApp')
         })
         .value();
 
-      var maxX = scope.filterNull ? countCum : col.length;
+      var maxX = countCum;
 
       x = d3.scale.linear().domain([0, maxX]).range([0, width]);
       var c = d3.scale.pow().exponent(0.5).domain([0, maxCount]).range(["#efefef", "steelblue"]);
@@ -203,9 +204,22 @@ angular.module('vizRecSrcApp')
         }
 
         scope.toggleFilterNull = function(){
-          scope.filterNull = !scope.filterNull;
-          _updateChart();
+          scope.col.filterNull = !scope.col.filterNull;
+          scope.col.filterFn = scope.col.filterNull ? helper.isNotNull : null;
+          //TODO(kanitw): implement setFilter in datavore
+//          scope.col.setFilter(helper.isNull);
+//          _updateChart();
+        };
+
+        scope.toggleIsZeroNull = function(){
+          scope.col.filterZero = !scope.col.filterZero;
+          scope.col.filterFn = scope.col.filterZero ? helper.isNonZero : null;
+          //TODO(kanitw): implement setFilter in datavore
+//          scope.col.setFilter(helper.isZero);
         }
+
+        scope.$watch("col.filterNull", _updateChart);
+        scope.$watch("col.filterZero", _updateChart);
 
       },
       scope: {
