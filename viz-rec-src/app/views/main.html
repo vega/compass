@@ -3,6 +3,9 @@
         <div>
             <select ng-model="currentSorter1dType" ng-options="n for n in sorter1dTypes">
             </select>
+            <a href="" ng-click="filterAllNull()">
+                Filter All Null
+            </a>
         </div>
         <!--<div class="block-1d" ng-init="col=data[0]">-->
         <div ng-repeat="col in cols" class="block-1d">
@@ -13,6 +16,7 @@
         <div>
             <select ng-model="currentSorter2dType" ng-options="n for n in sorter2dTypes">
             </select>
+
         </div>
         <div>
             <div><b>Quick Score Overview</b></div>

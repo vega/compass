@@ -46,12 +46,16 @@
 
                 <li ng-show="col.hasNull">
                     <a href="" ng-click="toggleFilterNull()">
-                        Filter Null
+                        <span ng-show="col.filterNull">Unfilter</span>
+                        <span ng-show="!col.filterNull">Filter</span>
+                        Null
                     </a>
                 </li>
                 <li ng-show="col.hasZero">
                     <a href="" ng-click="toggleIsZeroNull()">
-                        Filter 0
+                        <span ng-show="col.filterZero">Unfilter</span>
+                        <span ng-show="!col.filterZero">Filter</span>
+                        0
                     </a>
                 </li>
 
