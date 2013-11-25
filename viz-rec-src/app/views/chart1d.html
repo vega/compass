@@ -61,6 +61,12 @@
                         0
                     </a>
                 </li>
+                <li ng-show="col.type!='numeric'">
+                    <a href="" ng-click="toggleSortBy()">
+                        <span ng-show="sortBy=='count'">Sort by Alphabet</span>
+                        <span ng-show="sortBy=='val'">Sort by Count</span>
+                    </a>
+                </li>
 
             </ul>
 
