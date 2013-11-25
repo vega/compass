@@ -175,7 +175,7 @@ angular.module('vizRecSrcApp')
       templateUrl: 'views/chart1d.html',
       restrict: 'E',
       link: function postLink(scope, element, attrs) {
-        scope.chartType = "null";
+        scope.chartType = chartType.histogram;
         scope.sortBy = "count";
 
         function _updateChart(){
