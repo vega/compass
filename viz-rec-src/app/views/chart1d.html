@@ -3,7 +3,7 @@
         <span class="chart-name">
             <a href="" ng-click="select(col);">{{col.name}}</a>
             <span ng-show="col.metric && col.metric != col.name && currentSorted1dType!='name'">
-                ({{ col.metric }})
+                ({{ col.metric.toPrecision(2) }})
             </span>
             <!--{{ col.hasZero }}-->
             <!--{{ col.hasNull }}-->
