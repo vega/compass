@@ -5,12 +5,14 @@ angular.module('vizRecSrcApp')
     // Service logic
     // ...
 
-    function countTable(values){
-      var counter = {}
+    function countTable(values, getMap){
+      var counter = {};
       for(var i=0;i<values.length;i++){
         var val = values.get(i);
         counter[val] = (counter[val] || 0)+1;
       }
+      if(getMap) return counter;
+
       return _.map(counter, function(c,v){ return {val:v, count:c}; });  //{keys:_.keys(counter), count: _.values(counter)};
     }
 
@@ -31,12 +33,17 @@ angular.module('vizRecSrcApp')
           var originalDataLength = data.originalLength = data.length;
           var i,j;
           for (i = 0; i < originalDataLength; i++) {
-            data[i].countTable = countTable(data[i]);
+            var ct = countTable(data[i],true);
+            data[i].hasZero = ct[0] > 0;
+            data[i].hasNull = ct[""] > 0 || ct["NaN"] > 0 || ct["null"] > 0;
+
+            data[i].countTable = _.map(ct,function(c,v){ return {val:v, count:c}; });
 
             if (data[i].type == dv.type.numeric) {
               var binned = dv.bin(20).array(data[i]);
               data[i].bin20 = data.addColumn(data[i].name + ":bin20", binned, dv.type.ordinal, null, true);
               data[i].bin20.countTable = countTable(data[i].bin20);
+
               data[i].bin20.binLevel = 20;
               data[i].bin20.isBinCol = true;
             }else if(data[i].type == dv.type.date){
