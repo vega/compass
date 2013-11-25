@@ -5,15 +5,18 @@ angular.module('vizRecSrcApp')
     // Service logic
     // ...
 
-    function countTable(values, getMap){
+    function countMap(values){
       var counter = {};
       for(var i=0;i<values.length;i++){
         var val = values.get(i);
         counter[val] = (counter[val] || 0)+1;
       }
-      if(getMap) return counter;
+      return counter;
+    }
 
-      return _.map(counter, function(c,v){ return {val:v, count:c}; });  //{keys:_.keys(counter), count: _.values(counter)};
+    //TODO(kanitw): revise if we still need this!  It seems redundant in the future
+    function mapToTable(cm){
+      return _.map(cm,function(c,v){ return {val:v, count:c}; });
     }
 
     return {
@@ -33,19 +36,23 @@ angular.module('vizRecSrcApp')
           var originalDataLength = data.originalLength = data.length;
           var i,j;
           for (i = 0; i < originalDataLength; i++) {
-            var ct = countTable(data[i],true);
-            data[i].hasZero = ct[0] > 0;
-            data[i].hasNull = ct[""] > 0 || ct["NaN"] > 0 || ct["null"] > 0;
+            var cm = data[i].countMap = countMap(data[i]);
+            data[i].hasZero = cm[0] > 0;
+            data[i].hasNull = cm[""] > 0 || cm["NaN"] > 0 || cm["null"] > 0;
 
-            data[i].countTable = _.map(ct,function(c,v){ return {val:v, count:c}; });
+            data[i].countTable = mapToTable(data[i].countMap);
 
             if (data[i].type == dv.type.numeric) {
               var binned = dv.bin(20).array(data[i]);
               data[i].bin20 = data.addColumn(data[i].name + ":bin20", binned, dv.type.ordinal, null, true);
-              data[i].bin20.countTable = countTable(data[i].bin20);
+              cm = data[i].bin20.countMap = countMap(data[i].bin20);
+              data[i].bin20.countTable = mapToTable(cm);
 
               data[i].bin20.binLevel = 20;
               data[i].bin20.isBinCol = true;
+
+              //TODO(kanitw): _.values is not the most efficient method for sure
+              data[i].entropy = it.entropy(_.values(cm));
             }else if(data[i].type == dv.type.date){
               var dateData = data[i].map(function(v){ return new Date(v); });
               var dateBinner = {
@@ -55,10 +62,17 @@ angular.module('vizRecSrcApp')
               };
               _.each(dateBinner, function(binner, level){
                 data[i][level] = data.addColumn(data[i].name+":"+level, dateData.map(binner), dv.type.ordinal, null, true);
-                data[i][level].countTable = countTable(data[i][level]);
+                cm = data[i][level].countMap = countMap(data[i][level])
+                data[i][level].countTable = mapToTable(cm);
                 data[i][level].binLevel = level;
                 data[i][level].isBinCol = true;
+                //TODO(kanitw): _.values is not the most efficient method for sure
+                data[i][level].entropy = it.entropy(_.values(cm));
               });
+              //TODO(kanitw): change this to be flexble, just use month for now.
+              data[i].entropy = data[i]["month"].entropy;
+            }else{
+              data[i].entropy = it.entropy(_.values(data[i].countMap));
             }
           }
           data.mi_distance = [];

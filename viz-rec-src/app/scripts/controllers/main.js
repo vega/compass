@@ -61,6 +61,12 @@ angular.module('vizRecSrcApp')
           return col.type == dv.type.numeric ? 20 : col.countTable.length;
         },
         reverse: false
+      },
+      entropy:{
+        metric: function(col){
+          return col.entropy;
+        },
+        reverse: false
       }
     }
 
@@ -94,7 +100,7 @@ angular.module('vizRecSrcApp')
       var _cols = _(dataTable).filter(function(c){return !c.isBinCol;});
       if(currentSorter.metric)
         _cols = _cols .sortBy(function(c){
-          return currentSorter.metric(c);
+          return c.metric = currentSorter.metric(c);
         });
       $scope.cols = currentSorter.reverse ? _cols.reverse().value(): _cols.value();
     }

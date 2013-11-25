@@ -8,7 +8,8 @@
             </a>
         </div>
         <!--<div class="block-1d" ng-init="col=data[0]">-->
-        <div ng-repeat="col in cols" class="block-1d">
+        <!--| filter: {type:'numeric'}-->
+        <div ng-repeat="col in cols " class="block-1d">
             <chart1d col="col" select="select(col);" width="150" is-selected-field="selectedField.name == col.name">
         </div>
     </div>
