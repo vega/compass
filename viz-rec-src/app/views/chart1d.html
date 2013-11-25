@@ -6,8 +6,8 @@
             <!--{{ col.hasNull }}-->
         </span>
         <span class="chart-option"
-              ng-show="col.type == 'numeric' && yScaleLog"
-              ng-class="{'chart-option-on': yScaleLog}">
+              ng-show="col.type == 'numeric' && col.useLogScale"
+              ng-class="{'chart-option-on': col.useLogScale}">
             <a href="" ng-click="toggleLogTransform()">
             Log
             </a>

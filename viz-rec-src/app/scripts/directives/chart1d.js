@@ -57,7 +57,7 @@ angular.module('vizRecSrcApp')
 
 //      yMax = _.max(data, yField);
       yMax = d3.max(data, function(d){ return d[yField]; });
-      y = scope.yScaleLog ?
+      y = col.useLogScale ?
         d3.scale.log().domain([1, yMax]).range([height, 0])
         : d3.scale.linear().domain([0, yMax]).range([height, 0])
       ;
@@ -199,7 +199,7 @@ angular.module('vizRecSrcApp')
         }
 
         scope.toggleLogTransform = function(){
-          scope.yScaleLog = !scope.yScaleLog;
+          scope.col.useLogScale = !scope.col.useLogScale;
           _updateChart();
         }
 
