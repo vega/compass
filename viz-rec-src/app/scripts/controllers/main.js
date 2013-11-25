@@ -1,7 +1,9 @@
 'use strict';
 
 angular.module('vizRecSrcApp')
-  .controller('MainCtrl', function ($scope, dataManager) {
+  .controller('MainCtrl', function ($scope, dataManager, chartHelper) {
+    var helper = chartHelper;
+
     function set2dSorter(sorterType){
       $scope.current2dSorter = $scope.sorter2d[sorterType];
       updatePairs();
@@ -60,6 +62,22 @@ angular.module('vizRecSrcApp')
         },
         reverse: false
       }
+    }
+
+    $scope.filterAllNull = function(){
+      var i, dataTable = $scope.dataTable;
+      for(i=0 ; i<dataTable.originalLength; i++){
+        if(dataTable[i].hasNull){
+          dataTable[i].filterFn = helper.isNotNull;
+          dataTable[i].filterNull = true;
+          if(dataTable[i].hasZero)
+            console.error("We do not support both null and zero filter yet");
+        }else if(dataTable[i].hasZero){
+          dataTable[i].filterFn = helper.isNonZero;
+          dataTable[i].filterZero = true;
+        }
+      }
+      return dataTable[i];
     }
 
     $scope.sorter1dTypes = _.keys($scope.sorter1d);

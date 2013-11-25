@@ -44,8 +44,12 @@ angular.module('vizRecSrcApp')
 
       var x, y, marks, innerTickSize=6;
 
-      x = d3.scale.linear().domain([0, d3.max(xField)]).range([0, width]);
-      y = d3.scale.linear().domain([0, d3.max(yField)]).range([height, 0]);
+      x = (xField.useLogScale ? d3.scale.log().domain([1, d3.max(xField)])
+        : d3.scale.linear().domain([0, d3.max(xField)]))
+        .range([0, width]);
+      y = (yField.useLogScale ? d3.scale.log().domain([1, d3.max(yField)])
+        : d3.scale.linear().domain([0, d3.max(yField)]))
+        .range([height, 0]);
 
       var xAxis = d3.svg.axis().scale(x).orient("bottom").ticks(2).innerTickSize(innerTickSize)
         .tickFormat(helper.defaultNumberFormatter);
@@ -242,10 +246,17 @@ angular.module('vizRecSrcApp')
           updateChart(element.find(".chart")[0], scope.pair, attrs, scope);
         }
         scope.$watch("pair", function(pair){
+          scope.pairY = pair[0];
+          scope.pairX = pair[1];
           if(pair){
             _updateChart();
           }
-        })
+        });
+
+        scope.$watch("pairX.filtered", _updateChart);
+        scope.$watch("pairY.useLogScale", _updateChart);
+        scope.$watch("pairX.filtered", _updateChart);
+        scope.$watch("pairY.useLogScale", _updateChart);
       },
       scope:{
         pair:"="

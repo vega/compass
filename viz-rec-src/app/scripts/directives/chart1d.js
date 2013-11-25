@@ -33,7 +33,7 @@ angular.module('vizRecSrcApp')
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
       if (isNumeric){
-        var colData = col.filterFn ? _.filter(col, col.filterFn) : col;
+        var colData = col.filterFn ? col.filtered: col;
 
         xField = "x"; yField="y";
         x = d3.scale.linear().domain([Math.min(0,d3.min(colData)), d3.max(colData)]).nice().range([0, width]);
@@ -57,7 +57,7 @@ angular.module('vizRecSrcApp')
 
 //      yMax = _.max(data, yField);
       yMax = d3.max(data, function(d){ return d[yField]; });
-      y = scope.yScaleLog ?
+      y = col.useLogScale ?
         d3.scale.log().domain([1, yMax]).range([height, 0])
         : d3.scale.linear().domain([0, yMax]).range([height, 0])
       ;
@@ -199,23 +199,19 @@ angular.module('vizRecSrcApp')
         }
 
         scope.toggleLogTransform = function(){
-          scope.yScaleLog = !scope.yScaleLog;
+          scope.col.useLogScale = !scope.col.useLogScale;
           _updateChart();
         }
 
         scope.toggleFilterNull = function(){
           scope.col.filterNull = !scope.col.filterNull;
-          scope.col.filterFn = scope.col.filterNull ? helper.isNotNull : null;
-          //TODO(kanitw): implement setFilter in datavore
-//          scope.col.setFilter(helper.isNull);
+          scope.col.setFilter(scope.col.filterNull ? helper.isNotNull : null);
 //          _updateChart();
         };
 
         scope.toggleIsZeroNull = function(){
           scope.col.filterZero = !scope.col.filterZero;
-          scope.col.filterFn = scope.col.filterZero ? helper.isNonZero : null;
-          //TODO(kanitw): implement setFilter in datavore
-//          scope.col.setFilter(helper.isZero);
+          scope.col.setFilter(scope.col.filterZero ? helper.isNonZero : null);
         }
 
         scope.$watch("col.filterNull", _updateChart);
