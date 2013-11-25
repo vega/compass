@@ -47,7 +47,7 @@ angular.module('vizRecSrcApp')
         data = (col.filterFn ? _(col.countTable).filter(helper.checkField(xField,col.filterFn)) : _(col.countTable))
           .sortBy("count")
           .last(width / 2) //reduce problem for categorical value that has more than width/2
-          .reverse()
+          .sortBy(scope.sortBy)
           .value();
         x = d3.scale.ordinal().domain(_.pluck(data, 'val')).rangeBands([0, width]);
         xAxisTickFormat = function(x){return "";};
@@ -111,7 +111,7 @@ angular.module('vizRecSrcApp')
         width = (attrs.width || 120) - margin.left - margin.right,
         height = (attrs.height || 20) - margin.top - margin.bottom;
 
-      var x, y, data, yMax, xAxis, yAxis, marks;
+      var x, data, marks;
 
       var svg = d3.select(chart).select("svg")
         .attr("width", width + margin.left + margin.right)
@@ -122,7 +122,7 @@ angular.module('vizRecSrcApp')
       var countCum = 0, maxCount = 0;
       var xField = "val";
       data = (col.filterFn ? _(col.countTable).filter(helper.checkField(xField, col.filterFn)) :  _(col.countTable))
-        .sortBy("count").map(function (d) {
+        .sortBy(scope.sortBy).map(function (d) {
           d.countCum = countCum;
           countCum += d.count;
           if (maxCount < d.count) maxCount = d.count;
@@ -176,6 +176,7 @@ angular.module('vizRecSrcApp')
       restrict: 'E',
       link: function postLink(scope, element, attrs) {
         scope.chartType = "null";
+        scope.sortBy = "count";
 
         function _updateChart(){
           updateChart(element.find(".chart")[0], scope.col, attrs, scope);
@@ -212,10 +213,16 @@ angular.module('vizRecSrcApp')
         scope.toggleIsZeroNull = function(){
           scope.col.filterZero = !scope.col.filterZero;
           scope.col.setFilter(scope.col.filterZero ? helper.isNonZero : null);
+        };
+
+        scope.toggleSortBy = function(){
+          if(scope.sortBy == 'count') scope.sortBy = 'val';
+          else scope.sortBy = 'count';
         }
 
         scope.$watch("col.filterNull", _updateChart);
         scope.$watch("col.filterZero", _updateChart);
+        scope.$watch("sortBy", _updateChart);
 
       },
       scope: {
