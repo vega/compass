@@ -62,9 +62,9 @@ angular.module('vizRecSrcApp')
         },
         reverse: false
       },
-      entropy:{
+      "Normalized Entropy":{
         metric: function(col){
-          return col.entropy;
+          return col.normalizedEntropy;
         },
         reverse: false
       }

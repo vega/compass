@@ -52,7 +52,7 @@ angular.module('vizRecSrcApp')
               data[i].bin20.isBinCol = true;
 
               //TODO(kanitw): _.values is not the most efficient method for sure
-              data[i].entropy = it.entropy(_.values(cm));
+              data[i].normalizedEntropy = it.normalizedEntropy(_.values(cm));
             }else if(data[i].type == dv.type.date){
               var dateData = data[i].map(function(v){ return new Date(v); });
               var dateBinner = {
@@ -67,12 +67,12 @@ angular.module('vizRecSrcApp')
                 data[i][level].binLevel = level;
                 data[i][level].isBinCol = true;
                 //TODO(kanitw): _.values is not the most efficient method for sure
-                data[i][level].entropy = it.entropy(_.values(cm));
+                data[i][level].normalizedEntropy = it.normalizedEntropy(_.values(cm));
               });
               //TODO(kanitw): change this to be flexble, just use month for now.
-              data[i].entropy = data[i]["month"].entropy;
+              data[i].entropy = data[i]["month"].normalizedEntropy;
             }else{
-              data[i].entropy = it.entropy(_.values(data[i].countMap));
+              data[i].normalizedEntropy = it.normalizedEntropy(_.values(data[i].countMap));
             }
           }
           data.mi_distance = [];

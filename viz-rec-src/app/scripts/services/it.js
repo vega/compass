@@ -7,6 +7,10 @@ angular.module('vizRecSrcApp')
     // Service logic
     // ...
 
+    function normalizedEntropy(x){
+      return entropy(x) / ( Math.log(x.length) / Math.LN2);
+    }
+
     function entropy(x) {
       var i, p, s = 0, H = 0, N = x.length;
       for (i=0; i<N; ++i) {
@@ -56,6 +60,7 @@ angular.module('vizRecSrcApp')
     // Public API here
     return {
       entropy: entropy,
+      normalizedEntropy: normalizedEntropy,
       getDistance: getDistance
     };
   });
