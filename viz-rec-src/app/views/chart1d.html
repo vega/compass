@@ -29,12 +29,6 @@
         <!--</span>-->
 
         <div class="pull-right option-group">
-            <div ng-show="col.type!='numeric'" ng-class="{enabled: option}">
-                <a href="" ng-click="toggleChartType()"
-                   data-toggle="tooltip" title="Swap Chart Type">
-                    C
-                </a>
-            </div>
             <div ng-show="col.type=='numeric' || chartType=='histogram'"
                  ng-class="{enabled: col.useLogScale}">
                 <a href="" ng-click="toggleLogTransform()"
@@ -47,6 +41,12 @@
                    ng-class="{strike: col.filterNull}"
                    data-toggle="tooltip" title="Filter Null">
                     Null
+                </a>
+            </div>
+            <div ng-show="col.type!='numeric'" ng-class="{enabled: option}">
+                <a href="" ng-click="toggleChartType()"
+                   data-toggle="tooltip" title="Swap Chart Type">
+                    C
                 </a>
             </div>
             <div ng-show="col.hasZero" ng-class="{enabled: col.filterZero}">
