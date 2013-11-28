@@ -19,11 +19,11 @@ angular.module('vizRecSrcApp')
       var isNumeric = col.type == "numeric";
 
       var margin = {top: 5, right: 5, bottom: isNumeric ? 20 : 10, left: 5},
-        width = (attrs.width || 120) - margin.left - margin.right,
-        height = (attrs.height || 50) - margin.top - margin.bottom;
+        width = (attrs.width || 120),
+        height = (attrs.height || 30);
 
       var x, y, data, yMax, xAxis, yAxis, marks;
-      var yField, xField, xAxisTickFormat, barWidth, innerTickSize=6;
+      var yField, xField, xAxisTickFormat, barWidth, tickSize=6;
 
       var svg =  d3.select(chart).select("svg")
         .attr("width", width + margin.left + margin.right)
@@ -52,7 +52,7 @@ angular.module('vizRecSrcApp')
         x = d3.scale.ordinal().domain(_.pluck(data, 'val')).rangeBands([0, width]);
         xAxisTickFormat = function(x){return "";};
         barWidth = x.rangeBand() -1;
-        innerTickSize = 1
+        tickSize = 1
       }
 
 //      yMax = _.max(data, yField);
@@ -63,7 +63,8 @@ angular.module('vizRecSrcApp')
       ;
 
 
-      xAxis = d3.svg.axis().scale(x).orient("bottom").ticks(2).innerTickSize(innerTickSize)
+      xAxis = d3.svg.axis().scale(x).orient("bottom")
+        .ticks(2).tickSize(tickSize)
         .tickFormat(xAxisTickFormat);
 
       marks = main.selectAll(".marks").data(data, helper.getKey(xField));
@@ -107,7 +108,7 @@ angular.module('vizRecSrcApp')
 
       var isNumeric = col.type == "numeric";
 
-      var margin = {top: 5, right: 5, bottom: isNumeric ? 15 : 8, left: 5},
+      var margin = {top: 5, right: 5, bottom: isNumeric ? 10 : 5, left: 5},
         width = (attrs.width || 120) - margin.left - margin.right,
         height = (attrs.height || 20) - margin.top - margin.bottom;
 
@@ -175,6 +176,7 @@ angular.module('vizRecSrcApp')
       templateUrl: 'views/chart1d.html',
       restrict: 'E',
       link: function postLink(scope, element, attrs) {
+        scope.fieldTypeShort = chartHelper.fieldTypeShort;
         scope.chartType = chartType.histogram;
         scope.sortBy = "count";
 

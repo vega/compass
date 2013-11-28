@@ -1,3 +1,6 @@
 [submodule "viz-rec-src/app/lib/datavore"]
 	path = viz-rec-src/app/lib/datavore
-	url = https://github.com/StanfordHCI/datavore.git
+url=https://github.com/kanitw/datavore.git
+[submodule "viz-rec-src/app/lib/flexy-layout"]
+	path = viz-rec-src/app/lib/flexy-layout
+	url = https://kanitw@github.com/lorenzofox3/flexy-layout.git

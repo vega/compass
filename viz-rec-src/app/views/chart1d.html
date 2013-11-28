@@ -1,61 +1,49 @@
 <div class="chart-1d chart-container" ng-class="{'selected-field': isSelectedField}">
     <div class="name-row">
         <span class="chart-name">
-            <a href="" ng-click="select(col);">{{col.name}}</a>
+            <a href="" ng-click="select(col);">
+                <span class="label label-default type-label">{{ fieldTypeShort[col.type] }}</span>
+                {{col.name}}
+            </a>
             <span ng-show="col.metric && col.metric != col.name && currentSorted1dType!='name'">
                 ({{ col.metric.toPrecision(2) }})
             </span>
             <!--{{ col.hasZero }}-->
             <!--{{ col.hasNull }}-->
         </span>
-        <!--<span class="chart-option"-->
-              <!--ng-show="col.type == 'numeric' && col.useLogScale"-->
-              <!--ng-class="{'chart-option-on': col.useLogScale}">-->
-            <!--<a href="" ng-click="toggleLogTransform()">-->
-            <!--Log-->
-            <!--</a>-->
-        <!--</span>-->
-        <!--<span>-->
-            <!--<a href="" ng-click="toggleFilterNull()"-->
-               <!--class="chart-option strike chart-option-on"-->
-               <!--ng-show="col.filterNull">-->
-                <!--Null-->
-            <!--</a>-->
-            <!--<a href="" ng-click="toggleFilterZero()"-->
-               <!--class="chart-option strike chart-option-on"-->
-               <!--ng-show="col.filterZero">-->
-                <!--0-->
-            <!--</a>-->
-        <!--</span>-->
 
-        <div class="pull-right option-group">
-            <div ng-show="col.type=='numeric' || chartType=='histogram'"
+        <span class="option-group">
+            <span ng-show="col.type=='numeric' || chartType=='histogram'"
+                 class="option-item"
                  ng-class="{enabled: col.useLogScale}">
                 <a href="" ng-click="toggleLogTransform()"
                    data-toggle="tooltip" title="Apply Log">
                     log
                 </a>
-            </div>
-            <div ng-show="col.hasNull" ng-class="{enabled: col.filterNull}">
+            </span>
+            <span ng-show="col.hasNull" ng-class="{enabled: col.filterNull}"
+                  class="option-item">
                 <a href="" ng-click="toggleFilterNull()"
                    ng-class="{strike: col.filterNull}"
                    data-toggle="tooltip" title="Filter Null">
                     Null
                 </a>
-            </div>
-            <div ng-show="col.type!='numeric'" ng-class="{enabled: option}">
+            </span>
+            <span ng-show="col.type!='numeric'" ng-class="{enabled: option}"
+                  class="option-item">
                 <a href="" ng-click="toggleChartType()"
                    data-toggle="tooltip" title="Swap Chart Type">
                     C
                 </a>
-            </div>
-            <div ng-show="col.hasZero" ng-class="{enabled: col.filterZero}">
+            </span>
+            <span ng-show="col.hasZero" ng-class="{enabled: col.filterZero}"
+                  class="option-item">
                 <a href="" ng-click="toggleFilterZero()" ng-class="{strike: col.filterZero}"
                    data-toggle="tooltip" title="Filter Zero">
                     0
                 </a>
-            </div>
-            <div>
+            </span>
+            <span class="option-item">
                 <div class="btn-group btn-xxs">
                     <button type="button" class="btn btn-xxs btn-default">S</button>
                     <button type="button" class="btn btn-xxs btn-default dropdown-toggle" data-toggle="dropdown">
@@ -67,8 +55,8 @@
                         <li><a href="" ng-click="sortBy ='count';">by Count</a></li>
                     </ul>
                 </div>
-            </div>
-        </div>
+            </span>
+        </span>
 
 
         <!--<div class="btn-group btn-xs pull-right option-group">-->

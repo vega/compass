@@ -37,6 +37,12 @@ angular.module('vizRecSrcApp')
       return function(d){ return d[xField];};
     };
 
+    this.fieldTypeShort = {
+      "numeric": "n",
+      "ordinal": "o",
+      "nominal": "c"
+    };
+
     var month=new Array();
     month[0]="January";
     month[1]="February";

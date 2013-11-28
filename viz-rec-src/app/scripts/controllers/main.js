@@ -103,6 +103,8 @@ angular.module('vizRecSrcApp')
           return c.metric = currentSorter.metric(c);
         });
       $scope.cols = currentSorter.reverse ? _cols.reverse().value(): _cols.value();
+      $scope.numericCols = _.filter($scope.cols, function(c){ return c.type==dv.type.numeric;});
+      $scope.nonnumericCols = _.filter($scope.cols, function(c){ return c.type!=dv.type.numeric;});
     }
 
 

@@ -1,6 +1,7 @@
 $iconSpritePath: "../images/glyphicons-halflings.png";
 $iconWhiteSpritePath: "../images/glyphicons-halflings-white.png";
 
+@import "../lib/flexy-layout/src/flexyLayout.css";
 @import "../bower_components/bootstrap-sass/lib/bootstrap";
 @import "../bower_components/pure/base.css";
 @import "../bower_components/pure/grids-min.css";
@@ -8,6 +9,90 @@ $iconWhiteSpritePath: "../images/glyphicons-halflings-white.png";
 html, body {
   margin: 0px;
 }
+
+$border-color: #eee;
+
+.flexy-layout.flexy-layout-column > .splitter,
+.flexy-layout.flexy-layout-row > .splitter
+{
+  width: 1px;
+  background-color: $border-color;
+}
+
+.padding5{
+  padding: 5px;
+}
+
+//.flexy-layout.flexy-layout-row > .block.overflowable,
+//.flexy-layout.flexy-layout-column > .block.overflowable,
+//.flexy-layout.overflowable{
+//  overflow:visible;
+//}
+
+
+.stretch-row, .stretch-col { overflow: hidden; position: absolute; }
+.stretch-row {
+  left: 0; right: 0;
+
+  .bottom{
+    font-size: 12px;
+    position: absolute;
+    bottom: 0;
+  }
+
+  &.main-with-navbar{
+    top: 40px;
+    bottom:0;
+  }
+}
+
+.w100{
+  width:100%;
+}
+.h100{
+  height:100%;
+}
+
+
+::-webkit-scrollbar {
+  -webkit-appearance: none;
+}
+::-webkit-scrollbar:vertical {
+  width: 11px;
+}
+
+::-webkit-scrollbar:horizontal {
+  height: 11px;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 8px;
+  border: 2px solid white; /* should match background, can't be transparent */
+  background-color: rgba(0, 0, 0, .5);
+}
+
+
+
+.stretch-col {
+  top: 0; bottom: 0;
+//  &.left-menu{
+//    width: $left-menu-col-width - 1;
+//  }
+
+  &.main-with-left-menu{
+//    left: $left-menu-col-width;
+    right: 0;
+  }
+  &.avoid-top-menu{
+    top:40px;
+  }
+}
+
+.scroll-x { overflow-x: auto; }
+.scroll-y { overflow-y: auto; }
+.no-scroll-x { overflow-x: hidden; }
+.no-scroll-y { overflow-y: hidden; }
+
 
 body {
   font-size: 12px;
@@ -78,25 +163,39 @@ body {
 }
 
 .chart-container{
+  border: 1px solid #ddd;
+  margin: 3px 5px;
+  padding: 0px 3px;
+
   .name-row{
-    padding: 2px;
-    border-top: 1px solid #dddddd;
+    position: relative;
+    .type-label{
+      font-size:90%;
+      margin-right: 2px;
+      padding: 0 2px;
+    }
     .chart-name{
+
       font-size: 12px;
       font-weight: bold;
       text-align: center;
     }
-
   }
 
-  .option-group > div{
-    visibility: hidden;
-    &.enabled{
-      visibility: visible;
+  .option-group{
+    font-size: 10px;
+    .option-item{
+      visibility: hidden;
+      &.enabled{
+        visibility: visible;
+      }
     }
   }
+  .chart{
+    text-align: center;
+  }
 
-  &:hover .option-group > div{
+  &:hover .option-group .option-item{
     visibility: visible;
   }
 
@@ -112,9 +211,13 @@ body {
     margin-right: 4px;
   }
 
-  .chart{
-    padding: 3px 10px;
+  .chart-list{
+    box-sizing: padding-box;
+    padding: 5px;
   }
+
+
+
   .tooltip{
     opacity: 0;
     position: absolute;
@@ -138,16 +241,6 @@ body {
 }
 
 /* TODO(kanitw): these part are obviously unfinished work */
-
-.left-pane{
-  width:200px;
-  float:left;
-}
-
-.middle-pane{
-  padding-left: 220px;
-
-}
 
 .selected-field{
   background-color: #f1f1f1;
