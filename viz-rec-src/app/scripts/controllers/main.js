@@ -76,12 +76,12 @@ angular.module('vizRecSrcApp')
       var i, dataTable = $scope.dataTable;
       for(i=0 ; i<dataTable.originalLength; i++){
         if(dataTable[i].hasNull){
-          dataTable[i].filterFn = helper.isNotNull;
+          dataTable[i].setFilter(helper.isNotNull);
           dataTable[i].filterNull = true;
           if(dataTable[i].hasZero)
             console.error("We do not support both null and zero filter yet");
         }else if(dataTable[i].hasZero){
-          dataTable[i].filterFn = helper.isNonZero;
+          dataTable[i].setFilter(helper.isNonZero);
           dataTable[i].filterZero = true;
         }
       }
