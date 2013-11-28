@@ -3,7 +3,8 @@
 angular.module('vizRecSrcApp', [
   'ngCookies',
   'ngResource',
-  'ngSanitize'
+  'ngSanitize',
+  'flexyLayout'
 ])
   .config(function ($routeProvider) {
     $routeProvider

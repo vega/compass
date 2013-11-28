@@ -62,8 +62,7 @@ angular.module('vizRecSrcApp')
 
       marks.enter().append("g").attr("class","marks").append("circle");
 
-      marks.attr("class","circle-plot")
-        .select("circle")
+      marks.select("circle").transition().duration(500)
         .attr("cx", function(i){
           return x(xField[i]);
         })
@@ -74,7 +73,11 @@ angular.module('vizRecSrcApp')
         .style({
           "fill": "steelblue",
           "fill-opacity": "0.1"
-        })
+        });
+
+
+      marks.attr("class","circle-plot")
+        .select("circle")
         .on("mouseover", helper.onMouseOver(chart,function(i){
           return "("+ xField[i] +","+ yField[i] +")";
         }))
@@ -124,7 +127,14 @@ angular.module('vizRecSrcApp')
 //      console.log(xField.countTable.length, yField.countTable.length);
 //      console.log("type of x,y =", xField.type, yField.type);
 
-      var results = dataManager.currentData.query({dims: [yField.index, xField.index], vals:[dv.count()]});
+      var results = dataManager.currentData.query({
+        dims: [yField.index, xField.index],
+        vals:[dv.count()],
+        where: function(table, row){
+          return (!xField.filterFn || xField.filterFn(table.get(xField.name,row))) &&
+            (!yField.filterFn || yField.filterFn(table.get(yField.name,row)));
+        }
+      });
       var yArray = results[0], xArray=results[1], counts = results[2];
 //      console.log("counts=",counts);
 
