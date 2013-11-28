@@ -23,6 +23,11 @@ body {
   border-radius: 3px;
 }
 
+.btn-group.btn-xxs > .btn.btn-xxs + .dropdown-toggle {
+  padding-left: 0px;
+  padding-right: 0px;
+}
+
 .hero-unit {
     margin: 50px auto 0 auto;
     width: 300px;
@@ -58,7 +63,7 @@ body {
   fill: #fff;
 }
 
-.strike{
+.strike, .strike:hover{
   text-decoration: line-through;
 }
 
@@ -84,12 +89,15 @@ body {
 
   }
 
-  .option-group{
-    display: none;
+  .option-group > div{
+    visibility: hidden;
+    &.enabled{
+      visibility: visible;
+    }
   }
 
-  &:hover .option-group{
-    display: block;
+  &:hover .option-group > div{
+    visibility: visible;
   }
 
   .chart-option{
