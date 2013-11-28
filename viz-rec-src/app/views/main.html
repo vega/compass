@@ -1,47 +1,49 @@
 <div class='stretch-row stretch-col'>
     <flexy-layout>
         <block-container init="200">
-            <div>
-                <select ng-model="currentSorter1dType" ng-options="n for n in sorter1dTypes">
-                </select>
-                <a href="" ng-click="filterAllNull()">
-                    Filter All Null
-                </a>
-            </div>
-            <!--<div class="block-1d" ng-init="col=data[0]">-->
-            <!--| filter: {type:'numeric'}-->
-            <flexy-layout orientation="vertical">
+            <flexy-layout orientation="vertical" >
+                <block-container init="45">
+                    <div class="padding5">
+                        <select ng-model="currentSorter1dType" ng-options="n for n in sorter1dTypes">
+                        </select>
+                        <div>
+                            <a href="" ng-click="filterAllNull()">
+                                Filter All Null
+                            </a>
+                        </div>
+                    </div>
+                </block-container>
                 <block-container>
-                    Numerical
-                    <div class="scroll-y w100 h100">
-                        <div ng-repeat="col in numericCols " class="block-1d">
+                    <!--Numerical-->
+                    <div class="scroll-y no-scroll-x w100 h100 overflowable">
+                        <div ng-repeat="col in cols " class="block-1d">
                             <chart1d col="col" select="select(col);" width="150" is-selected-field="selectedField.name == col.name">
                         </div>
                     </div>
                 </block-container>
-                <block-splitter></block-splitter>
-                <block-container>
-                    Non-numerical
-                    <div class="scroll-y w100 h100">
-                        <div ng-repeat="col in nonnumericCols" class="block-1d">
-                            <chart1d col="col" select="select(col);" width="150" is-selected-field="selectedField.name == col.name">
-                        </div>
-                    </div>
-                </block-container>
+                <!--<block-splitter></block-splitter>-->
+                <!--<block-container>-->
+                    <!--Non-numerical-->
+                    <!--<div class="scroll-y w100 h100 overflowable">-->
+                        <!--<div ng-repeat="col in nonnumericCols" class="block-1d">-->
+                            <!--<chart1d col="col" select="select(col);" width="150" is-selected-field="selectedField.name == col.name">-->
+                        <!--</div>-->
+                    <!--</div>-->
+                <!--</block-container>-->
             </flexy-layout>
 
         </block-container>
         <block-splitter></block-splitter>
         <block-container>
-            <div>
+            <div class="padding5">
                 <select ng-model="currentSorter2dType" ng-options="n for n in sorter2dTypes">
                 </select>
             </div>
             <flexy-layout orientation="vertical">
                 <block-container init="80">
-                    <div>
+                    <div class="padding5">
                         <div><b>Quick Score Overview</b></div>
-                        <div class="w100 scroll-x no-scroll-y">
+                        <div class="w100 scroll-x no-scroll-y chart-list">
                             <span ng-repeat="pair in colPairs" style="margin-right:5px;">
                                 {{ pair[1].name }}:
                                 <span style="background-color: {{ metricColor(pair.metric)}}">

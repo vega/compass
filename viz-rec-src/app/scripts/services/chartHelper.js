@@ -38,7 +38,7 @@ angular.module('vizRecSrcApp')
     };
 
     this.fieldTypeShort = {
-      "numerical": "n",
+      "numeric": "n",
       "ordinal": "o",
       "nominal": "c"
     };

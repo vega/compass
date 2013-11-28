@@ -19,6 +19,10 @@ $border-color: #eee;
   background-color: $border-color;
 }
 
+.padding5{
+  padding: 5px;
+}
+
 //.flexy-layout.flexy-layout-row > .block.overflowable,
 //.flexy-layout.flexy-layout-column > .block.overflowable,
 //.flexy-layout.overflowable{
@@ -159,25 +163,39 @@ body {
 }
 
 .chart-container{
+  border: 1px solid #ddd;
+  margin: 3px 5px;
+  padding: 0px 3px;
+
   .name-row{
-    padding: 2px;
-    border-top: 1px solid #dddddd;
+    position: relative;
+    .type-label{
+      font-size:90%;
+      margin-right: 2px;
+      padding: 0 2px;
+    }
     .chart-name{
+
       font-size: 12px;
       font-weight: bold;
       text-align: center;
     }
-
   }
 
-  .option-group > div{
-    visibility: hidden;
-    &.enabled{
-      visibility: visible;
+  .option-group{
+    font-size: 10px;
+    .option-item{
+      visibility: hidden;
+      &.enabled{
+        visibility: visible;
+      }
     }
   }
+  .chart{
+    text-align: center;
+  }
 
-  &:hover .option-group > div{
+  &:hover .option-group .option-item{
     visibility: visible;
   }
 
@@ -193,9 +211,13 @@ body {
     margin-right: 4px;
   }
 
-  .chart{
-    padding: 3px 10px;
+  .chart-list{
+    box-sizing: padding-box;
+    padding: 5px;
   }
+
+
+
   .tooltip{
     opacity: 0;
     position: absolute;
