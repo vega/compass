@@ -5,6 +5,7 @@ angular.module('vizRecSrcApp')
     var helper = chartHelper;
 
     $scope.sorter1d = {
+      /** map of type of sorter */
       types:{
         name:{
           metric: null,
@@ -27,8 +28,9 @@ angular.module('vizRecSrcApp')
     $scope.sorter1d.current = $scope.sorter1d.types["name"];
 
     //TODO(kanitw): refactor this method's code maybe we need to move them to a separate controller or directives
-    /** map of type of sorter */
+
     $scope.sorter2d = {
+      /** map of type of sorter */
       types:{
         cardinality: {
           metric: function(pair){
