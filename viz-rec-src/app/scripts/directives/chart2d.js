@@ -171,45 +171,46 @@ angular.module('vizRecSrcApp')
         .domain([d3.min(counts),d3.max(counts)])
         .range(["#efefef", "steelblue"]);
 
+      var svgRect = d3.select(chart).select("svg")[0][0].getBoundingClientRect();
+      var chartRect = d3.select(chart)[0][0].getBoundingClientRect();
 
-
-      var xAxisGroup=svg.select("g.x.axis")
-        .attr("transform","translate("+margin.left+","+(margin.top-3)+")")
-        .selectAll("text");
+      var xAxisLabels = d3.select(chart).select(".x-labels").selectAll(".x-label").data(xDomain);
       if(x.rangeBand() < 8){
-        xAxisGroup.remove();
+        xAxisLabels.remove();
       }else{
-        var getX = function(d, i){return  (i+0.5)* x.rangeBand(); }
-        xAxisGroup = xAxisGroup.data(xDomain);
-        xAxisGroup.enter().append("text");
-        xAxisGroup.attr("x", getX)
-          .style("text-anchor","start")
+        var getX = function(d, i){return  i* x.rangeBand() + svgRect.left - chartRect.left + margin.left + "px"; };
+        xAxisLabels.enter().append("div").attr("class","x-label");
+        xAxisLabels
+          .style("left", getX)
+          .style("width", margin.top +"px") //TODO replace
+          .style("height", x.rangeBand()+"px")
+          .style("top", (svgRect.top - chartRect.top + margin.top - 3)+ "px")
           .text(helper.ellipsis(15, xFormatter))
           .on("mouseover", helper.onMouseOver(chart, helper.I))
           .on("mouseout", helper.onMouseOut(chart));
+        xAxisLabels.exit().remove();
         //rotate only if needed!
         if(!_.all(xDomain, function(d){ return d.toString().length * 5 < x.rangeBand();})){
-          xAxisGroup.attr("transform",function(d,i){ return "rotate(270,"+getX(d, i)+",0)";})
-            .attr("dy",5);
+          xAxisLabels.classed("rotate", true);
         }
-
       }
 
-      var yAxisGroup=svg.select("g.y.axis")
-        .attr("transform","translate("+margin.left+","+margin.top+")")
-        .selectAll("text");
-      if(y.rangeBand() < 8){
-        yAxisGroup.remove();
+      var yAxisLabels = d3.select(chart).select(".y-labels").selectAll(".y-label").data(yDomain);
+      if(y.rangeBand()<8){
+        yAxisLabels.remove();
       }else{
-        yAxisGroup = yAxisGroup.data(yDomain);
-        yAxisGroup.enter().append("text");
-        yAxisGroup.attr("y", function(d, i){return  (i+0.5)* y.rangeBand(); })
-          .attr("dy",2.5)
-          .style("text-anchor","end")
-          .text(helper.ellipsis(15, yFormatter))
-          .on("mouseover", helper.onMouseOver(chart, helper.I))
+        yAxisLabels.enter().append("div").attr("class","y-label");
+        yAxisLabels //.transition().duration(500)
+          .style("left", (svgRect.left - chartRect.left - 3) + "px")
+          .style("width", margin.left + "px") //TODO replace with label width instead
+          .style("height", y.rangeBand()+"px")
+          .style("top", function(d,i){
+            return margin.top + svgRect.top - chartRect.top + (i)* y.rangeBand() + "px";
+          })
+          .text(helper.ellipsis(15, yFormatter));
+        yAxisLabels.on("mouseover", helper.onMouseOver(chart, helper.I))
           .on("mouseout", helper.onMouseOut(chart));
-
+        yAxisLabels.exit().remove();
       }
 
       //TODO improve way to filter indices shown
@@ -230,14 +231,15 @@ angular.module('vizRecSrcApp')
         });
 
       marks.select("rect")
-        .attr("x", 1)
-        .attr("width", x.rangeBand()-1)
-        .attr("height", y.rangeBand()-1)
-        .style("fill", function(i){ return c(counts[i]);})
         .on('mouseover', helper.onMouseOver(chart, function(i){
           return "("+ xFormatter(xArray[i]) +","+ yFormatter(yArray[i]) +")="+ counts[i];
         }))
-        .on('mouseout', helper.onMouseOut(chart));
+        .on('mouseout', helper.onMouseOut(chart))
+        .transition().duration(500)
+        .attr("x", 1)
+        .attr("width", x.rangeBand()-1)
+        .attr("height", y.rangeBand()-1)
+        .style("fill", function(i){ return c(counts[i]);});
     }
 
     function updateChart(chart, pair, attrs, scope){
@@ -264,8 +266,8 @@ angular.module('vizRecSrcApp')
         });
 
         scope.$watch("pairX.filtered", _updateChart);
-        scope.$watch("pairY.useLogScale", _updateChart);
-        scope.$watch("pairX.filtered", _updateChart);
+        scope.$watch("pairX.useLogScale", _updateChart);
+        scope.$watch("pairY.filtered", _updateChart);
         scope.$watch("pairY.useLogScale", _updateChart);
       },
       scope:{

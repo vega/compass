@@ -23,12 +23,11 @@ $border-color: #eee;
   padding: 5px;
 }
 
-//.flexy-layout.flexy-layout-row > .block.overflowable,
-//.flexy-layout.flexy-layout-column > .block.overflowable,
-//.flexy-layout.overflowable{
-//  overflow:visible;
-//}
-
+.flexy-layout.flexy-layout-row > .block.overflowable,
+.flexy-layout.flexy-layout-column > .block.overflowable,
+.flexy-layout.overflowable{
+  overflow:visible;
+}
 
 .stretch-row, .stretch-col { overflow: hidden; position: absolute; }
 .stretch-row {
@@ -193,6 +192,29 @@ body {
   }
   .chart{
     text-align: center;
+    position: relative;
+  }
+  .y-label, .x-label{
+    position: absolute;
+    text-overflow: ellipsis;
+    flex-wrap: nowrap;
+    font-size: 10px;
+    line-height: 10px;
+    overflow: hidden;
+//    background-color: white;
+  }
+  .y-label{
+    text-align: right;
+  }
+  .x-label.rotate{
+    text-align: left;
+    //TODO use compass instead!
+    transform: rotate(270deg);
+    -webkit-transform: rotate(270deg);
+    -moz-transform: rotate(270deg);
+    transform-origin: 0 0;
+    -webkit-transform-origin: 0 0;
+    -moz-transform-origin: 0 0;
   }
 
   &:hover .option-group .option-item{
@@ -220,7 +242,7 @@ body {
 
   .tooltip{
     opacity: 0;
-    position: absolute;
+    position: fixed;
     text-align: left;
     padding: 8px;
     font: 12px;
