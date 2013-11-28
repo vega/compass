@@ -11,7 +11,7 @@ angular.module('vizRecSrcApp')
     }
 
 
-    function getFormattedData(field, maxLength) {
+    function getFormattedData(field, maxLength, reverse) {
       var domain = _(field.countTable);
       //TODO(kanitw): options for sortBy methods here.
       //TODO(kanitw): pluck, last is not efficient here, cutting top stuff is not that great
@@ -26,6 +26,8 @@ angular.module('vizRecSrcApp')
       }else{
         domain = domain.sortBy("val");
       }
+
+      if(reverse) domain = domain.reverse();
 
       return domain.pluck("val").value();
     }
@@ -162,7 +164,8 @@ angular.module('vizRecSrcApp')
       var x, y, yMax, marks, c;
 
       var xDomain = getFormattedData(xField, width/2);
-      var yDomain = getFormattedData(yField, height/2);
+      //for y, we need to reverse for numeric data so 0 are on the bottom
+      var yDomain = getFormattedData(yField, height/2, _yField.type== dv.type.numeric);
 
       var reduceToMap = function(map, cur, index){
         map[cur] = index;
