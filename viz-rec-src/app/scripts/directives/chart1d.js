@@ -212,7 +212,7 @@ angular.module('vizRecSrcApp')
 //          _updateChart();
         };
 
-        scope.toggleIsZeroNull = function(){
+        scope.toggleFilterZero = function(){
           scope.col.filterZero = !scope.col.filterZero;
           scope.col.setFilter(scope.col.filterZero ? helper.isNonZero : null);
         };
