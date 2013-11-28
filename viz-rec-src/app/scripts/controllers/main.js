@@ -4,13 +4,52 @@ angular.module('vizRecSrcApp')
   .controller('MainCtrl', function ($scope, dataManager, chartHelper) {
     var helper = chartHelper;
 
-    function set2dSorter(sorterType){
-      $scope.current2dSorter = $scope.sorter2d[sorterType];
-      updatePairs();
+    $scope.sorter1d = {
+      /** map of type of sorter */
+      types:{
+        name:{
+          metric: null,
+          reverse: false
+        },
+        cardinality: {
+          metric: function(col){
+            return col.type == dv.type.numeric ? 20 : col.countTable.length;
+          },
+          reverse: false
+        },
+        "Normalized Entropy":{
+          metric: function(col){
+            return col.normalizedEntropy;
+          },
+          reverse: false
+        }
+      },
+    };
+    $scope.sorter1d.current = $scope.sorter1d.types["name"];
 
-    }
+    //TODO(kanitw): refactor this method's code maybe we need to move them to a separate controller or directives
+
+    $scope.sorter2d = {
+      /** map of type of sorter */
+      types:{
+        cardinality: {
+          metric: function(pair){
+            return (pair[1].type == dv.type.numeric ? 20 : pair[1].countTable.length);
+          },
+          reverse: false
+        },
+        mutualInformationDistance: {
+          metric: function(pair){
+            return dataManager.currentData.mi_distance[pair[0].index][pair[1].index];
+          },
+          reverse: true
+        }
+      }
+    };
+    $scope.sorter2d.current = $scope.sorter2d.types["mutualInformationDistance"];
+
     function updatePairs(){
-      var col = $scope.selectedField, dataTable = $scope.dataTable, currentSorter = $scope.current2dSorter;
+      var col = $scope.selectedField, dataTable = $scope.dataTable, currentSorter = $scope.sorter2d.current;
       var maxMetric = -Infinity, minMetric= Infinity;
       var _colPairs = _(dataTable).filter(function(c,i){return c!=col && i < dataTable.originalLength;})
         .map(function(c){
@@ -29,46 +68,9 @@ angular.module('vizRecSrcApp')
       $scope.metricColor = d3.scale.linear().domain([minMetric,maxMetric]).range(["#efefef","#0099ff"]);
     }
 
-    //TODO(kanitw): refactor this method's code maybe we need to move them to a separate controller or directives
 
-    /** map of type of sorter */
-    $scope.sorter2d = {
-      cardinality: {
-        metric: function(pair){
-          return (pair[1].type == dv.type.numeric ? 20 : pair[1].countTable.length);
-        },
-        reverse: false
-      },
-      mutualInformationDistance: {
-        metric: function(pair){
-          return dataManager.currentData.mi_distance[pair[0].index][pair[1].index];
-        },
-        reverse: true
-      }
-    };
-
-    $scope.sorter2dTypes = _.keys($scope.sorter2d);
-    $scope.currentSorter2dType = "mutualInformationDistance";
-    $scope.$watch("currentSorter2dType", set2dSorter);
-
-    $scope.sorter1d = {
-      name:{
-        metric: null,
-        reverse: false
-      },
-      cardinality: {
-        metric: function(col){
-          return col.type == dv.type.numeric ? 20 : col.countTable.length;
-        },
-        reverse: false
-      },
-      "Normalized Entropy":{
-        metric: function(col){
-          return col.normalizedEntropy;
-        },
-        reverse: false
-      }
-    }
+    $scope.$watch("sorter1d.current", updateSingles);
+    $scope.$watch("sorter2d.current", updatePairs);
 
     $scope.filterAllNull = function(){
       var i, dataTable = $scope.dataTable;
@@ -84,19 +86,13 @@ angular.module('vizRecSrcApp')
         }
       }
       return dataTable[i];
-    }
+    };
 
-    $scope.sorter1dTypes = _.keys($scope.sorter1d);
-    $scope.currentSorter1dType = "name";
-    $scope.$watch("currentSorter1dType", set1dSorter);
 
-    function set1dSorter(sorterType){
-      $scope.current1dSorter = $scope.sorter1d[sorterType];
-      updateSingles();
-    }
+
 
     function updateSingles(){
-      var col = $scope.selectedField, dataTable = $scope.dataTable, currentSorter = $scope.current1dSorter;
+      var dataTable = $scope.dataTable, currentSorter = $scope.sorter1d.current;
       var _cols = _(dataTable).filter(function(c){return !c.isBinCol;});
       if(currentSorter.metric)
         _cols = _cols .sortBy(function(c){

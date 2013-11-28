@@ -1,10 +1,13 @@
 <div class='stretch-row stretch-col'>
+    {{ currentSorter1dType }}
     <flexy-layout>
         <block-container init="200">
             <flexy-layout orientation="vertical" >
                 <block-container init="45">
                     <div class="padding5">
-                        <select ng-model="currentSorter1dType" ng-options="n for n in sorter1dTypes">
+                        {{ sorted1d.types }}
+                        <select ng-model="sorter1d.current"
+                                ng-options="n for (n,s) in sorter1d.types">
                         </select>
                         <div>
                             <a href="" ng-click="filterAllNull()">
@@ -36,7 +39,7 @@
         <block-splitter></block-splitter>
         <block-container>
             <div class="padding5">
-                <select ng-model="currentSorter2dType" ng-options="n for n in sorter2dTypes">
+                <select ng-model="sorter2d.current" ng-options="n for (n,s) in sorter2d.types">
                 </select>
             </div>
             <flexy-layout orientation="vertical">
