@@ -37,6 +37,13 @@ angular.module('vizRecSrcApp')
       return function(d){ return d[xField];};
     };
 
+    this.chartTypes = {
+      histogram: "histogram",
+      stack1d: "stack1d",
+      scatter: "scatter",
+      heatmap: "heatmap"
+    };
+
     this.fieldTypeShort = {
       "numeric": "n",
       "ordinal": "o",
