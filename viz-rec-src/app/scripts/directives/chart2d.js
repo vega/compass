@@ -4,9 +4,14 @@ angular.module('vizRecSrcApp')
   .directive('chart2d', function (dataManager, chartHelper) {
     //noinspection UnnecessaryLocalVariableJS
     var helper= chartHelper;
+    var chartTypes = helper.chartTypes;
+
+    function notHaveElement(elementType){
+      return function(){ return d3.select(this).select(elementType).empty();}
+    }
 
 
-    function getFormattedData(field, maxLength) {
+    function getFormattedData(field, maxLength, reverse) {
       var domain = _(field.countTable);
       //TODO(kanitw): options for sortBy methods here.
       //TODO(kanitw): pluck, last is not efficient here, cutting top stuff is not that great
@@ -21,6 +26,8 @@ angular.module('vizRecSrcApp')
       }else{
         domain = domain.sortBy("val");
       }
+
+      if(reverse) domain = domain.reverse();
 
       return domain.pluck("val").value();
     }
@@ -60,7 +67,12 @@ angular.module('vizRecSrcApp')
 
       marks = main.selectAll(".marks").data(indicesShown);
 
-      marks.enter().append("g").attr("class","marks").append("circle");
+      marks.enter().append("g").append("circle");
+      marks.filter(notHaveElement("circle")).append("circle"); //for ones previous has rect
+
+      marks.attr("class","marks").attr("transform",null); //clear transform from other
+
+      marks.select("rect").remove(); //TODO animate this
 
       marks.select("circle").transition().duration(500)
         .attr("cx", function(i){
@@ -75,13 +87,13 @@ angular.module('vizRecSrcApp')
           "fill-opacity": "0.1"
         });
 
-
-      marks.attr("class","circle-plot")
-        .select("circle")
+      marks.select("circle")
         .on("mouseover", helper.onMouseOver(chart,function(i){
           return "("+ xField[i] +","+ yField[i] +")";
         }))
         .on("mouseout", helper.onMouseOut(chart));
+
+      marks.exit().remove();
 
       svg.select("g.x.axis")
         .attr("transform", "translate("+margin.left+"," + (margin.top + height) + ")")
@@ -90,12 +102,17 @@ angular.module('vizRecSrcApp')
       svg.select("g.y.axis")
         .attr("transform", "translate("+margin.left+"," + (margin.top) + ")")
         .call(yAxis);
+
+      //remove div labels
+      d3.select(chart).select(".x-labels").selectAll(".x-label").remove();
+      d3.select(chart).select(".y-labels").selectAll(".y-label").remove();
     }
 
     function drawHeatMap(chart, pair, attrs, scope){
       var xField = pair[1], yField = pair[0];
+      var _xField = xField, _yField = yField;
 
-      /** textformatter (default = Identify function aka do nothing) */
+      /** text formatter (default = Identify function aka do nothing) */
       var xFormatter = helper.I, yFormatter = helper.I;
 
       var xIsNumeric = xField.type == dv.type.numeric,
@@ -120,10 +137,6 @@ angular.module('vizRecSrcApp')
         console.log("yField", yField.type, "doesn't qualify");
         return;
       }
-
-//      if(xField.type != "nominal" || xField.type != "nominal")
-//        return;
-
 //      console.log(xField.countTable.length, yField.countTable.length);
 //      console.log("type of x,y =", xField.type, yField.type);
 
@@ -136,7 +149,6 @@ angular.module('vizRecSrcApp')
         }
       });
       var yArray = results[0], xArray=results[1], counts = results[2];
-//      console.log("counts=",counts);
 
       var margin = { top: 75 || attrs.marginTop , right: 5 || attrs.marginLeft , bottom: 5 ||  attrs.marginBottom, left: 75 || attrs.marginLeft },
         width = (attrs.width || 120) - margin.left - margin.right,
@@ -152,7 +164,8 @@ angular.module('vizRecSrcApp')
       var x, y, yMax, marks, c;
 
       var xDomain = getFormattedData(xField, width/2);
-      var yDomain = getFormattedData(yField, height/2);
+      //for y, we need to reverse for numeric data so 0 are on the bottom
+      var yDomain = getFormattedData(yField, height/2, _yField.type== dv.type.numeric);
 
       var reduceToMap = function(map, cur, index){
         map[cur] = index;
@@ -160,8 +173,6 @@ angular.module('vizRecSrcApp')
       };
 
       var xDomainMap = xDomain.reduce(reduceToMap,{}), yDomainMap = yDomain.reduce(reduceToMap,{});
-
-//      console.log("domains: ", xDomain, yDomain);
 
       x = d3.scale.ordinal().domain(xDomain).rangeRoundBands([0, width]);
       y = d3.scale.ordinal().domain(yDomain).rangeRoundBands([0,height]);
@@ -213,6 +224,10 @@ angular.module('vizRecSrcApp')
         yAxisLabels.exit().remove();
       }
 
+      //remove axis from other chart types
+      svg.select("g.x.axis").selectAll("*").remove();
+      svg.select("g.y.axis").selectAll("*").remove();
+
       //TODO improve way to filter indices shown
       //use only indices that are selected (top k)
       var indicesShown = _.filter(_.range(0, yArray.length), function(i){
@@ -222,13 +237,17 @@ angular.module('vizRecSrcApp')
       marks = main.selectAll(".marks")
         .data(indicesShown);
 
-      marks.enter().append("g").append("rect");
+      marks.enter().append("g");
 
       marks.attr("class", "marks")
         .attr("transform", function (i) {
           return "translate(" + x(xArray[i]) +
             "," + y(yArray[i]) + ")";
         });
+
+      marks.select("circle").remove(); //TODO animate this
+
+      marks.filter(notHaveElement("rect")).append("rect");
 
       marks.select("rect")
         .on('mouseover', helper.onMouseOver(chart, function(i){
@@ -240,13 +259,15 @@ angular.module('vizRecSrcApp')
         .attr("width", x.rangeBand()-1)
         .attr("height", y.rangeBand()-1)
         .style("fill", function(i){ return c(counts[i]);});
+
+      marks.exit().remove();
     }
 
     function updateChart(chart, pair, attrs, scope){
-      if(pair[0].type == dv.type.numeric && pair[1].type == dv.type.numeric){
-        drawScatterPlot(chart, pair, attrs, scope);
-      }else{
+      if(scope.chartType=="heatmap"){
         drawHeatMap(chart, pair, attrs, scope);
+      }else if(scope.chartType=="scatter"){
+        drawScatterPlot(chart, pair, attrs, scope);
       }
     }
 
@@ -254,12 +275,24 @@ angular.module('vizRecSrcApp')
       templateUrl: 'views/chart2d.html',
       restrict: 'E',
       link: function postLink(scope, element, attrs) {
+        scope.chartType= "heatmap";
+
         function _updateChart(){
           updateChart(element.find(".chart")[0], scope.pair, attrs, scope);
         }
+
+        scope.toggleChartType = function(){
+          if(scope.chartType == chartTypes.heatmap){
+            scope.chartType = chartTypes.scatter;
+          }else{
+            scope.chartType = chartTypes.heatmap;
+          }
+        };
+
         scope.$watch("pair", function(pair){
           scope.pairY = pair[0];
           scope.pairX = pair[1];
+          scope.isQonQ = pair[0].type == dv.type.numeric && pair[1].type == dv.type.numeric;
           if(pair){
             _updateChart();
           }
@@ -269,6 +302,7 @@ angular.module('vizRecSrcApp')
         scope.$watch("pairX.useLogScale", _updateChart);
         scope.$watch("pairY.filtered", _updateChart);
         scope.$watch("pairY.useLogScale", _updateChart);
+        scope.$watch("chartType", _updateChart);
       },
       scope:{
         pair:"="
