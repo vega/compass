@@ -23,6 +23,10 @@ $border-color: #eee;
   padding: 5px;
 }
 
+.invisible{
+  visibility: hidden;
+}
+
 .flexy-layout.flexy-layout-row > .block.overflowable,
 .flexy-layout.flexy-layout-column > .block.overflowable,
 .flexy-layout.overflowable{

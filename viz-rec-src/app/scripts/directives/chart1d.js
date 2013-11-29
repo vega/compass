@@ -57,21 +57,16 @@ angular.module('vizRecSrcApp')
 
 //      yMax = _.max(data, yField);
       yMax = d3.max(data, function(d){ return d[yField]; });
-      y = col.useLogScale ?
+      y = scope.useLogCount ?
         d3.scale.log().domain([1, yMax]).range([height, 0])
         : d3.scale.linear().domain([0, yMax]).range([height, 0])
       ;
-
 
       xAxis = d3.svg.axis().scale(x).orient("bottom")
         .ticks(2).tickSize(tickSize)
         .tickFormat(xAxisTickFormat);
 
       marks = main.selectAll(".marks").data(data, helper.getKey(xField));
-
-//      console.log("Exit:", bar.exit());
-//      console.log("Enter:", bar.enter());
-//      console.log("Bar:", bar);
 
       marks.enter().append("g").attr("class","marks").append("rect").append("title");
 
@@ -201,7 +196,12 @@ angular.module('vizRecSrcApp')
           _updateChart();
         }
 
-        scope.toggleLogTransform = function(){
+        scope.toggleLogCount = function(){
+          scope.useLogCount = !scope.useLogCount;
+          _updateChart();
+        };
+
+        scope.toggleLogScale = function(){
           scope.col.useLogScale = !scope.col.useLogScale;
           _updateChart();
         }
