@@ -6,6 +6,7 @@ require(nnet)
 require(plyr)
 require(nortest)
 require(entropy)
+require(mclust)
 
 not <- function(f){ return(function(x) !f(x))} # create not(f(x)) = !f(x)
 
@@ -73,14 +74,33 @@ combine_ranks <- function(u,v) {
   return(ret)
 }
 
+clust_error <- function(x) {
+  opt_centers = dim(Mclust(as.matrix(x[!is.na(x)]), G=1:20)$z)[2]
+  clust = kmeans(x[!is.na(x)], centers = opt_centers, nstart = 25)
+  return(clust$betweenss/clust$totss)
+}
+
 normality <- make_rank_1D(num_vars, fn=function(x) lillie.test(x)$statistic)
 rankdf <- data.frame(normality)
 ranks <- c("Normality")
 
 cat_entropy <- make_rank_1D(c(cat_vars, "Title"), fn=function(x) entropy(table(x))/log(length(table(x))))
-num_entropy <- make_rank_1D(num_vars, fn=function(x) entropy(cut(x, breaks=20))/log(20))
+num_entropy <- make_rank_1D(num_vars, fn=function(x) entropy(table(cut(x, breaks=20)))/log(20))
 rankdf <- rbind(rankdf, combine_ranks(num_entropy, cat_entropy))
 ranks <- c(ranks, "Normalized Entropy")
+
+num_clusters <- make_rank_1D(num_vars, fn=function(x) dim(Mclust(as.matrix(x[!is.na(x)]), G=1:20)$z)[2])
+rankdf <- rbind(rankdf, num_clusters)
+ranks <- c(ranks, "Number of Clusters")
+
+clustering_error <- make_rank_1D(num_vars, fn=function(x) clust_error(x))
+rankdf <- rbind(rankdf, clustering_error)
+ranks <- c(ranks, "Percent Variance Explained Clustering")
+
+#by 1.5xIQR (apparently)
+outliers <- make_rank_1D(num_vars, fn=function(x) length(x[x %in% boxplot.stats(x)$out]))
+rankdf <- rbind(rankdf, outliers)
+ranks <- c(ranks, "Number of Outliers")
 
 list_1D <- list(names = ranks, data = rankdf)
 #sink(paste(output_path, "1D_rankings.json",sep=""))
