@@ -20,14 +20,14 @@
                     lg<sub>y</sub>
                 </a>
             </span>
-            <!--<span ng-show="col.type=='numeric'"-->
-                  <!--class="option-item"-->
-                  <!--ng-class="{enabled: col.useLogScale}">-->
-                <!--<a href="" ng-click="toggleLogScale()"-->
-                   <!--data-toggle="tooltip" title="Apply Log to Domain">-->
-                    <!--lg<sub>x</sub>-->
-                <!--</a>-->
-            <!--</span>-->
+            <span ng-show="col.type=='numeric' && col.max > 10000 && col.min >=0"
+                  class="option-item"
+                  ng-class="{enabled: col.useLogScale}">
+                <a href="" ng-click="toggleLogScale()"
+                   data-toggle="tooltip" title="Apply Log to Domain">
+                    lg<sub>x</sub>
+                </a>
+            </span>
             <span ng-show="col.hasNull" ng-class="{enabled: col.filterNull}"
                   class="option-item">
                 <a href="" ng-click="toggleFilterNull()"

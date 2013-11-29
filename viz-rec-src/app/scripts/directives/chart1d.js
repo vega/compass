@@ -23,7 +23,7 @@ angular.module('vizRecSrcApp')
         height = (attrs.height || 30);
 
       var x, y, data, yMax, xAxis, yAxis, marks;
-      var yField, xField, xAxisTickFormat, barWidth, tickSize=6;
+      var yField, xField, xAxisTickFormat, barWidth, innerTickSize= 6, outerTickSize=6;
 
       var svg =  d3.select(chart).select("svg")
         .attr("width", width + margin.left + margin.right)
@@ -33,13 +33,28 @@ angular.module('vizRecSrcApp')
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
       if (isNumeric){
-        var colData = col.filterFn ? col.filtered: col;
+        var colData = col.filterFn ? col.filtered: col, xTicks;
 
         xField = "x"; yField="y";
-        x = d3.scale.linear().domain([Math.min(0,d3.min(colData)), d3.max(colData)]).nice().range([0, width]);
-        data = d3.layout.histogram().bins(x.ticks(20))(colData);
-        xAxisTickFormat = helper.defaultNumberFormatter;
-        barWidth = x(data[0].dx) - 1;
+        var xMax = d3.max(colData);
+        if(scope.col.useLogScale){
+          x = d3.scale.log().domain([1, xMax]).nice().range([0, width]);
+          x.tickFormat(Math.log(xMax)/Math.LN10);
+
+          xTicks = [];
+          innerTickSize=2;
+          for(var i=1; 10*i< xMax; i*=10) xTicks.push(i);
+//          barWidth = width / (xTicks.length - 1);
+          data = d3.layout.histogram().bins(xTicks)(colData);
+          barWidth = x(data[0].dx) - 1;
+        }else{
+          //normal linear scale
+          x = d3.scale.linear().domain([Math.max
+            (0,d3.min(colData)), xMax]).nice().range([0, width]);
+          xAxisTickFormat = helper.defaultNumberFormatter;
+          data = d3.layout.histogram().bins(x.ticks())(colData);
+          barWidth = x(data[0].dx) - 1;
+        }
       }else{
         xField = "val"; yField="count";
 
@@ -52,7 +67,7 @@ angular.module('vizRecSrcApp')
         x = d3.scale.ordinal().domain(_.pluck(data, 'val')).rangeBands([0, width]);
         xAxisTickFormat = function(x){return "";};
         barWidth = x.rangeBand() -1;
-        tickSize = 1
+        outerTickSize = innerTickSize = 1
       }
 
 //      yMax = _.max(data, yField);
@@ -62,11 +77,11 @@ angular.module('vizRecSrcApp')
         : d3.scale.linear().domain([0, yMax]).range([height, 0])
       ;
 
-      xAxis = d3.svg.axis().scale(x).orient("bottom")
-        .ticks(2).tickSize(tickSize)
-        .tickFormat(xAxisTickFormat);
-
       marks = main.selectAll(".marks").data(data, helper.getKey(xField));
+
+      xAxis = d3.svg.axis().scale(x).orient("bottom")
+        .ticks(2).innerTickSize(innerTickSize).outerTickSize(outerTickSize)
+        .tickFormat(xAxisTickFormat);
 
       marks.enter().append("g").attr("class","marks").append("rect").append("title");
 
@@ -203,6 +218,8 @@ angular.module('vizRecSrcApp')
 
         scope.toggleLogScale = function(){
           scope.col.useLogScale = !scope.col.useLogScale;
+          //make sure to filter zero otherwise log scale will explode!
+          if(scope.col.useLogScale && !scope.col.filterZero) scope.toggleFilterZero();
           _updateChart();
         }
 
