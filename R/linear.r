@@ -59,7 +59,7 @@ if (DATASET == "movies"){
 #unscaled_df <- df
 #df[,num_ids] <- scale(df[,num_ids])
 
-#TODO do for both null and non-null? callback architecture
+#TODO do for both null and non-null? callback architecture?
 # Section: Rankings 1D
 make_rank_1D <- function(colsubset, fn=lillie.test, data=df) {
   rank <- lapply(data[colsubset], function(x) fn(x))
@@ -107,11 +107,13 @@ list_1D <- list(names = ranks, data = rankdf)
 cat(toJSON(list_1D))
 #sink()
 
+
+
 ## get "y ~ X_1 + X_2 + ..."
 ## also remove y from X
-get_linear_formula <- function(y, X) paste(
-  y, "~", paste(X[X!=y], collapse= " + ")
-)
+get_linear_formula <- function(y, X) {
+  return(paste(y, "~", paste(X[X!=y], collapse= " + ")))
+}
 
 ## Get Linear Formulae with one independent variable
 get_simple_linear_formulae <- function(y, Xs) lapply(
