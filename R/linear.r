@@ -4,14 +4,19 @@
 require(rjson)
 require(nnet)
 require(plyr)
+require(nortest)
+require(entropy)
+require(mclust)
+
+not <- function(f){ return(function(x) !f(x))} # create not(f(x)) = !f(x)
 
 # WARNING this line is specific to only Kanitw's computer
-setwd("~/Dropbox/_Projects/_idl/vis-rec/R")
+# setwd("~/Dropbox/_Projects/_idl/vis-rec/R")
+setwd("~/vizrec/R")
 
 DATASET <- "movies"
-output_path = paste("../data/r-output/",DATASET,"/",sep="")
 # DATASET <- "coffee"
-
+output_path = paste("../data/r-output/",DATASET,"/",sep="")
 json <- paste("../data/rows/", DATASET, ".json", sep="")
 metajson <- paste("../data/rows/", DATASET, "_meta.json", sep="")
 
@@ -25,13 +30,9 @@ dataFrameFromJSON = function(json_file){
   return(do.call("rbind", lapply(json_file, as.data.frame)))
 }
 
-not <- function(f){ return(function(x) !f(x))} # create not(f(x)) = !f(x)
-
 df <- dataFrameFromJSON(paste(readLines(json), collapse=""))
-
-
-
 meta_df <- dataFrameFromJSON(paste(readLines(metajson), collapse=""))
+
 names_df <- names(df)
 N <- length(df)
 
@@ -49,19 +50,70 @@ num_vars = names_df[num_ids]
 cat_vars = names_df[cat_ids]
 all_vars = c(num_vars, cat_vars)
 
-##scale all numerical data so it coefficient in the models can be compared
-unscaled_df <- df
-df[,num_ids] <- scale(df[,num_ids])
+if (DATASET == "movies"){
+  df[num_vars][df[num_vars] == 0] <- NA
+}
 
+#for now, leave vars scaled for use with various packages
+#scale all numerical data so it coefficient in the models can be compared
+#unscaled_df <- df
+#df[,num_ids] <- scale(df[,num_ids])
 
+#TODO do for both null and non-null? callback architecture?
+# Section: Rankings 1D
+make_rank_1D <- function(colsubset, fn=lillie.test, data=df) {
+  rank <- lapply(data[colsubset], function(x) fn(x))
+  rank[names(data)[!(names(data) %in% colsubset)]] <- NA
+  return(rank)
+}
+
+combine_ranks <- function(u,v) {
+  ret <- u
+  #order of vectors may not be the same, but field names should be
+  ret[names(u[is.na(u)])] <- v[names(u[is.na(u)])]
+  return(ret)
+}
+
+clust_error <- function(x) {
+  opt_centers = dim(Mclust(as.matrix(x[!is.na(x)]), G=1:20)$z)[2]
+  clust = kmeans(x[!is.na(x)], centers = opt_centers, nstart = 25)
+  return(clust$betweenss/clust$totss)
+}
+
+normality <- make_rank_1D(num_vars, fn=function(x) lillie.test(x)$statistic)
+rankdf <- data.frame(normality)
+ranks <- c("Normality")
+
+cat_entropy <- make_rank_1D(c(cat_vars, "Title"), fn=function(x) entropy(table(x))/log(length(table(x))))
+num_entropy <- make_rank_1D(num_vars, fn=function(x) entropy(table(cut(x, breaks=20)))/log(20))
+rankdf <- rbind(rankdf, combine_ranks(num_entropy, cat_entropy))
+ranks <- c(ranks, "Normalized Entropy")
+
+num_clusters <- make_rank_1D(num_vars, fn=function(x) dim(Mclust(as.matrix(x[!is.na(x)]), G=1:20)$z)[2])
+rankdf <- rbind(rankdf, num_clusters)
+ranks <- c(ranks, "Number of Clusters")
+
+clustering_error <- make_rank_1D(num_vars, fn=function(x) clust_error(x))
+rankdf <- rbind(rankdf, clustering_error)
+ranks <- c(ranks, "Percent Variance Explained Clustering")
+
+#by 1.5xIQR (apparently)
+outliers <- make_rank_1D(num_vars, fn=function(x) length(x[x %in% boxplot.stats(x)$out]))
+rankdf <- rbind(rankdf, outliers)
+ranks <- c(ranks, "Number of Outliers")
+
+list_1D <- list(names = ranks, data = rankdf)
+#sink(paste(output_path, "1D_rankings.json",sep=""))
+cat(toJSON(list_1D))
+#sink()
 
 
 
 ## get "y ~ X_1 + X_2 + ..."
 ## also remove y from X
-get_linear_formula <- function(y, X) paste(
-  y, "~", paste(X[X!=y], collapse= " + ")
-)
+get_linear_formula <- function(y, X) {
+  return(paste(y, "~", paste(X[X!=y], collapse= " + ")))
+}
 
 ## Get Linear Formulae with one independent variable
 get_simple_linear_formulae <- function(y, Xs) lapply(
