@@ -170,6 +170,14 @@ angular.module('vizRecSrcApp')
       //TODO(kanitw): show trendline for numeric ~ nominal
       //TODO(kanitw): show trendline for nominal ~ nominal
       //TODO(kanitw): show trendline for nominal ~ numeric (can we?)
+
+
+
+      var xAxisPos = {x: width/2,y: height + 30};
+      var yAxisPos = {x: -20, y: height/2};
+
+      moveNamePos(svg, margin, xAxisPos, yAxisPos, width, height);
+
     }
 
     function drawHeatMap(chart, pair, attrs, scope){
@@ -214,7 +222,7 @@ angular.module('vizRecSrcApp')
       });
       var yArray = results[0], xArray=results[1], counts = results[2];
 
-      var margin = { top: 75 || attrs.marginTop , right: 5 || attrs.marginLeft , bottom: 5 ||  attrs.marginBottom, left: 75 || attrs.marginLeft },
+      var margin = { top: 75 || attrs.marginTop , right: 15 || attrs.marginLeft , bottom: 15 ||  attrs.marginBottom, left: 75 || attrs.marginLeft },
         width = (attrs.width || 120) - margin.left - margin.right,
         height = (attrs.height || 120) - margin.top - margin.bottom;
 
@@ -329,6 +337,30 @@ angular.module('vizRecSrcApp')
       //remove trendlines
       var trends = svg.select("g.trends");
       trends.selectAll(".trend").remove();
+
+      var xAxisPos = {x: width/2,y: height + 10};
+      var yAxisPos = {x: width+10, y: height/2};
+
+      moveNamePos(svg, margin, xAxisPos, yAxisPos, width, height);
+    }
+
+
+    function moveNamePos(svg, margin, xAxisPos, yAxisPos, width, height) {
+      var names = svg.select("g.names")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+      names.select(".axis.x")
+        .transition().duration(500)
+        .attr(xAxisPos)
+        .style({
+          "text-anchor": 'middle'
+        });
+      names.select(".axis.y")
+        .transition().duration(500)
+        .attr(yAxisPos)
+        .attr("transform", "rotate(270," + yAxisPos.x + "," + yAxisPos.y + ")")
+        .style({
+          "text-anchor": 'middle'
+        });
     }
 
     function updateChart(chart, pair, attrs, scope){
