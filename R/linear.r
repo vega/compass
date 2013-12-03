@@ -115,6 +115,16 @@ get_linear_formula <- function(y, X) {
   return(paste(y, "~", paste(X[X!=y], collapse= " + ")))
 }
 
+# get dependent variable string from simple formula
+dep <- function(form) {
+  return(strsplit(form[[1]], " ~ ")[[1]][1])
+}
+
+# get independent variable string from simple formula
+ind <- function(form) {
+  return(strsplit(form[[1]], " ~ ")[[1]][2])
+}
+
 ## Get Linear Formulae with one independent variable
 get_simple_linear_formulae <- function(y, Xs) lapply(
   Xs[Xs!=y], function(X) get_linear_formula(y,X)
@@ -234,4 +244,3 @@ summary(multinom(formula=simple_cat_num[[1]],data=df))
 # long_cat_num = get_all_long_linear_formulae(cat_vars, num_vars)
 #sum_simple_num_num = run_and_sumall(simple_num_num, fn=glm, family=binomial())
 # sum_long_num_num = run_and_sum_all(long_num_num, fn=glm)
-
