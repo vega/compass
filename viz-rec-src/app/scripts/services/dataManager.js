@@ -11,15 +11,26 @@ angular.module('vizRecSrcApp')
     var toRName = {}, fromRName={};
 
     function addStats(values){
-      var countMap = {} , max= -Infinity, min=Infinity;
+      var countMap = {} , max= -Infinity, min=Infinity, ssq=0, sum=0;
       for(var i=0;i<values.length;i++){
         var val = values.get(i);
-        if(val > max) max = val;
-        if(val < min) min = val;
         countMap[val] = (countMap[val] || 0)+1;
+        if(values.type == dv.type.numeric){
+          if(val > max) max = val;
+          if(val < min) min = val;
+          sum+=val;
+          ssq+=val*val;
+        }
       }
-      values.max = max;
-      values.min = min;
+      if(values.type == dv.type.numeric){
+        values.max = max;
+        values.min = min;
+        values.sum = sum;
+        var avg = values.avg = sum/values.length;
+        values.ssq = ssq;
+        values.variance = ssq/values.length - avg*avg;
+        values.sd = Math.sqrt(values.variance);
+      }
       values.countTable = mapToTable(countMap);
       values.hasZero = countMap[0] > 0;
       values.hasNull = countMap[""] > 0 || countMap["NaN"] > 0 || countMap["null"] > 0;
@@ -78,7 +89,7 @@ angular.module('vizRecSrcApp')
               };
               _.each(dateBinner, function(binner, level){
                 data[i][level] = data.addColumn(data[i].name+":"+level, dateData.map(binner), dv.type.ordinal, null, true);
-                stats = addStats(data[i][level])
+                stats = addStats(data[i][level]);
                 data[i][level].binLevel = level;
                 data[i][level].isBinCol = true;
                 //TODO(kanitw): _.values is not the most efficient method for sure
@@ -172,7 +183,7 @@ angular.module('vizRecSrcApp')
               setdefault(setdefault(rel2d,p0,{}),p1,{})[modelName] =
                 setdefault(setdefault(rel2d,p1,{}),p0,{})[modelName] = data;
 
-              console.log(rel2d[p0][p1][modelName]==rel2d[p1][p0][modelName], rel2d[p0][p1]);
+//              console.log(rel2d[p0][p1][modelName]==rel2d[p1][p0][modelName], rel2d[p0][p1]);
             });
           };
         }
