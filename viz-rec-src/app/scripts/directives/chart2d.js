@@ -222,7 +222,7 @@ angular.module('vizRecSrcApp')
       });
       var yArray = results[0], xArray=results[1], counts = results[2];
 
-      var margin = { top: 75 || attrs.marginTop , right: 15 || attrs.marginLeft , bottom: 15 ||  attrs.marginBottom, left: 75 || attrs.marginLeft },
+      var margin = { top: 75 || attrs.marginTop , right: 15 || attrs.marginLeft , bottom: 10 ||  attrs.marginBottom, left: 75 || attrs.marginLeft },
         width = (attrs.width || 120) - margin.left - margin.right,
         height = (attrs.height || 120) - margin.top - margin.bottom;
 
