@@ -30,7 +30,9 @@ angular.module('vizRecSrcApp')
     //TODO(kanitw): refactor this method's code maybe we need to move them to a separate controller or directives
 
     $scope.sorter2d = {
-      /** map of type of sorter */
+      /** map of type of sorter
+       * if reverse=false, the result will be sorted ascending (and vice versa)
+       * */
       types:{
         cardinality: {
           metric: function(pair){
@@ -43,7 +45,16 @@ angular.module('vizRecSrcApp')
             return dataManager.currentData.mi_distance[pair[0].index][pair[1].index];
           },
           reverse: true
+        },
+        linearRSquare:{
+          metric: function(pair){
+            var rel = (dataManager.currentData.rel2d[pair[0].name] || {})[pair[1].name];
+            //Ham: I know, r.squared.rsquared is weird but it's due to a weird R export bug.
+            return rel ? rel["simple_linear_all"]["r.squared.r.squared"] : Infinity;
+          },
+          reverse: false
         }
+
       }
     };
     $scope.sorter2d.current = $scope.sorter2d.types["mutualInformationDistance"];

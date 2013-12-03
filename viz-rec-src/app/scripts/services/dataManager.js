@@ -5,18 +5,32 @@ angular.module('vizRecSrcApp')
     // Service logic
     // ...
 
-    var rNameMapper = {};
+    /** since R replace " ","(",")" with dot ("."),
+     * toRName and fromRName provide mappings between column names in R and in JS
+    */
+    var toRName = {}, fromRName={};
 
     function addStats(values){
-      var countMap = {} , max= -Infinity, min=Infinity;
+      var countMap = {} , max= -Infinity, min=Infinity, ssq=0, sum=0;
       for(var i=0;i<values.length;i++){
         var val = values.get(i);
-        if(val > max) max = val;
-        if(val < min) min = val;
         countMap[val] = (countMap[val] || 0)+1;
+        if(values.type == dv.type.numeric){
+          if(val > max) max = val;
+          if(val < min) min = val;
+          sum+=val;
+          ssq+=val*val;
+        }
       }
-      values.max = max;
-      values.min = min;
+      if(values.type == dv.type.numeric){
+        values.max = max;
+        values.min = min;
+        values.sum = sum;
+        var avg = values.avg = sum/values.length;
+        values.ssq = ssq;
+        values.variance = ssq/values.length - avg*avg;
+        values.sd = Math.sqrt(values.variance);
+      }
       values.countTable = mapToTable(countMap);
       values.hasZero = countMap[0] > 0;
       values.hasNull = countMap[""] > 0 || countMap["NaN"] > 0 || countMap["null"] > 0;
@@ -75,7 +89,7 @@ angular.module('vizRecSrcApp')
               };
               _.each(dateBinner, function(binner, level){
                 data[i][level] = data.addColumn(data[i].name+":"+level, dateData.map(binner), dv.type.ordinal, null, true);
-                stats = addStats(data[i][level])
+                stats = addStats(data[i][level]);
                 data[i][level].binLevel = level;
                 data[i][level].isBinCol = true;
                 //TODO(kanitw): _.values is not the most efficient method for sure
@@ -90,7 +104,9 @@ angular.module('vizRecSrcApp')
 
           //r name mapper
           for (i = 0; i < originalDataLength; i++) {
-            rNameMapper[data[i].name] = data[i].name.replace(/\ /g,".").replace(/\(/g,".").replace(/\)/,".");
+            var rName = data[i].name.replace(/\ /g,".").replace(/\(/g,".").replace(/\)/,".");
+            toRName[data[i].name] = rName;
+            fromRName[rName] = data[i].name;
           }
 //          console.log("rNameMapper", rNameMapper);
 
@@ -127,7 +143,12 @@ angular.module('vizRecSrcApp')
         });
       },
       loadRData: function(){
+        //TODO(kanitw): this method doesn't support multiple dataset yet.
+
         var self=this;
+        /* all 2-d data are stored in currentData.rel2d for now */
+        var rel2d = self.currentData.rel2d = {};
+
         //LOAD 1d rankings
         $http.get("data/r_output/1D_rankings.json").success(function(json){
           var valueNames = self.currentData.colPropNames = json.names;
@@ -137,7 +158,7 @@ angular.module('vizRecSrcApp')
 
           for(i=0 ; i<self.currentData.originalLength; i++){
             var col = self.currentData[i];
-            var values = rankingData[rNameMapper[col.name]];
+            var values = rankingData[toRName[col.name]];
             col.prop = {};
             for(j=0 ; j< values.length; j++){
               col.prop[valueNames[j]] = values[j];
@@ -148,9 +169,31 @@ angular.module('vizRecSrcApp')
           }
         });
 
-        $http.get("data/r_output/simple_linear.json").success(function(json){
-          
-        })
+        /** set default function inspired from python */
+        function setdefault(map,key,value){
+          return key in map ? map[key] : (map[key]=value);
+        }
+
+        /** method for load simple, long linear model to the rel2d table*/
+        function loadModel(modelName){
+          return function(json){
+            _(json).each(function(data, pairNames){
+              var pair = pairNames.split("~");
+              var p0 = fromRName[pair[0].trim()], p1= fromRName[pair[1].trim()];
+              setdefault(setdefault(rel2d,p0,{}),p1,{})[modelName] =
+                setdefault(setdefault(rel2d,p1,{}),p0,{})[modelName] = data;
+
+//              console.log(rel2d[p0][p1][modelName]==rel2d[p1][p0][modelName], rel2d[p0][p1]);
+            });
+          };
+        }
+
+        //for each of these models, load json
+        _(["simple_linear_all", "long_linear_all"]).each(function(modelName){
+          $http.get("data/r_output/"+modelName+".json").success(loadModel(modelName))
+        });
+
+
       },
 
       get: function (key) {

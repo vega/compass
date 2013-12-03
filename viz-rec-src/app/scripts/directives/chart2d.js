@@ -46,7 +46,7 @@ angular.module('vizRecSrcApp')
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom);
 
-      var main = svg.select("g")
+      var main = svg.select("g.main")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
       var x, y, marks, innerTickSize=6;
@@ -106,6 +106,56 @@ angular.module('vizRecSrcApp')
       //remove div labels
       d3.select(chart).select(".x-labels").selectAll(".x-label").remove();
       d3.select(chart).select(".y-labels").selectAll(".y-label").remove();
+
+      //draw trendline
+      //TODO(kanitw): decouple this from this class
+
+      //only show trendline for numeric for now
+      var trends = svg.select("g.trends")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+      trends.selectAll(".trend").remove();
+      if(yField.type==dv.type.numeric && xField.type==dv.type.numeric){
+        var rel = ((dataManager.currentData.rel2d[yField.name]||{})[xField.name]||{})['simple_linear_all'];
+        if(rel){
+          var estimate = rel['coefs']['Estimate'];
+          var keys = _.keys(estimate);
+          //m,c we get from the original model are from centered y and x
+          var centered_c = estimate[keys[0]];
+          var centered_m = estimate[keys[1]];
+          // uncentered values
+          var m = centered_m * yField.sd / xField.sd;
+          var c = yField.sd * (centered_c - centered_m * xField.avg / xField.sd) + yField.avg;
+
+          var _x1 = 0, _y1 = c;
+          var _x2= x.domain()[1], _y2 = c + m * x.domain()[1];
+          if(y.domain()[0] > _y2 || _y2 > y.domain()[1]){
+            if(m>0){
+              _y2 = y.domain()[1];
+            }else{
+              _y2 = y.domain()[0];
+            }
+            _x2 = (_y2 - c) / m;
+          }
+
+          console.log(c, m, x.domain()[1], m* x.domain()[1]);
+
+          trends.append("line")
+            .attr("class","trend")
+            .attr({x1:x(_x1), y1: y(_y1), x2:x(_x2), y2:y(_y2)})
+            .style({
+              stroke:'red',
+              'stroke-width':1
+            });
+
+
+        }
+
+
+      }
+      //TODO(kanitw): show trendline for numeric ~ nominal
+      //TODO(kanitw): show trendline for nominal ~ nominal
+      //TODO(kanitw): show trendline for nominal ~ numeric (can we?)
     }
 
     function drawHeatMap(chart, pair, attrs, scope){
