@@ -311,6 +311,10 @@ angular.module('vizRecSrcApp')
         .style("fill", function(i){ return c(counts[i]);});
 
       marks.exit().remove();
+
+      //remove trendlines
+      var trends = svg.select("g.trends");
+      trends.selectAll(".trend").remove();
     }
 
     function updateChart(chart, pair, attrs, scope){
