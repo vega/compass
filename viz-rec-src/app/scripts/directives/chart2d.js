@@ -147,6 +147,20 @@ angular.module('vizRecSrcApp')
               stroke:'red',
               'stroke-width':1
             });
+          //thicker line to make hovering easier!
+          trends.append("line")
+            .attr("class","trend")
+            .attr({x1:x(_x1), y1: y(_y1), x2:x(_x2), y2:y(_y2)})
+            .style({
+              'stroke-width':4,
+              'stroke':'white',
+              'opacity': 0.01
+            })
+            .on("mouseover", helper.onMouseOver(chart, function(){
+              return "slope="+ m.toPrecision(2)+", intercept="+ c.toPrecision(2);
+            }))
+            .on("mouseout", helper.onMouseOut(chart));
+
 
 
         }
