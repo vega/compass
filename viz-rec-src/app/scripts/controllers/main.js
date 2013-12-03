@@ -106,6 +106,7 @@ angular.module('vizRecSrcApp')
 
     dataManager.load("data/movies.json", "movies", true, function callback(dataTable){
       console.log("data loaded!");
+      dataManager.loadRData();
       $scope.dataTable = dataTable;
       $scope.fix = {type:'nominal', values:['1','1','2']};
       $scope.select = function(col){

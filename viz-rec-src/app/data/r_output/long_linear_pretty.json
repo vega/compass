@@ -1,0 +1,442 @@
+{
+    "IMDB.Rating ~ US.DVD.Sales + Running.Time..min. + Production.Budget + US.Gross + Rotten.Tomatoes.Rating + Worldwide.Gross + IMDB.Votes": {
+        "coefs": {
+            "Estimate": {
+                "(Intercept)": 1.36880976126184e-15,
+                "IMDB.Votes": 0.379193050578305,
+                "Production.Budget": -0.0348898775926824,
+                "Rotten.Tomatoes.Rating": 0.332909341301406,
+                "Running.Time..min.": -0.00806340351845059,
+                "US.DVD.Sales": 0.00308368180031381,
+                "US.Gross": -0.124608855757014,
+                "Worldwide.Gross": 0.0145589013568155
+            },
+            "Pr(>|t|)": {
+                "(Intercept)": 0.999999999999927,
+                "IMDB.Votes": 6.69128533053426e-88,
+                "Production.Budget": 0.108037828708385,
+                "Rotten.Tomatoes.Rating": 6.14167220500975e-90,
+                "Running.Time..min.": 0.641437176308958,
+                "US.DVD.Sales": 0.857163242867462,
+                "US.Gross": 0.00579126229268693,
+                "Worldwide.Gross": 0.758210104366831
+            },
+            "Std. Error": {
+                "(Intercept)": 0.0149939101090747,
+                "IMDB.Votes": 0.0184903761012806,
+                "Production.Budget": 0.0217040784382869,
+                "Rotten.Tomatoes.Rating": 0.0160325263905725,
+                "Running.Time..min.": 0.0173132976948302,
+                "US.DVD.Sales": 0.0171314749284462,
+                "US.Gross": 0.0451279603835456,
+                "Worldwide.Gross": 0.0472908903197147
+            },
+            "t value": {
+                "(Intercept)": 9.1291047585606e-14,
+                "IMDB.Votes": 20.5075899214426,
+                "Production.Budget": -1.60752633160113,
+                "Rotten.Tomatoes.Rating": 20.764621444638,
+                "Running.Time..min.": -0.465734700608674,
+                "US.DVD.Sales": 0.180000952235202,
+                "US.Gross": -2.76123393785038,
+                "Worldwide.Gross": 0.307858474610832
+            }
+        },
+        "df.df": [
+            8,
+            3193,
+            8
+        ],
+        "fstatistic.fstatistic": {
+            "dendf": 3193,
+            "numdf": 7,
+            "value": 179.095126361776
+        },
+        "r.squared.r.squared": 0.281933906681242
+    },
+    "IMDB.Votes ~ US.DVD.Sales + Running.Time..min. + Production.Budget + US.Gross + Rotten.Tomatoes.Rating + Worldwide.Gross + IMDB.Rating": {
+        "coefs": {
+            "Estimate": {
+                "(Intercept)": -1.75452598878251e-15,
+                "IMDB.Rating": 0.30692584473643,
+                "Production.Budget": -0.0493255075351463,
+                "Rotten.Tomatoes.Rating": 0.0903985243301354,
+                "Running.Time..min.": 0.0992305719324306,
+                "US.DVD.Sales": 0.0172148014190543,
+                "US.Gross": 0.118163102865911,
+                "Worldwide.Gross": 0.349590941045941
+            },
+            "Pr(>|t|)": {
+                "(Intercept)": 0.999999999999896,
+                "IMDB.Rating": 6.69128533053198e-88,
+                "Production.Budget": 0.0115335800741126,
+                "Rotten.Tomatoes.Rating": 3.67590901111119e-09,
+                "Running.Time..min.": 1.65616832219837e-10,
+                "US.DVD.Sales": 0.264023177173585,
+                "US.Gross": 0.00363040195854396,
+                "Worldwide.Gross": 1.45862249000392e-16
+            },
+            "Std. Error": {
+                "(Intercept)": 0.0134896738027577,
+                "IMDB.Rating": 0.0149664512462047,
+                "Production.Budget": 0.0195150437463023,
+                "Rotten.Tomatoes.Rating": 0.0152836497937936,
+                "Running.Time..min.": 0.0154775980012536,
+                "US.DVD.Sales": 0.0154098584217081,
+                "US.Gross": 0.0405952028512688,
+                "Worldwide.Gross": 0.0420949460024869
+            },
+            "t value": {
+                "(Intercept)": -1.30064374753363e-13,
+                "IMDB.Rating": 20.5075899214426,
+                "Production.Budget": -2.52756325716628,
+                "Rotten.Tomatoes.Rating": 5.91472099595245,
+                "Running.Time..min.": 6.41123848315442,
+                "US.DVD.Sales": 1.11712910968757,
+                "US.Gross": 2.91076517831018,
+                "Worldwide.Gross": 8.30481980010824
+            }
+        },
+        "df.df": [
+            8,
+            3193,
+            8
+        ],
+        "fstatistic.fstatistic": {
+            "dendf": 3193,
+            "numdf": 7,
+            "value": 328.665046587714
+        },
+        "r.squared.r.squared": 0.418784068082661
+    },
+    "Production.Budget ~ US.DVD.Sales + Running.Time..min. + US.Gross + Rotten.Tomatoes.Rating + Worldwide.Gross + IMDB.Rating + IMDB.Votes": {
+        "coefs": {
+            "Estimate": {
+                "(Intercept)": -3.22885909448243e-15,
+                "IMDB.Rating": -0.0231774945711674,
+                "IMDB.Votes": -0.0404823312821668,
+                "Rotten.Tomatoes.Rating": -0.0396655434315547,
+                "Running.Time..min.": 0.2692289597787,
+                "US.DVD.Sales": 0.1374698610134,
+                "US.Gross": -0.113545389273141,
+                "Worldwide.Gross": 0.648603251311211
+            },
+            "Pr(>|t|)": {
+                "(Intercept)": 0.999999999999789,
+                "IMDB.Rating": 0.108037828708378,
+                "IMDB.Votes": 0.0115335800741124,
+                "Rotten.Tomatoes.Rating": 0.00436105436531464,
+                "Running.Time..min.": 5.03048575776172e-86,
+                "US.DVD.Sales": 3.39213125403224e-23,
+                "US.Gross": 0.00203275729687124,
+                "Worldwide.Gross": 1.94670748719175e-66
+            },
+            "Std. Error": {
+                "(Intercept)": 0.0122207658748751,
+                "IMDB.Rating": 0.014418111924849,
+                "IMDB.Votes": 0.0160163474316178,
+                "Rotten.Tomatoes.Rating": 0.0139039274685801,
+                "Running.Time..min.": 0.0132829941712682,
+                "US.DVD.Sales": 0.0137494862622111,
+                "US.Gross": 0.0367705065327922,
+                "Worldwide.Gross": 0.0367961999030501
+            },
+            "t value": {
+                "(Intercept)": -2.6421086268584e-13,
+                "IMDB.Rating": -1.60752633160116,
+                "IMDB.Votes": -2.52756325716629,
+                "Rotten.Tomatoes.Rating": -2.85283014610011,
+                "Running.Time..min.": 20.2686951682216,
+                "US.DVD.Sales": 9.99818163324543,
+                "US.Gross": -3.08794737901912,
+                "Worldwide.Gross": 17.6269085671927
+            }
+        },
+        "df.df": [
+            8,
+            3193,
+            8
+        ],
+        "fstatistic.fstatistic": {
+            "dendf": 3193,
+            "numdf": 7,
+            "value": 500.102668819668
+        },
+        "r.squared.r.squared": 0.522985629988994
+    },
+    "Rotten.Tomatoes.Rating ~ US.DVD.Sales + Running.Time..min. + Production.Budget + US.Gross + Worldwide.Gross + IMDB.Rating + IMDB.Votes": {
+        "coefs": {
+            "Estimate": {
+                "(Intercept)": -6.74988841910883e-16,
+                "IMDB.Rating": 0.357366264809049,
+                "IMDB.Votes": 0.119888029534055,
+                "Production.Budget": -0.0640964442751569,
+                "Running.Time..min.": 0.0220862282800595,
+                "US.DVD.Sales": 0.0267125606548917,
+                "US.Gross": 0.378883537326921,
+                "Worldwide.Gross": -0.260675054447098
+            },
+            "Pr(>|t|)": {
+                "(Intercept)": 0.999999999999965,
+                "IMDB.Rating": 6.14167220500695e-90,
+                "IMDB.Votes": 3.67590901111135e-09,
+                "Production.Budget": 0.00436105436531437,
+                "Running.Time..min.": 0.218224570552675,
+                "US.DVD.Sales": 0.13229617978348,
+                "US.Gross": 4.11706145787443e-16,
+                "Worldwide.Gross": 9.73760929783488e-08
+            },
+            "Std. Error": {
+                "(Intercept)": 0.0155349081053854,
+                "IMDB.Rating": 0.0172103433603087,
+                "IMDB.Votes": 0.0202694310714058,
+                "Production.Budget": 0.0224676692942192,
+                "Running.Time..min.": 0.0179343325091777,
+                "US.DVD.Sales": 0.0177433925010493,
+                "US.Gross": 0.0463293288139662,
+                "Worldwide.Gross": 0.0487802790683972
+            },
+            "t value": {
+                "(Intercept)": -4.34498123408202e-14,
+                "IMDB.Rating": 20.764621444638,
+                "IMDB.Votes": 5.91472099595244,
+                "Production.Budget": -2.85283014610013,
+                "Running.Time..min.": 1.23150545294937,
+                "US.DVD.Sales": 1.50549341977933,
+                "US.Gross": 8.17804934857388,
+                "Worldwide.Gross": -5.34386148307174
+            }
+        },
+        "df.df": [
+            8,
+            3193,
+            8
+        ],
+        "fstatistic.fstatistic": {
+            "dendf": 3193,
+            "numdf": 7,
+            "value": 135.621613885654
+        },
+        "r.squared.r.squared": 0.22918174463894
+    },
+    "Running.Time..min. ~ US.DVD.Sales + Production.Budget + US.Gross + Rotten.Tomatoes.Rating + Worldwide.Gross + IMDB.Rating + IMDB.Votes": {
+        "coefs": {
+            "Estimate": {
+                "(Intercept)": 1.15644583503908e-14,
+                "IMDB.Rating": -0.00842423319658615,
+                "IMDB.Votes": 0.128080905912027,
+                "Production.Budget": 0.423415466119838,
+                "Rotten.Tomatoes.Rating": 0.0214954218040868,
+                "US.DVD.Sales": -0.0565045983384259,
+                "US.Gross": 0.422345195437202,
+                "Worldwide.Gross": -0.378164757537493
+            },
+            "Pr(>|t|)": {
+                "(Intercept)": 0.999999999999398,
+                "IMDB.Rating": 0.641437176308957,
+                "IMDB.Votes": 1.65616832219896e-10,
+                "Production.Budget": 5.03048575777463e-86,
+                "Rotten.Tomatoes.Rating": 0.218224570552683,
+                "US.DVD.Sales": 0.00124116221665588,
+                "US.Gross": 3.40612674290514e-20,
+                "Worldwide.Gross": 3.82327372967003e-15
+            },
+            "Std. Error": {
+                "(Intercept)": 0.0153257203297479,
+                "IMDB.Rating": 0.0180880513854269,
+                "IMDB.Votes": 0.0199775606926121,
+                "Production.Budget": 0.0208901195960407,
+                "Rotten.Tomatoes.Rating": 0.0174545892205408,
+                "US.DVD.Sales": 0.0174821023247829,
+                "US.Gross": 0.0455728179977284,
+                "Worldwide.Gross": 0.0478726180107897
+            },
+            "t value": {
+                "(Intercept)": 7.54578453839051e-13,
+                "IMDB.Rating": -0.465734700608675,
+                "IMDB.Votes": 6.41123848315436,
+                "Production.Budget": 20.2686951682215,
+                "Rotten.Tomatoes.Rating": 1.23150545294935,
+                "US.DVD.Sales": -3.23213977865374,
+                "US.Gross": 9.26748035327231,
+                "Worldwide.Gross": -7.89939579766165
+            }
+        },
+        "df.df": [
+            8,
+            3193,
+            8
+        ],
+        "fstatistic.fstatistic": {
+            "dendf": 3193,
+            "numdf": 7,
+            "value": 151.88639272648
+        },
+        "r.squared.r.squared": 0.249801128414661
+    },
+    "US.DVD.Sales ~ Running.Time..min. + Production.Budget + US.Gross + Rotten.Tomatoes.Rating + Worldwide.Gross + IMDB.Rating + IMDB.Votes": {
+        "coefs": {
+            "Estimate": {
+                "(Intercept)": 2.01955609748167e-15,
+                "IMDB.Rating": 0.00329061234114521,
+                "IMDB.Votes": 0.0226953085503773,
+                "Production.Budget": 0.220824683108068,
+                "Rotten.Tomatoes.Rating": 0.0265543157102733,
+                "Running.Time..min.": -0.0577137069783942,
+                "US.Gross": 0.0451388922075483,
+                "Worldwide.Gross": 0.270417427745341
+            },
+            "Pr(>|t|)": {
+                "(Intercept)": 0.999999999999896,
+                "IMDB.Rating": 0.857163242867488,
+                "IMDB.Votes": 0.264023177173564,
+                "Production.Budget": 3.39213125403245e-23,
+                "Rotten.Tomatoes.Rating": 0.132296179783479,
+                "Running.Time..min.": 0.00124116221665638,
+                "US.Gross": 0.333482765541333,
+                "Worldwide.Gross": 2.88474888711614e-08
+            },
+            "Std. Error": {
+                "(Intercept)": 0.0154888254348498,
+                "IMDB.Rating": 0.0182810829625283,
+                "IMDB.Votes": 0.0203157435909297,
+                "Production.Budget": 0.0220864844437106,
+                "Rotten.Tomatoes.Rating": 0.0176382808196965,
+                "Running.Time..min.": 0.0178561915420735,
+                "US.Gross": 0.046666321237996,
+                "Worldwide.Gross": 0.0486176189964049
+            },
+            "t value": {
+                "(Intercept)": 1.30387943616285e-13,
+                "IMDB.Rating": 0.180000952235168,
+                "IMDB.Votes": 1.11712910968762,
+                "Production.Budget": 9.99818163324542,
+                "Rotten.Tomatoes.Rating": 1.50549341977934,
+                "Running.Time..min.": -3.23213977865362,
+                "US.Gross": 0.967269135643714,
+                "Worldwide.Gross": 5.56212816109602
+            }
+        },
+        "df.df": [
+            8,
+            3193,
+            8
+        ],
+        "fstatistic.fstatistic": {
+            "dendf": 3193,
+            "numdf": 7,
+            "value": 139.148111686116
+        },
+        "r.squared.r.squared": 0.233748064345477
+    },
+    "US.Gross ~ US.DVD.Sales + Running.Time..min. + Production.Budget + Rotten.Tomatoes.Rating + Worldwide.Gross + IMDB.Rating + IMDB.Votes": {
+        "coefs": {
+            "Estimate": {
+                "(Intercept)": -7.52261985923998e-16,
+                "IMDB.Rating": -0.0191171339691138,
+                "IMDB.Votes": 0.022396629821857,
+                "Production.Budget": -0.0262226354190224,
+                "Rotten.Tomatoes.Rating": 0.0541491993421976,
+                "Running.Time..min.": 0.0620196694342804,
+                "US.DVD.Sales": 0.0064895951960797,
+                "Worldwide.Gross": 0.913653192609263
+            },
+            "Pr(>|t|)": {
+                "(Intercept)": 0.999999999999898,
+                "IMDB.Rating": 0.00579126229268723,
+                "IMDB.Votes": 0.00363040195854382,
+                "Production.Budget": 0.00203275729687166,
+                "Rotten.Tomatoes.Rating": 4.11706145787832e-16,
+                "Running.Time..min.": 3.40612674290421e-20,
+                "US.DVD.Sales": 0.333482765541322,
+                "Worldwide.Gross": 0
+            },
+            "Std. Error": {
+                "(Intercept)": 0.00587288964985659,
+                "IMDB.Rating": 0.00692340250750236,
+                "IMDB.Votes": 0.00769441313533201,
+                "Production.Budget": 0.00849193078780783,
+                "Rotten.Tomatoes.Rating": 0.00662128547214516,
+                "Running.Time..min.": 0.00669218245630068,
+                "US.DVD.Sales": 0.00670919287811322,
+                "Worldwide.Gross": 0.0090377846062087
+            },
+            "t value": {
+                "(Intercept)": -1.28090604587193e-13,
+                "IMDB.Rating": -2.76123393785036,
+                "IMDB.Votes": 2.91076517831019,
+                "Production.Budget": -3.08794737901906,
+                "Rotten.Tomatoes.Rating": 8.17804934857376,
+                "Running.Time..min.": 9.26748035327234,
+                "US.DVD.Sales": 0.967269135643738,
+                "Worldwide.Gross": 101.092605369419
+            }
+        },
+        "df.df": [
+            8,
+            3193,
+            8
+        ],
+        "fstatistic.fstatistic": {
+            "dendf": 3193,
+            "numdf": 7,
+            "value": 3684.45051766905
+        },
+        "r.squared.r.squared": 0.889836355359677
+    },
+    "Worldwide.Gross ~ US.DVD.Sales + Running.Time..min. + Production.Budget + US.Gross + Rotten.Tomatoes.Rating + IMDB.Rating + IMDB.Votes": {
+        "coefs": {
+            "Estimate": {
+                "(Intercept)": 5.96949891213194e-16,
+                "IMDB.Rating": 0.00203873985751041,
+                "IMDB.Votes": 0.0604811847554272,
+                "Production.Budget": 0.136724167950328,
+                "Rotten.Tomatoes.Rating": -0.0340051826146779,
+                "Running.Time..min.": -0.0506876639743661,
+                "US.DVD.Sales": 0.0354863002531812,
+                "US.Gross": 0.833951339438668
+            },
+            "Pr(>|t|)": {
+                "(Intercept)": 0.999999999999915,
+                "IMDB.Rating": 0.758210104366834,
+                "IMDB.Votes": 1.45862249000399e-16,
+                "Production.Budget": 1.94670748719619e-66,
+                "Rotten.Tomatoes.Rating": 9.73760929783515e-08,
+                "Running.Time..min.": 3.82327372966857e-15,
+                "US.DVD.Sales": 2.88474888711665e-08,
+                "US.Gross": 0
+            },
+            "Std. Error": {
+                "(Intercept)": 0.00561088681257141,
+                "IMDB.Rating": 0.00662232819833086,
+                "IMDB.Votes": 0.007282660697182,
+                "Production.Budget": 0.007756559661562,
+                "Rotten.Tomatoes.Rating": 0.0063634101898785,
+                "Running.Time..min.": 0.00641665075060174,
+                "US.DVD.Sales": 0.00637998608183614,
+                "US.Gross": 0.00824938022312503
+            },
+            "t value": {
+                "(Intercept)": 1.06391362213136e-13,
+                "IMDB.Rating": 0.307858474610827,
+                "IMDB.Votes": 8.30481980010824,
+                "Production.Budget": 17.6269085671926,
+                "Rotten.Tomatoes.Rating": -5.34386148307173,
+                "Running.Time..min.": -7.8993957976617,
+                "US.DVD.Sales": 5.56212816109599,
+                "US.Gross": 101.092605369419
+            }
+        },
+        "df.df": [
+            8,
+            3193,
+            8
+        ],
+        "fstatistic.fstatistic": {
+            "dendf": 3193,
+            "numdf": 7,
+            "value": 4080.17260550759
+        },
+        "r.squared.r.squared": 0.899446398536766
+    }
+}

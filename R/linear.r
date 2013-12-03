@@ -107,7 +107,7 @@ list_1D <- list(names = ranks, data = rankdf)
 cat(toJSON(list_1D))
 #sink()
 
-
+#### END OF 1D #####
 
 ## get "y ~ X_1 + X_2 + ..."
 ## also remove y from X

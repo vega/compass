@@ -5,6 +5,8 @@ angular.module('vizRecSrcApp')
     // Service logic
     // ...
 
+    var rNameMapper = {};
+
     function addStats(values){
       var countMap = {} , max= -Infinity, min=Infinity;
       for(var i=0;i<values.length;i++){
@@ -85,6 +87,14 @@ angular.module('vizRecSrcApp')
               data[i].normalizedEntropy = it.normalizedEntropy(_.values(data[i].countMap));
             }
           }
+
+          //r name mapper
+          for (i = 0; i < originalDataLength; i++) {
+            rNameMapper[data[i].name] = data[i].name.replace(/\ /g,".").replace(/\(/g,".").replace(/\)/,".");
+          }
+//          console.log("rNameMapper", rNameMapper);
+
+          // calculate mi distance
           data.mi_distance = [];
           for (i =0; i < originalDataLength; i++) data.mi_distance[i] = [];
           for (i =0; i < originalDataLength; i++){
@@ -110,16 +120,39 @@ angular.module('vizRecSrcApp')
                   data.mi_distance[j][i] = data.mi_distance[i][j] = null;
                   continue;
               }
-
-
-//              console.log(data[i].name, data[i].type, data[j].name, data[j].type);
               data.mi_distance[j][i] = data.mi_distance[i][j] = it.getDistance(data, _i, _j);
-//              console.log("dist["+i+"]["+j+"]=", data.mi_distance[i][j]);
             }
           }
           if (callback) callback(data);
         });
       },
+      loadRData: function(){
+        var self=this;
+        //LOAD 1d rankings
+        $http.get("data/r_output/1D_rankings.json").success(function(json){
+          var valueNames = self.currentData.colPropNames = json.names;
+          var rankingData = json.data;
+
+          var i,j;
+
+          for(i=0 ; i<self.currentData.originalLength; i++){
+            var col = self.currentData[i];
+            var values = rankingData[rNameMapper[col.name]];
+            col.prop = {};
+            for(j=0 ; j< values.length; j++){
+              col.prop[valueNames[j]] = values[j];
+            }
+            console.log(col.name, col.prop);
+            if(col.normalizedEntropy != col.prop["Normalized Entropy"])
+              console.log("bug!", col.normalizedEntropy, col.prop["Normalized Entropy"]);
+          }
+        });
+
+        $http.get("data/r_output/simple_linear.json").success(function(json){
+          
+        })
+      },
+
       get: function (key) {
         return key ? _[key] : this.currentData;
       },
