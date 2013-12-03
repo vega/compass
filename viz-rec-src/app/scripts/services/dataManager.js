@@ -178,8 +178,8 @@ angular.module('vizRecSrcApp')
         }
 
         //for each of these models, load json
-        _(["simple_linear","simple_linear_all","long_linear","long_linear_all"]).each(function(modelName){
-          $http.get("data/r_output/simple_linear.json").success(loadModel(modelName))
+        _(["simple_linear_all", "long_linear_all"]).each(function(modelName){
+          $http.get("data/r_output/"+modelName+".json").success(loadModel(modelName))
         });
 
 
