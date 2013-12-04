@@ -181,28 +181,28 @@ simple_num_num = get_all_simple_linear_formulae(num_vars, num_vars)
 
 
 ## ANALYSIS OF SIMPLE NUM ~ NUM
-function analyse_simple_num_num(sum_simple_num_num){
-  estimate <- sapply(sum_simple_num_num, function(s) s$coefficients[1,2])
-  s_estimate <- estimate[sort.list(estimate, decreasing=T)]
-}
-
+#function analyse_simple_num_num(sum_simple_num_num){
+#  estimate <- sapply(sum_simple_num_num, function(s) s$coefficients[1,2])
+#  s_estimate <- estimate[sort.list(estimate, decreasing=T)]
+#}
+#
 ## ANALYSIS OF LONG NUM ~ NUM
-function analyse_long_num_num(sum_long_num_num){
-
-  estimate <- lapply(sum_long_num_num, function(s) s$coefficients[,1])
-  max_estimate <- apply(estimate, 2, max)
-  s_estimate <- estimate[sort.list(estimate, decreasing=T)]
-  head(s_estimate)
-
-  ## recreate table with NA values (since the extracted estimates
-  ## won't include depedent variable in coefficients.
-  est_table <- sapply(c("(Intercept)",num_vars), function(var) lapply(
-    1:length(estimate), function(i) estimate[[i]][var], USE.NAMES=T)
-  )
-  names(est_table) <- c("(Intercept)",num_vars)  ## assign the right name for each variable
-  ## write to table so we can easily
-  write.table(est_table, paste(output_path,"/est.tsv",sep=""), sep="\t", col.names=NA)
-}
+#function analyse_long_num_num(sum_long_num_num){
+#
+#  estimate <- lapply(sum_long_num_num, function(s) s$coefficients[,1])
+#  max_estimate <- apply(estimate, 2, max)
+#  s_estimate <- estimate[sort.list(estimate, decreasing=T)]
+#  head(s_estimate)
+#
+#  ## recreate table with NA values (since the extracted estimates
+#  ## won't include depedent variable in coefficients.
+#  est_table <- sapply(c("(Intercept)",num_vars), function(var) lapply(
+#    1:length(estimate), function(i) estimate[[i]][var], USE.NAMES=T)
+#  )
+#  names(est_table) <- c("(Intercept)",num_vars)  ## assign the right name for each variable
+#  ## write to table so we can easily
+#  write.table(est_table, paste(output_path,"/est.tsv",sep=""), sep="\t", col.names=NA)
+#}
 
 ### ANALYSIS OF NUM ~ ALL  (ALL = Both Cat, Num)
 #simple_num_all = get_all_simple_linear_formulae(num_vars, all_vars)
@@ -217,21 +217,21 @@ function analyse_long_num_num(sum_long_num_num){
 
 # copied from above but still haven't make good use of it.
 
-function analyse_long_num_all(sum_long_num_all){
-   estimate <- lapply(sum_long_num_all, function(s) s$coefficients[,1])
-   max_estimate <- apply(estimate, 2, max)
-   s_estimate <- estimate[sort.list(estimate, decreasing=T)]
-   head(s_estimate)
-
-   ## recreate table with NA values (since the extracted estimates
-   ## won't include depedent variable in coefficients.
-   est_table <- sapply(c("(Intercept)",num_vars), function(var) lapply(
-     1:length(estimate), function(i) estimate[[i]][var], USE.NAMES=T)
-   )
-   names(est_table) <- c("(Intercept)",num_vars) ## assign the right name for each variable
-   ## write to table so we can easily
-   write.table(est_table, paste(output_path,"/sum_long_num_all.tsv",sep=""), sep="\t", col.names=NA)
-}
+#function analyse_long_num_all(sum_long_num_all){
+#   estimate <- lapply(sum_long_num_all, function(s) s$coefficients[,1])
+#   max_estimate <- apply(estimate, 2, max)
+#   s_estimate <- estimate[sort.list(estimate, decreasing=T)]
+#   head(s_estimate)
+#
+#   ## recreate table with NA values (since the extracted estimates
+#   ## won't include depedent variable in coefficients.
+#   est_table <- sapply(c("(Intercept)",num_vars), function(var) lapply(
+#     1:length(estimate), function(i) estimate[[i]][var], USE.NAMES=T)
+#   )
+#   names(est_table) <- c("(Intercept)",num_vars) ## assign the right name for each variable
+#   ## write to table so we can easily
+#   write.table(est_table, paste(output_path,"/sum_long_num_all.tsv",sep=""), sep="\t", col.names=NA)
+#}
 
 
 ## ANALYSIS OF CAT ~ NUM
