@@ -66,7 +66,7 @@ angular.module('vizRecSrcApp')
         .map(function(c){
           var pair = [col,c];
           pair.metric = currentSorter.metric(pair);
-          if(pair.metric && pair.metric > maxMetric) maxMetric = pair.metric;
+          if(pair.metric && pair.metric != Infinity && pair.metric > maxMetric) maxMetric = pair.metric;
           if(pair.metric && pair.metric < minMetric) minMetric = pair.metric;
           return pair;
         })

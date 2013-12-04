@@ -15,9 +15,14 @@
             <g class="trends"></g>
             <g class="x axis tick"></g>
             <g class="y axis tick"></g>
+            <g class="names">
+                <text class="x axis">{{ pair[1].name }}</text>
+                <text class="y axis">{{ pair[0].name }}</text>
+            </g>
         </svg>
         <div class="tooltip"></div>
         <div class="y-labels"></div>
         <div class="x-labels"></div>
     </div>
+    {{ pair.metric.toFixed(2) }}
 </div>
