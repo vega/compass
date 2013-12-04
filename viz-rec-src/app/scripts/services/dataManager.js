@@ -60,6 +60,8 @@ angular.module('vizRecSrcApp')
 
           var originalDataLength = data.originalLength = data.length;
           var i, j, stats;
+          data.indexCol = data.addColumn("index", d3.range(data[0].length), dv.type.ordinal);
+          data.textIndices = [];
           for (i = 0; i < originalDataLength; i++) {
             addStats(data[i]);
 
@@ -91,6 +93,10 @@ angular.module('vizRecSrcApp')
               data[i].entropy = data[i]["month"].normalizedEntropy;
             }else{
               data[i].normalizedEntropy = it.normalizedEntropy(_.values(data[i].countMap));
+
+              if(data[i].type == dv.type.text){
+                data.textIndices.push(i);
+              }
             }
           }
 
@@ -185,6 +191,18 @@ angular.module('vizRecSrcApp')
           $http.get("data/r_output/"+modelName+".json").success(loadModel(modelName))
         });
 
+        //load 2D outliers
+        $http.get("data/r_output/2D_Outliers.json").success(function(json){
+          _(json.data).each(function(data, pairNames){
+            var pair = pairNames.split("~");
+            var p0 = fromRName[pair[0].trim()], p1= fromRName[pair[1].trim()];
+            var modelName = "outliers";
+            setdefault(setdefault(rel2d,p0,{}),p1,{})[modelName] =
+              setdefault(setdefault(rel2d,p1,{}),p0,{})[modelName] = data[0];
+          });
+        });
+
+        //TODO(kanitw): load 2d clustering here
 
       },
 

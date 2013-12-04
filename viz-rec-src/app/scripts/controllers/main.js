@@ -53,6 +53,13 @@ angular.module('vizRecSrcApp')
             return rel ? rel["simple_linear_all"]["r.squared.r.squared"] : Infinity;
           },
           reverse: false
+        },
+        outliers:{
+          metric: function(pair){
+            var rel = (dataManager.currentData.rel2d[pair[0].name] || {})[pair[1].name];
+            return (rel && "outliers" in rel ) ? rel["outliers"].length : 0;
+          },
+          reverse: true
         }
 
       }
