@@ -156,6 +156,7 @@ angular.module('vizRecSrcApp')
           var m = centered_m * yField.sd / xField.sd;
           var c = yField.sd * (centered_c - centered_m * xField.avg / xField.sd) + yField.avg;
 
+          //pick _x2, _y2 at the boundary of the drawing frame
           var _x1 = 0, _y1 = c;
           var _x2= x.domain()[1], _y2 = c + m * x.domain()[1];
           if(y.domain()[0] > _y2 || _y2 > y.domain()[1]){
@@ -166,8 +167,6 @@ angular.module('vizRecSrcApp')
             }
             _x2 = (_y2 - c) / m;
           }
-
-          console.log(c, m, x.domain()[1], m* x.domain()[1]);
 
           trends.append("line")
             .attr("class","trend")
