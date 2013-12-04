@@ -19,7 +19,7 @@
                 <block-container>
                     <!--Numerical-->
                     <div class="scroll-y no-scroll-x w100 h100 overflowable">
-                        <div ng-repeat="col in cols " class="block-1d">
+                        <div ng-repeat="col in cols " class="block-1d" ng-show="col.name!='Title'">
                             <chart1d col="col" select="select(col);" width="150" is-selected-field="selectedField.name == col.name">
                         </div>
                     </div>
