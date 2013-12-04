@@ -392,7 +392,9 @@ angular.module('vizRecSrcApp')
     }
 
     function updateChart(chart, pair, attrs, scope){
-      if(scope.chartType=="heatmap"){
+      if(scope.chartType=="heatmap"  ||
+        scope.pair[0].type != dv.type.numeric ||
+        scope.pair[1].type != dv.type.numeric){
         drawHeatMap(chart, pair, attrs, scope);
       }else if(scope.chartType=="scatter"){
         drawScatterPlot(chart, pair, attrs, scope);
@@ -403,7 +405,7 @@ angular.module('vizRecSrcApp')
       templateUrl: 'views/chart2d.html',
       restrict: 'E',
       link: function postLink(scope, element, attrs) {
-        scope.chartType= "heatmap";
+        scope.chartType= "scatter";
         scope.sampling = true;
 
         function _updateChart(){
