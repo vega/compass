@@ -3,10 +3,10 @@
     <flexy-layout>
         <block-container init="200">
             <flexy-layout orientation="vertical" >
-                <block-container init="45">
+                <block-container init="60">
                     <div class="padding5">
-                        {{ sorted1d.types }}
-                        <select ng-model="sorter1d.current"
+                        <div><b>Variables</b></div>
+                        Sort by <select ng-model="sorter1d.current"
                                 ng-options="n for (n,s) in sorter1d.types">
                         </select>
                         <div>
@@ -39,17 +39,18 @@
         <block-splitter></block-splitter>
         <block-container>
             <div class="padding5">
-                <select ng-model="sorter2d.current" ng-options="n for (n,s) in sorter2d.types">
+                <div><b>Variables Relevant to "{{selectedField.name}}"</b></div>
+                Sort by <select ng-model="sorter2d.current" ng-options="n for (n,s) in sorter2d.types">
                 </select>
             </div>
             <flexy-layout orientation="vertical">
-                <block-container init="80">
+                <block-container init="90">
                     <div class="padding5">
                         <div><b>Quick Score Overview</b></div>
                         <div class="w100 scroll-x no-scroll-y chart-list">
-                            <span ng-repeat="pair in colPairs" style="margin-right:5px;">
+                            <span ng-repeat="pair in colPairs" style="margin-right:5px;" class="quick-score">
                                 {{ pair[1].name }}:
-                                <span style="background-color: {{ metricColor(pair.metric)}}">
+                                <span class="pull-right" style="background-color: {{ metricColor(pair.metric)}}">
                                     {{ pair.metric.toFixed(2) }}
                                 </span>
                             </span>
@@ -57,9 +58,10 @@
 
                     </div>
                 </block-container>
+                <block-splitter></block-splitter>
                 <block-container>
                     <div class="w100 h100 scroll-y">
-                        <div ng-repeat="pair in colPairs | limitTo: 6" class="block-2d">
+                        <div ng-repeat="pair in colPairs | limitTo: 12" class="block-2d">
                             <chart2d pair="pair" width="250" height="250"/>
                         </div>
                     </div>
