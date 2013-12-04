@@ -10,6 +10,20 @@ angular.module('vizRecSrcApp')
       return function(){ return d3.select(this).select(elementType).empty();}
     }
 
+    /** create where clause for datavore from given fields's filterFn
+     * to optimize for performance, fields should be sorted by likelihood to be filtered
+     */
+    function whereFiltered(fields){
+      return function(table, row){
+        for(var i=0 ; i<fields.length ; i++){
+          if(fields[i].filterFn && !fields[i].filterFn(table.get(fields[i].name,row))){
+            return false;
+          }
+        }
+        return true;
+      };
+    }
+
 
     function getFormattedData(field, maxLength, reverse) {
       var domain = _(field.countTable);
@@ -49,7 +63,21 @@ angular.module('vizRecSrcApp')
       var main = svg.select("g.main")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-      var x, y, marks, innerTickSize=6;
+//      var results = dataManager.currentData.query({
+//        dims: [yField.index, xField.index],
+//        vals:[dv.count()],
+//        where: whereFiltered([xField, yField])
+//      });
+//
+//      var rY =results[0], rX = results[1], rCount=results[2];
+
+      var filteredTable = dataManager.currentData.where(whereFiltered([xField,yField]));
+      var rX = filteredTable[xField.index], rY = filteredTable[yField.index];
+
+      var indicesShown = d3.range(0, rX.length);
+      //TODO(kanitw): add random sampling here!
+
+      var x, y,  marks, innerTickSize=6;
 
       x = (xField.useLogScale ? d3.scale.log().domain([1, d3.max(xField)])
         : d3.scale.linear().domain([0, d3.max(xField)]))
@@ -57,13 +85,14 @@ angular.module('vizRecSrcApp')
       y = (yField.useLogScale ? d3.scale.log().domain([1, d3.max(yField)])
         : d3.scale.linear().domain([0, d3.max(yField)]))
         .range([height, 0]);
+//      var opacity = d3.scale.pow(0.5).domain([0,d3.max(rCount)]).range([0.1,1]);
 
       var xAxis = d3.svg.axis().scale(x).orient("bottom").ticks(2).innerTickSize(innerTickSize)
         .tickFormat(helper.defaultNumberFormatter);
       var yAxis = d3.svg.axis().scale(y).orient("left").ticks(2).innerTickSize(innerTickSize)
         .tickFormat(helper.defaultNumberFormatter);
 
-      var indicesShown = d3.range(0, xField.length);
+
 
       marks = main.selectAll(".marks").data(indicesShown);
 
@@ -76,10 +105,10 @@ angular.module('vizRecSrcApp')
 
       marks.select("circle").transition().duration(500)
         .attr("cx", function(i){
-          return x(xField[i]);
+          return x(rX[i]);
         })
         .attr("cy", function(i){
-          return y(yField[i]);
+          return y(rY[i]);
         })
         .attr("r", 3)
         .style({
@@ -89,7 +118,7 @@ angular.module('vizRecSrcApp')
 
       marks.select("circle")
         .on("mouseover", helper.onMouseOver(chart,function(i){
-          return "("+ xField[i] +","+ yField[i] +")";
+          return "("+ rX[i] +","+ rY[i] +")";
         }))
         .on("mouseout", helper.onMouseOut(chart));
 
@@ -215,10 +244,7 @@ angular.module('vizRecSrcApp')
       var results = dataManager.currentData.query({
         dims: [yField.index, xField.index],
         vals:[dv.count()],
-        where: function(table, row){
-          return (!xField.filterFn || xField.filterFn(table.get(xField.name,row))) &&
-            (!yField.filterFn || yField.filterFn(table.get(yField.name,row)));
-        }
+        where: whereFiltered([xField, yField])
       });
       var yArray = results[0], xArray=results[1], counts = results[2];
 
