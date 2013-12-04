@@ -49,8 +49,7 @@ angular.module('vizRecSrcApp')
           barWidth = x(data[0].dx) - 1;
         }else{
           //normal linear scale
-          x = d3.scale.linear().domain([Math.max
-            (0,d3.min(colData)), xMax]).nice().range([0, width]);
+          x = d3.scale.linear().domain([0, xMax]).nice().range([0, width]);
           xAxisTickFormat = helper.defaultNumberFormatter;
           data = d3.layout.histogram().bins(x.ticks())(colData);
           barWidth = x(data[0].dx) - 1;

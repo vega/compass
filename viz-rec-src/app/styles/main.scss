@@ -165,6 +165,11 @@ body {
   font-size: 9px;
 }
 
+.quick-score{
+  display:inline-block; //TODO(kanitw) use compass instead
+  width: 175px;
+}
+
 .chart-container{
   border: 1px solid #ddd;
   margin: 3px 5px;
@@ -206,6 +211,10 @@ body {
     line-height: 10px;
     overflow: hidden;
 //    background-color: white;
+  }
+  .names{
+    font-size: 11px;
+    font-weight: bold;
   }
   .y-label{
     text-align: right;

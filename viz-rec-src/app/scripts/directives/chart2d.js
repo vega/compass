@@ -10,6 +10,20 @@ angular.module('vizRecSrcApp')
       return function(){ return d3.select(this).select(elementType).empty();}
     }
 
+    /** create where clause for datavore from given fields's filterFn
+     * to optimize for performance, fields should be sorted by likelihood to be filtered
+     */
+    function whereFiltered(fields){
+      return function(table, row){
+        for(var i=0 ; i<fields.length ; i++){
+          if(fields[i].filterFn && !fields[i].filterFn(table.get(fields[i].name,row))){
+            return false;
+          }
+        }
+        return true;
+      };
+    }
+
 
     function getFormattedData(field, maxLength, reverse) {
       var domain = _(field.countTable);
@@ -49,7 +63,24 @@ angular.module('vizRecSrcApp')
       var main = svg.select("g.main")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-      var x, y, marks, innerTickSize=6;
+//      var results = dataManager.currentData.query({
+//        dims: [yField.index, xField.index],
+//        vals:[dv.count()],
+//        where: whereFiltered([xField, yField])
+//      });
+//
+//      var rY =results[0], rX = results[1], rCount=results[2];
+
+      var filteredTable = dataManager.currentData.where(whereFiltered([xField,yField]));
+      var rX = filteredTable[xField.index], rY = filteredTable[yField.index];
+
+      var indicesShown = d3.range(0, rX.length);
+      if(scope.sampling){
+        indicesShown = helper.getRandomSubArray(indicesShown, 500);
+      }
+      //TODO(kanitw): add random sampling here!
+
+      var x, y,  marks, innerTickSize=6;
 
       x = (xField.useLogScale ? d3.scale.log().domain([1, d3.max(xField)])
         : d3.scale.linear().domain([0, d3.max(xField)]))
@@ -57,13 +88,14 @@ angular.module('vizRecSrcApp')
       y = (yField.useLogScale ? d3.scale.log().domain([1, d3.max(yField)])
         : d3.scale.linear().domain([0, d3.max(yField)]))
         .range([height, 0]);
+//      var opacity = d3.scale.pow(0.5).domain([0,d3.max(rCount)]).range([0.1,1]);
 
       var xAxis = d3.svg.axis().scale(x).orient("bottom").ticks(2).innerTickSize(innerTickSize)
         .tickFormat(helper.defaultNumberFormatter);
       var yAxis = d3.svg.axis().scale(y).orient("left").ticks(2).innerTickSize(innerTickSize)
         .tickFormat(helper.defaultNumberFormatter);
 
-      var indicesShown = d3.range(0, xField.length);
+
 
       marks = main.selectAll(".marks").data(indicesShown);
 
@@ -76,10 +108,10 @@ angular.module('vizRecSrcApp')
 
       marks.select("circle").transition().duration(500)
         .attr("cx", function(i){
-          return x(xField[i]);
+          return x(rX[i]);
         })
         .attr("cy", function(i){
-          return y(yField[i]);
+          return y(rY[i]);
         })
         .attr("r", 3)
         .style({
@@ -89,7 +121,7 @@ angular.module('vizRecSrcApp')
 
       marks.select("circle")
         .on("mouseover", helper.onMouseOver(chart,function(i){
-          return "("+ xField[i] +","+ yField[i] +")";
+          return "("+ rX[i] +","+ rY[i] +")";
         }))
         .on("mouseout", helper.onMouseOut(chart));
 
@@ -127,6 +159,7 @@ angular.module('vizRecSrcApp')
           var m = centered_m * yField.sd / xField.sd;
           var c = yField.sd * (centered_c - centered_m * xField.avg / xField.sd) + yField.avg;
 
+          //pick _x2, _y2 at the boundary of the drawing frame
           var _x1 = 0, _y1 = c;
           var _x2= x.domain()[1], _y2 = c + m * x.domain()[1];
           if(y.domain()[0] > _y2 || _y2 > y.domain()[1]){
@@ -138,8 +171,6 @@ angular.module('vizRecSrcApp')
             _x2 = (_y2 - c) / m;
           }
 
-          console.log(c, m, x.domain()[1], m* x.domain()[1]);
-
           trends.append("line")
             .attr("class","trend")
             .attr({x1:x(_x1), y1: y(_y1), x2:x(_x2), y2:y(_y2)})
@@ -147,6 +178,20 @@ angular.module('vizRecSrcApp')
               stroke:'red',
               'stroke-width':1
             });
+          //thicker line to make hovering easier!
+          trends.append("line")
+            .attr("class","trend")
+            .attr({x1:x(_x1), y1: y(_y1), x2:x(_x2), y2:y(_y2)})
+            .style({
+              'stroke-width':4,
+              'stroke':'white',
+              'opacity': 0.01
+            })
+            .on("mouseover", helper.onMouseOver(chart, function(){
+              return "slope="+ m.toPrecision(2)+", intercept="+ c.toPrecision(2);
+            }))
+            .on("mouseout", helper.onMouseOut(chart));
+
 
 
         }
@@ -156,6 +201,14 @@ angular.module('vizRecSrcApp')
       //TODO(kanitw): show trendline for numeric ~ nominal
       //TODO(kanitw): show trendline for nominal ~ nominal
       //TODO(kanitw): show trendline for nominal ~ numeric (can we?)
+
+
+
+      var xAxisPos = {x: width/2,y: height + 30};
+      var yAxisPos = {x: -20, y: height/2};
+
+      moveNamePos(svg, margin, xAxisPos, yAxisPos, width, height);
+
     }
 
     function drawHeatMap(chart, pair, attrs, scope){
@@ -193,14 +246,11 @@ angular.module('vizRecSrcApp')
       var results = dataManager.currentData.query({
         dims: [yField.index, xField.index],
         vals:[dv.count()],
-        where: function(table, row){
-          return (!xField.filterFn || xField.filterFn(table.get(xField.name,row))) &&
-            (!yField.filterFn || yField.filterFn(table.get(yField.name,row)));
-        }
+        where: whereFiltered([xField, yField])
       });
       var yArray = results[0], xArray=results[1], counts = results[2];
 
-      var margin = { top: 75 || attrs.marginTop , right: 5 || attrs.marginLeft , bottom: 5 ||  attrs.marginBottom, left: 75 || attrs.marginLeft },
+      var margin = { top: 75 || attrs.marginTop , right: 15 || attrs.marginLeft , bottom: 10 ||  attrs.marginBottom, left: 75 || attrs.marginLeft },
         width = (attrs.width || 120) - margin.left - margin.right,
         height = (attrs.height || 120) - margin.top - margin.bottom;
 
@@ -311,10 +361,40 @@ angular.module('vizRecSrcApp')
         .style("fill", function(i){ return c(counts[i]);});
 
       marks.exit().remove();
+
+      //remove trendlines
+      var trends = svg.select("g.trends");
+      trends.selectAll(".trend").remove();
+
+      var xAxisPos = {x: width/2,y: height + 10};
+      var yAxisPos = {x: width+10, y: height/2};
+
+      moveNamePos(svg, margin, xAxisPos, yAxisPos, width, height);
+    }
+
+
+    function moveNamePos(svg, margin, xAxisPos, yAxisPos, width, height) {
+      var names = svg.select("g.names")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+      names.select(".axis.x")
+        .transition().duration(500)
+        .attr(xAxisPos)
+        .style({
+          "text-anchor": 'middle'
+        });
+      names.select(".axis.y")
+        .transition().duration(500)
+        .attr(yAxisPos)
+        .attr("transform", "rotate(270," + yAxisPos.x + "," + yAxisPos.y + ")")
+        .style({
+          "text-anchor": 'middle'
+        });
     }
 
     function updateChart(chart, pair, attrs, scope){
-      if(scope.chartType=="heatmap"){
+      if(scope.chartType=="heatmap"  ||
+        scope.pair[0].type != dv.type.numeric ||
+        scope.pair[1].type != dv.type.numeric){
         drawHeatMap(chart, pair, attrs, scope);
       }else if(scope.chartType=="scatter"){
         drawScatterPlot(chart, pair, attrs, scope);
@@ -325,7 +405,8 @@ angular.module('vizRecSrcApp')
       templateUrl: 'views/chart2d.html',
       restrict: 'E',
       link: function postLink(scope, element, attrs) {
-        scope.chartType= "heatmap";
+        scope.chartType= "scatter";
+        scope.sampling = true;
 
         function _updateChart(){
           updateChart(element.find(".chart")[0], scope.pair, attrs, scope);

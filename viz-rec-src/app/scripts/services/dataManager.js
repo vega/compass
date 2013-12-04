@@ -38,14 +38,6 @@ angular.module('vizRecSrcApp')
       return {countMap: countMap};
     }
 
-    function countMap(values){
-      var counter = {};
-      for(var i=0;i<values.length;i++){
-        var val = values.get(i);
-        counter[val] = (counter[val] || 0)+1;
-      }
-      return counter;
-    }
 
     //TODO(kanitw): revise if we still need this!  It seems redundant in the future
     function mapToTable(cm){
