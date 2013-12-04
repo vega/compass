@@ -48,7 +48,7 @@
                     <div class="padding5">
                         <div><b>Quick Score Overview</b></div>
                         <div class="w100 scroll-x no-scroll-y chart-list">
-                            <span ng-repeat="pair in colPairs" style="margin-right:5px;" class="quick-score">
+                            <span ng-repeat="pair in colPairs" style="margin-right:5px;" class="quick-score" ng-show="pair[0].name!='Title'&&pair[1].name!='Title'">
                                 {{ pair[1].name }}:
                                 <span class="pull-right" style="background-color: {{ metricColor(pair.metric)}}">
                                     {{ pair.metric.toFixed(2) }}

@@ -428,7 +428,7 @@ angular.module('vizRecSrcApp')
       link: function postLink(scope, element, attrs) {
         scope.chartType= "scatter";
         scope.sampling = true;
-        scope.includeOutliers = false;
+        scope.includeOutliers = true;
 
         function _updateChart(){
           updateChart(element.find(".chart")[0], scope.pair, attrs, scope);

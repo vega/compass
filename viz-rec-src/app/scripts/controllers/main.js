@@ -54,6 +54,14 @@ angular.module('vizRecSrcApp')
           },
           reverse: false
         },
+        linearWeights:{
+          metric: function(pair){
+            var rel = (dataManager.currentData.rel2d[pair[0].name] || {})[pair[1].name];
+            var est = rel ? rel["simple_linear_all"]["coefs"]["Estimate"] : null;
+            return est ?  est[_.keys(est)[1]] : null;
+          },
+          reverse: true
+        },
         outliers:{
           metric: function(pair){
             var rel = (dataManager.currentData.rel2d[pair[0].name] || {})[pair[1].name];

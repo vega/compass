@@ -198,7 +198,7 @@ angular.module('vizRecSrcApp')
             var p0 = fromRName[pair[0].trim()], p1= fromRName[pair[1].trim()];
             var modelName = "outliers";
             setdefault(setdefault(rel2d,p0,{}),p1,{})[modelName] =
-              setdefault(setdefault(rel2d,p1,{}),p0,{})[modelName] = data[0];
+              setdefault(setdefault(rel2d,p1,{}),p0,{})[modelName] = data;
           });
         });
 
