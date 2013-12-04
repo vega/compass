@@ -75,6 +75,9 @@ angular.module('vizRecSrcApp')
       var rX = filteredTable[xField.index], rY = filteredTable[yField.index];
 
       var indicesShown = d3.range(0, rX.length);
+      if(scope.sampling){
+        indicesShown = helper.getRandomSubArray(indicesShown, 500);
+      }
       //TODO(kanitw): add random sampling here!
 
       var x, y,  marks, innerTickSize=6;
@@ -401,6 +404,7 @@ angular.module('vizRecSrcApp')
       restrict: 'E',
       link: function postLink(scope, element, attrs) {
         scope.chartType= "heatmap";
+        scope.sampling = true;
 
         function _updateChart(){
           updateChart(element.find(".chart")[0], scope.pair, attrs, scope);
