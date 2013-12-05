@@ -48,6 +48,8 @@ angular.module('vizRecSrcApp')
 
     function drawScatterPlot(chart, pair, attrs, scope){
       var xField = pair[1], yField = pair[0];
+
+      //TODO(kanitw): refactor -- decouple this rel!
       var rel = ((dataManager.currentData.rel2d[yField.name]||{})[xField.name]||{})
 
       var margin = { top: 15 || attrs.marginTop ,
@@ -72,10 +74,9 @@ angular.module('vizRecSrcApp')
 //
 //      var rY =results[0], rX = results[1], rCount=results[2];
 
+      //TODO(kanitw): refactor -- decouple this rel!
       var filteredTable = dataManager.currentData.where(whereFiltered([xField,yField]));
       var filteredIndices = filteredTable[dataManager.currentData.indexCol.index];
-
-
 
       var indicesShown = filteredIndices;
       if(scope.sampling){
@@ -126,10 +127,8 @@ angular.module('vizRecSrcApp')
           return y(yField[i]);
         })
         .attr("r", 3)
-        .style("fill", scope.includeOutliers ? function(i){ return isOutlier[i]? "red" : "steelblue"; } : "steelblue")
-        .style({
-          "fill-opacity": "0.1"
-        });
+        .style("fill", scope.includeOutliers ? function(i){ return isOutlier[i]? "#d62728" : "#1f77b4"; } : "#1f77b4")
+        .style("fill-opacity", scope.includeOutliers ? function(i){ return isOutlier[i]? "0.08" : "0.24"; } : "0.24");
 
       marks.select("circle")
         .on("mouseover", helper.onMouseOver(chart,function(i){
@@ -301,7 +300,7 @@ angular.module('vizRecSrcApp')
         .pow()
         .exponent(0.5)
         .domain([d3.min(counts),d3.max(counts)])
-        .range(["#efefef", "steelblue"]);
+        .range(["#efefef", "#1f77b4"]);
 
       var svgRect = d3.select(chart).select("svg")[0][0].getBoundingClientRect();
       var chartRect = d3.select(chart)[0][0].getBoundingClientRect();
