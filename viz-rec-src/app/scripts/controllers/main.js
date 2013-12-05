@@ -21,7 +21,7 @@ angular.module('vizRecSrcApp')
           metric: function(col){
             return col.normalizedEntropy;
           },
-          reverse: false
+          reverse: true
         }
       },
     };
