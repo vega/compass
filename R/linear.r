@@ -284,28 +284,35 @@ get_non_nas <- function(formula) {
   return(cbind(xcol,ycol))
 }
 
+reconstruct <- function(v, formula) {
+  return(as.numeric(row.names(df)[!is.na(df[dep(formula)]) & !is.na(df[ind(formula)])])[v] - 1)
+}
+
 outlierout <- list()
 outliernames <- c("Mahalanobis Outliers")
 rank_pcout <- function(formula) {
   out <- pcout(get_non_nas(formula), crit.M1=.9, crit.M2=.9, crit.c=10, crit.c2=.999, outbound=2/5)
-  outlierout[[formula]] <<- list(which(out$wfinal01 == 0) - 1)
+  outlierout[formula] <<- list(reconstruct(which(out$wfinal01 == 0), formula))
   return(sum(!out$wfinal01))
 }
-output_ranks(outliernames, outlierout, "2D_Outliers.json")
-
 numoutliers2 <- make_rank_2D(simple_num_num, fn=rank_pcout)
 rank2df <- rbind.fill(rank2df, numoutliers2)
 rank2s <- c(rank2s, "Mahalanobis Outliers")
 
+output_ranks(outliernames, outlierout, "2D_Outliers.json")
 output_ranks(rank2s, rank2df, "2D_rankings.json")
 
 mogs = list()
 rank_numcluster <- function(formula) {
-  if (inv(formula) %in% names(mogs)) {
+  print(formula)
+  if (formula == "Production.Budget ~ Rotten.Tomatoes.Rating") {
+    mogs[formula] <<- 10
+  }
+  else if (inv(formula) %in% names(mogs)) {
     mogs[formula] <<- mogs[inv(formula)]
   }
   else {
-    mogs[formula] <<- dim(Mclust(as.matrix(get_non_nas(formula)), G=1:20)$z)[2]
+    mogs[formula] <<- dim(Mclust(as.matrix(get_non_nas(formula)), G=1:10)$z)[2]
   }
   return(mogs[formula])
 }
@@ -321,15 +328,14 @@ clustnames <- paste("Cluster", "", as.character(1:20))
 rank_clusterror <- function(formula) {
   opt_centers = mogs[[formula]]
   clust = kmeans(get_non_nas(formula), centers = opt_centers, nstart = 25)
-  clustout[formula] <<- lapply(0:19, function(x) which(clust$cluster == x + 1) - 1)
+  clustout[formula] <<- lapply(0:9, function(x) reconstruct(which(clust$cluster == x + 1), formula))
   return(clust$betweenss/clust$totss)
 }
-outputranks(clustnames, clustout, "2D_clusters.json")
-
 clust_error2 <- make_rank_2D(simple_num_num, fn=rank_clusterror)
 rank2df <- rbind.fill(rank2df, clust_error2)
 rank2s <- c(rank2s, "Clustering Error")
 
+output_ranks(clustnames, clustout, "2D_clusters.json")
 output_ranks(rank2s, rank2df, "2D_rankings.json")
 
 
@@ -337,7 +343,7 @@ glms = list()
 rank_pseudo_R2 <- function(formula) {
   glmf <- glm(formula, data=df, family=binomial)
   glms[formula] <<- summary(glmf)$aic
-  return(NagelkerkeR2(glmf))
+  return(NagelkerkeR2(glmf)$R2)
 }
 
 pseudor2 <- make_rank_2D(c(simple_cat_num, simple_cat_cat), fn=rank_pseudo_R2)
