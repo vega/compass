@@ -1,4 +1,4 @@
-## Generate all linear models with one indepedent variable
+#Generate all linear models with one indepedent variable
 ## and export to a JSON file
 
 require(rjson)
@@ -7,6 +7,8 @@ require(plyr)
 require(nortest)
 require(entropy)
 require(mclust)
+require(fmsb)
+require(mvoutlier)
 
 not <- function(f){ return(function(x) !f(x))} # create not(f(x)) = !f(x)
 
@@ -80,6 +82,13 @@ clust_error <- function(x) {
   return(clust$betweenss/clust$totss)
 }
 
+output_ranks <- function(rank_names, rank_data, filename) {
+  rank_list <- list(names = rank_names, data = rank_data)
+  sink(paste(output_path, filename, sep=""))
+  cat(toJSON(rank_list))
+  sink()
+}
+
 normality <- make_rank_1D(num_vars, fn=function(x) lillie.test(x)$statistic)
 rankdf <- data.frame(normality)
 ranks <- c("Normality")
@@ -102,10 +111,7 @@ outliers <- make_rank_1D(num_vars, fn=function(x) length(x[x %in% boxplot.stats(
 rankdf <- rbind(rankdf, outliers)
 ranks <- c(ranks, "Number of Outliers")
 
-list_1D <- list(names = ranks, data = rankdf)
-#sink(paste(output_path, "1D_rankings.json",sep=""))
-cat(toJSON(list_1D))
-#sink()
+#output_ranks(ranks, rankdf, "1D_rankings.json")
 
 #### END OF 1D #####
 
@@ -113,6 +119,20 @@ cat(toJSON(list_1D))
 ## also remove y from X
 get_linear_formula <- function(y, X) {
   return(paste(y, "~", paste(X[X!=y], collapse= " + ")))
+}
+
+# get dependent variable string from simple formula
+dep <- function(form) {
+  return(strsplit(form[[1]], " ~ ")[[1]][1])
+}
+
+# get independent variable string from simple formula
+ind <- function(form) {
+  return(strsplit(form[[1]], " ~ ")[[1]][2])
+}
+
+inv <- function(form) {
+  return(paste(ind(form), "~", dep(form)))
 }
 
 ## Get Linear Formulae with one independent variable
@@ -154,54 +174,54 @@ run_and_sum_all <- function(formulae, fn=lm, ...){
 }
 
 simple_num_num = get_all_simple_linear_formulae(num_vars, num_vars)
-long_num_num = get_all_long_linear_formulae(num_vars,num_vars)
+#long_num_num = get_all_long_linear_formulae(num_vars,num_vars)
 
-sum_simple_num_num = run_and_sum_all(simple_num_num)
-sum_long_num_num = run_and_sum_all(long_num_num)
+#sum_simple_num_num = run_and_sum_all(simple_num_num)
+#sum_long_num_num = run_and_sum_all(long_num_num)
 
-export_json(sum_simple_num_num, "simple_linear.json")
-export_json(sum_long_num_num, "long_linear.json")
+#export_json(sum_simple_num_num, "simple_linear.json")
+#export_json(sum_long_num_num, "long_linear.json")
 
 
 
 ## ANALYSIS OF SIMPLE NUM ~ NUM
-function analyse_simple_num_num(sum_simple_num_num){
-  estimate <- sapply(sum_simple_num_num, function(s) s$coefficients[1,2])
-  s_estimate <- estimate[sort.list(estimate, decreasing=T)]
-}
-
+#function analyse_simple_num_num(sum_simple_num_num){
+#  estimate <- sapply(sum_simple_num_num, function(s) s$coefficients[1,2])
+#  s_estimate <- estimate[sort.list(estimate, decreasing=T)]
+#}
+#
 ## ANALYSIS OF LONG NUM ~ NUM
-function analyse_long_num_num(sum_long_num_num){
-
-  estimate <- lapply(sum_long_num_num, function(s) s$coefficients[,1])
-  max_estimate <- apply(estimate, 2, max)
-  s_estimate <- estimate[sort.list(estimate, decreasing=T)]
-  head(s_estimate)
-
-  ## recreate table with NA values (since the extracted estimates
-  ## won't include depedent variable in coefficients.
-  est_table <- sapply(c("(Intercept)",num_vars), function(var) lapply(
-    1:length(estimate), function(i) estimate[[i]][var], USE.NAMES=T)
-  )
-  names(est_table) <- c("(Intercept)",num_vars)  ## assign the right name for each variable
-  ## write to table so we can easily
-  write.table(est_table, paste(output_path,"/est.tsv",sep=""), sep="\t", col.names=NA)
-}
+#function analyse_long_num_num(sum_long_num_num){
+#
+#  estimate <- lapply(sum_long_num_num, function(s) s$coefficients[,1])
+#  max_estimate <- apply(estimate, 2, max)
+#  s_estimate <- estimate[sort.list(estimate, decreasing=T)]
+#  head(s_estimate)
+#
+#  ## recreate table with NA values (since the extracted estimates
+#  ## won't include depedent variable in coefficients.
+#  est_table <- sapply(c("(Intercept)",num_vars), function(var) lapply(
+#    1:length(estimate), function(i) estimate[[i]][var], USE.NAMES=T)
+#  )
+#  names(est_table) <- c("(Intercept)",num_vars)  ## assign the right name for each variable
+#  ## write to table so we can easily
+#  write.table(est_table, paste(output_path,"/est.tsv",sep=""), sep="\t", col.names=NA)
+#}
 
 ### ANALYSIS OF NUM ~ ALL  (ALL = Both Cat, Num)
-simple_num_all = get_all_simple_linear_formulae(num_vars, all_vars)
-long_num_all = get_all_long_linear_formulae(num_vars, all_vars)
+#simple_num_all = get_all_simple_linear_formulae(num_vars, all_vars)
+#long_num_all = get_all_long_linear_formulae(num_vars, all_vars)
 
-sum_simple_num_all = run_and_sum_all(simple_num_all)
-sum_long_num_all = run_and_sum_all(long_num_all)
+#sum_simple_num_all = run_and_sum_all(simple_num_all)
+#sum_long_num_all = run_and_sum_all(long_num_all)
 
-export_json(sum_simple_num_all, "simple_linear_all.json")
-export_json(sum_long_num_all, "long_linear_all.json")
+#export_json(sum_simple_num_all, "simple_linear_all.json")
+#export_json(sum_long_num_all, "long_linear_all.json")
 
 
 # copied from above but still haven't make good use of it.
 
-# function analyse_long_num_all(sum_long_num_all){
+#function analyse_long_num_all(sum_long_num_all){
 #   estimate <- lapply(sum_long_num_all, function(s) s$coefficients[,1])
 #   max_estimate <- apply(estimate, 2, max)
 #   s_estimate <- estimate[sort.list(estimate, decreasing=T)]
@@ -215,23 +235,130 @@ export_json(sum_long_num_all, "long_linear_all.json")
 #   names(est_table) <- c("(Intercept)",num_vars) ## assign the right name for each variable
 #   ## write to table so we can easily
 #   write.table(est_table, paste(output_path,"/sum_long_num_all.tsv",sep=""), sep="\t", col.names=NA)
-# }
+#}
 
 
 ## ANALYSIS OF CAT ~ NUM
 #still have some bugs below
 simple_cat_num = get_all_simple_linear_formulae(cat_vars, num_vars)
-sum_simple_cat_num = run_and_sum_all(simple_cat_num, fn=multinom)
+#sum_simple_cat_num = run_and_sum_all(simple_cat_num, fn=multinom)
 
-models_simple_cat_num = list()
-for(i in 1:length(simple_cat_num)){
-  cat(i)
-  models_simple_cat_num[i]<- multinom(formula=simple_cat_num[[i]],data=df)
-}
+#models_simple_cat_num = list()
+#for(i in 1:length(simple_cat_num)){
+#  cat(i)
+#  models_simple_cat_num[i]<- multinom(formula=simple_cat_num[[i]],data=df)
+#}
 
-summary(multinom(formula=simple_cat_num[[1]],data=df))
+#summary(multinom(formula=simple_cat_num[[1]],data=df))
 
 # long_cat_num = get_all_long_linear_formulae(cat_vars, num_vars)
 #sum_simple_num_num = run_and_sumall(simple_num_num, fn=glm, family=binomial())
 # sum_long_num_num = run_and_sum_all(long_num_num, fn=glm)
 
+# 2D Rankings - Jeff
+
+simple_cat_cat = get_all_simple_linear_formulae(cat_vars, cat_vars)
+simple_num_cat = get_all_simple_linear_formulae(num_vars, cat_vars)
+all_simple_formulae = get_all_simple_linear_formulae(names(df), names(df))
+
+make_rank_2D <- function(formulae, fn=rank_R2) {
+  names(formulae) <- formulae
+  rank <- lapply(formulae, function(x) fn(x))
+  rank[unlist(all_simple_formulae[!(all_simple_formulae %in% formulae)])] <- NA
+  return(data.frame(rank))
+}
+
+rank_R2 <- function(formula) {
+  return(summary(lm(formula, data=df))$adj.r.squared)
+}
+
+nnr2 <- make_rank_2D(c(simple_num_num, simple_num_cat), fn=rank_R2)
+rank2df <- nnr2
+rank2s <- c("R-Squared")
+
+get_non_nas <- function(formula) {
+  y <- dep(formula)
+  x <- ind(formula)
+  xcol <- df[x][!is.na(df[x]) & !is.na(df[y])]
+  ycol <- df[y][!is.na(df[x]) & !is.na(df[y])]
+  return(cbind(xcol,ycol))
+}
+
+reconstruct <- function(v, formula) {
+  return(as.numeric(row.names(df)[!is.na(df[dep(formula)]) & !is.na(df[ind(formula)])])[v] - 1)
+}
+
+outlierout <- list()
+outliernames <- c("Mahalanobis Outliers")
+rank_pcout <- function(formula) {
+  out <- pcout(get_non_nas(formula), crit.M1=.9, crit.M2=.9, crit.c=10, crit.c2=.999, outbound=2/5)
+  outlierout[formula] <<- list(reconstruct(which(out$wfinal01 == 0), formula))
+  return(sum(!out$wfinal01))
+}
+numoutliers2 <- make_rank_2D(simple_num_num, fn=rank_pcout)
+rank2df <- rbind.fill(rank2df, numoutliers2)
+rank2s <- c(rank2s, "Mahalanobis Outliers")
+
+output_ranks(outliernames, outlierout, "2D_Outliers.json")
+output_ranks(rank2s, rank2df, "2D_rankings.json")
+
+mogs = list()
+rank_numcluster <- function(formula) {
+  print(formula)
+  if (formula == "Production.Budget ~ Rotten.Tomatoes.Rating") {
+    mogs[formula] <<- 10
+  }
+  else if (inv(formula) %in% names(mogs)) {
+    mogs[formula] <<- mogs[inv(formula)]
+  }
+  else {
+    mogs[formula] <<- dim(Mclust(as.matrix(get_non_nas(formula)), G=1:10)$z)[2]
+  }
+  return(mogs[formula])
+}
+
+num_clusters2 <- make_rank_2D(simple_num_num, fn=rank_numcluster)
+rank2df <- rbind.fill(rank2df, num_clusters2)
+rank2s <- c(rank2s, "Number of Clusters")
+
+output_ranks(rank2s, rank2df, "2D_rankings.json")
+
+clustout <- list()
+clustnames <- paste("Cluster", "", as.character(1:20))
+rank_clusterror <- function(formula) {
+  opt_centers = mogs[[formula]]
+  clust = kmeans(get_non_nas(formula), centers = opt_centers, nstart = 25)
+  clustout[formula] <<- lapply(0:9, function(x) reconstruct(which(clust$cluster == x + 1), formula))
+  return(clust$betweenss/clust$totss)
+}
+clust_error2 <- make_rank_2D(simple_num_num, fn=rank_clusterror)
+rank2df <- rbind.fill(rank2df, clust_error2)
+rank2s <- c(rank2s, "Clustering Error")
+
+output_ranks(clustnames, clustout, "2D_clusters.json")
+output_ranks(rank2s, rank2df, "2D_rankings.json")
+
+
+glms = list()
+rank_pseudo_R2 <- function(formula) {
+  glmf <- glm(formula, data=df, family=binomial)
+  glms[formula] <<- summary(glmf)$aic
+  return(NagelkerkeR2(glmf)$R2)
+}
+
+pseudor2 <- make_rank_2D(c(simple_cat_num, simple_cat_cat), fn=rank_pseudo_R2)
+rank2df <- rbind.fill(rank2df, pseudor2)
+rank2s <- c(rank2s, "Pseudo R-Squared")
+
+output_ranks(rank2s, rank2df, "2D_rankings.json")
+
+
+rank_aic <- function(formula) {
+  return(glms[formula])
+}
+
+aic <- make_rank_2D(c(simple_cat_num, simple_cat_cat), fn=rank_aic)
+rank2df <- rbind.fill(rank2df, aic)
+rank2s <- c(rank2s, "Logistic Reg. AIC")
+
+output_ranks(rank2s, rank2df, "2D_rankings.json")
