@@ -6,6 +6,20 @@
                ng-show="isQonQ">
                 C
             </a>
+            <span class="option-item pull-right" ng-show="chartType=='heatmap'">
+                <div class="btn-group btn-xxs">
+                    <button type="button" class="btn btn-xxs btn-default dropdown-toggle" data-toggle="dropdown">
+                        {{ normalize || '(norm)' }}
+                        <span class="caret"></span>
+                        <span class="sr-only">Toggle Dropdown</span>
+                    </button>
+                    <ul class="dropdown-menu" role="menu">
+                        <li><a href="" ng-click="normalize = null;">None</a></li>
+                        <li><a href="" ng-click="normalize ='row';">By Row</a></li>
+                        <li><a href="" ng-click="normalize ='col';">By Col</a></li>
+                    </ul>
+                </div>
+            </span>
         </span>
     </div>
 

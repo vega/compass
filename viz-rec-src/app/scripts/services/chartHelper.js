@@ -79,6 +79,17 @@ angular.module('vizRecSrcApp')
     weekday[5]="Friday";
     weekday[6]="Saturday";
 
+    /**
+     *
+     * @param array
+     * @returns map which key = value in array, value = index of key in the given array
+     *
+     * e.g. indexDict(['a','b']) = {a:0, b:1}
+     */
+    this.indexDict = function(arr) {
+      return arr.reduce(function(a,b,i) { a[b] = i; return a; }, {});
+    };
+
     this.defaultNumberFormatter = function (d) {
       return _.isNumber(d) && d > 10000 ? d.toPrecision(2) : d;
     }

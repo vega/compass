@@ -211,18 +211,11 @@ angular.module('vizRecSrcApp')
               return "slope="+ m.toPrecision(2)+", intercept="+ c.toPrecision(2);
             }))
             .on("mouseout", helper.onMouseOut(chart));
-
-
-
         }
-
-
       }
       //TODO(kanitw): show trendline for numeric ~ nominal
       //TODO(kanitw): show trendline for nominal ~ nominal
       //TODO(kanitw): show trendline for nominal ~ numeric (can we?)
-
-
 
       var xAxisPos = {x: width/2,y: height + 30};
       var yAxisPos = {x: -20, y: height/2};
@@ -263,12 +256,49 @@ angular.module('vizRecSrcApp')
 //      console.log(xField.countTable.length, yField.countTable.length);
 //      console.log("type of x,y =", xField.type, yField.type);
 
+      var where = whereFiltered([xField, yField]);
+
       var results = dataManager.currentData.query({
         dims: [yField.index, xField.index],
         vals:[dv.count()],
-        where: whereFiltered([xField, yField])
+        where: where
       });
-      var yArray = results[0], xArray=results[1], counts = results[2];
+
+      var rowCount = dataManager.currentData.query({
+        dims: [yField.index],
+        vals: [dv.count()],
+        where: where
+      });
+
+      var colCount = dataManager.currentData.query({
+        dims: [xField.index],
+        vals: [dv.count()],
+        where: where
+      });
+
+      var rowCountIndex = helper.indexDict(rowCount[0]), colCountIndex = helper.indexDict(colCount[0]);
+
+      var yArray = results[0], xArray=results[1], counts = results[2], percent=[];
+      var colorMeasure = counts;
+
+      var normIndex, nSums, i, normField, normArray, normCount;
+      if(scope.normalize){
+        if(scope.normalize == 'row'){
+          normCount = rowCount;
+          normArray = yArray;
+          normIndex = rowCountIndex;
+        }else if(scope.normalize =='col'){
+          normCount = colCount;
+          normArray = xArray;
+          normIndex = colCountIndex;
+        }
+
+        for(i=0; i<counts.length; i++){
+          var nsum = normCount[1][normIndex[normArray[i]]];
+          percent.push( nsum>0 ? counts[i]/nsum * 100: null);
+        }
+        colorMeasure = percent;
+      }
 
       var margin = { top: 75 || attrs.marginTop , right: 15 || attrs.marginLeft , bottom: 10 ||  attrs.marginBottom, left: 75 || attrs.marginLeft },
         width = (attrs.width || 120) - margin.left - margin.right,
@@ -299,7 +329,7 @@ angular.module('vizRecSrcApp')
       c = d3.scale//. linear()
         .pow()
         .exponent(0.5)
-        .domain([d3.min(counts),d3.max(counts)])
+        .domain([d3.min(colorMeasure),d3.max(colorMeasure)])
         .range(["#efefef", "#1f77b4"]);
 
       var svgRect = d3.select(chart).select("svg")[0][0].getBoundingClientRect();
@@ -317,7 +347,10 @@ angular.module('vizRecSrcApp')
           .style("height", x.rangeBand()+"px")
           .style("top", (svgRect.top - chartRect.top + margin.top - 3)+ "px")
           .text(helper.ellipsis(15, xFormatter))
-          .on("mouseover", helper.onMouseOver(chart, helper.I))
+          .on("mouseover", helper.onMouseOver(chart, function(d){
+            return xFormatter(d) +
+              "(" + colCount[1][colCountIndex[d]]  +  ")";
+          }))
           .on("mouseout", helper.onMouseOut(chart));
         xAxisLabels.exit().remove();
         //rotate only if needed!
@@ -339,7 +372,10 @@ angular.module('vizRecSrcApp')
             return margin.top + svgRect.top - chartRect.top + (i)* y.rangeBand() + "px";
           })
           .text(helper.ellipsis(15, yFormatter));
-        yAxisLabels.on("mouseover", helper.onMouseOver(chart, helper.I))
+        yAxisLabels.on("mouseover", helper.onMouseOver(chart, function(d){
+            return yFormatter(d) +
+              "(" + rowCount[1][rowCountIndex[d]]  +  ")";
+          }))
           .on("mouseout", helper.onMouseOut(chart));
         yAxisLabels.exit().remove();
       }
@@ -371,14 +407,19 @@ angular.module('vizRecSrcApp')
 
       marks.select("rect")
         .on('mouseover', helper.onMouseOver(chart, function(i){
-          return "("+ xFormatter(xArray[i]) +","+ yFormatter(yArray[i]) +")="+ counts[i];
+          var countLabel = counts[i];
+          if(scope.normalize){
+            countLabel = percent[i].toFixed(2)+"%" + " ("+ counts[i] +" of "+normCount[1][normIndex[normArray[i]]] +")";
+          }
+
+          return "("+ xFormatter(xArray[i]) +","+ yFormatter(yArray[i]) +")=" + countLabel;
         }))
         .on('mouseout', helper.onMouseOut(chart))
         .transition().duration(500)
         .attr("x", 1)
         .attr("width", x.rangeBand()-1)
         .attr("height", y.rangeBand()-1)
-        .style("fill", function(i){ return c(counts[i]);});
+        .style("fill", function(i){ return c(colorMeasure[i]);});
 
       marks.exit().remove();
 
@@ -428,6 +469,7 @@ angular.module('vizRecSrcApp')
         scope.chartType= "scatter";
         scope.sampling = true;
         scope.includeOutliers = true;
+        scope.normalize = null;
 
         function _updateChart(){
           updateChart(element.find(".chart")[0], scope.pair, attrs, scope);
@@ -445,6 +487,7 @@ angular.module('vizRecSrcApp')
           scope.pairY = pair[0];
           scope.pairX = pair[1];
           scope.isQonQ = pair[0].type == dv.type.numeric && pair[1].type == dv.type.numeric;
+          scope.chartType= scope.isQonQ ? "scatter" : "heatmap";
           if(pair){
             _updateChart();
           }
@@ -455,6 +498,7 @@ angular.module('vizRecSrcApp')
         scope.$watch("pairY.filtered", _updateChart);
         scope.$watch("pairY.useLogScale", _updateChart);
         scope.$watch("chartType", _updateChart);
+        scope.$watch("normalize", _updateChart);
       },
       scope:{
         pair:"="
