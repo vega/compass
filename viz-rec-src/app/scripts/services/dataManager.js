@@ -145,7 +145,7 @@ angular.module('vizRecSrcApp')
 
         var self=this;
         /* all 2-d data are stored in currentData.rel2d for now */
-        var rel2d = self.currentData.rel2d = {};
+        var rel2d = self.currentData.rel2d = { aggregate:{ max:{}, min:{}}};
 
         //LOAD 1d rankings
         $http.get("data/r_output/1D_rankings.json").success(function(json){
@@ -157,6 +157,8 @@ angular.module('vizRecSrcApp')
           for(i=0 ; i<self.currentData.originalLength; i++){
             var col = self.currentData[i];
             var values = rankingData[toRName[col.name]];
+
+            //create map of property names
             col.prop = {};
             for(j=0 ; j< values.length; j++){
               col.prop[valueNames[j]] = values[j];
@@ -167,21 +169,55 @@ angular.module('vizRecSrcApp')
           }
         });
 
+
+        //set aggregate value
+        function setAggregate(p0, modelName, val) {
+          var agg_max = setdefault(rel2d.aggregate.max, p0, {});
+          if (modelName in agg_max) {
+            if (val > agg_max[modelName]) agg_max[modelName] = val;
+          } else agg_max[modelName] = val;
+
+          var agg_min = setdefault(rel2d.aggregate.min, p0, {});
+          if (modelName in agg_min) {
+            if (val < agg_min[modelName]) agg_min[modelName] = val;
+          } else agg_min[modelName] = val; //put first time value here
+        }
+
+        /** load 2d rankings */
+        $http.get("data/r_output/2D_rankings.json").success(function(json){
+          var valueNames = setdefault(self.currentData, rel2d, {}).propNames = json.names;
+
+          _(json.data).each(function(values, pairNames){
+            var pair = pairNames.split("~");
+            var p0 = fromRName[pair[0].trim()], p1= fromRName[pair[1].trim()];
+
+            var  j;
+            for(j=0 ; j< values.length; j++) {
+              var modelName = valueNames[j];
+              var val = values[j];
+              setdefault(setdefault(rel2d, p0, {}), p1, {})[ modelName] = val;
+              setAggregate(p0, modelName, val);
+
+            }
+          });
+
+        });
+
         /** set default function inspired from python */
         function setdefault(map,key,value){
           return key in map ? map[key] : (map[key]=value);
         }
 
         /** method for load simple, long linear model to the rel2d table*/
-        function loadModel(modelName){
+        function loadModel(modelName, symmetric, aggregate){
           return function(json){
             _(json).each(function(data, pairNames){
               var pair = pairNames.split("~");
               var p0 = fromRName[pair[0].trim()], p1= fromRName[pair[1].trim()];
-              setdefault(setdefault(rel2d,p0,{}),p1,{})[modelName] =
-                setdefault(setdefault(rel2d,p1,{}),p0,{})[modelName] = data;
 
-//              console.log(rel2d[p0][p1][modelName]==rel2d[p1][p0][modelName], rel2d[p0][p1]);
+              setdefault(setdefault(rel2d,p0,{}),p1,{})[modelName] =data;
+              if(symmetric) setdefault(setdefault(rel2d,p1,{}),p0,{})[modelName] = data;
+              if(aggregate) setAggregate(p0,modelName,data);
             });
           };
         }
@@ -193,17 +229,12 @@ angular.module('vizRecSrcApp')
 
         //load 2D outliers
         $http.get("data/r_output/2D_Outliers.json").success(function(json){
-          _(json.data).each(function(data, pairNames){
-            var pair = pairNames.split("~");
-            var p0 = fromRName[pair[0].trim()], p1= fromRName[pair[1].trim()];
-            var modelName = "outliers";
-            setdefault(setdefault(rel2d,p0,{}),p1,{})[modelName] =
-              setdefault(setdefault(rel2d,p1,{}),p0,{})[modelName] = data;
-          });
+          loadModel("outliers",true)(json.data);
         });
-
-        //TODO(kanitw): load 2d clustering here
-
+        //load 2D cluster
+        $http.get("data/r_output/2D_clusters.json").success(function(json){
+          loadModel("clusters",true)(json.data);
+        });
       },
 
       get: function (key) {

@@ -36,7 +36,7 @@ angular.module('vizRecSrcApp')
       types:{
         cardinality: {
           metric: function(pair){
-            return (pair[1].type == dv.type.numeric ? 20 : pair[1].countTable.length);
+            return (pair[1].type == dv.type.numeric ? 20 : (pair[1].countTable || []).length);
           },
           reverse: false
         },
