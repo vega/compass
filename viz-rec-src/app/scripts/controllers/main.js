@@ -13,7 +13,7 @@ angular.module('vizRecSrcApp')
         },
         cardinality: {
           metric: function(col){
-            return col.type == dv.type.numeric ? 20 : col.countTable.length;
+            return col.type == dv.type.numeric ? 20 : (col.countTable || []).length;
           },
           reverse: false
         },
@@ -28,6 +28,8 @@ angular.module('vizRecSrcApp')
     $scope.sorter1d.current = $scope.sorter1d.types["name"];
 
     //TODO(kanitw): refactor this method's code maybe we need to move them to a separate controller or directives
+
+
 
     $scope.sorter2d = {
       /** map of type of sorter
@@ -72,6 +74,26 @@ angular.module('vizRecSrcApp')
 
       }
     };
+
+    //append these ranking to sorter2d types
+    var sorter2dBuilder = {
+      "R-Squared": {},
+      "Mahalanobis Outliers": {},
+      "Number of Clusters": {},
+      "Clustering Error": {},
+      "Pseudo R-Squared": {},
+//      "Logistic Reg. AIC": {}
+    };
+//    _.each(sorter2dBuilder, function(prop, name){
+//      $scope.sorter2d.types[name] = {
+//        metric: function(pair){
+//          var rel = (dataManager.currentData.rel2d[pair[0].name] || {})[pair[1].name];
+//          return (rel && name in rel) ? rel[name] : prop.default || 0;
+//        },
+//        reverse: prop.reverse || false
+//      }
+//    });
+
     $scope.sorter2d.current = $scope.sorter2d.types["mutualInformationDistance"];
 
     function updatePairs(){

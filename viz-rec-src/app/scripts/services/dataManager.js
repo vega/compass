@@ -216,7 +216,10 @@ angular.module('vizRecSrcApp')
               var p0 = fromRName[pair[0].trim()], p1= fromRName[pair[1].trim()];
 
               setdefault(setdefault(rel2d,p0,{}),p1,{})[modelName] =data;
-              if(symmetric) setdefault(setdefault(rel2d,p1,{}),p0,{})[modelName] = data;
+              if(symmetric){
+                var rel2dp1p0 = setdefault(setdefault(rel2d,p1,{}),p0,{});
+                if(! modelName in rel2dp1p0) rel2dp1p0[modelName] = data;
+              }
               if(aggregate) setAggregate(p0,modelName,data);
             });
           };
@@ -224,7 +227,7 @@ angular.module('vizRecSrcApp')
 
         //for each of these models, load json
         _(["simple_linear_all", "long_linear_all"]).each(function(modelName){
-          $http.get("data/r_output/"+modelName+".json").success(loadModel(modelName))
+          $http.get("data/r_output/"+modelName+".json").success(loadModel(modelName, true, false))
         });
 
         //load 2D outliers
