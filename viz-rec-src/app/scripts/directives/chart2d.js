@@ -49,6 +49,9 @@ angular.module('vizRecSrcApp')
     function drawScatterPlot(chart, pair, attrs, scope){
       var xField = pair[1], yField = pair[0];
 
+      //TODO(kanitw): refactor -- decouple this rel!
+      var rel = ((dataManager.currentData.rel2d[yField.name]||{})[xField.name]||{})
+
       var margin = { top: 15 || attrs.marginTop ,
           right: 5 || attrs.marginLeft ,
           bottom: 35 ||  attrs.marginBottom,
@@ -71,14 +74,24 @@ angular.module('vizRecSrcApp')
 //
 //      var rY =results[0], rX = results[1], rCount=results[2];
 
+      //TODO(kanitw): refactor -- decouple this rel!
       var filteredTable = dataManager.currentData.where(whereFiltered([xField,yField]));
-      var rX = filteredTable[xField.index], rY = filteredTable[yField.index];
+      var filteredIndices = filteredTable[dataManager.currentData.indexCol.index];
 
-      var indicesShown = d3.range(0, rX.length);
+      var indicesShown = filteredIndices;
       if(scope.sampling){
-        indicesShown = helper.getRandomSubArray(indicesShown, 500);
+        indicesShown = helper.getRandomSubArray( filteredIndices, 500);
       }
-      //TODO(kanitw): add random sampling here!
+
+      if(scope.includeOutliers){
+        var outliers = rel["outliers"];
+        if(outliers){
+          indicesShown = _.union(indicesShown, outliers);
+          //TODO(kanitw): write more optimal code for this
+          var isOutlier = dv.array(xField.length);
+          for(var i=0 ; i<outliers.length ; i++) isOutlier[outliers[i]] = 1;
+        }
+      }
 
       var x, y,  marks, innerTickSize=6;
 
@@ -108,20 +121,27 @@ angular.module('vizRecSrcApp')
 
       marks.select("circle").transition().duration(500)
         .attr("cx", function(i){
-          return x(rX[i]);
+          return x(xField[i]);
         })
         .attr("cy", function(i){
-          return y(rY[i]);
+          return y(yField[i]);
         })
         .attr("r", 3)
-        .style({
-          "fill": "steelblue",
-          "fill-opacity": "0.1"
-        });
+        .style("fill", scope.includeOutliers ? function(i){ return isOutlier[i]? "#d62728" : "#1f77b4"; } : "#1f77b4")
+        .style("fill-opacity", scope.includeOutliers ? function(i){ return isOutlier[i]? "0.08" : "0.24"; } : "0.24");
 
       marks.select("circle")
         .on("mouseover", helper.onMouseOver(chart,function(i){
-          return "("+ rX[i] +","+ rY[i] +")";
+          return "#"+ dataManager.currentData.indexCol[i] +" " +
+            "("+ xField[i] +","+ yField[i] +")" +
+            (scope.includeOutliers && isOutlier[i] ? " *" : "") +
+            //show text fields
+            //TODO(kanitw): this should be customizable
+            "<br/>" +
+            _(dataManager.currentData.textIndices).map(function(j){
+              return dataManager.currentData[j].get(i);
+            }).join(",")
+            ;
         }))
         .on("mouseout", helper.onMouseOut(chart));
 
@@ -148,9 +168,9 @@ angular.module('vizRecSrcApp')
 
       trends.selectAll(".trend").remove();
       if(yField.type==dv.type.numeric && xField.type==dv.type.numeric){
-        var rel = ((dataManager.currentData.rel2d[yField.name]||{})[xField.name]||{})['simple_linear_all'];
-        if(rel){
-          var estimate = rel['coefs']['Estimate'];
+
+        if(rel && "simple_linear_all" in rel){
+          var estimate = rel['simple_linear_all']['coefs']['Estimate'];
           var keys = _.keys(estimate);
           //m,c we get from the original model are from centered y and x
           var centered_c = estimate[keys[0]];
@@ -280,7 +300,7 @@ angular.module('vizRecSrcApp')
         .pow()
         .exponent(0.5)
         .domain([d3.min(counts),d3.max(counts)])
-        .range(["#efefef", "steelblue"]);
+        .range(["#efefef", "#1f77b4"]);
 
       var svgRect = d3.select(chart).select("svg")[0][0].getBoundingClientRect();
       var chartRect = d3.select(chart)[0][0].getBoundingClientRect();
@@ -407,6 +427,7 @@ angular.module('vizRecSrcApp')
       link: function postLink(scope, element, attrs) {
         scope.chartType= "scatter";
         scope.sampling = true;
+        scope.includeOutliers = true;
 
         function _updateChart(){
           updateChart(element.find(".chart")[0], scope.pair, attrs, scope);

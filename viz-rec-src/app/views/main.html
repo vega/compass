@@ -19,7 +19,7 @@
                 <block-container>
                     <!--Numerical-->
                     <div class="scroll-y no-scroll-x w100 h100 overflowable">
-                        <div ng-repeat="col in cols " class="block-1d">
+                        <div ng-repeat="col in cols " class="block-1d" ng-show="col.name!='Title' && col.name!='index'">
                             <chart1d col="col" select="select(col);" width="150" is-selected-field="selectedField.name == col.name">
                         </div>
                     </div>
@@ -48,7 +48,7 @@
                     <div class="padding5">
                         <div><b>Quick Score Overview</b></div>
                         <div class="w100 scroll-x no-scroll-y chart-list">
-                            <span ng-repeat="pair in colPairs" style="margin-right:5px;" class="quick-score">
+                            <span ng-repeat="pair in colPairs" style="margin-right:5px;" class="quick-score" ng-show="pair[0].name!='Title'&&pair[1].name!='Title'&&pair[0].name!='Director'&&pair[1].name!='Director'">
                                 {{ pair[1].name }}:
                                 <span class="pull-right" style="background-color: {{ metricColor(pair.metric)}}">
                                     {{ pair.metric.toFixed(2) }}
@@ -61,7 +61,7 @@
                 <block-splitter></block-splitter>
                 <block-container>
                     <div class="w100 h100 scroll-y">
-                        <div ng-repeat="pair in colPairs | limitTo: 12" class="block-2d">
+                        <div ng-repeat="pair in colPairs | limitTo: 6" class="block-2d">
                             <chart2d pair="pair" width="250" height="250"/>
                         </div>
                     </div>

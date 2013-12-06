@@ -111,7 +111,7 @@ angular.module('vizRecSrcApp')
             "left": (d3.event.pageX + 8) + "px",
             "top": (d3.event.pageY + 8) +"px"
           })
-          .text(titleText(d));
+          .html(titleText(d));
       };
     };
 
