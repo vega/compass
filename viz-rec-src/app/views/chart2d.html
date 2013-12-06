@@ -8,8 +8,8 @@
             </a>
             <span class="option-item pull-right" ng-show="chartType=='heatmap'">
                 <div class="btn-group btn-xxs">
-                    <button type="button" class="btn btn-xxs btn-default">N</button>
                     <button type="button" class="btn btn-xxs btn-default dropdown-toggle" data-toggle="dropdown">
+                        {{ normalize || '(norm)' }}
                         <span class="caret"></span>
                         <span class="sr-only">Toggle Dropdown</span>
                     </button>

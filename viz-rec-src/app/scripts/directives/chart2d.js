@@ -278,7 +278,8 @@ angular.module('vizRecSrcApp')
 
       var rowCountIndex = helper.indexDict(rowCount[0]), colCountIndex = helper.indexDict(colCount[0]);
 
-      var yArray = results[0], xArray=results[1], counts = results[2];
+      var yArray = results[0], xArray=results[1], counts = results[2], percent=[];
+      var colorMeasure = counts;
 
       var normIndex, nSums, i, normField, normArray, normCount;
       if(scope.normalize){
@@ -294,8 +295,9 @@ angular.module('vizRecSrcApp')
 
         for(i=0; i<counts.length; i++){
           var nsum = normCount[1][normIndex[normArray[i]]];
-          if (nsum>0) counts[i]/=nsum;
+          percent.push( nsum>0 ? counts[i]/nsum * 100: null);
         }
+        colorMeasure = percent;
       }
 
       var margin = { top: 75 || attrs.marginTop , right: 15 || attrs.marginLeft , bottom: 10 ||  attrs.marginBottom, left: 75 || attrs.marginLeft },
@@ -327,7 +329,7 @@ angular.module('vizRecSrcApp')
       c = d3.scale//. linear()
         .pow()
         .exponent(0.5)
-        .domain([d3.min(counts),d3.max(counts)])
+        .domain([d3.min(colorMeasure),d3.max(colorMeasure)])
         .range(["#efefef", "#1f77b4"]);
 
       var svgRect = d3.select(chart).select("svg")[0][0].getBoundingClientRect();
@@ -405,19 +407,19 @@ angular.module('vizRecSrcApp')
 
       marks.select("rect")
         .on('mouseover', helper.onMouseOver(chart, function(i){
-          var count = counts[i];
+          var countLabel = counts[i];
           if(scope.normalize){
-            count = (counts[i]*100).toFixed(2)+"%" + " of "+normCount[1][normIndex[normArray[i]]];
+            countLabel = percent[i].toFixed(2)+"%" + " ("+ counts[i] +" of "+normCount[1][normIndex[normArray[i]]] +")";
           }
 
-          return "("+ xFormatter(xArray[i]) +","+ yFormatter(yArray[i]) +")=" + count;
+          return "("+ xFormatter(xArray[i]) +","+ yFormatter(yArray[i]) +")=" + countLabel;
         }))
         .on('mouseout', helper.onMouseOut(chart))
         .transition().duration(500)
         .attr("x", 1)
         .attr("width", x.rangeBand()-1)
         .attr("height", y.rangeBand()-1)
-        .style("fill", function(i){ return c(counts[i]);});
+        .style("fill", function(i){ return c(colorMeasure[i]);});
 
       marks.exit().remove();
 
