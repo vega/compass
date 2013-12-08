@@ -184,24 +184,24 @@ angular.module('vizRecSrcApp')
         }
 
         /** load 2d rankings */
-        $http.get("data/r_output/2D_rankings.json").success(function(json){
-          var valueNames = setdefault(self.currentData, rel2d, {}).propNames = json.names;
+        // $http.get("data/r_output/2D_rankings.json").success(function(json){
+        //   var valueNames = setdefault(self.currentData, rel2d, {}).propNames = json.names;
 
-          _(json.data).each(function(values, pairNames){
-            var pair = pairNames.split("~");
-            var p0 = fromRName[pair[0].trim()], p1= fromRName[pair[1].trim()];
+        //   _(json.data).each(function(values, pairNames){
+        //     var pair = pairNames.split("~");
+        //     var p0 = fromRName[pair[0].trim()], p1= fromRName[pair[1].trim()];
 
-            var  j;
-            for(j=0 ; j< values.length; j++) {
-              var modelName = valueNames[j];
-              var val = values[j];
-              setdefault(setdefault(rel2d, p0, {}), p1, {})[ modelName] = val;
-              setAggregate(p0, modelName, val);
+        //     var  j;
+        //     for(j=0 ; j< values.length; j++) {
+        //       var modelName = valueNames[j];
+        //       var val = values[j];
+        //       setdefault(setdefault(rel2d, p0, {}), p1, {})[ modelName] = val;
+        //       setAggregate(p0, modelName, val);
 
-            }
-          });
+        //     }
+        //   });
 
-        });
+        // });
 
         /** set default function inspired from python */
         function setdefault(map,key,value){
