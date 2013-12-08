@@ -13,6 +13,7 @@
                             <a href="" ng-click="filterAllNull()">
                                 Filter All Null
                             </a>
+
                         </div>
                     </div>
                 </block-container>
@@ -42,6 +43,19 @@
                 <div><b>Variables Relevant to "{{selectedField.name}}"</b></div>
                 Sort by <select ng-model="sorter2d.current" ng-options="n for (n,s) in sorter2d.types">
                 </select>
+                Highlight
+                <div class="btn-group btn-xxs">
+                    <button type="button" class="btn btn-xxs btn-default dropdown-toggle" data-toggle="dropdown">
+                        {{ highlightMode.current || '(norm)' }}
+                        <span class="caret"></span>
+                        <span class="sr-only">Toggle Dropdown</span>
+                    </button>
+                    <ul class="dropdown-menu" role="menu">
+                        <li><a href="" ng-click="highlightMode.update(null);">None</a></li>
+                        <li><a href="" ng-click="highlightMode.update('Outliers');">Outliers</a></li>
+                        <li><a href="" ng-click="highlightMode.update('Clusters');">Clusters</a></li>
+                    </ul>
+                </div>
             </div>
             <flexy-layout orientation="vertical">
                 <block-container init="90">
@@ -61,7 +75,8 @@
                 <block-splitter></block-splitter>
                 <block-container>
                     <div class="w100 h100 scroll-y">
-                        <div ng-repeat="pair in colPairs | limitTo: 6" class="block-2d">
+                        <div ng-repeat="pair in colPairs | limitTo: 12" class="block-2d"
+                            ng-show="pair[0].name!='Title'&&pair[1].name!='Title'&&pair[0].name!='Director'&&pair[1].name!='Director'">
                             <chart2d pair="pair" width="250" height="250"/>
                         </div>
                     </div>

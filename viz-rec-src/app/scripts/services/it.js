@@ -7,6 +7,7 @@ angular.module('vizRecSrcApp')
     // Service logic
     // ...
 
+    //FIXME(kanitw): this entropy function or its usage is probably buggy
     function normalizedEntropy(x){
       return entropy(x) / ( Math.log(x.length) / Math.LN2);
     }
