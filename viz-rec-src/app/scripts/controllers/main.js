@@ -44,7 +44,7 @@ angular.module('vizRecSrcApp')
           metric: function(pair){
             return dataManager.currentData.mi_distance[pair[0].index][pair[1].index];
           },
-          reverse: true
+          reverse: false
         },
         linearRSquare:{
           metric: function(pair){
