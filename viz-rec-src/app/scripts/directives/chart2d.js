@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('vizRecSrcApp')
-  .directive('chart2d', function (dataManager, chartHelper) {
+  .directive('chart2d', function (dataManager, chartHelper, $rootScope) {
     //noinspection UnnecessaryLocalVariableJS
     var helper= chartHelper;
     var chartTypes = helper.chartTypes;
@@ -50,7 +50,9 @@ angular.module('vizRecSrcApp')
       var xField = pair[1], yField = pair[0];
 
       //TODO(kanitw): refactor -- decouple this rel!
-      var rel = ((dataManager.currentData.rel2d[yField.name]||{})[xField.name]||{})
+      var rel = ((dataManager.currentData.rel2d[yField.name]||{})[xField.name]||{});
+
+      var highlightMode = $rootScope.highlightMode;
 
       var margin = { top: 15 || attrs.marginTop ,
           right: 5 || attrs.marginLeft ,
@@ -92,6 +94,18 @@ angular.module('vizRecSrcApp')
           for(var i=0 ; i<outliers.length ; i++) isOutlier[outliers[i]] = 1;
         }
       }
+      var clusters;
+      if(highlightMode==="Clusters"){
+        //merge n array's cluster to one array
+        clusters = dv.array(xField.length, -1);
+        var cl = rel["clusters"], i, j;
+        for(i=0 ; i<cl.length; i++){
+          for(j=0 ; j<cl[i].length ; j++){
+            clusters[cl[i][j]] = i;
+          }
+        }
+      }
+
 
       var x, y,  marks, innerTickSize=6;
 
@@ -108,6 +122,7 @@ angular.module('vizRecSrcApp')
       var yAxis = d3.svg.axis().scale(y).orient("left").ticks(2).innerTickSize(innerTickSize)
         .tickFormat(helper.defaultNumberFormatter);
 
+      var c10 = d3.scale.category10();
 
 
       marks = main.selectAll(".marks").data(indicesShown);
@@ -127,7 +142,17 @@ angular.module('vizRecSrcApp')
           return y(yField[i]);
         })
         .attr("r", 3)
-        .style("fill", scope.includeOutliers ? function(i){ return isOutlier[i]? "#d62728" : "#1f77b4"; } : "#1f77b4")
+        .style("fill",  function(i){
+          if(highlightMode){
+            if(highlightMode === 'Outliers' && scope.includeOutliers && isOutlier[i]){
+              return "#d62728"; //red from c10
+            }
+            if(highlightMode === "Clusters" && clusters && clusters[i] >=0){
+              return c10(clusters[i])
+            }
+          }
+          return "#1f77b4";
+        })
         .style("fill-opacity", scope.includeOutliers ? function(i){ return isOutlier[i]? "0.08" : "0.24"; } : "0.24");
 
       marks.select("circle")
@@ -140,7 +165,10 @@ angular.module('vizRecSrcApp')
             "<br/>" +
             _(dataManager.currentData.textIndices).map(function(j){
               return dataManager.currentData[j].get(i);
-            }).join(",")
+            }).join(",") +
+
+            (highlightMode === "Clusters" && clusters && clusters[i] >=0 ? "<br/> Cluster #"+clusters[i] : "")
+
             ;
         }))
         .on("mouseout", helper.onMouseOut(chart));
@@ -499,6 +527,7 @@ angular.module('vizRecSrcApp')
         scope.$watch("pairY.useLogScale", _updateChart);
         scope.$watch("chartType", _updateChart);
         scope.$watch("normalize", _updateChart);
+        $rootScope.$watch("highlightMode",_updateChart);
       },
       scope:{
         pair:"="
