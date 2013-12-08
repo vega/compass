@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('vizRecSrcApp')
-  .controller('MainCtrl', function ($scope, dataManager, chartHelper) {
+  .controller('MainCtrl', function ($scope, dataManager, chartHelper, $rootScope) {
     var helper = chartHelper;
 
     $scope.sorter1d = {
@@ -186,5 +186,12 @@ angular.module('vizRecSrcApp')
       return "white";
     }
 
-
+    $scope.highlightMode = {
+      current: null,
+      update: function(highlightMode){
+        this.current = highlightMode;
+        $rootScope.highlightMode = highlightMode;
+      }
+    };
+    $scope.highlightMode.update();
   });
