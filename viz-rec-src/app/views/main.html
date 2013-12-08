@@ -61,7 +61,8 @@
                 <block-splitter></block-splitter>
                 <block-container>
                     <div class="w100 h100 scroll-y">
-                        <div ng-repeat="pair in colPairs | limitTo: 9" class="block-2d">
+                        <div ng-repeat="pair in colPairs | limitTo: 12" class="block-2d"
+                            ng-show="pair[0].name!='Title'&&pair[1].name!='Title'&&pair[0].name!='Director'&&pair[1].name!='Director'">
                             <chart2d pair="pair" width="250" height="250"/>
                         </div>
                     </div>
