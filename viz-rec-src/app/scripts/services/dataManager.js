@@ -218,7 +218,7 @@ angular.module('vizRecSrcApp')
               setdefault(setdefault(rel2d,p0,{}),p1,{})[modelName] =data;
               if(symmetric){
                 var rel2dp1p0 = setdefault(setdefault(rel2d,p1,{}),p0,{});
-                if(! modelName in rel2dp1p0) rel2dp1p0[modelName] = data;
+                if(! (modelName in rel2dp1p0)) rel2dp1p0[modelName] = data;
               }
               if(aggregate) setAggregate(p0,modelName,data);
             });

@@ -13,13 +13,28 @@ angular.module('vizRecSrcApp')
         },
         cardinality: {
           metric: function(col){
-            return col.type == dv.type.numeric ? 20 : (col.countTable || []).length;
+            return col.type === dv.type.numeric ? 20 : (col.countTable || []).length;
           },
           reverse: false
         },
         "Normalized Entropy":{
           metric: function(col){
-            return col.normalizedEntropy;
+            return (col.prop||{})["Normalized Entropy"];
+          },
+          reverse: true
+        },
+        "Normality":{
+          metric: function(col){
+            var normality =  (col.prop||{}).Normality;
+            // console.log(col.name, normality==='NA' ? Infinity : normality);
+            return normality==="NA" ? Infinity : normality;
+          },
+          reverse: false
+        },
+        "Number of Clusters":{
+          metric: function(col){
+            var no = (col.prop||{})["Number of Clusters"];
+            return no==="NA" ? -Infinity : no;
           },
           reverse: true
         }
@@ -52,9 +67,9 @@ angular.module('vizRecSrcApp')
           metric: function(pair){
             var rel = (dataManager.currentData.rel2d[pair[0].name] || {})[pair[1].name];
             //Ham: I know, r.squared.rsquared is weird but it's due to a weird R export bug.
-            return rel ? rel["simple_linear_all"]["r.squared.r.squared"] : Infinity;
+            return rel ? rel["simple_linear_all"]["r.squared.r.squared"] : 0;
           },
-          reverse: false
+          reverse: true
         },
         linearWeights:{
           metric: function(pair){
