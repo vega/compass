@@ -1,0 +1,26 @@
+# 2D Strong cases
+"BAR--x:#,y:C", "BAR--x:Q,y:C"
+"LINE--y:#,x:D ", "LINE--y:Q,x:D"
+"MAP--geo:G,size/color:# ", "MAP--geo:G,size/Color:Q"
+"LINE--y:Q*,x:D ", "BAR--x:Q*,y:D"
+"MAP--geo:G,size:#", "BAR--x:Q*,y:C"
+"MAP--geo:G,size:Q*", "MAP--geo:G,color:Q*"
+
+# everything 2D > table
+"BAR--x:*1,y:*2 ", "TABLE--x:*1,y:*2"
+"LINE--x:*1,y:*2 ", "TABLE--x:*1,y:*2"
+"PLOT--x:*1,y:*2 ", "TABLE--x:*1,y:*2"
+"MAP--geo:G,size/color:Q*", "TABLE--x:G,size/color:Q*"
+
+# BAR
+
+
+
+
+
+# WEAK
+# small multiple is better
+"PLOT--x:@#1,@Q1;y:G1", "PLOT--x:@#1,@Q1;y:G1"
+"PLOT--x:@#1,@Q1;y:G1", "PLOT--x:@#1;y:G1;size:@Q1"
+
+

@@ -1,0 +1,5 @@
+{
+  "node":true,
+  "sub": false,
+  "predef": ["require", "describe", "it"]
+}
