@@ -1,4 +1,4 @@
 vega-lite
 =========
 
-High-level Visual Specification Module
+High-level Visualization Specification Module for Automatic Visualization. 
