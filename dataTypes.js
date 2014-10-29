@@ -3,7 +3,7 @@
 var _ = require('lodash');
 var at = require('./aggTypes');
 
-var dt = {},DataType;
+var dt = {}, DataType;
 DataType = (function(){
   var d = function(name, short, parent, aggTypes){
     this.name = name;
@@ -51,7 +51,6 @@ dt.ordinal = new DataType("ordinal", "O", dt.categorical);
 dt.interval = new DataType("interval","I", dt.ordinal);
 
 //TODO measures name
-//FIXME(kanitw) ... date is actually quantitative ... but becomes interval after aggregation.
 dt.datetime = new DataType("datetime", "D", dt.interval, [at.YEAR,at.MONTH,at.DAY, at.HOUR, at.MINUTE, at.SECOND]);
 //TODO(kanitw): time?
 

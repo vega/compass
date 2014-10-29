@@ -10,7 +10,7 @@ var templates = [], groups = {};
 var specs = [
   //1D -------------------------------------
   {
-    type: ct.TABLE,
+    type: ct.TABLE, //imply marks = text
     name:'Summary Table',
     id:"summary-table",
     note: "Table showing min,max, average, sum, median",
@@ -20,16 +20,17 @@ var specs = [
     transposable: false,
     smallMultiple: false
   },{
-    type: ct.HISTOGRAM,
+    type: ct.HISTOGRAM, //imply marks = rect
     name: "Histogram",
     id: "histogram",
+
     encodings: {
       hist: {dataType: dt.quantitative}
     }
   },
   //2D -------------------------------------
   {
-    type: ct.BAR,
+    type: ct.BAR, //imply marks = rect
     name:"Bar Chart",
     id: "bar-chart",
     encodings: {
@@ -178,13 +179,19 @@ var specs = [
 
 var addTemplate = (function(){
   var key = 0, list=1;
-
-  function addTemplateVariation(spec, encodingPairs, i, templates){
+  /**
+   * recursive function for exhaustive search
+   * @param {Object} spec         ChartTemplate spec (see ChartTemplates above)
+   * @param {Array} encodingPairs list of encoding pairs (data attribute-visual variables)
+   * @param {Int} i               i th pair
+   * @param {[type]} output    output list of templates
+   */
+  function addTemplateVariation(spec, encodingPairs, i, output){ //
     var j, pair;
 
     // console.log(encodingPairs);
 
-    if(i===encodingPairs.length){
+    if(i===encodingPairs.length){ // finish assigning all encoding
       var id = spec.id;
 
       if(i>0){ //append variation to id
@@ -194,7 +201,7 @@ var addTemplate = (function(){
         }).join("-");
       }
       // console.log(id,spec.id);
-      templates.push(new ChartTemplate(spec,id));
+      output.push(new ChartTemplate(spec,id));
       return;
     }
 
@@ -205,7 +212,7 @@ var addTemplate = (function(){
         spec.encodings[pair[key]] = pair[list][j];
       else
         delete spec.encodings[pair[key]];
-      addTemplateVariation(spec, encodingPairs, i+1, templates);
+      addTemplateVariation(spec, encodingPairs, i+1, output);
     }
   }
 
@@ -217,13 +224,13 @@ var addTemplate = (function(){
 
   return function(spec){
     var encodingPairs = _(spec.encodings).pairs().filter(function(e){
-      return _.isArray(e[list]);
+      return _.isArray(e[list]);   //FIXME(kanitw): I forget why I need to check the pair here?
     }).value();
 
     var group = [];
     addTemplateVariation(spec, encodingPairs, 0, group);
 
-    templates.push.apply(templates,group);
+    templates.push.apply(templates, group);
     group.satisfyFieldTypeCount = groupSatisfyFieldTypeCount;
     groups[spec.id] = group;
   };
