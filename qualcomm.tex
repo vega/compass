@@ -1,0 +1,246 @@
+%--------------------------------------------------------------------
+%
+% Kanit Wongsuphasawat, Dominik Moritz
+%
+% Copied from Jeffrey Heer, Maneesh Agrawala, Nicholas Kong
+% 
+% Copied from James O'Brien's MICRO 2005 Continuation Proposal
+%
+%--------------------------------------------------------------------
+
+\ProvidesFile{gp09.tex}
+\documentclass[10pt,onecolumn,letterpaper]{article}
+%\documentclass[11pt]{article}
+
+\usepackage{times}
+%\usepackage{palatino}
+%\usepackage{arial}
+\usepackage{graphicx}
+\usepackage[font=small,justification=centering]{caption}
+\usepackage{wrapfig}
+\usepackage{fancyhdr}
+\usepackage{cite}
+\usepackage{ifthen}
+\usepackage[usenames]{color}
+\usepackage{url}
+
+%--------------------------------------------------------------------
+
+%\flushbottom
+
+\setlength{\parindent     }{   0in}
+\setlength{\parskip       }{.075in}
+
+\setlength{\oddsidemargin }{-.1in}
+\setlength{\evensidemargin}{-.1in}
+\setlength{\topmargin     }{ -.1in}
+%\setlength{\headsep       }{  .15in}
+\setlength{\headsep       }{  .2in}
+\setlength{\textheight    }{ 8.7in}
+\setlength{\textwidth     }{ 6.5in}
+\setlength{\parindent     }{   0in}
+\setlength{\headheight    }{   0in}
+\setlength{\parindent     }{   0in}
+
+%--------------------------------------------------------------------
+% Creating the pcode command for writing psuedocode
+\newcommand{\pcline }{\rule{0in}{0.0in}    }  % Spacing for pseudo-code.
+\newcommand{\pctab  }{\hspace{0.10in}      }  % Pseudo-code indentation.
+\newcommand{\pcbigtab  }{\hspace{0.1in}    }  % Pseudo-code indentation.
+\newcommand{\pcasgn }{\mbox{$\leftarrow$}  }  % Pseudo-code assignment operato
+\newcommand{\pcomment}[1]{{\it #1}}  % Pseudo-code comments.
+
+\newcommand{\pcode}[1]{
+    \vspace{-0.1in}
+    \begin{minipage}{100in} % The width argument will be ignored:
+                            % See lamport p. 99
+    \begin{tabbing} \hspace{0.20in} \= \pcbigtab \= \pcbigtab \= \pcbigtab \=
+\pcbigtab \= \pcbigtab \= \\
+       #1
+    \end{tabbing}
+    \end{minipage}
+%    \vspace{0.15in}
+}
+%--------------------------------------------------------------------
+
+\newcommand{\assA}{-1ex}
+\newcommand{\assB}{-2ex}
+
+\newcommand{\assAs}{-1ex}
+\newcommand{\assBs}{-2ex}
+
+\newcommand{\assAss}{-1ex}
+\newcommand{\assBss}{-2ex}
+
+\newcommand{\assAp}{-1ex}
+\newcommand{\assBp}{-2ex}
+
+\newcommand{\assAsp}{-1ex}
+\newcommand{\assBsp}{-2ex}
+
+\let\ORIGsection\section
+\newcommand{\sectionname}{Section Name}
+\def\section#1{\ifthenelse{\equal{#1}{*}}%
+	{\sectionS}%
+	{\renewcommand{\sectionname}{#1}\vspace{\assA}\ORIGsection{#1}\vspace{\assB}}}%
+\def\sectionS#1{\renewcommand{\sectionname}{#1}\vspace{\assA}\ORIGsection*{#1}\vspace{\assB}}%
+
+\let\ORIGsubsection\subsection
+\def\subsection#1{\ifthenelse{\equal{#1}{*}}%
+	{\subsectionS}%
+	{\vspace{\assAs}\ORIGsubsection{#1}\vspace{\assBs}}}%
+\def\subsectionS#1{\vspace{\assAs}\ORIGsubsection*{#1}\vspace{\assBs}}%
+
+
+\let\ORIGsubsubsection\subsubsection
+\def\subsubsection#1{\ifthenelse{\equal{#1}{*}}%
+	{\subsubsectionS}%
+	{\vspace{\assAss}\ORIGsubsubsection{#1}\vspace{\assBss}}}%
+\def\subsubsectionS#1{\vspace{\assAss}\ORIGsubsubsection*{#1}\vspace{\assBss}}%
+
+
+\let\ORIGparagraph\paragraph
+\def\paragraph#1{\ifthenelse{\equal{#1}{*}}%
+	{\paragraphS}%
+	{\vspace{\assAp}\ORIGparagraph{#1}}}%
+\def\paragraphS#1{\vspace{\assAp}\ORIGparagraph*{#1}}%
+
+
+\let\ORIGsubparagraph\subparagraph
+\def\subparagraph#1{\ifthenelse{\equal{#1}{*}}%
+	{\subparagraphS}%
+	{\vspace{\assAsp}\ORIGsubparagraph{#1}}}%
+\def\subparagraphS#1{\vspace{\assAsp}\ORIGsubparagraph*{#1}}%
+
+%--------------------------------------------------------------------
+%--------------------------------------------------------------------
+
+\newcommand{\Cite}[1]{\,\cite{#1}}
+
+% Make the captions have small ``Figure #'' 
+\makeatletter
+\renewcommand{\@makecaption}[2]{%
+        \vskip\abovecaptionskip
+        {\small #1:} {\small #2\par
+        \vskip\belowcaptionskip}}
+\makeatother
+
+\newcommand{\figureTop}[1]{
+  \begin{figure}[!t]{\sloppy #1}\end{figure}
+}
+
+\newcommand{\figureBot}[1]{
+  \begin{figure}[!b]{\sloppy #1}\end{figure}
+}
+
+\newcommand{\BM}[1]{
+  \mbox{\boldmath$#1$}
+}
+
+\newcommand{\B}[1]{
+  \mbox{\boldmath$#1$}
+}
+
+\newcommand{\TP}{^\mathsf{T}}
+\newcommand{\IV}{^{-1}}
+\newcommand{\TI}{^\mathsf{-T}}
+
+\newcommand{\Unit}[1]{
+ \mbox{$\,\mathrm{#1}$}
+}
+
+\newcommand{\Per}{\%} 
+\newcommand{\Sec}{\,s} 
+\newcommand{\Hz}{\,Hz} 
+
+
+\newcommand{\Stress}{\ensuremath{\sigma}}
+\newcommand{\StressD}{\ensuremath{{\Stress'}}}
+
+\newcommand{\VMFC}{\ensuremath{\gamma_1}}
+\newcommand{\VMFS}{\ensuremath{\gamma_2}}
+
+\newcommand{\Strain}{\ensuremath{\epsilon}}
+\newcommand{\StrainE}{\ensuremath{\epsilon^{(e)}}} 
+\newcommand{\StrainP}{\ensuremath{\epsilon^{(p)}}}
+\newcommand{\StrainRate}{\ensuremath{\dot{\Strain}}}
+% Comment region command from Sara McMains
+\newcommand{\comment}[1]{} 
+% Make text red command (requires \usepackage[usenames]{color})
+\newcommand{\textred}[1]{\textcolor{red}{#1}}
+\newcommand {\note}[1]{{\color{magenta}\bf{Note: #1}\normalfont}}
+% Turn comments into comments :)
+\newcommand {\kanitw}[1]{{\color{red}\bf{KW: #1}\normalfont}}
+\newcommand {\jheer}[1]{{\color{magenta}\bf{JH: #1}\normalfont}}
+\newcommand {\dmoritz}[1]{{\color{blue}\bf{DM: #1}\normalfont}}
+
+
+
+%--------------------------------------------------------------------
+
+\begin{document}
+
+\newlength{\origbaselineskip}
+\setlength{\origbaselineskip}{\baselineskip}
+%\setlength{\baselineskip}{.8\origbaselineskip}
+
+%--------------------------------------------------------------------
+
+\newcommand{\mytitle}{Accelerating Data Analysis with Visualization Recommendation}
+\pagestyle{plain}  %Plain style with page numbes
+%\pagestyle{empty}  %Plain style with no page numbers
+%\pagestyle{fancy}
+\lhead{\small\textsl{\mytitle}}
+\rhead{}
+\chead{}
+\lfoot{}
+\rfoot{}
+%\cfoot{\small\textsl{Page \thepage}} % Add in page numbers
+\cfoot{\small\textsl{}} % Remove page numbers
+\renewcommand{\footrulewidth}{0pt}
+
+\renewcommand{\thepage}{\arabic{page}}
+\renewcommand{\thesection}{\Alph{section}}
+%\renewcommand{\thesubsection}{\arabic{subSection}}
+
+\fancypagestyle{plain}{
+  \fancyhf{}
+  \cfoot{\small\textsl{Page \thepage}} 
+  \renewcommand{\footrulewidth}{0pt}
+  \renewcommand{\headrulewidth}{0pt}
+}
+
+
+%--------------------------------------------------------------------
+%--------------------------------------------------------------------
+
+
+%--------------------------------------------------------------------
+%--------------------------------------------------------------------
+\clearpage
+
+%--------------------------------------------------------------------
+%--------------------------------------------------------------------
+
+\clearpage
+\input{intro.tex}
+\input{background.tex}
+\input{ui.tex}
+\input{recommendation.tex}
+\input{system.tex}
+\input{horizon.tex}
+\input{team.tex}
+
+\bibliographystyle{acm-sigchi}
+{\footnotesize
+	\bibliography{qualcomm}
+}
+\end{document}
+
+%--------------------------------------------------------------------
+%--------------------------------------------------------------------
+
+ 
+
+
+
