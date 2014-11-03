@@ -17,13 +17,16 @@
     <!-- RequireJS config for external libs. Requirejs loaded at end of body -->
     <script>
       require = {
-        baseUrl: 'scripts/lib',
+        baseUrl: 'scripts',
         paths : {
-          'd3':'d3',
-          'dv':'dv',
-          'jquery' : 'jquery-1.7.1.min',
-          'lodash' : 'lodash.min', //TODO: change this to lodash
-          'vega': 'vega'
+          'd3':'lib/d3',
+          'dv':'lib/dv',
+          'jquery' : 'lib/jquery-1.7.1.min',
+          'lodash' : 'lib/lodash.min', //TODO: change this to lodash
+          'vega': 'lib/vega',
+          //
+
+
         }
       }
     </script>
@@ -47,7 +50,7 @@
     </div>
 
     <div id="content" class="container">
-      <h1>RequireJS + Bootstrap starter template</h1>
+
     </div>
 
     <!-- RequireJS referencing scripts/main.js -->

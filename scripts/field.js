@@ -16,12 +16,10 @@
         root.returnExports = factory.apply(this, deps.map(function(dep){ return root[dep];}));
     }
 }(this, ['lodash', './dataTypes'], function(_, dt){
-
-
-
   // var _ = require('lodash');
   // var dt = require('./dataTypes');
 
+  // TODO: rename field -> Field
   var field = function(key, fieldName, dataType, cardinality, domain, enabled){
     this.key = key;
     this.fieldName = fieldName;
@@ -56,6 +54,12 @@
     );
   };
 
+  field.fromColumnsSchema = function(columns){
+    return columns.map(function(col){
+      return new field(col.key, col.field_name, col.data_type, col.cardinality, col.domain);
+    });
+  };
+
   /**
    *  Transform
    *  { ordinal: 1, datetime: 1 }  ==>
@@ -75,7 +79,6 @@
       return dt[type].short + count;
     }).sort().join("-");
   };
-
 
   field.fromTypeCountMap = function(typeCountMap){
     var fieldSet = field.typeCountMapToTypeCountList

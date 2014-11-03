@@ -48,27 +48,13 @@
     return out;
   };
 
-  var genCharts = function(typeCountMaps){
-    return _.reduce(typeCountMaps, function(m, map){
-      var key = field.typeCountMapToKey(map),
-        fields = field.fromTypeCountMap(map),
-        charts = chartTemplates.generateCharts(fields, true, map);
-
-      if(charts.length > 0){
-        console.log("charts for", key, ":", charts.map(chart.toShorthand));
-        // console.log("charts for", key, ":", util.inspect(charts));
-        m[key] = charts;
-      }
-      return m;
-    }, {});
-  };
 
   var fieldSets = {}, fieldsCount;
 
   for(fieldsCount=3; fieldsCount<4 ; fieldsCount++){
     var typeCountMaps = genTypeCountMaps(fieldsCount);
     console.log(typeCountMaps);
-    fieldSets[fieldsCount] = genCharts(typeCountMaps);
+    // fieldSets[fieldsCount] = genCharts(typeCountMaps);
     // console.log(fieldSets[fieldsCount]);
     //   .map(function(fields))
   }

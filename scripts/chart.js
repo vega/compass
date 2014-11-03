@@ -142,6 +142,5 @@
   };
 
   var c = Chart.fromShorthand("MAP--geo:G1;color:Q1");
-  console.log(c);
   return Chart;
 }));
