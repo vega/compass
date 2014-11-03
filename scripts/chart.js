@@ -1,3 +1,5 @@
+// TODO(kanitw): refactor
+
 var _ = require('lodash');
 var encodings = require('./encodings');
 var dt = require('./dataTypes');

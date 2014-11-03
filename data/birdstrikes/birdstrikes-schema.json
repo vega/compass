@@ -1,0 +1,131 @@
+[{
+  "key": "OPERATOR",
+  "field_name": "Aircraft: Airline/Operator",
+  "data_type": "categorical",
+  "tab_schema_type": "text",
+  "cardinality": 48,
+  "enabled": true,
+  "domain": ["ABX AIR", "AIR CANADA", "AIR WISCONSIN AIRLINES", "AIRTRAN AIRWAYS", "ALASKA AIRLINES", "ALLEGHENYAIRLINES", "ALOHA AIRLINES", "AMERICA WEST AIRLINES", "AMERICAN AIRLINES", "AMERICAN EAGLE AIRLINES", "ASTAR AIR CARGO", "ATLANTIC COAST AIRLINES", "ATLANTIC SOUTHEAST", "BUSINESS", "CHAUTAUQUA AIRLINES", "COMAIR AIRLINES", "COMMUTAIR", "CONTINENTAL AIRLINES", "DELTA AIR LINES", "EXECUTIVE JET AVIATION", "EXPRESSJET (CONTINENTAL EXPRS)", "FEDEX EXPRESS", "FRONTIER AIRLINES", "GOVERNMENT", "GREAT LAKES AIRLINES", "HAWAIIAN AIR", "HORIZON AIR", "JAPAN AIRLINES", "JETBLUE AIRWAYS", "MESA AIRLINES", "MESABA AIRLINES", "MILITARY", "NORTHWEST AIRLINES", "PIEDMONT AIRLINES", "PINNACLE", "PRIVATELY OWNED", "PSA AIRLINES", "REPUBLIC AIRLINES", "SKYWEST AIRLINES", "SOUTHWEST AIRLINES", "SPIRIT AIRLINES", "TRANS STATES AIRLINES", "TRANS WORLD AIRLINES", "UNITED AIRLINES", "UNKNOWN", "UPS AIRLINES", "US AIRWAYS", "US AIRWAYS*"]
+}, {
+  "key": "ATYPE",
+  "field_name": "Aircraft: Make/Model",
+  "data_type": "categorical",
+  "tab_schema_type": "text",
+  "cardinality": 50,
+  "enabled": true,
+  "domain": ["A-7", "A-10A", "A-300", "A-310", "A-318", "A-319", "A-320", "A-321", "A-330", "AEROS 350", "AEROS SA365", "AEROS SN601", "ATR-42", "ATR-72", "AVRO RJ 85", "B-1B", "B-52", "B-52G", "B-52H", "B-717-200", "B-727", "B-727-100", "B-727-200", "B-737", "B-737-100", "B-737-200", "B-737-300", "B-737-400", "B-737-500", "B-737-700", "B-737-800", "B-737-900", "B-747", "B-747-1/200", "B-747-300", "B-747-400", "B-757", "B-757-200", "B-757-300", "B-767", "B-767-200", "B-767-300", "B-767-400", "B-777", "B-777-200", "B-777-300", "BA-31 JETSTR", "BA-41 JETSTR", "BA-125-700", "BA-125-800", "BA-146", "BA-146-100", "BA-146-200", "BA-ATP", "BD-700", "BE-33", "BE-36", "BE-55  BARON", "BE-58  BARON", "BE-60 DUKE", "BE-65 QUEEN", "BE-76  DUCHESS", "BE-90  KING", "BE-95", "BE-100 KING", "BE-200 KING", "BE-300 KING", "BE-400 BJET", "BE-1900", "BELL-206", "BELL-212", "BELLANCA 260", "C-5", "C-5A", "C-5B", "C-9", "C-17A", "C-20B", "C-21A", "C-32A", "C-37A", "C-120/140", "C-130", "C-130E", "C-130H", "C-130J", "C-135", "C-135B", "C-135C", "C-135E", "C-137C", "C-141", "C-141B", "C-141C", "C-150", "C-152", "C-172", "C-177", "C-182 SKYLAN", "C-185 SKYWAG", "C-206 STATIO", "C-208", "C-210 CENTUR", "C-310", "C-340", "C-402", "C-414", "C-421", "C-425", "C-441 CONQUE", "C-500", "C-550", "C-560", "C-650", "C-680", "CANADAIR", "CASA C-212", "CESSNA LC-41", "CHALLENGER 300", "CIRRUS SR 20/22", "CITATION EXL", "CITATION II", "CITATION MUSTANG 510", "CITATION X", "CITATIONJET", "CL-600", "CL-601/604", "CL-RJ100/200", "CL-RJ700", "CL-RJ900", "CRJ-440", "CRJ-900", "CV-580", "DA-10 FALCON", "DA-20 FALCON", "DA-50 FALCON", "DA-200 FALCON", "DA-900", "DA-2000", "DC-3", "DC-8", "DC-8-61", "DC-8-62", "DC-8-63", "DC-8-70", "DC-9", "DC-9-10", "DC-9-30", "DC-9-40", "DC-9-50", "DC-10", "DC-10-10", "DC-10-30", "DC-10-40", "DHC6", "DHC7 DASH 7", "DHC8 DASH 8", "DORNIER 228", "DORNIER 328", "DORNIER 328J", "E-3", "E-3B", "E-3C", "E-4B", "E-6", "E-8C", "EC-130", "EC-130E", "EC-130J", "EC-135", "EC-135E", "EC-135L", "ECLIPSE 500", "EMB UNKN", "EMB-110", "EMB-120", "EMB-135", "EMB-145", "EMB-170", "EMB-190", "F-15", "F-15A", "F-15B", "F-15C", "F-16", "F-16A", "F-16B", "F-16C", "F/A-18", "FOKKER F27", "FOKKER F28 MK 1000", "FOKKER F28 MK 4000", "FOKKER F100", "G-159", "GIPPSLAND GA-8", "GLOBAL EXPRS", "GRUMAMER AA1", "GRUMMAN GA7", "GULFAERO III", "GULFAERO IV", "GULFSTREAM V", "GULFSTRM 200", "GULFSTRM II", "HAWKER 800", "HAWKER 1000", "HAWKER 4000", "HAWKER-SDLY HS125", "HC-130P", "HH-60G", "HH-65", "HOMEBUILT", "HUGHES 369", "HUGHES 500", "IAI ASTRA JT", "IAI GALAXY", "IAI-1124", "KC-10A", "KC-135", "KC-135E", "KC-135R", "KC-135T", "L-1011", "L-1011-500", "LEARJET-24", "LEARJET-25", "LEARJET-31", "LEARJET-35", "LEARJET-36", "LEARJET-45", "LEARJET-55", "LEARJET-60", "LOCKHEED 1329", "LOCKHEED C-130", "MC-130P", "MD-11", "MD-80", "MD-82", "MD-83", "MD-87", "MD-88", "MD-90-10", "MD-90-30", "MD-900", "MERLIN III", "MERLIN IV", "MILITARY", "MOONEY M20", "MOONEY UNKN", "MOONEY-20B/C", "MOONEY-20J", "MU2", "MU-300", "OA-10A", "P-3", "PA-23-250", "PA-28", "PA-31 NAVAJO", "PA-31-350", "PA-32", "PA-34 SENECA", "PA-42", "PA-44 SEMINOLE", "PA-46 MALIBU", "PA-60 600", "PIAGGIO P180", "PILATUS PC12", "RAYTHEON 390", "RC-135V", "RC-135W", "RKWL CMDR114", "RKWL SABRLNR", "RKWL SHRIKE", "RKWLTRBO 690", "ROBINSON R22", "SA226 TC", "SA227 AC METRO III", "SAAB 2000", "SAAB-340", "SABRLNR-65", "SHORTS 360", "SHORTS SC7", "SIKORSKY S-76", "SOCATA TB-20", "SOCATA TBM700", "STINSON 108", "SWEARINGIN", "T-1A", "T-37B", "T-38A", "T-38C", "T-43A", "TC-18F", "VC-137"]
+}, {
+  "key": "AIRPORT",
+  "field_name": "Airport: Name",
+  "data_type": "categorical",
+  "tab_schema_type": "text",
+  "cardinality": 50,
+  "enabled": true,
+  "domain": ["ATLANTA INTL", "ATLANTIC CITY INTL", "AUSTIN-BERGSTROM INTL", "BALTIMORE WASH INTL", "BARKSDALE AIR FORCE BASE ARPT", "CHARLESTON AFB/INTL ARPT", "CHARLOTTE/DOUGLAS INTL ARPT", "CHICAGO MIDWAY INTL ARPT", "CHICAGO O'HARE INTL ARPT", "CINCINNATI/NORTHERN KENTUCKY INTL ARPT", "CLEVELAND-HOPKINS INTL ARPT", "DALLAS/FORT WORTH INTL ARPT", "DENVER INTL AIRPORT", "DETROIT METRO WAYNE COUNTY ARPT", "EPPLEY AIRFIELD", "FORT LAUDERDALE/HOLLYWOOD INTL", "GEORGE BUSH INTERCONTINENTAL", "GREATER PITTSBURGH", "HONOLULU INTL ARPT", "HOUSTON-HOBBY", "INDIANAPOLIS INTL", "JOHN F KENNEDY INTL", "KANSAS CITY INTL", "LAGUARDIA NY", "LAMBERT-ST LOUIS INTL", "LIHUE ARPT", "LOGAN INTL", "LOS ANGELES INTL", "LOUISVILLE INTL ARPT", "MEMPHIS INTL", "METRO OAKLAND INTL", "MINETA SAN JOSE INTL", "MINNEAPOLIS-ST PAUL INTL", "NASHVILLE INTL", "NEW ORLEANS INTL", "NEWARK LIBERTY INTL ARPT", "ORLANDO INTL", "PHILADELPHIA INTL", "PHOENIX SKY HARBOR", "PORT COLUMBUS INTL", "PORTLAND INTL (OR)", "RONALD REAGAN WASHINGTON NATL", "SACRAMENTO INTL", "SALT LAKE CITY INTL", "SAN ANTONIO INTL", "SAN FRANCISCO INTL ARPT", "SEATTLE-TACOMA INTL", "TETERBORO AIRPORT", "WASHINGTON DULLES INTL ARPT", "WILL ROGERS WORLD ARPT"]
+}, {
+  "key": "Effect_Amount of damage",
+  "field_name": "Effect: Amount of damage",
+  "data_type": "categorical",
+  "tab_schema_type": "text",
+  "cardinality": 5,
+  "enabled": true,
+  "domain": ["None", "Minor", "Substantial", "Medium", "Destroyed"]
+}, {
+  "key": "INCIDENT_DATE",
+  "field_name": "Flight Date",
+  "tab_schema_type": "datetime",
+  "data_type": "date",
+  "cardinality": 23,
+  "enabled": true
+}, {
+  "key": "FAAREGION",
+  "field_name": "Location: FAA Region",
+  "tab_schema_type": "text",
+  "data_type": "categorical",
+  "cardinality": 8,
+  "enabled": false,
+  "domain": ["ASO","AEA","ASW","AWP","AGL","ANM","ACE","ANE"]
+}, {
+  "key": "Origin_State_Code_(copy)",
+  "field_name": "Origin State",
+  "tab_schema_type": "geographic",
+  "data_type": "geographic",
+  "cardinality": 29,
+  "enabled": true,
+  "domain": ["Arizona", "California", "Colorado", "DC", "Florida", "Georgia", "Hawaii", "Illinois", "Indiana", "Kentucky", "Louisiana", "Massachusetts", "Maryland", "Michigan", "Minnesota", "Missouri", "North Carolina", "Nebraska", "New Jersey", "New York", "Ohio", "Oklahoma", "Oregon", "Pennsylvania", "South Carolina", "Tennessee", "Texas", "Utah", "Washington"]
+}, {
+  "key": "PHASE_OF_FLT",
+  "field_name": "When: Phase of flight",
+  "data_type": "categorical",
+  "tab_schema_type": "text",
+  "cardinality": 8,
+  "enabled": true,
+  "domain": ["Approach", "Climb", "Descent", "En Route", "Landing Roll", "Parked", "Take-off run", "Taxi"]
+}, {
+  "key": "TIME_OF_DAY",
+  "field_name": "When: Time of day",
+  "data_type": "categorical",
+  "tab_schema_type": "text",
+  "cardinality": 4,
+  "enabled": true,
+  "domain": ["Dawn","Day","Dusk","Night"]
+}, {
+  "key": "SIZE",
+  "field_name": "Wildlife: Size",
+  "data_type": "categorical",
+  "tab_schema_type": "text",
+  "cardinality": 3,
+  "enabled": true,
+  "domain": ["Large", "Medium", "Small"]
+}, {
+  "key": "SPECIES",
+  "field_name": "Wildlife: Species",
+  "data_type": "categorical",
+  "tab_schema_type": "text",
+  "cardinality": 49,
+  "enabled": true,
+  "domain": ["American crow", "American kestrel", "American robin", "Barn owl", "Barn swallow", "Blackbirds", "Canada goose", "Cattle egret", "Chimney swift", "Cliff swallow", "Common nighthawk", "Coyote", "Doves", "Ducks", "Eastern meadowlark", "Egrets", "European starling", "Geese", "Great blue heron", "Gulls", "Hawks", "Herring gull", "Horned lark", "Killdeer", "Laughing gull", "Mallard", "Meadowlarks", "Microbats", "Mourning dove", "New World Vultures", "Owls", "Pacific golden-plover", "Perching birds (y)", "Red-tailed hawk", "Ring-billed gull", "Rock pigeon", "Savannah sparrow", "Short-eared owl", "Sparrows", "Swallows", "Tree swallow", "Turkey vulture", "Unknown bird - large", "Unknown bird - medium", "Unknown bird - small", "Unknown bird or bat", "Western meadowlark", "White-tailed deer", "Zebra dove"]
+}, {
+  "key": "AOS",
+  "field_name": "Cost: Aircraft time out of Service",
+  "data_type": "quantitative",
+  "tab_schema_type": "number-quant",
+  "enabled": false,
+  "domain": [0, 16742]
+}, {
+  "key": "Cost_Other_inflation adj",
+  "field_name": "Cost: Other",
+  "data_type": "quantitative",
+  "tab_schema_type": "number-quant",
+  "domain": [0, 3191193],
+  "enabled": true
+}, {
+  "key": "Cost__Repairs_(adj)",
+  "field_name": "Cost: Repair",
+  "data_type": "quantitative",
+  "tab_schema_type": "number-quant",
+  "domain": [0, 56290952],
+  "enabled": true
+}, {
+  "key": "Cost__Total_$",
+  "field_name": "Cost: Total $",
+  "data_type": "quantitative",
+  "tab_schema_type": "number-quant",
+  "domain": [0, 59482145],
+  "enabled": true
+}, {
+  "key": "SPEED",
+  "field_name": "Speed (IAS) in knots",
+  "data_type": "quantitative",
+  "tab_schema_type": "number-quant",
+  "domain": [140, 1311685],
+  "enabled": true
+}, {
+  "key": "Number_of_Records",
+  "field_name": "Number of Strikes",
+  "data_type": "count",
+  "tab_schema_type": "number-quant",
+  "domain": [0,15839],
+  "enabled": true,
+  "note": "Domain here is domain for the sum"
+}]
