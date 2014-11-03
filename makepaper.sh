@@ -1,0 +1,4 @@
+pdflatex qualcomm
+bibtex qualcomm
+pdflatex qualcomm
+pdflatex qualcomm
