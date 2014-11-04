@@ -35,21 +35,21 @@
     }];
   };
 
-  vlTemplates.scale_y_ord = function(){
-    return {
-      "name": "y",
+  vlTemplates.scale_ord = function(name, opt){
+    return _.merge({
+      "name": name,
       "type": "ordinal",
       "range": "height",
-      "domain": { "data": "all", "field": "__field_y__"}
-    };
+      "domain": { "data": "all", "field": "__field_" + name + "__"}
+    }, opt||{});
   };
 
-  vlTemplates.scale_x_quant = function(){
+  vlTemplates.scale_qnt = function(name){
     return {
-      "name": "x",
+      "name": name,
       "range": "width",
       "nice": true,
-      "domain": { "data": "all", "field": "__field_x__"}
+      "domain": { "data": "all", "field": "__field_" + name + "__"}
     }
   }
 
@@ -62,6 +62,17 @@
       "type": "ordinal",
       "range": "category20"
     };
+  };
+
+  // TODO(kanitw): split this to axes x/y, ordinal/quant
+  vlTemplates.axes = function(){
+    return [{
+      "type": "x",
+      "scale": "x"
+    }, {
+      "type": "y",
+      "scale": "y"
+    }];
   };
 
   vlTemplates.marks_bar = function(){
@@ -81,89 +92,30 @@
     };
   };
 
-  vlTemplates.FILL_COLOR_FIELD = {"scale": "color", "field": "__field_color__"};
-
-  vlTemplates.axes = function(){
-    return [{
-      "type": "x",
-      "scale": "x"
-    }, {
-      "type": "y",
-      "scale": "y"
-    }];
-  };
-
-  vlTemplates.PLOT = {
-    "width": "__width__",
-    "height": "__height__",
-    "padding": "__padding__",
-    "data": [
-      {"name": "all"},
-      {"name": "selected"},
-      {"name": "filtered"}
-    ],
-    "scales": [
-      {
-        "name": "x",
-        "nice": true,
-        "range": "width",
-        "domain": {"data": "all", "field": "__field_x__"}
-      },
-      {
-        "name": "y",
-        "nice": true,
-        "range": "height",
-        "domain": {"data": "all", "field": "__field_y__"}
-      }
-      // ,
-      // {
-      //   "name": "c",
-      //   "type": "ordinal",
-      //   "domain": {"data": "iris", "field": "data.species"},
-      //   "range": ["#800", "#080", "#008"]
-      // }
-    ],
-    "axes": [
-      {"type": "x", "scale": "x"}, //TODO(kanitw): title
-      {"type": "y", "scale": "y"} //TODO(kanitw): title
-    ],
-    // "legends": [
-    //   {
-    //     "fill": "c",
-    //     "title": "Species",
-    //     "offset": 0,
-    //     "properties": {
-    //       "symbols": {
-    //         "fillOpacity": {"value": 0.5},
-    //         "stroke": {"value": "transparent"}
-    //       }
-    //     }
-    //   }
-    // ],
-    "marks": [
-      {
+  vlTemplates.marks_plot = function(){
+    return {
         "type": "symbol",
         "from": {"data": "all"},
         "properties": {
           "enter": {
             "x": {"scale": "x", "field": "__field_x__"},
             "y": {"scale": "y", "field": "__field_y__"},
-            "fill": {"value": "steelblue"},
             // "fill": {"scale": "c", "field": "data.species"},
-            "fillOpacity": {"value": 0.5}
+            "fillOpacity": {"value": 0.5},
+            "size": {"value": 100}
           },
           "update": {
-            "size": {"value": 100},
-            "stroke": {"value": "transparent"}
+            "fill": {"value": "__markscolor__"},
           },
           "hover": {
-            "size": {"value": 300}
+            "fill": {"value": "__markshovercolor__"}
             // ,"stroke": {"value": "white"}
           }
         }
-      }
-    ]
+      };
   };
+
+  vlTemplates.FILL_COLOR_FIELD = {"scale": "color", "field": "__field_color__"};
 
   return vlTemplates;
 }));

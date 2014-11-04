@@ -138,8 +138,8 @@ require(['jquery','d3', 'dv', 'lodash',
           }, {});
         });
 
-      console.log('rawData', JSON.stringify(rawData));
-      console.log('aggregatedData', JSON.stringify(aggregatedData));
+      // console.log('rawData', JSON.stringify(rawData));
+      // console.log('aggregatedData', JSON.stringify(aggregatedData));
 
       // ----- render results -----
 

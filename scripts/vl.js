@@ -15,7 +15,7 @@
     // Browser globals (root is window)
     root.returnExports = factory.apply(this, deps.map(function(dep){ return root[dep];}));
   }
-}(this, ['lodash', 'vega', 'vl.templates'], function (lodash, vg, vlTemplates){
+}(this, ['lodash', 'vega', 'vl.templates'], function (lodash, vg, mixins){
 
   var vl = {
     version:  "0.0.1", // semantic versioning
@@ -27,7 +27,8 @@
     height: 200,
     "padding": {"top": 20, "left": 50, "bottom": 20, "right": 20},
     legends: false, // on for big visualization
-    markscolor: "steelblue"
+    markscolor: "steelblue",
+    markshovercolor: "red"
   }
 
   function traverse(node, fn){
@@ -46,21 +47,41 @@
   }
 
   function getVGSpec(chart, schema, data, opt){
-    var spec = vlTemplates.spec(), props = {};
+    var spec = mixins.spec(), props = {};
+
+
+    var fieldX = (chart.fields.x||{})[0],
+      fieldY = (chart.fields.y||{})[0];
+    // TODO(kanitw): support table algebra
+    if(fieldX) props.field_x = 'data.' + fieldX.key;
+    if(fieldY) props.field_y = 'data.' + fieldY.key;
+    //TODO:(kanitw): update scale based on x,y fields
+
+    console.log("fields", fieldX, fieldY);
+
     if(chart.chart_type == "BAR"){
-      spec.data = vlTemplates.data();
+      spec.data = mixins.data();
       spec.scales = [
-        vlTemplates.scale_x_quant(),
-        vlTemplates.scale_y_ord()
+        mixins.scale_qnt('x'),
+        mixins.scale_ord('y')
       ];
       //TODO add color, shape
-      spec.axes = vlTemplates.axes();
+      spec.axes = mixins.axes();
       spec.marks = [
-        vlTemplates.marks_bar()
+        mixins.marks_bar()
       ];
+
     }else if(chart.chart_type == "PLOT"){
-      spec = _.cloneDeep(vlTemplates.PLOT);
-      // return;
+      spec.data = mixins.data();
+      spec.scales = [
+        fieldX.dataType == "quantitative" ? mixins.scale_qnt('x') : mixins.scale_ord('x', {points:true}),
+        fieldY.dataType == "quantitative" ? mixins.scale_qnt('y') : mixins.scale_ord('y', {points:true})
+      ];
+      //TODO add color, shape
+      spec.axes = mixins.axes();
+      spec.marks = [
+        mixins.marks_plot()
+      ];
     }else{
       return null;
     }
@@ -70,13 +91,7 @@
     // TODO(kanitw): determine properties for field
     console.log('getVGSpec', chart);
 
-    // TODO(kanitw): support table algebra
-    props.field_x = 'data.' + chart.fields.x[0].key;
-    //TODO:(kanitw): update scale based on x fields
 
-    // TODO(kanitw): support table algebra
-    props.field_y = 'data.' + chart.fields.y[0].key;
-    //TODO:(kanitw): update scale based on x fields
 
     // TODO(kanitw): create scale for color, shape, size
 
