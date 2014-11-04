@@ -1,7 +1,7 @@
 require(['jquery','d3', 'dv', 'lodash',
-    'chartTemplates', 'dataTypes', 'field', 'chart'
+    'chartTemplates', 'dataTypes', 'field', 'chart', 'vl'
   ],function($, d3, dv, _,
-    chartTemplates, dt, field, Chart){
+    chartTemplates, dt, field, Chart, vl){
 
 
   var table, schema, col_indices;
@@ -20,6 +20,8 @@ require(['jquery','d3', 'dv', 'lodash',
   }
 
   // ----- load schema -----
+  //TODO: use something else to load json, csv
+  //amd-plugin
   d3.json("/data/birdstrikes/birdstrikes-schema.json", function(_schema) {
     //TODO: remove this line after updating csv.
     schema = _(_schema).filter(function(r){ return r.enabled; })
@@ -69,40 +71,34 @@ require(['jquery','d3', 'dv', 'lodash',
     // 12: "When: Time of day"
     // 13: "Wildlife: Size"
     // 14: "Wildlife: Species"
-    //
-    var selectedColIndices, selectedCols, selectedColTypes,
-      typeCountMap;
 
-    selectedColIndices = [6, 8];
-    selectedCols = selectedColIndices.map(function(i){ return schema[i];});
+    var selectedColIndicesSet = [[6,8,10], [6,10], [2,10]];
 
-    console.log('selectedColNames', _.pluck(selectedCols, 'field_name'));
+    _.each(selectedColIndicesSet, function(selectedColIndices){
+      var selectedCols = selectedColIndices.map(function(i){ return schema[i];}),
+        selectedColNames = _.pluck(selectedCols, 'field_name'),
+        selectedColTypes = _.pluck(selectedCols, 'data_type');
 
-    selectedColTypes = _.pluck(selectedCols, 'data_type');
+      // ----- Generate Charts -----
+      // TODO: change schema format to match
+      var fields = field.fromColumnsSchema(selectedCols);
+      // TODO: generate a list of charts and rank
+      var charts = chartTemplates.generateCharts(fields, true);
 
-    typeCountMap = _.reduce(selectedColTypes, function(count, type){
-      count[type] = (count[type] || 0) + 1;
-      return count;
-    }, {});
+      console.log('charts', charts);
 
-    console.log('typeCountMap=', typeCountMap);
+      // ----- calculate query -----
 
-    // ----- Generate Charts -----
-    //
-    var fields = field.fromColumnsSchema(selectedCols);
-    // TODO: generate a list of charts and rank
-    var charts = chartTemplates.generateCharts(fields, true);
+      // TODO: append placeholder and run generate vega spec for these files
+      // $('#content').append('<p>' + chart.toShorthand() + '</p>');
+      //
+      $('#content').append('<h2>' + selectedColNames.join(",") + '</h2>');
 
-    console.log('charts', charts);
-
-    // ----- calculate query -----
-
-    // TODO: append placeholder and run generate vega spec for these files
-
-    _.each(charts, function(chart){
-      console.log('chart', chart, chart.toShorthand());
-      $('#content').append('<h2>' + chart.toShorthand() + '</h2>');
-    })
+      _.each(charts, function(chart){
+        console.log('chart', chart, chart.toShorthand());
+        $('#content').append('<p>' + chart.toShorthand() + '</p>');
+      })
+    });
 
   });
 })
