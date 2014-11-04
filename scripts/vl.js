@@ -26,7 +26,8 @@
     width: 200,
     height: 200,
     "padding": {"top": 20, "left": 50, "bottom": 20, "right": 20},
-    legends: false // on for big visualization
+    legends: false, // on for big visualization
+    markscolor: "steelblue"
   }
 
   function traverse(node, fn){
@@ -45,9 +46,18 @@
   }
 
   function getVGSpec(chart, schema, data, opt){
-    var spec, props = {};
+    var spec = vlTemplates.spec(), props = {};
     if(chart.chart_type == "BAR"){
-      spec = _.cloneDeep(vlTemplates.BAR);
+      spec.data = vlTemplates.data();
+      spec.scales = [
+        vlTemplates.scale_x_quant(),
+        vlTemplates.scale_y_ord()
+      ];
+      //TODO add color, shape
+      spec.axes = vlTemplates.axes();
+      spec.marks = [
+        vlTemplates.marks_bar()
+      ];
     }else if(chart.chart_type == "PLOT"){
       spec = _.cloneDeep(vlTemplates.PLOT);
       // return;

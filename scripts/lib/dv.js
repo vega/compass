@@ -125,7 +125,9 @@ dv.table = function(input)
 
     table.cols = function() { return table.length; };
 
-    table.get = function(col, row) { return table[col].get(row); }
+    table.get = function(col, row) {
+        return table[col].get(row);
+    };
 
     table.dense_query = function(q) {
         var tab = q.where ? table.where(q.where) : table;
@@ -363,7 +365,16 @@ outer:
             result[i].type = table[i].type;
             result[i].index = i;
             result[table[i].name] = result[i];
-            if (table[i].lut) { result[i].lut = table[i].lut; }
+            if (table[i].lut) {
+                result[i].lut = table[i].lut;
+                if(table[i].get){
+                    result[i].get = function(idx) { return this.lut[this[idx]]; };
+                }
+            }else {
+                if (table[i].get) {
+                    result[i].get = function(idx) { return this[idx]; };
+                }
+            }
         }
 
         // populate result table

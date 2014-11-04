@@ -17,79 +17,81 @@
 }(this, function () {
   var vlTemplates = {};
 
-  vlTemplates.BAR = {
+  vlTemplates.spec = function(){
+    return {
       "width": "__width__",
       "height": "__height__",
-      "padding": "__padding__",
-      "data": [{
-        "name": "all"
-      }, {
-        "name": "selected"
-      }, {
-        "name": "filtered"
-      }],
-      "scales": [{
-        "name": "y",
-        "type": "ordinal",
-        "range": "height",
-        "domain": {
-          "data": "all",
-          "field": "__field_y__"
-        }
-      }, {
-        "name": "x",
-        "range": "width",
-        "nice": true,
-        "domain": {
-          "data": "all",
-          "field": "__field_x__"
-        }
-      }],
-      "axes": [{
-        "type": "x",
-        "scale": "x"
-      }, {
-        "type": "y",
-        "scale": "y"
-      }],
-      "marks": [{
-        "type": "rect",
-        "from": {
-          "data": "all"
-        },
-        "properties": {
-          "enter": {
-            "x": {
-              "scale": "x",
-              "field": "__field_x__"
-            },
-            "x2": {
-              "scale": "x",
-              "value": 0
-            },
-            "y": {
-              "scale": "y",
-              "field": "__field_y__"
-            },
-            "height": {
-              "scale": "y",
-              "band": true,
-              "offset": -1
-            }
-          },
-          "update": {
-            "fill": {
-              "value": "steelblue"
-            }
-          },
-          "hover": {
-            "fill": {
-              "value": "red"
-            }
-          }
-        }
-      }]
+      "padding": "__padding__"
     };
+  };
+
+  vlTemplates.data = function(){
+    return [{
+      "name": "all"
+    }, {
+      "name": "selected"
+    }, {
+      "name": "filtered"
+    }];
+  };
+
+  vlTemplates.scale_y_ord = function(){
+    return {
+      "name": "y",
+      "type": "ordinal",
+      "range": "height",
+      "domain": { "data": "all", "field": "__field_y__"}
+    };
+  };
+
+  vlTemplates.scale_x_quant = function(){
+    return {
+      "name": "x",
+      "range": "width",
+      "nice": true,
+      "domain": { "data": "all", "field": "__field_x__"}
+    }
+  }
+
+  // TODO add SCALE_X_QUANT,ORDINAL and Y
+  //
+
+  vlTemplates.scale_color = function(){
+    return {
+      "name": "color",
+      "type": "ordinal",
+      "range": "category20"
+    };
+  };
+
+  vlTemplates.marks_bar = function(){
+    return {
+      "type": "rect",
+      "from": { "data": "all"},
+      "properties": {
+        "enter": {
+          "x": { "scale": "x", "field": "__field_x__"},
+          "x2": {"scale": "x", "value": 0},
+          "y": {"scale": "y", "field": "__field_y__"},
+          "height": { "scale": "y", "band": true, "offset": -1}
+        },
+        "update": {"fill": { "value": "__markscolor__"}},
+        "hover": {"fill": { "value": "red"}}
+      }
+    };
+  };
+
+  vlTemplates.FILL_COLOR_FIELD = {"scale": "color", "field": "__field_color__"};
+
+  vlTemplates.axes = function(){
+    return [{
+      "type": "x",
+      "scale": "x"
+    }, {
+      "type": "y",
+      "scale": "y"
+    }];
+  };
 
   vlTemplates.PLOT = {
     "width": "__width__",
