@@ -28,14 +28,25 @@
     FIELDS_SPLIT = ",";
 
   var Chart = function(template, fields, count){
-    this.chart_type = template.type;
+    this.chart_type = template.type; //TODO: refactor this to be chartType
     this.templateID = template.id;
+    this.template = template; //TODO: decide again if we need this
     this.isAggregated = template.isAggregated;
     this.fields = _.cloneDeep(fields);
     this.count = count || Chart.countFields(fields);
   };
 
   var prototype = Chart.prototype;
+
+  prototype.toJSON = function(){
+    return {
+      chartType: this.chart_type,
+      template: this.template, //TODO(kanitw): .toJSON()?
+      isAggregated: this.isAggregated,
+      fields: this.fields,
+      count: this.count
+    };
+  }
 
   prototype.isCycle = function(c){
     var s = this;

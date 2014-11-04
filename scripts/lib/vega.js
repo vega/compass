@@ -21,7 +21,7 @@ function (d3, topojson) {
 //---------------------------------------------------
 
   var vg = {
-    version:  "1.4.0", // semantic versioning
+    version:  "1.4.2", // semantic versioning
     d3:       d3,      // stash d3 for use in property functions
     topojson: topojson // stash topojson similarly
   };
@@ -39,7 +39,7 @@ vg.isFunction = function(obj) {
 vg.isString = function(obj) {
   return toString.call(obj) == '[object String]';
 };
-  
+
 vg.isArray = Array.isArray || function(obj) {
   return toString.call(obj) == '[object Array]';
 };
@@ -70,6 +70,8 @@ vg.boolean = function(s) { return !!s; };
 // utility functions
 
 vg.identity = function(x) { return x; };
+
+vg.true = function() { return true; };
 
 vg.extend = function(obj) {
   for (var x, name, i=1, len=arguments.length; i<len; ++i) {
@@ -132,10 +134,6 @@ vg.array = function(x) {
 
 vg.values = function(x) {
   return (vg.isObject(x) && !vg.isArray(x) && x.values) ? x.values : x;
-};
-
-vg.capitalize = function(x) {
-  return x.charAt(0).toUpperCase() + x.slice(1);
 };
 
 vg.str = function(x) {
@@ -243,6 +241,15 @@ vg.error = function(msg) {
 // are we running in node.js?
 // via timetler.com/2012/10/13/environment-detection-in-javascript/
 vg.config.isNode = typeof exports !== 'undefined' && this.exports !== exports;
+
+// Allows domain restriction when using data loading via XHR.
+// To enable, set it to a list of allowed domains
+// e.g., ['wikipedia.org', 'eff.org']
+vg.config.domainWhiteList = false;
+
+// If true, disable potentially unsafe transforms (filter, formula)
+// involving possible JavaScript injection attacks.
+vg.config.safeMode = false;
 
 // base url for loading external data files
 // used only for server-side operation
@@ -374,9 +381,9 @@ vg.config.range = {
     this.clear();
     if (b) this.union(b);
   };
-  
+
   var prototype = bounds.prototype;
-  
+
   prototype.clear = function() {
     this.x1 = +Number.MAX_VALUE;
     this.y1 = +Number.MAX_VALUE;
@@ -384,7 +391,7 @@ vg.config.range = {
     this.y2 = -Number.MAX_VALUE;
     return this;
   };
-  
+
   prototype.set = function(x1, y1, x2, y2) {
     this.x1 = x1;
     this.y1 = y1;
@@ -408,7 +415,7 @@ vg.config.range = {
     this.y2 += d;
     return this;
   };
-  
+
   prototype.round = function() {
     this.x1 = Math.floor(this.x1);
     this.y1 = Math.floor(this.y1);
@@ -424,7 +431,7 @@ vg.config.range = {
     this.y2 += dy;
     return this;
   };
-  
+
   prototype.rotate = function(angle, x, y) {
     var cos = Math.cos(angle),
         sin = Math.sin(angle),
@@ -505,7 +512,7 @@ vg.config.range = {
     });
     return this;
   };
-  
+
   return gradient;
 })();
 
@@ -582,9 +589,9 @@ var vg_gradient_id = 0;vg.canvas = {};vg.canvas.path = (function() {
     var segs = arcToSegments(ex, ey, rx, ry, large, sweep, rot, x, y);
     for (var i=0; i<segs.length; i++) {
       var bez = segmentToBezier.apply(null, segs[i]);
-      bounds.add(bez[0]-l, bez[1]-t);
-      bounds.add(bez[2]-l, bez[3]-t);
-      bounds.add(bez[4]-l, bez[5]-t);
+      bounds.add(bez[0], bez[1]);
+      bounds.add(bez[2], bez[3]);
+      bounds.add(bez[4], bez[5]);
     }
   }
 
@@ -701,7 +708,7 @@ var vg_gradient_id = 0;vg.canvas = {};vg.canvas.path = (function() {
     if (t == undefined) t = 0;
 
     g.beginPath();
-  
+
     for (var i=0, len=path.length; i<len; ++i) {
       current = path[i];
 
@@ -1217,7 +1224,7 @@ var vg_gradient_id = 0;vg.canvas = {};vg.canvas.path = (function() {
     }
     return bounds;
   }
-  
+
   function area(items) {
     var o = items[0];
     var area = d3.svg.area()
@@ -1238,7 +1245,7 @@ var vg_gradient_id = 0;vg.canvas = {};vg.canvas.path = (function() {
     if (o.tension != null) line.tension(o.tension);
     return line(items);
   }
-  
+
   return {
     parse:  parse,
     render: render,
@@ -1246,7 +1253,7 @@ var vg_gradient_id = 0;vg.canvas = {};vg.canvas.path = (function() {
     area:   area,
     line:   line
   };
-  
+
 })();vg.canvas.marks = (function() {
 
   var parsePath = vg.canvas.path.parse,
@@ -1475,7 +1482,7 @@ var vg_gradient_id = 0;vg.canvas = {};vg.canvas.path = (function() {
 
       opac = o.opacity == null ? 1 : o.opacity;
       if (opac == 0) continue;
-      
+
       if (stroke = o.stroke) {
         lw = (lw = o.strokeWidth) != null ? lw : vg.config.render.lineWidth;
         if (lw > 0) {
@@ -1617,9 +1624,9 @@ var vg_gradient_id = 0;vg.canvas = {};vg.canvas.path = (function() {
         g.rect(0, 0, group.width || 0, group.height || 0);
         g.clip();
       }
-      
+
       if (bounds) bounds.translate(-gx, -gy);
-      
+
       for (j=0, m=axes.length; j<m; ++j) {
         if (axes[j].def.layer === "back") {
           renderer.draw(g, axes[j], bounds);
@@ -1636,10 +1643,10 @@ var vg_gradient_id = 0;vg.canvas = {};vg.canvas.path = (function() {
       for (j=0, m=legends.length; j<m; ++j) {
         renderer.draw(g, legends[j], bounds);
       }
-      
+
       if (bounds) bounds.translate(gx, gy);
       g.restore();
-    }    
+    }
   }
 
   function color(g, o, value) {
@@ -1819,41 +1826,41 @@ var vg_gradient_id = 0;vg.canvas = {};vg.canvas.path = (function() {
     }
   };
 
-})();vg.canvas.Renderer = (function() {  
+})();vg.canvas.Renderer = (function() {
   var renderer = function() {
     this._ctx = null;
     this._el = null;
     this._imgload = 0;
   };
-  
+
   var prototype = renderer.prototype;
-  
+
   prototype.initialize = function(el, width, height, pad) {
     this._el = el;
-    
+
     if (!el) return this; // early exit if no DOM element
 
     // select canvas element
     var canvas = d3.select(el)
       .selectAll("canvas.marks")
       .data([1]);
-    
+
     // create new canvas element if needed
     canvas.enter()
       .append("canvas")
       .attr("class", "marks");
-    
+
     // remove extraneous canvas if needed
     canvas.exit().remove();
-    
+
     return this.resize(width, height, pad);
   };
-  
+
   prototype.resize = function(width, height, pad) {
     this._width = width;
     this._height = height;
     this._padding = pad;
-    
+
     if (this._el) {
       var canvas = d3.select(this._el).select("canvas.marks");
 
@@ -1868,11 +1875,11 @@ var vg_gradient_id = 0;vg.canvas = {};vg.canvas.path = (function() {
       this._ctx._ratio = (s = scaleCanvas(canvas.node(), this._ctx) || 1);
       this._ctx.setTransform(s, 0, 0, s, s*pad.left, s*pad.top);
     }
-    
+
     initializeLineDash(this._ctx);
     return this;
   };
-  
+
   function scaleCanvas(canvas, ctx) {
     // get canvas pixel data
     var devicePixelRatio = window.devicePixelRatio || 1,
@@ -1903,7 +1910,7 @@ var vg_gradient_id = 0;vg.canvas = {};vg.canvas.path = (function() {
       ctx.vgLineDash = function(dash) { this.setLineDash(dash || NODASH); };
       ctx.vgLineDashOffset = function(off) { this.lineDashOffset = off; };
     } else if (ctx.webkitLineDash !== undefined) {
-    	ctx.vgLineDash = function(dash) { this.webkitLineDash = dash || NODASH; };
+      ctx.vgLineDash = function(dash) { this.webkitLineDash = dash || NODASH; };
       ctx.vgLineDashOffset = function(off) { this.webkitLineDashOffset = off; };
     } else if (ctx.mozDash !== undefined) {
       ctx.vgLineDash = function(dash) { this.mozDash = dash; };
@@ -1913,16 +1920,16 @@ var vg_gradient_id = 0;vg.canvas = {};vg.canvas.path = (function() {
       ctx.vgLineDashOffset = function(off) { /* unsupported */ };
     }
   }
-  
+
   prototype.context = function(ctx) {
     if (ctx) { this._ctx = ctx; return this; }
     else return this._ctx;
   };
-  
+
   prototype.element = function() {
     return this._el;
   };
-  
+
   prototype.pendingImages = function() {
     return this._imgload;
   };
@@ -1934,15 +1941,15 @@ var vg_gradient_id = 0;vg.canvas = {};vg.canvas.path = (function() {
     }
     return b;
   }
-    
+
   function getBounds(items) {
     return !items ? null :
       vg.array(items).reduce(function(b, item) {
         return b.union(translatedBounds(item, item.bounds))
                 .union(translatedBounds(item, item['bounds:prev']));
-      }, new vg.Bounds());  
+      }, new vg.Bounds());
   }
-  
+
   function setBounds(g, bounds) {
     var bbox = null;
     if (bounds) {
@@ -1953,7 +1960,7 @@ var vg_gradient_id = 0;vg.canvas = {};vg.canvas.path = (function() {
     }
     return bbox;
   }
-  
+
   prototype.render = function(scene, items) {
     var g = this._ctx,
         pad = this._padding,
@@ -1980,18 +1987,18 @@ var vg_gradient_id = 0;vg.canvas = {};vg.canvas.path = (function() {
         this.draw(g, scene, bb2);
       }
     }
-    
+
     // takedown
     g.restore();
     this._scene = null;
   };
-  
+
   prototype.draw = function(ctx, scene, bounds) {
     var marktype = scene.marktype,
         renderer = vg.canvas.marks.draw[marktype];
     renderer.call(this, ctx, scene, bounds);
   };
-  
+
   prototype.renderAsync = function(scene) {
     // TODO make safe for multiple scene rendering?
     var renderer = this;
@@ -2003,7 +2010,7 @@ var vg_gradient_id = 0;vg.canvas = {};vg.canvas.path = (function() {
       delete renderer._async_id;
     }, 50);
   };
-  
+
   prototype.loadImage = function(uri) {
     var renderer = this,
         scene = renderer._scene,
@@ -2032,7 +2039,7 @@ var vg_gradient_id = 0;vg.canvas = {};vg.canvas.path = (function() {
 
     return image;
   };
-  
+
   return renderer;
 })();vg.canvas.Handler = (function() {
   var handler = function(el, model) {
@@ -2041,7 +2048,7 @@ var vg_gradient_id = 0;vg.canvas = {};vg.canvas.path = (function() {
     if (el) this.initialize(el);
     if (model) this.model(model);
   };
-  
+
   var prototype = handler.prototype;
 
   prototype.initialize = function(el, pad, obj) {
@@ -2049,7 +2056,7 @@ var vg_gradient_id = 0;vg.canvas = {};vg.canvas.path = (function() {
     this._canvas = d3.select(el).select("canvas.marks").node();
     this._padding = pad;
     this._obj = obj || null;
-    
+
     // add event listeners
     var canvas = this._canvas, that = this;
     events.forEach(function(type) {
@@ -2057,15 +2064,15 @@ var vg_gradient_id = 0;vg.canvas = {};vg.canvas.path = (function() {
         prototype[type].call(that, evt);
       });
     });
-    
+
     return this;
   };
-  
+
   prototype.padding = function(pad) {
     this._padding = pad;
     return this;
   };
-  
+
   prototype.model = function(model) {
     if (!arguments.length) return this._model;
     this._model = model;
@@ -2123,7 +2130,7 @@ var vg_gradient_id = 0;vg.canvas = {};vg.canvas.path = (function() {
       this.fire("mouseover", evt);
     }
   };
-  
+
   prototype.mouseout = function(evt) {
     if (this._active) {
       this.fire("mouseout", evt);
@@ -2170,12 +2177,12 @@ var vg_gradient_id = 0;vg.canvas = {};vg.canvas.path = (function() {
     }
     return this;
   };
-  
+
   // retrieve the current canvas context
   prototype.context = function() {
     return this._canvas.getContext("2d");
   };
-  
+
   // find the scenegraph item at the current mouse position
   // x, y -- the absolute x, y mouse coordinates on the canvas element
   // gx, gy -- the relative coordinates within the current group
@@ -2195,21 +2202,21 @@ var vg_gradient_id = 0;vg.canvas = {};vg.canvas.path = (function() {
   function key(o)   { return o.key; }
   function size(o)  { return o.size==null ? 100 : o.size; }
   function shape(o) { return o.shape || "circle"; }
-      
+
   var arc_path    = d3.svg.arc(),
       area_path   = d3.svg.area().x(x).y1(y).y0(yh),
       line_path   = d3.svg.line().x(x).y(y),
       symbol_path = d3.svg.symbol().type(shape).size(size);
-  
+
   var mark_id = 0,
       clip_id = 0;
-  
+
   var textAlign = {
     "left":   "start",
     "center": "middle",
     "right":  "end"
   };
-  
+
   var styles = {
     "fill":             "fill",
     "fillOpacity":      "fill-opacity",
@@ -2246,14 +2253,14 @@ var vg_gradient_id = 0;vg.canvas = {};vg.canvas.path = (function() {
       }
     }
   }
-  
+
   function arc(o) {
     var x = o.x || 0,
         y = o.y || 0;
     this.setAttribute("transform", "translate("+x+","+y+")");
     this.setAttribute("d", arc_path(o));
   }
-  
+
   function area(items) {
     if (!items.length) return;
     var o = items[0];
@@ -2262,7 +2269,7 @@ var vg_gradient_id = 0;vg.canvas = {};vg.canvas.path = (function() {
       .tension(o.tension == null ? 0.7 : o.tension);
     this.setAttribute("d", area_path(items));
   }
-  
+
   function line(items) {
     if (!items.length) return;
     var o = items[0];
@@ -2271,7 +2278,7 @@ var vg_gradient_id = 0;vg.canvas = {};vg.canvas.path = (function() {
       .tension(o.tension == null ? 0.7 : o.tension);
     this.setAttribute("d", line_path(items));
   }
-  
+
   function path(o) {
     var x = o.x || 0,
         y = o.y || 0;
@@ -2294,14 +2301,14 @@ var vg_gradient_id = 0;vg.canvas = {};vg.canvas.path = (function() {
     this.setAttribute("x2", o.x2 != null ? o.x2 : x1);
     this.setAttribute("y2", o.y2 != null ? o.y2 : y1);
   }
-  
+
   function symbol(o) {
     var x = o.x || 0,
         y = o.y || 0;
     this.setAttribute("transform", "translate("+x+","+y+")");
     this.setAttribute("d", symbol_path(o));
   }
-  
+
   function image(o) {
     var w = o.width || (o.image && o.image.width) || 0,
         h = o.height || (o.image && o.image.height) || 0,
@@ -2310,14 +2317,14 @@ var vg_gradient_id = 0;vg.canvas = {};vg.canvas.path = (function() {
         y = o.y - (o.baseline === "middle"
           ? h/2 : (o.baseline === "bottom" ? h : 0)),
         url = vg.config.baseURL + o.url;
-    
+
     this.setAttributeNS("http://www.w3.org/1999/xlink", "href", url);
     this.setAttribute("x", x);
     this.setAttribute("y", y);
     this.setAttribute("width", w);
     this.setAttribute("height", h);
   }
-    
+
   function fontString(o) {
     return (o.fontStyle ? o.fontStyle + " " : "")
       + (o.fontVariant ? o.fontVariant + " " : "")
@@ -2325,7 +2332,7 @@ var vg_gradient_id = 0;vg.canvas = {};vg.canvas.path = (function() {
       + (o.fontSize != null ? o.fontSize : vg.config.render.fontSize) + "px "
       + (o.font || vg.config.render.font);
   }
-  
+
   function text(o) {
     var x = o.x || 0,
         y = o.y || 0,
@@ -2346,17 +2353,17 @@ var vg_gradient_id = 0;vg.canvas = {};vg.canvas.path = (function() {
     this.setAttribute("x", x + dx);
     this.setAttribute("y", y + dy);
     this.setAttribute("text-anchor", align);
-    
+
     if (a) this.setAttribute("transform", "rotate("+a+" "+x+","+y+")");
     else this.removeAttribute("transform");
-    
+
     if (base) this.setAttribute("dy", base);
     else this.removeAttribute("dy");
-    
+
     this.textContent = o.text;
     this.style.setProperty("font", fontString(o), null);
   }
-  
+
   function group(o) {
     var x = o.x || 0,
         y = o.y || 0;
@@ -2388,7 +2395,7 @@ var vg_gradient_id = 0;vg.canvas = {};vg.canvas.path = (function() {
       drawMark(g, scene, index, "mark_", tag, attr, nest);
     };
   }
-  
+
   function drawMark(g, scene, index, prefix, tag, attr, nest) {
     var data = nest ? [scene.items] : scene.items,
         evts = scene.interactive===false ? "none" : null,
@@ -2414,19 +2421,19 @@ var vg_gradient_id = 0;vg.canvas = {};vg.canvas.path = (function() {
     } else {
       e.append("rect").attr("class","background").style("pointer-events",evts);
     }
-    
+
     m.exit().remove();
     m.each(attr);
     if (notG) m.each(style);
     else p.selectAll(s+" > rect.background").each(group_bg).each(style);
-    
+
     return p;
   }
 
-  function drawGroup(g, scene, index, prefix) {    
+  function drawGroup(g, scene, index, prefix) {
     var p = drawMark(g, scene, index, prefix || "group_", "g", group),
         c = p.node().childNodes, n = c.length, i, j, m;
-    
+
     for (i=0; i<n; ++i) {
       var items = c[i].__data__.items,
           legends = c[i].__data__.legendItems || [],
@@ -2485,8 +2492,8 @@ var vg_gradient_id = 0;vg.canvas = {};vg.canvas.path = (function() {
       draw:    draw // expose for extensibility
     }
   };
-  
-})();vg.svg.Renderer = (function() {  
+
+})();vg.svg.Renderer = (function() {
   var renderer = function() {
     this._svg = null;
     this._ctx = null;
@@ -2496,9 +2503,9 @@ var vg_gradient_id = 0;vg.canvas = {};vg.canvas.path = (function() {
       clipping: {}
     };
   };
-  
+
   var prototype = renderer.prototype;
-  
+
   prototype.initialize = function(el, width, height, pad) {
     this._el = el;
 
@@ -2509,32 +2516,32 @@ var vg_gradient_id = 0;vg.canvas = {};vg.canvas.path = (function() {
     this._svg = d3.select(el)
       .append("svg")
       .attr("class", "marks");
-    
+
     // set the svg root group
     this._ctx = this._svg.append("g");
-    
+
     return this.resize(width, height, pad);
   };
-  
+
   prototype.resize = function(width, height, pad) {
     this._width = width;
     this._height = height;
     this._padding = pad;
-    
+
     this._svg
       .attr("width", width + pad.left + pad.right)
       .attr("height", height + pad.top + pad.bottom);
-      
+
     this._ctx
       .attr("transform", "translate("+pad.left+","+pad.top+")");
 
     return this;
   };
-  
+
   prototype.context = function() {
     return this._ctx;
   };
-  
+
   prototype.element = function() {
     return this._el;
   };
@@ -2545,21 +2552,21 @@ var vg_gradient_id = 0;vg.canvas = {};vg.canvas.path = (function() {
         dgrad = vg.keys(all.gradient),
         dclip = vg.keys(all.clipping),
         defs = svg.select("defs"), grad, clip;
-  
+
     // get or create svg defs block
     if (dgrad.length===0 && dclip.length==0) { defs.remove(); return; }
     if (defs.empty()) defs = svg.insert("defs", ":first-child");
-    
+
     grad = defs.selectAll("linearGradient").data(dgrad, vg.identity);
     grad.enter().append("linearGradient").attr("id", vg.identity);
     grad.exit().remove();
     grad.each(function(id) {
       var def = all.gradient[id],
           grd = d3.select(this);
-  
+
       // set gradient coordinates
       grd.attr({x1: def.x1, x2: def.x2, y1: def.y1, y2: def.y2});
-  
+
       // set gradient stops
       stop = grd.selectAll("stop").data(def.stops);
       stop.enter().append("stop");
@@ -2567,7 +2574,7 @@ var vg_gradient_id = 0;vg.canvas = {};vg.canvas.path = (function() {
       stop.attr("offset", function(d) { return d.offset; })
           .attr("stop-color", function(d) { return d.color; });
     });
-    
+
     clip = defs.selectAll("clipPath").data(dclip, vg.identity);
     clip.enter().append("clipPath").attr("id", vg.identity);
     clip.exit().remove();
@@ -2581,7 +2588,7 @@ var vg_gradient_id = 0;vg.canvas = {};vg.canvas.path = (function() {
         .attr("height", def.height);
     });
   };
-  
+
   prototype.render = function(scene, items) {
     vg.svg._cur = this;
 
@@ -2594,7 +2601,7 @@ var vg_gradient_id = 0;vg.canvas = {};vg.canvas.path = (function() {
 
    delete vg.svg._cur;
   };
-  
+
   prototype.renderItems = function(items) {
     var item, node, type, nest, i, n,
         marks = vg.svg.marks;
@@ -2609,13 +2616,13 @@ var vg_gradient_id = 0;vg.canvas = {};vg.canvas.path = (function() {
       marks.style.call(node, item);
     }
   }
-  
+
   prototype.draw = function(ctx, scene, index) {
     var marktype = scene.marktype,
         renderer = vg.svg.marks.draw[marktype];
     renderer.call(this, ctx, scene, index);
   };
-  
+
   return renderer;
 })();vg.svg.Handler = (function() {
   var handler = function(el, model) {
@@ -2624,7 +2631,7 @@ var vg_gradient_id = 0;vg.canvas = {};vg.canvas.path = (function() {
     if (el) this.initialize(el);
     if (model) this.model(model);
   };
-  
+
   function svgHandler(handler) {
     var that = this;
     return function(evt) {
@@ -2636,12 +2643,12 @@ var vg_gradient_id = 0;vg.canvas = {};vg.canvas.path = (function() {
       }
     };
   }
-  
+
   function eventName(name) {
     var i = name.indexOf(".");
     return i < 0 ? name : name.slice(0,i);
   }
-  
+
   var prototype = handler.prototype;
 
   prototype.initialize = function(el, pad, obj) {
@@ -2651,18 +2658,18 @@ var vg_gradient_id = 0;vg.canvas = {};vg.canvas.path = (function() {
     this._obj = obj || null;
     return this;
   };
-  
+
   prototype.padding = function(pad) {
     this._padding = pad;
     return this;
   };
-  
+
   prototype.model = function(model) {
     if (!arguments.length) return this._model;
     this._model = model;
     return this;
   };
-  
+
   prototype.handlers = function() {
     var h = this._handlers;
     return vg.keys(h).reduce(function(a, k) {
@@ -2675,7 +2682,7 @@ var vg_gradient_id = 0;vg.canvas = {};vg.canvas.path = (function() {
     var name = eventName(type),
         h = this._handlers,
         dom = d3.select(this._svg).node();
-        
+
     var x = {
       type: type,
       handler: handler,
@@ -2784,7 +2791,7 @@ vg.data.size = function(size, group) {
   } else {
     // in browser, use xhr
     vg_load_xhr(url, callback);
-  }  
+  }
 };
 
 var vg_load_protocolRE = /^[A-Za-z]+\:\/\//;
@@ -2800,9 +2807,24 @@ function vg_load_isFile(url) {
 
 function vg_load_xhr(url, callback) {
   vg.log("LOAD: " + url);
+  if (!vg_url_check(url)) {
+    vg.error("URL is not whitelisted: " + url);
+    return;
+  }
   d3.xhr(url, function(err, resp) {
     if (resp) resp = resp.responseText;
     callback(err, resp);
+  });
+}
+
+function vg_url_check(url) {
+  if (!vg.config.domainWhiteList) return true;
+  var a = document.createElement("a");
+  a.href = url;
+  var domain = a.hostname.toLowerCase();
+  return vg.config.domainWhiteList.some(function(d) {
+    return d === domain ||
+      domain.lastIndexOf("."+d) === (domain.length - d.length - 1);
   });
 }
 
@@ -2815,14 +2837,14 @@ function vg_load_file(file, callback) {
 
 function vg_load_http(url, callback) {
   vg.log("LOAD HTTP: " + url);
-	var req = require("http").request(url, function(res) {
+  var req = require("http").request(url, function(res) {
     var pos=0, data = new Buffer(parseInt(res.headers['content-length'],10));
-		res.on("error", function(err) { callback(err, null); });
-		res.on("data", function(x) { x.copy(data, pos); pos += x.length; });
-		res.on("end", function() { callback(null, data); });
-	});
-	req.on("error", function(err) { callback(err); });
-	req.end();
+    res.on("error", function(err) { callback(err, null); });
+    res.on("data", function(x) { x.copy(data, pos); pos += x.length; });
+    res.on("end", function() { callback(null, data); });
+  });
+  req.on("error", function(err) { callback(err); });
+  req.end();
 }vg.data.read = (function() {
   var formats = {},
       parsers = {
@@ -2855,12 +2877,12 @@ function vg_load_http(url, callback) {
     var d = d3.tsv.parse(data);
     return d;
   };
-  
+
   formats.topojson = function(data, format) {
     if (topojson == null) {
       vg.error("TopoJSON library not loaded.");
       return [];
-    }    
+    }
     var t = vg.isObject(data) ? data : JSON.parse(data),
         obj = [];
 
@@ -2877,19 +2899,19 @@ function vg_load_http(url, callback) {
 
     return obj;
   };
-  
+
   formats.treejson = function(data, format) {
     data = vg.isObject(data) ? data : JSON.parse(data);
     return vg.tree(data, format.children);
   };
-  
+
   function parseValues(data, types) {
     var cols = vg.keys(types),
         p = cols.map(function(col) { return parsers[types[col]]; }),
         tree = vg.isTree(data);
     vg_parseArray(tree ? [data] : data, cols, p, tree);
   }
-  
+
   function vg_parseArray(data, cols, p, tree) {
     var d, i, j, len, clen;
     for (i=0, len=data.length; i<len; ++i) {
@@ -2906,9 +2928,9 @@ function vg_load_http(url, callback) {
   return read;
 })();vg.data.array = function() {
   var fields = [];
-   
+
   function array(data) {
-    return data.map(function(d) {      
+    return data.map(function(d) {
       var list = [];
       for (var i=0, len=fields.length; i<len; ++i) {
         list.push(fields[i](d));
@@ -2916,18 +2938,18 @@ function vg_load_http(url, callback) {
       return list;
     });
   }
-  
+
   array.fields = function(fieldList) {
     fields = vg.array(fieldList).map(vg.accessor);
     return array;
   };
-  
+
   return array;
 };vg.data.copy = function() {
   var from = vg.accessor("data"),
       fields = [],
       as = null;
-  
+
   var copy = vg.data.mapper(function(d) {
     var src = from(d), i, len,
         source = fields,
@@ -2942,12 +2964,12 @@ function vg_load_http(url, callback) {
     from = vg.accessor(field);
     return copy;
   };
-  
+
   copy.fields = function(fieldList) {
     fields = vg.array(fieldList);
     return copy;
   };
-  
+
   copy.as = function(fieldList) {
     as = vg.array(fieldList);
     return copy;
@@ -2980,7 +3002,7 @@ function vg_load_http(url, callback) {
     other = d;
     return cross;
   };
-  
+
   cross.diagonal = function(x) {
     nodiag = !x;
     return cross;
@@ -3000,13 +3022,13 @@ vg.data.facet = function() {
   var keys = [],
       sort = null;
 
-  function facet(data) {    
+  function facet(data) {
     var result = {
           key: "",
           keys: [],
           values: []
         },
-        map = {}, 
+        map = {},
         vals = result.values,
         obj, klist, kstr, len, i, j, k, kv, cmp;
 
@@ -3046,12 +3068,12 @@ vg.data.facet = function() {
 
     return result;
   }
-  
+
   facet.keys = function(k) {
     keys = vg.array(k).map(vg.accessor);
     return facet;
   };
-  
+
   facet.sort = function(s) {
     sort = vg.data.sort().by(s);
     return facet;
@@ -3065,7 +3087,7 @@ vg.data.facet = function() {
   function filter(data) {
     return test ? data.filter(test) : data;
   }
-  
+
   filter.test = function(func) {
     test = vg.isFunction(func) ? func : vg.parse.expr(func);
     return filter;
@@ -3073,11 +3095,11 @@ vg.data.facet = function() {
 
   return filter;
 };vg.data.flatten = function() {
-    
+
   function flatten(data) {
     return flat(data, []);
   }
-  
+
   function flat(data, list) {
     if (data.values) {
       for (var i=0, n=data.values.length; i<n; ++i) {
@@ -3088,7 +3110,7 @@ vg.data.facet = function() {
     }
     return list;
   }
-  
+
   return flatten;
 };vg.data.fold = function() {
   var fields = [],
@@ -3116,7 +3138,7 @@ vg.data.facet = function() {
     }
 
     return values;
-  }  
+  }
 
   fold.fields = function(f) {
     fields = vg.array(f);
@@ -3149,21 +3171,21 @@ vg.data.facet = function() {
         "alpha"
       ];
 
-  function force(data, db, group) {    
+  function force(data, db, group) {
     layout
       .size(vg.data.size(size, group))
       .nodes(data);
-      
+
     if (links && db[links]) {
       layout.links(db[links]);
     }
 
-    layout.start();      
+    layout.start();
     for (var i=0; i<iterations; ++i) {
       layout.tick();
     }
     layout.stop();
-    
+
     return data;
   }
 
@@ -3171,12 +3193,12 @@ vg.data.facet = function() {
     links = dataSetName;
     return force;
   };
-  
+
   force.size = function(sz) {
     size = sz;
     return force;
   };
-       
+
   force.linkDistance = function(field) {
     linkDistance = typeof field === 'number'
       ? field
@@ -3192,7 +3214,7 @@ vg.data.facet = function() {
     layout.linkStrength(linkStrength);
     return force;
   };
-  
+
   force.charge = function(field) {
     charge = typeof field === 'number'
       ? field
@@ -3200,7 +3222,7 @@ vg.data.facet = function() {
     layout.charge(charge);
     return force;
   };
-  
+
   force.iterations = function(iter) {
     iterations = iter;
     return force;
@@ -3217,11 +3239,11 @@ vg.data.facet = function() {
 };
 
 vg.data.force.dependencies = ["links"];vg.data.formula = (function() {
-  
+
   return function() {
     var field = null,
         expr = vg.identity;
-  
+
     var formula = vg.data.mapper(function(d, i, list) {
       if (field) d[field] = expr.call(null, d, i, list);
       return d;
@@ -3231,7 +3253,7 @@ vg.data.force.dependencies = ["links"];vg.data.formula = (function() {
       field = name;
       return formula;
     };
-  
+
     formula.expr = function(func) {
       expr = vg.isFunction(func) ? func : vg.parse.expr(func);
       return formula;
@@ -3259,7 +3281,7 @@ vg.data.force.dependencies = ["links"];vg.data.formula = (function() {
           "x": "x",
           "y": "y"
         };
-    
+
     var map = vg.data.mapper(function(d) {
       var ll = [lon(d), lat(d)],
           xy = func(ll);
@@ -3271,7 +3293,7 @@ vg.data.force.dependencies = ["links"];vg.data.formula = (function() {
     map.func = function() {
       return func;
     };
-        
+
     map.projection = function(p) {
       if (projection !== p) {
         projection = p;
@@ -3290,7 +3312,7 @@ vg.data.force.dependencies = ["links"];vg.data.formula = (function() {
         return map;
       }
     });
-    
+
     map.lon = function(field) {
       lon = vg.accessor(field);
       return map;
@@ -3300,7 +3322,7 @@ vg.data.force.dependencies = ["links"];vg.data.formula = (function() {
       lat = vg.accessor(field);
       return map;
     };
-    
+
     map.output = function(map) {
       vg.keys(output).forEach(function(k) {
         if (map[k] !== undefined) {
@@ -3309,11 +3331,11 @@ vg.data.force.dependencies = ["links"];vg.data.formula = (function() {
       });
       return map;
     };
-    
-    
+
+
     return map;
   };
-  
+
   geo.params = params;
   return geo;
 })();vg.data.geopath = function() {
@@ -3327,7 +3349,7 @@ vg.data.force.dependencies = ["links"];vg.data.formula = (function() {
     d[output.path] = geopath(geojson(d));
     return d;
   });
-  
+
   map.projection = function(proj) {
     if (projection !== proj) {
       projection = proj;
@@ -3339,7 +3361,7 @@ vg.data.force.dependencies = ["links"];vg.data.formula = (function() {
     }
     return map;
   };
-  
+
   vg.data.geo.params.forEach(function(name) {
     map[name] = function(x) {
       opt[name] = x;
@@ -3347,7 +3369,7 @@ vg.data.force.dependencies = ["links"];vg.data.formula = (function() {
       return map;
     }
   });
-   
+
   map.value = function(field) {
     geojson = vg.accessor(field);
     return map;
@@ -3369,11 +3391,11 @@ vg.data.force.dependencies = ["links"];vg.data.formula = (function() {
       target = vg.accessor("target"),
       tension = 0.2,
       output = {"path": "path"};
-  
+
   function line(d) {
     var s = source(d),
         t = target(d);
-    return "M" + s.x + "," + s.y 
+    return "M" + s.x + "," + s.y
          + "L" + t.x + "," + t.y;
   }
 
@@ -3389,7 +3411,7 @@ vg.data.force.dependencies = ["links"];vg.data.formula = (function() {
          + " " + (t.x+iy) + "," + (t.y-ix)
          + " " + t.x + "," + t.y;
   }
-  
+
   function diagonalX(d) {
     var s = source(d),
         t = target(d),
@@ -3417,14 +3439,14 @@ vg.data.force.dependencies = ["links"];vg.data.formula = (function() {
     diagonalX: diagonalX,
     diagonalY: diagonalY
   };
-  
+
   function link(data) {
     var path = shapes[shape];
-        
+
     data.forEach(function(d) {
       d[output.path] = path(d);
     });
-    
+
     return data;
   }
 
@@ -3437,17 +3459,17 @@ vg.data.force.dependencies = ["links"];vg.data.formula = (function() {
     tension = val;
     return link;
   };
-  
+
   link.source = function(field) {
     source = vg.accessor(field);
     return link;
   };
-  
+
   link.target = function(field) {
     target = vg.accessor(field);
     return link;
   };
-  
+
   link.output = function(map) {
     vg.keys(output).forEach(function(k) {
       if (map[k] !== undefined) {
@@ -3456,7 +3478,7 @@ vg.data.force.dependencies = ["links"];vg.data.formula = (function() {
     });
     return link;
   };
-  
+
   return link;
 };vg.data.pie = function() {
   var one = function() { return 1; },
@@ -3475,13 +3497,13 @@ vg.data.force.dependencies = ["links"];vg.data.formula = (function() {
         a = start,
         k = (end - start) / d3.sum(values),
         index = d3.range(data.length);
-    
+
     if (sort) {
       index.sort(function(a, b) {
         return values[a] - values[b];
       });
     }
-    
+
     index.forEach(function(i) {
       var d;
       data[i].value = (d = values[i]);
@@ -3489,7 +3511,7 @@ vg.data.force.dependencies = ["links"];vg.data.formula = (function() {
       data[i][output.midAngle] = (a + 0.5 * d * k);
       data[i][output.endAngle] = (a += d * k);
     });
-    
+
     return data;
   }
 
@@ -3497,17 +3519,17 @@ vg.data.force.dependencies = ["links"];vg.data.formula = (function() {
     sort = b;
     return pie;
   };
-       
+
   pie.value = function(field) {
     value = field ? vg.accessor(field) : one;
     return pie;
   };
-  
+
   pie.startAngle = function(startAngle) {
     start = Math.PI * startAngle / 180;
     return pie;
   };
-  
+
   pie.endAngle = function(endAngle) {
     end = Math.PI * endAngle / 180;
     return pie;
@@ -3529,7 +3551,7 @@ vg.data.force.dependencies = ["links"];vg.data.formula = (function() {
 
   function slice(data) {
     data = vg.values(data);
-    
+
     if (by === "min") {
       data = [data[vg.minIndex(data, field)]];
     } else if (by === "max") {
@@ -3546,12 +3568,12 @@ vg.data.force.dependencies = ["links"];vg.data.formula = (function() {
     }
     return data;
   }
-  
+
   slice.by = function(x) {
     by = x;
     return slice;
   };
-  
+
   slice.field = function(f) {
     field = vg.accessor(f);
     return slice;
@@ -3567,7 +3589,7 @@ vg.data.force.dependencies = ["links"];vg.data.formula = (function() {
     for (var i=0, n=data.length; i<n; ++i) data[i].index = i; // re-index
     return data;
   }
-  
+
   sort.by = function(s) {
     by = vg.comparator(s);
     return sort;
@@ -3589,10 +3611,10 @@ vg.data.force.dependencies = ["links"];vg.data.formula = (function() {
     var out_y0 = output["y0"],
         out_y1 = output["y1"],
         out_cy = output["cy"];
-    
+
     var series = stacks(data);
     if (series.length === 0) return data;
-    
+
     layout.out(function(d, y0, y) {
       if (d.datum) {
         d.datum[out_y0] = y0;
@@ -3600,10 +3622,10 @@ vg.data.force.dependencies = ["links"];vg.data.formula = (function() {
         d.datum[out_cy] = y0 + y/2;
       }
     })(series);
-    
+
     return data;
   }
-  
+
   function stacks(data) {
     var values = vg.values(data),
         points = [], series = [],
@@ -3626,7 +3648,7 @@ vg.data.force.dependencies = ["links"];vg.data.formula = (function() {
 
     // emit data series for stack layout
     for (x=points[0].x, i=0, j=0, k=0, n=points.length; k<n; ++k) {
-      p = points[k];    
+      p = points[k];
       if (p.x !== x) {
         while (i < series.length) series[i++].push({x:j, y:0});
         x = p.x; i = 0; j += 1;
@@ -3639,12 +3661,12 @@ vg.data.force.dependencies = ["links"];vg.data.formula = (function() {
 
     return series;
   }
-       
+
   stack.point = function(field) {
     point = vg.accessor(field);
     return stack;
   };
-  
+
   stack.height = function(field) {
     height = vg.accessor(field);
     return stack;
@@ -3681,7 +3703,7 @@ vg.data.force.dependencies = ["links"];vg.data.formula = (function() {
         "stdev":    "stdev",
         "median":   "median"
       };
-  
+
   function reduce(data) {
     var min = +Infinity,
         max = -Infinity,
@@ -3691,7 +3713,7 @@ vg.data.force.dependencies = ["links"];vg.data.formula = (function() {
         i, len, v, delta;
 
     var list = (vg.isArray(data) ? data : data.values || []).map(value);
-    
+
     // compute aggregates
     for (i=0, len=list.length; i<len; ++i) {
       v = list[i];
@@ -3703,7 +3725,7 @@ vg.data.force.dependencies = ["links"];vg.data.formula = (function() {
       M2 = M2 + delta * (v - mean);
     }
     M2 = M2 / (len - 1);
-    
+
     var o = vg.isArray(data) ? {} : data;
     if (median) {
       list.sort(vg.numcmp);
@@ -3719,7 +3741,7 @@ vg.data.force.dependencies = ["links"];vg.data.formula = (function() {
     o[output.mean] = mean;
     o[output.variance] = M2;
     o[output.stdev] = Math.sqrt(M2);
-    
+
     if (assign) {
       list = (vg.isArray(data) ? data : data.values);
       v = {};
@@ -3734,12 +3756,12 @@ vg.data.force.dependencies = ["links"];vg.data.formula = (function() {
       for (i=0, len=list.length; i<len; ++i) {
         list[i].stats = v;
       }
-      o = list;
+      if (vg.isArray(data)) o = list;
     }
-    
+
     return o;
   }
-  
+
   function stats(data) {
     if (vg.isArray(data)) {
       return reduce(data);
@@ -3747,12 +3769,12 @@ vg.data.force.dependencies = ["links"];vg.data.formula = (function() {
       return (data.values || []).map(reduce);
     }
   }
-  
+
   stats.median = function(bool) {
     median = bool || false;
     return stats;
   };
-  
+
   stats.value = function(field) {
     value = vg.accessor(field);
     return stats;
@@ -3762,7 +3784,7 @@ vg.data.force.dependencies = ["links"];vg.data.formula = (function() {
     assign = b;
     return stats;
   };
-  
+
   stats.output = function(map) {
     vg.keys(output).forEach(function(k) {
       if (map[k] !== undefined) {
@@ -3771,7 +3793,7 @@ vg.data.force.dependencies = ["links"];vg.data.formula = (function() {
     });
     return stats;
   };
-  
+
   return stats;
 };vg.data.treemap = function() {
   var layout = d3.layout.treemap()
@@ -3791,7 +3813,7 @@ vg.data.force.dependencies = ["links"];vg.data.formula = (function() {
       .size(vg.data.size(size, group))
       .value(value)
       .nodes(vg.isTree(data) ? data : {values: data});
-    
+
     var keys = vg.keys(output),
         len = keys.length;
     data.forEach(function(d) {
@@ -3805,7 +3827,7 @@ vg.data.force.dependencies = ["links"];vg.data.formula = (function() {
         }
       }
     });
-    
+
     return data;
   }
 
@@ -3843,7 +3865,7 @@ vg.data.force.dependencies = ["links"];vg.data.formula = (function() {
       ellipsis = "...",
       wordBreak = true,
       limit = 100;
-  
+
   var truncate = vg.data.mapper(function(d) {
     var text = vg.truncate(value(d), limit, position, wordBreak, ellipsis);
     return (d[as] = text, d);
@@ -3853,7 +3875,7 @@ vg.data.force.dependencies = ["links"];vg.data.formula = (function() {
     value = vg.accessor(field);
     return truncate;
   };
-  
+
   truncate.output = function(field) {
     as = field;
     return truncate;
@@ -3863,7 +3885,7 @@ vg.data.force.dependencies = ["links"];vg.data.formula = (function() {
     limit = +len;
     return truncate;
   };
-  
+
   truncate.position = function(pos) {
     position = pos;
     return truncate;
@@ -3893,12 +3915,12 @@ vg.data.force.dependencies = ["links"];vg.data.formula = (function() {
         return o;
       });
   }
-  
+
   unique.field = function(f) {
     field = vg.accessor(f);
     return unique;
   };
-  
+
   unique.as = function(x) {
     as = x;
     return unique;
@@ -3909,7 +3931,7 @@ vg.data.force.dependencies = ["links"];vg.data.formula = (function() {
 
   var size = 2,
       step = 1;
-  
+
   function win(data) {
     data = vg.isArray(data) ? data : data.values || [];
     var runs = [], i, j, n=data.length-size, curr;
@@ -3919,12 +3941,12 @@ vg.data.force.dependencies = ["links"];vg.data.formula = (function() {
     }
     return {values: runs};
   }
-  
+
   win.size = function(n) {
     size = n;
     return win;
   };
-  
+
   win.step = function(n) {
     step = n;
     return win;
@@ -3938,7 +3960,7 @@ vg.data.force.dependencies = ["links"];vg.data.formula = (function() {
       fontSize = function() { return 14; },
       rotate = function() { return 0; },
       params = ["font", "fontStyle", "fontWeight", "padding"];
-  
+
   var output = {
     "x": "x",
     "y": "y",
@@ -3946,7 +3968,7 @@ vg.data.force.dependencies = ["links"];vg.data.formula = (function() {
     "font": "font",
     "rotate": "angle"
   };
-  
+
   function cloud(data, db, group) {
     function finish(tags, bounds) {
       var size = layout.size(),
@@ -3970,7 +3992,7 @@ vg.data.force.dependencies = ["links"];vg.data.formula = (function() {
         }
       }
     }
-    
+
     layout
       .size(vg.data.size(size, group))
       .text(text)
@@ -3986,17 +4008,17 @@ vg.data.force.dependencies = ["links"];vg.data.formula = (function() {
     text = vg.accessor(field);
     return cloud;
   };
-  
+
   cloud.size = function(sz) {
     size = sz;
     return cloud;
   };
-         
+
   cloud.fontSize = function(field) {
     fontSize = vg.accessor(field);
     return cloud;
   };
-  
+
   cloud.rotate = function(x) {
     var v;
     if (vg.isObject(x) && !Array.isArray(x)) {
@@ -4032,7 +4054,7 @@ vg.data.force.dependencies = ["links"];vg.data.formula = (function() {
     });
     return cloud;
   };
-  
+
   return cloud;
 };vg.data.zip = function() {
   var z = null,
@@ -4043,19 +4065,19 @@ vg.data.force.dependencies = ["links"];vg.data.formula = (function() {
 
   function zip(data, db) {
     var zdata = db[z], zlen = zdata.length, v, d, i, len, map;
-    
+
     if (withKey) {
       map = {};
       zdata.forEach(function(s) { map[withKey(s)] = s; });
     }
-    
+
     for (i=0, len=data.length; i<len; ++i) {
       d = data[i];
       d[as] = map
         ? ((v=map[key(d)]) != null ? v : defaultValue)
         : zdata[i % zlen];
     }
-    
+
     return data;
   }
 
@@ -4063,7 +4085,7 @@ vg.data.force.dependencies = ["links"];vg.data.formula = (function() {
     z = d;
     return zip;
   };
-  
+
   zip["default"] = function(d) {
     defaultValue = d;
     return zip;
@@ -4174,31 +4196,67 @@ vg.data.zip.dependencies = ["with"];vg.parse = {};vg.parse.axes = (function() {
 
   return axes;
 })();
-vg.parse.data = function(spec, graph, callback) {
+vg.parse.data = function(spec, callback) {
+  var model = {
+    defs: spec,
+    load: {},
+    flow: {},
+    deps: {},
+    source: {},
+    sorted: null
+  };
+
+  var count = 0;
+
+  function load(d) {
+    return function(error, data) {
+      if (error) {
+        vg.error("LOADING FAILED: " + d.url);
+      } else {
+        model.load[d.name] = vg.data.read(data.toString(), d.format);
+      }
+      if (--count === 0) callback();
+    }
+  }
+
   // process each data set definition
   (spec || []).forEach(function(d) {
-    var source = graph.data(d.name);
-    if(!source) {
-      source = new vg.reactive.Source(graph);
-      graph.data(d.name, source);
+    if (d.url) {
+      count += 1;
+      vg.data.load(d.url, load(d));
+    } else if (d.values) {
+      model.load[d.name] = vg.data.read(d.values, d.format);
+    } else if (d.source) {
+      (model.source[d.source] || (model.source[d.source] = [])).push(d.name);
     }
 
-    source.def(d).load();
-
-    (d.transform || []).forEach(function(t) {
-      var tx = new vg.reactive.transforms[vg.capitalize(t.type)]()
-        .source(source);
-          
-      vg.keys(t).forEach(function(k) {
-        if (k === 'type' || k == 'transform') return;
-        (tx[k])(t[k]);
+    if (d.transform) {
+      var flow = vg.parse.dataflow(d);
+      model.flow[d.name] = flow;
+      flow.dependencies.forEach(function(dep) {
+        (model.deps[dep] || (model.deps[dep] = [])).push(d.name);
       });
-
-      source.transform(tx);
-    });
+    }
   });
-  
-  return spec;
+
+  // topological sort by dependencies
+  var names = (spec || []).map(vg.accessor("name")),
+      order = [], v = {}, n;
+  function visit(n) {
+    if (v[n] === 1) return; // not a DAG!
+    if (!v[n]) {
+      v[n] = 1;
+      (model.source[n] || []).forEach(visit);
+      (model.deps[n] || []).forEach(visit);
+      v[n] = 2;
+      order.push(n);
+    }
+  }
+  while (names.length) { if (v[n=names.pop()] !== 2) visit(n); }
+  model.sorted = order.reverse();
+
+  if (count === 0) setTimeout(callback, 1);
+  return model;
 };vg.parse.dataflow = function(def) {
   var tx = (def.transform || []).map(vg.parse.transform),
       df = tx.length
@@ -4216,939 +4274,50 @@ vg.parse.data = function(spec, graph, callback) {
       return map;
     }, {}));
   return df;
-};vg.parse.event_selector = (function() {
-  /*
-   * Generated by PEG.js 0.8.0.
-   *
-   * http://pegjs.majda.cz/
-   */
+};vg.parse.expr = (function() {
 
-  function peg$subclass(child, parent) {
-    function ctor() { this.constructor = child; }
-    ctor.prototype = parent.prototype;
-    child.prototype = new ctor();
-  }
-
-  function SyntaxError(message, expected, found, offset, line, column) {
-    this.message  = message;
-    this.expected = expected;
-    this.found    = found;
-    this.offset   = offset;
-    this.line     = line;
-    this.column   = column;
-
-    this.name     = "SyntaxError";
-  }
-
-  peg$subclass(SyntaxError, Error);
-
-  function parse(input) {
-    var options = arguments.length > 1 ? arguments[1] : {},
-
-        peg$FAILED = {},
-
-        peg$startRuleFunctions = { start: peg$parsestart },
-        peg$startRuleFunction  = peg$parsestart,
-
-        peg$c0 = peg$FAILED,
-        peg$c1 = ",",
-        peg$c2 = { type: "literal", value: ",", description: "\",\"" },
-        peg$c3 = function(o, m) { return [o].concat(m) },
-        peg$c4 = function(o) { return [o] },
-        peg$c5 = "[",
-        peg$c6 = { type: "literal", value: "[", description: "\"[\"" },
-        peg$c7 = "]",
-        peg$c8 = { type: "literal", value: "]", description: "\"]\"" },
-        peg$c9 = ">",
-        peg$c10 = { type: "literal", value: ">", description: "\">\"" },
-        peg$c11 = function(f1, f2, o) { return {start: f1, end: f2, middle: o}},
-        peg$c12 = [],
-        peg$c13 = function(s, f) { return (s.filters = f), s },
-        peg$c14 = function(s) { return s },
-        peg$c15 = function(e) { return { event: e } },
-        peg$c16 = "(",
-        peg$c17 = { type: "literal", value: "(", description: "\"(\"" },
-        peg$c18 = ")",
-        peg$c19 = { type: "literal", value: ")", description: "\")\"" },
-        peg$c20 = function(m) { return { stream: m }},
-        peg$c21 = "mousedown",
-        peg$c22 = { type: "literal", value: "mousedown", description: "\"mousedown\"" },
-        peg$c23 = "mouseup",
-        peg$c24 = { type: "literal", value: "mouseup", description: "\"mouseup\"" },
-        peg$c25 = "click",
-        peg$c26 = { type: "literal", value: "click", description: "\"click\"" },
-        peg$c27 = "dblclick",
-        peg$c28 = { type: "literal", value: "dblclick", description: "\"dblclick\"" },
-        peg$c29 = "wheel",
-        peg$c30 = { type: "literal", value: "wheel", description: "\"wheel\"" },
-        peg$c31 = "keydown",
-        peg$c32 = { type: "literal", value: "keydown", description: "\"keydown\"" },
-        peg$c33 = "keypress",
-        peg$c34 = { type: "literal", value: "keypress", description: "\"keypress\"" },
-        peg$c35 = "keyup",
-        peg$c36 = { type: "literal", value: "keyup", description: "\"keyup\"" },
-        peg$c37 = "mousewheel",
-        peg$c38 = { type: "literal", value: "mousewheel", description: "\"mousewheel\"" },
-        peg$c39 = "mousemove",
-        peg$c40 = { type: "literal", value: "mousemove", description: "\"mousemove\"" },
-        peg$c41 = "mouseout",
-        peg$c42 = { type: "literal", value: "mouseout", description: "\"mouseout\"" },
-        peg$c43 = function(a, field, o, v) { return a + field + o + v },
-        peg$c44 = "event.",
-        peg$c45 = { type: "literal", value: "event.", description: "\"event.\"" },
-        peg$c46 = "item.",
-        peg$c47 = { type: "literal", value: "item.", description: "\"item.\"" },
-        peg$c48 = "data.",
-        peg$c49 = { type: "literal", value: "data.", description: "\"data.\"" },
-        peg$c50 = "==",
-        peg$c51 = { type: "literal", value: "==", description: "\"==\"" },
-        peg$c52 = "!=",
-        peg$c53 = { type: "literal", value: "!=", description: "\"!=\"" },
-        peg$c54 = ">=",
-        peg$c55 = { type: "literal", value: ">=", description: "\">=\"" },
-        peg$c56 = "<",
-        peg$c57 = { type: "literal", value: "<", description: "\"<\"" },
-        peg$c58 = "<=",
-        peg$c59 = { type: "literal", value: "<=", description: "\"<=\"" },
-        peg$c60 = /^[a-zA-Z0-9_\-]/,
-        peg$c61 = { type: "class", value: "[a-zA-Z0-9_\\-]", description: "[a-zA-Z0-9_\\-]" },
-        peg$c62 = function(v) { return v.join("") },
-        peg$c63 = /^[ \t\r\n]/,
-        peg$c64 = { type: "class", value: "[ \\t\\r\\n]", description: "[ \\t\\r\\n]" },
-
-        peg$currPos          = 0,
-        peg$reportedPos      = 0,
-        peg$cachedPos        = 0,
-        peg$cachedPosDetails = { line: 1, column: 1, seenCR: false },
-        peg$maxFailPos       = 0,
-        peg$maxFailExpected  = [],
-        peg$silentFails      = 0,
-
-        peg$result;
-
-    if ("startRule" in options) {
-      if (!(options.startRule in peg$startRuleFunctions)) {
-        throw new Error("Can't start parsing from rule \"" + options.startRule + "\".");
-      }
-
-      peg$startRuleFunction = peg$startRuleFunctions[options.startRule];
-    }
-
-    function text() {
-      return input.substring(peg$reportedPos, peg$currPos);
-    }
-
-    function offset() {
-      return peg$reportedPos;
-    }
-
-    function line() {
-      return peg$computePosDetails(peg$reportedPos).line;
-    }
-
-    function column() {
-      return peg$computePosDetails(peg$reportedPos).column;
-    }
-
-    function expected(description) {
-      throw peg$buildException(
-        null,
-        [{ type: "other", description: description }],
-        peg$reportedPos
-      );
-    }
-
-    function error(message) {
-      throw peg$buildException(message, null, peg$reportedPos);
-    }
-
-    function peg$computePosDetails(pos) {
-      function advance(details, startPos, endPos) {
-        var p, ch;
-
-        for (p = startPos; p < endPos; p++) {
-          ch = input.charAt(p);
-          if (ch === "\n") {
-            if (!details.seenCR) { details.line++; }
-            details.column = 1;
-            details.seenCR = false;
-          } else if (ch === "\r" || ch === "\u2028" || ch === "\u2029") {
-            details.line++;
-            details.column = 1;
-            details.seenCR = true;
-          } else {
-            details.column++;
-            details.seenCR = false;
-          }
-        }
-      }
-
-      if (peg$cachedPos !== pos) {
-        if (peg$cachedPos > pos) {
-          peg$cachedPos = 0;
-          peg$cachedPosDetails = { line: 1, column: 1, seenCR: false };
-        }
-        advance(peg$cachedPosDetails, peg$cachedPos, pos);
-        peg$cachedPos = pos;
-      }
-
-      return peg$cachedPosDetails;
-    }
-
-    function peg$fail(expected) {
-      if (peg$currPos < peg$maxFailPos) { return; }
-
-      if (peg$currPos > peg$maxFailPos) {
-        peg$maxFailPos = peg$currPos;
-        peg$maxFailExpected = [];
-      }
-
-      peg$maxFailExpected.push(expected);
-    }
-
-    function peg$buildException(message, expected, pos) {
-      function cleanupExpected(expected) {
-        var i = 1;
-
-        expected.sort(function(a, b) {
-          if (a.description < b.description) {
-            return -1;
-          } else if (a.description > b.description) {
-            return 1;
-          } else {
-            return 0;
-          }
-        });
-
-        while (i < expected.length) {
-          if (expected[i - 1] === expected[i]) {
-            expected.splice(i, 1);
-          } else {
-            i++;
-          }
-        }
-      }
-
-      function buildMessage(expected, found) {
-        function stringEscape(s) {
-          function hex(ch) { return ch.charCodeAt(0).toString(16).toUpperCase(); }
-
-          return s
-            .replace(/\\/g,   '\\\\')
-            .replace(/"/g,    '\\"')
-            .replace(/\x08/g, '\\b')
-            .replace(/\t/g,   '\\t')
-            .replace(/\n/g,   '\\n')
-            .replace(/\f/g,   '\\f')
-            .replace(/\r/g,   '\\r')
-            .replace(/[\x00-\x07\x0B\x0E\x0F]/g, function(ch) { return '\\x0' + hex(ch); })
-            .replace(/[\x10-\x1F\x80-\xFF]/g,    function(ch) { return '\\x'  + hex(ch); })
-            .replace(/[\u0180-\u0FFF]/g,         function(ch) { return '\\u0' + hex(ch); })
-            .replace(/[\u1080-\uFFFF]/g,         function(ch) { return '\\u'  + hex(ch); });
-        }
-
-        var expectedDescs = new Array(expected.length),
-            expectedDesc, foundDesc, i;
-
-        for (i = 0; i < expected.length; i++) {
-          expectedDescs[i] = expected[i].description;
-        }
-
-        expectedDesc = expected.length > 1
-          ? expectedDescs.slice(0, -1).join(", ")
-              + " or "
-              + expectedDescs[expected.length - 1]
-          : expectedDescs[0];
-
-        foundDesc = found ? "\"" + stringEscape(found) + "\"" : "end of input";
-
-        return "Expected " + expectedDesc + " but " + foundDesc + " found.";
-      }
-
-      var posDetails = peg$computePosDetails(pos),
-          found      = pos < input.length ? input.charAt(pos) : null;
-
-      if (expected !== null) {
-        cleanupExpected(expected);
-      }
-
-      return new SyntaxError(
-        message !== null ? message : buildMessage(expected, found),
-        expected,
-        found,
-        pos,
-        posDetails.line,
-        posDetails.column
-      );
-    }
-
-    function peg$parsestart() {
-      var s0;
-
-      s0 = peg$parsemerged();
-
-      return s0;
-    }
-
-    function peg$parsemerged() {
-      var s0, s1, s2, s3, s4, s5;
-
-      s0 = peg$currPos;
-      s1 = peg$parseordered();
-      if (s1 !== peg$FAILED) {
-        s2 = peg$parsesep();
-        if (s2 !== peg$FAILED) {
-          if (input.charCodeAt(peg$currPos) === 44) {
-            s3 = peg$c1;
-            peg$currPos++;
-          } else {
-            s3 = peg$FAILED;
-            if (peg$silentFails === 0) { peg$fail(peg$c2); }
-          }
-          if (s3 !== peg$FAILED) {
-            s4 = peg$parsesep();
-            if (s4 !== peg$FAILED) {
-              s5 = peg$parsemerged();
-              if (s5 !== peg$FAILED) {
-                peg$reportedPos = s0;
-                s1 = peg$c3(s1, s5);
-                s0 = s1;
-              } else {
-                peg$currPos = s0;
-                s0 = peg$c0;
-              }
-            } else {
-              peg$currPos = s0;
-              s0 = peg$c0;
-            }
-          } else {
-            peg$currPos = s0;
-            s0 = peg$c0;
-          }
-        } else {
-          peg$currPos = s0;
-          s0 = peg$c0;
-        }
-      } else {
-        peg$currPos = s0;
-        s0 = peg$c0;
-      }
-      if (s0 === peg$FAILED) {
-        s0 = peg$currPos;
-        s1 = peg$parseordered();
-        if (s1 !== peg$FAILED) {
-          peg$reportedPos = s0;
-          s1 = peg$c4(s1);
-        }
-        s0 = s1;
-      }
-
-      return s0;
-    }
-
-    function peg$parseordered() {
-      var s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, s12, s13;
-
-      s0 = peg$currPos;
-      if (input.charCodeAt(peg$currPos) === 91) {
-        s1 = peg$c5;
-        peg$currPos++;
-      } else {
-        s1 = peg$FAILED;
-        if (peg$silentFails === 0) { peg$fail(peg$c6); }
-      }
-      if (s1 !== peg$FAILED) {
-        s2 = peg$parsesep();
-        if (s2 !== peg$FAILED) {
-          s3 = peg$parsefiltered();
-          if (s3 !== peg$FAILED) {
-            s4 = peg$parsesep();
-            if (s4 !== peg$FAILED) {
-              if (input.charCodeAt(peg$currPos) === 44) {
-                s5 = peg$c1;
-                peg$currPos++;
-              } else {
-                s5 = peg$FAILED;
-                if (peg$silentFails === 0) { peg$fail(peg$c2); }
-              }
-              if (s5 !== peg$FAILED) {
-                s6 = peg$parsesep();
-                if (s6 !== peg$FAILED) {
-                  s7 = peg$parsefiltered();
-                  if (s7 !== peg$FAILED) {
-                    s8 = peg$parsesep();
-                    if (s8 !== peg$FAILED) {
-                      if (input.charCodeAt(peg$currPos) === 93) {
-                        s9 = peg$c7;
-                        peg$currPos++;
-                      } else {
-                        s9 = peg$FAILED;
-                        if (peg$silentFails === 0) { peg$fail(peg$c8); }
-                      }
-                      if (s9 !== peg$FAILED) {
-                        s10 = peg$parsesep();
-                        if (s10 !== peg$FAILED) {
-                          if (input.charCodeAt(peg$currPos) === 62) {
-                            s11 = peg$c9;
-                            peg$currPos++;
-                          } else {
-                            s11 = peg$FAILED;
-                            if (peg$silentFails === 0) { peg$fail(peg$c10); }
-                          }
-                          if (s11 !== peg$FAILED) {
-                            s12 = peg$parsesep();
-                            if (s12 !== peg$FAILED) {
-                              s13 = peg$parseordered();
-                              if (s13 !== peg$FAILED) {
-                                peg$reportedPos = s0;
-                                s1 = peg$c11(s3, s7, s13);
-                                s0 = s1;
-                              } else {
-                                peg$currPos = s0;
-                                s0 = peg$c0;
-                              }
-                            } else {
-                              peg$currPos = s0;
-                              s0 = peg$c0;
-                            }
-                          } else {
-                            peg$currPos = s0;
-                            s0 = peg$c0;
-                          }
-                        } else {
-                          peg$currPos = s0;
-                          s0 = peg$c0;
-                        }
-                      } else {
-                        peg$currPos = s0;
-                        s0 = peg$c0;
-                      }
-                    } else {
-                      peg$currPos = s0;
-                      s0 = peg$c0;
-                    }
-                  } else {
-                    peg$currPos = s0;
-                    s0 = peg$c0;
-                  }
-                } else {
-                  peg$currPos = s0;
-                  s0 = peg$c0;
-                }
-              } else {
-                peg$currPos = s0;
-                s0 = peg$c0;
-              }
-            } else {
-              peg$currPos = s0;
-              s0 = peg$c0;
-            }
-          } else {
-            peg$currPos = s0;
-            s0 = peg$c0;
-          }
-        } else {
-          peg$currPos = s0;
-          s0 = peg$c0;
-        }
-      } else {
-        peg$currPos = s0;
-        s0 = peg$c0;
-      }
-      if (s0 === peg$FAILED) {
-        s0 = peg$parsefiltered();
-      }
-
-      return s0;
-    }
-
-    function peg$parsefiltered() {
-      var s0, s1, s2, s3;
-
-      s0 = peg$currPos;
-      s1 = peg$parsestream();
-      if (s1 !== peg$FAILED) {
-        s2 = [];
-        s3 = peg$parsefilter();
-        if (s3 !== peg$FAILED) {
-          while (s3 !== peg$FAILED) {
-            s2.push(s3);
-            s3 = peg$parsefilter();
-          }
-        } else {
-          s2 = peg$c0;
-        }
-        if (s2 !== peg$FAILED) {
-          peg$reportedPos = s0;
-          s1 = peg$c13(s1, s2);
-          s0 = s1;
-        } else {
-          peg$currPos = s0;
-          s0 = peg$c0;
-        }
-      } else {
-        peg$currPos = s0;
-        s0 = peg$c0;
-      }
-      if (s0 === peg$FAILED) {
-        s0 = peg$currPos;
-        s1 = peg$parsestream();
-        if (s1 !== peg$FAILED) {
-          peg$reportedPos = s0;
-          s1 = peg$c14(s1);
-        }
-        s0 = s1;
-      }
-
-      return s0;
-    }
-
-    function peg$parsestream() {
-      var s0, s1, s2, s3;
-
-      s0 = peg$currPos;
-      s1 = peg$parseeventType();
-      if (s1 !== peg$FAILED) {
-        peg$reportedPos = s0;
-        s1 = peg$c15(s1);
-      }
-      s0 = s1;
-      if (s0 === peg$FAILED) {
-        s0 = peg$currPos;
-        if (input.charCodeAt(peg$currPos) === 40) {
-          s1 = peg$c16;
-          peg$currPos++;
-        } else {
-          s1 = peg$FAILED;
-          if (peg$silentFails === 0) { peg$fail(peg$c17); }
-        }
-        if (s1 !== peg$FAILED) {
-          s2 = peg$parsemerged();
-          if (s2 !== peg$FAILED) {
-            if (input.charCodeAt(peg$currPos) === 41) {
-              s3 = peg$c18;
-              peg$currPos++;
-            } else {
-              s3 = peg$FAILED;
-              if (peg$silentFails === 0) { peg$fail(peg$c19); }
-            }
-            if (s3 !== peg$FAILED) {
-              peg$reportedPos = s0;
-              s1 = peg$c20(s2);
-              s0 = s1;
-            } else {
-              peg$currPos = s0;
-              s0 = peg$c0;
-            }
-          } else {
-            peg$currPos = s0;
-            s0 = peg$c0;
-          }
-        } else {
-          peg$currPos = s0;
-          s0 = peg$c0;
-        }
-      }
-
-      return s0;
-    }
-
-    function peg$parseeventType() {
-      var s0;
-
-      if (input.substr(peg$currPos, 9) === peg$c21) {
-        s0 = peg$c21;
-        peg$currPos += 9;
-      } else {
-        s0 = peg$FAILED;
-        if (peg$silentFails === 0) { peg$fail(peg$c22); }
-      }
-      if (s0 === peg$FAILED) {
-        if (input.substr(peg$currPos, 7) === peg$c23) {
-          s0 = peg$c23;
-          peg$currPos += 7;
-        } else {
-          s0 = peg$FAILED;
-          if (peg$silentFails === 0) { peg$fail(peg$c24); }
-        }
-        if (s0 === peg$FAILED) {
-          if (input.substr(peg$currPos, 5) === peg$c25) {
-            s0 = peg$c25;
-            peg$currPos += 5;
-          } else {
-            s0 = peg$FAILED;
-            if (peg$silentFails === 0) { peg$fail(peg$c26); }
-          }
-          if (s0 === peg$FAILED) {
-            if (input.substr(peg$currPos, 8) === peg$c27) {
-              s0 = peg$c27;
-              peg$currPos += 8;
-            } else {
-              s0 = peg$FAILED;
-              if (peg$silentFails === 0) { peg$fail(peg$c28); }
-            }
-            if (s0 === peg$FAILED) {
-              if (input.substr(peg$currPos, 5) === peg$c29) {
-                s0 = peg$c29;
-                peg$currPos += 5;
-              } else {
-                s0 = peg$FAILED;
-                if (peg$silentFails === 0) { peg$fail(peg$c30); }
-              }
-              if (s0 === peg$FAILED) {
-                if (input.substr(peg$currPos, 7) === peg$c31) {
-                  s0 = peg$c31;
-                  peg$currPos += 7;
-                } else {
-                  s0 = peg$FAILED;
-                  if (peg$silentFails === 0) { peg$fail(peg$c32); }
-                }
-                if (s0 === peg$FAILED) {
-                  if (input.substr(peg$currPos, 8) === peg$c33) {
-                    s0 = peg$c33;
-                    peg$currPos += 8;
-                  } else {
-                    s0 = peg$FAILED;
-                    if (peg$silentFails === 0) { peg$fail(peg$c34); }
-                  }
-                  if (s0 === peg$FAILED) {
-                    if (input.substr(peg$currPos, 5) === peg$c35) {
-                      s0 = peg$c35;
-                      peg$currPos += 5;
-                    } else {
-                      s0 = peg$FAILED;
-                      if (peg$silentFails === 0) { peg$fail(peg$c36); }
-                    }
-                    if (s0 === peg$FAILED) {
-                      if (input.substr(peg$currPos, 10) === peg$c37) {
-                        s0 = peg$c37;
-                        peg$currPos += 10;
-                      } else {
-                        s0 = peg$FAILED;
-                        if (peg$silentFails === 0) { peg$fail(peg$c38); }
-                      }
-                      if (s0 === peg$FAILED) {
-                        if (input.substr(peg$currPos, 9) === peg$c39) {
-                          s0 = peg$c39;
-                          peg$currPos += 9;
-                        } else {
-                          s0 = peg$FAILED;
-                          if (peg$silentFails === 0) { peg$fail(peg$c40); }
-                        }
-                        if (s0 === peg$FAILED) {
-                          if (input.substr(peg$currPos, 8) === peg$c41) {
-                            s0 = peg$c41;
-                            peg$currPos += 8;
-                          } else {
-                            s0 = peg$FAILED;
-                            if (peg$silentFails === 0) { peg$fail(peg$c42); }
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-
-      return s0;
-    }
-
-    function peg$parsefilter() {
-      var s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10;
-
-      s0 = peg$currPos;
-      if (input.charCodeAt(peg$currPos) === 91) {
-        s1 = peg$c5;
-        peg$currPos++;
-      } else {
-        s1 = peg$FAILED;
-        if (peg$silentFails === 0) { peg$fail(peg$c6); }
-      }
-      if (s1 !== peg$FAILED) {
-        s2 = peg$parsesep();
-        if (s2 !== peg$FAILED) {
-          s3 = peg$parseaccessor();
-          if (s3 !== peg$FAILED) {
-            s4 = peg$parsevalue();
-            if (s4 !== peg$FAILED) {
-              s5 = peg$parsesep();
-              if (s5 !== peg$FAILED) {
-                s6 = peg$parseop();
-                if (s6 !== peg$FAILED) {
-                  s7 = peg$parsesep();
-                  if (s7 !== peg$FAILED) {
-                    s8 = peg$parsevalue();
-                    if (s8 !== peg$FAILED) {
-                      s9 = peg$parsesep();
-                      if (s9 !== peg$FAILED) {
-                        if (input.charCodeAt(peg$currPos) === 93) {
-                          s10 = peg$c7;
-                          peg$currPos++;
-                        } else {
-                          s10 = peg$FAILED;
-                          if (peg$silentFails === 0) { peg$fail(peg$c8); }
-                        }
-                        if (s10 !== peg$FAILED) {
-                          peg$reportedPos = s0;
-                          s1 = peg$c43(s3, s4, s6, s8);
-                          s0 = s1;
-                        } else {
-                          peg$currPos = s0;
-                          s0 = peg$c0;
-                        }
-                      } else {
-                        peg$currPos = s0;
-                        s0 = peg$c0;
-                      }
-                    } else {
-                      peg$currPos = s0;
-                      s0 = peg$c0;
-                    }
-                  } else {
-                    peg$currPos = s0;
-                    s0 = peg$c0;
-                  }
-                } else {
-                  peg$currPos = s0;
-                  s0 = peg$c0;
-                }
-              } else {
-                peg$currPos = s0;
-                s0 = peg$c0;
-              }
-            } else {
-              peg$currPos = s0;
-              s0 = peg$c0;
-            }
-          } else {
-            peg$currPos = s0;
-            s0 = peg$c0;
-          }
-        } else {
-          peg$currPos = s0;
-          s0 = peg$c0;
-        }
-      } else {
-        peg$currPos = s0;
-        s0 = peg$c0;
-      }
-
-      return s0;
-    }
-
-    function peg$parseaccessor() {
-      var s0;
-
-      if (input.substr(peg$currPos, 6) === peg$c44) {
-        s0 = peg$c44;
-        peg$currPos += 6;
-      } else {
-        s0 = peg$FAILED;
-        if (peg$silentFails === 0) { peg$fail(peg$c45); }
-      }
-      if (s0 === peg$FAILED) {
-        if (input.substr(peg$currPos, 5) === peg$c46) {
-          s0 = peg$c46;
-          peg$currPos += 5;
-        } else {
-          s0 = peg$FAILED;
-          if (peg$silentFails === 0) { peg$fail(peg$c47); }
-        }
-        if (s0 === peg$FAILED) {
-          if (input.substr(peg$currPos, 5) === peg$c48) {
-            s0 = peg$c48;
-            peg$currPos += 5;
-          } else {
-            s0 = peg$FAILED;
-            if (peg$silentFails === 0) { peg$fail(peg$c49); }
-          }
-        }
-      }
-
-      return s0;
-    }
-
-    function peg$parseop() {
-      var s0;
-
-      if (input.substr(peg$currPos, 2) === peg$c50) {
-        s0 = peg$c50;
-        peg$currPos += 2;
-      } else {
-        s0 = peg$FAILED;
-        if (peg$silentFails === 0) { peg$fail(peg$c51); }
-      }
-      if (s0 === peg$FAILED) {
-        if (input.substr(peg$currPos, 2) === peg$c52) {
-          s0 = peg$c52;
-          peg$currPos += 2;
-        } else {
-          s0 = peg$FAILED;
-          if (peg$silentFails === 0) { peg$fail(peg$c53); }
-        }
-        if (s0 === peg$FAILED) {
-          if (input.charCodeAt(peg$currPos) === 62) {
-            s0 = peg$c9;
-            peg$currPos++;
-          } else {
-            s0 = peg$FAILED;
-            if (peg$silentFails === 0) { peg$fail(peg$c10); }
-          }
-          if (s0 === peg$FAILED) {
-            if (input.substr(peg$currPos, 2) === peg$c54) {
-              s0 = peg$c54;
-              peg$currPos += 2;
-            } else {
-              s0 = peg$FAILED;
-              if (peg$silentFails === 0) { peg$fail(peg$c55); }
-            }
-            if (s0 === peg$FAILED) {
-              if (input.charCodeAt(peg$currPos) === 60) {
-                s0 = peg$c56;
-                peg$currPos++;
-              } else {
-                s0 = peg$FAILED;
-                if (peg$silentFails === 0) { peg$fail(peg$c57); }
-              }
-              if (s0 === peg$FAILED) {
-                if (input.substr(peg$currPos, 2) === peg$c58) {
-                  s0 = peg$c58;
-                  peg$currPos += 2;
-                } else {
-                  s0 = peg$FAILED;
-                  if (peg$silentFails === 0) { peg$fail(peg$c59); }
-                }
-              }
-            }
-          }
-        }
-      }
-
-      return s0;
-    }
-
-    function peg$parsevalue() {
-      var s0, s1, s2;
-
-      s0 = peg$currPos;
-      s1 = [];
-      if (peg$c60.test(input.charAt(peg$currPos))) {
-        s2 = input.charAt(peg$currPos);
-        peg$currPos++;
-      } else {
-        s2 = peg$FAILED;
-        if (peg$silentFails === 0) { peg$fail(peg$c61); }
-      }
-      if (s2 !== peg$FAILED) {
-        while (s2 !== peg$FAILED) {
-          s1.push(s2);
-          if (peg$c60.test(input.charAt(peg$currPos))) {
-            s2 = input.charAt(peg$currPos);
-            peg$currPos++;
-          } else {
-            s2 = peg$FAILED;
-            if (peg$silentFails === 0) { peg$fail(peg$c61); }
-          }
-        }
-      } else {
-        s1 = peg$c0;
-      }
-      if (s1 !== peg$FAILED) {
-        peg$reportedPos = s0;
-        s1 = peg$c62(s1);
-      }
-      s0 = s1;
-
-      return s0;
-    }
-
-    function peg$parsesep() {
-      var s0, s1;
-
-      s0 = [];
-      if (peg$c63.test(input.charAt(peg$currPos))) {
-        s1 = input.charAt(peg$currPos);
-        peg$currPos++;
-      } else {
-        s1 = peg$FAILED;
-        if (peg$silentFails === 0) { peg$fail(peg$c64); }
-      }
-      while (s1 !== peg$FAILED) {
-        s0.push(s1);
-        if (peg$c63.test(input.charAt(peg$currPos))) {
-          s1 = input.charAt(peg$currPos);
-          peg$currPos++;
-        } else {
-          s1 = peg$FAILED;
-          if (peg$silentFails === 0) { peg$fail(peg$c64); }
-        }
-      }
-
-      return s0;
-    }
-
-    peg$result = peg$startRuleFunction();
-
-    if (peg$result !== peg$FAILED && peg$currPos === input.length) {
-      return peg$result;
-    } else {
-      if (peg$result !== peg$FAILED && peg$currPos < input.length) {
-        peg$fail({ type: "end", description: "end of input" });
-      }
-
-      throw peg$buildException(null, peg$maxFailExpected, peg$maxFailPos);
-    }
-  }
-
-  return {
-    SyntaxError: SyntaxError,
-    parse:       parse
-  };
-})();
-vg.parse.expr = (function() {
-  
   var CONSTANT = {
-  	"E":       "Math.E",
-  	"LN2":     "Math.LN2",
-  	"LN10":    "Math.LN10",
-  	"LOG2E":   "Math.LOG2E",
-  	"LOG10E":  "Math.LOG10E",
-  	"PI":      "Math.PI",
-  	"SQRT1_2": "Math.SQRT1_2",
-  	"SQRT2":   "Math.SQRT2"
+    "E":       "Math.E",
+    "LN2":     "Math.LN2",
+    "LN10":    "Math.LN10",
+    "LOG2E":   "Math.LOG2E",
+    "LOG10E":  "Math.LOG10E",
+    "PI":      "Math.PI",
+    "SQRT1_2": "Math.SQRT1_2",
+    "SQRT2":   "Math.SQRT2"
   };
 
   var FUNCTION = {
-  	"abs":    "Math.abs",
-  	"acos":   "Math.acos",
-  	"asin":   "Math.asin",
-  	"atan":   "Math.atan",
-  	"atan2":  "Math.atan2",
-  	"ceil":   "Math.ceil",
-  	"cos":    "Math.cos",
-  	"exp":    "Math.exp",
-  	"floor":  "Math.floor",
-  	"log":    "Math.log",
-  	"max":    "Math.max",
-  	"min":    "Math.min",
-  	"pow":    "Math.pow",
-  	"random": "Math.random",
-  	"round":  "Math.round",
-  	"sin":    "Math.sin",
-  	"sqrt":   "Math.sqrt",
-  	"tan":    "Math.tan"
+    "abs":    "Math.abs",
+    "acos":   "Math.acos",
+    "asin":   "Math.asin",
+    "atan":   "Math.atan",
+    "atan2":  "Math.atan2",
+    "ceil":   "Math.ceil",
+    "cos":    "Math.cos",
+    "exp":    "Math.exp",
+    "floor":  "Math.floor",
+    "log":    "Math.log",
+    "max":    "Math.max",
+    "min":    "Math.min",
+    "pow":    "Math.pow",
+    "random": "Math.random",
+    "round":  "Math.round",
+    "sin":    "Math.sin",
+    "sqrt":   "Math.sqrt",
+    "tan":    "Math.tan"
   };
-  
+
   var lexer = /([\"\']|[\=\<\>\~\&\|\?\:\+\-\/\*\%\!\^\,\;\[\]\{\}\(\) ]+)/;
-      
-  return function(x, graph) {
+
+  return function(x) {
+    if (vg.config.safeMode) {
+      vg.error("Safe mode: Expression parsing disabled.");
+      return vg.true;
+    }
+
     var tokens = x.split(lexer),
-        t, v, i, n, sq, dq, sg = {}, fd = {},
-        args = ["vg", "d", "e", "i"];
+        t, v, i, n, sq, dq;
 
     for (sq=0, dq=0, i=0, n=tokens.length; i<n; ++i) {
       var t = tokens[i];
@@ -5161,18 +4330,11 @@ vg.parse.expr = (function() {
       if (FUNCTION[t] && (v=tokens[i+1]) && v[0]==="(") {
         tokens[i] = FUNCTION[t];
       }
-      if(graph.signal(v = t.split("."))) sg[v[0]] = 1;
-      if(v[0] == "d") fd[v.splice(1).join("")] = 1;
     }
 
-    args = args.concat(sg = vg.keys(sg)).concat(["return ("+tokens.join("")+");"]);
-   
-    return {
-      eval: new (Function.bind.apply(Function, args)),
-      signals: sg,
-      fields: vg.keys(fd)
-    };
-  };  
+    return Function("d", "index", "data", "return ("+tokens.join("")+");");
+  };
+
 })();vg.parse.legends = (function() {
 
   function legends(spec, legends, scales) {
@@ -5212,24 +4374,15 @@ vg.parse.expr = (function() {
     legend.symbolProperties(p && p.symbols || {});
     legend.gradientProperties(p && p.gradient || {});
   }
-  
+
   return legends;
-})();vg.parse.mark = function(mark, graph) {
+})();vg.parse.mark = function(mark) {
   var props = mark.properties,
-      group = mark.marks,
-      signals = mark.signals;
-
-  if(!mark.name) mark.name = mark.type+"_"+Date.now();
-
-  if(group && signals) {
-    mark.signals = signals.map(function(signal) {
-      return vg.parse.signal(signal, graph);
-    });
-  }
+      group = mark.marks;
 
   // parse mark property definitions
   vg.keys(props).forEach(function(k) {
-    props[k] = vg.parse.properties(mark.type, props[k]); 
+    props[k] = vg.parse.properties(mark.type, props[k]);
   });
 
   // parse delay function
@@ -5251,9 +4404,9 @@ vg.parse.expr = (function() {
   if (group) {
     mark.marks = group.map(vg.parse.mark);
   }
-    
+
   return mark;
-};vg.parse.marks = function(spec, width, height, graph) {
+};vg.parse.marks = function(spec, width, height) {
   return {
     type: "group",
     width: width,
@@ -5261,12 +4414,7 @@ vg.parse.expr = (function() {
     scales: spec.scales || [],
     axes: spec.axes || [],
     legends: spec.legends || [],
-    signals: (spec.signals || []).map(function(signal) {
-      return vg.parse.signal(signal, graph);
-    }),
-    marks: (spec.marks || []).map(function(mark) { 
-      return vg.parse.mark(mark, graph); 
-    })
+    marks: (spec.marks || []).map(vg.parse.mark)
   };
 };vg.parse.padding = function(pad) {
   if (pad == null) return "auto";
@@ -5279,17 +4427,15 @@ vg.parse.properties = (function() {
   function compile(mark, spec) {
     var code = "",
         names = vg.keys(spec),
-        i, len, name, ref, vars = {}, signals = {};
-        
+        i, len, name, ref, vars = {};
+
     code += "var o = trans ? {} : item;\n"
-    
+
     for (i=0, len=names.length; i<len; ++i) {
       ref = spec[name = names[i]];
-      ref = valueRef(name, ref);
       code += (i > 0) ? "\n  " : "  ";
-      code += "o."+name+" = "+ref.val+";";
+      code += "o."+name+" = "+valueRef(name, ref)+";";
       vars[name] = true;
-      if(ref.signal != null) signals[ref.signal] = 1;
     }
 
     if (vars.x2) {
@@ -5315,23 +4461,18 @@ vg.parse.properties = (function() {
         code += "\n  o.y = o.y2;"
       }
     }
-    
+
     if (hasPath(mark, vars)) code += "\n  item.touch();";
     code += "\n  if (trans) trans.interpolate(item, o);";
 
     try {
-      var args = ["vg", "item", "group", "trans"]
-        .concat(signals = vg.keys(signals)).concat([code]);
-      return {
-        encode: new (Function.bind.apply(Function, args)),
-        signals: signals
-      }
+      return Function("item", "group", "trans", code);
     } catch (e) {
       vg.error(e);
       vg.log(code);
     }
   }
-  
+
   function hasPath(mark, vars) {
     return vars.path ||
       ((mark==="area" || mark==="line") &&
@@ -5339,7 +4480,7 @@ vg.parse.properties = (function() {
          vars.y || vars.y2 || vars.height ||
          vars.tension || vars.interpolate));
   }
-  
+
   var GROUP_VARS = {
     "width": 1,
     "height": 1,
@@ -5350,7 +4491,6 @@ vg.parse.properties = (function() {
   function valueRef(name, ref) {
     if (ref == null) return null;
     var isColor = name==="fill" || name==="stroke";
-    var signalName = null;
 
     if (isColor) {
       if (ref.c) {
@@ -5368,12 +4508,6 @@ vg.parse.properties = (function() {
     var val = "item.datum.data";
     if (ref.value !== undefined) {
       val = vg.str(ref.value);
-    }
-
-    if (ref.signal !== undefined) {
-      var signalRef = vg.field(ref.signal), signalName = signalRef.shift();
-      val = signalName;
-      if(signalRef.length > 0) val+="["+signalRef.map(vg.str).join("][")+"]";
     }
 
     // get field reference for enclosing group
@@ -5409,37 +4543,22 @@ vg.parse.properties = (function() {
       scale = "group.scales[" + scale + "]";
       val = scale + (ref.band ? ".rangeBand()" : "("+val+")");
     }
-    
+
     // multiply, offset, return value
     val = "(" + (ref.mult?(vg.number(ref.mult)+" * "):"") + val + ")"
       + (ref.offset ? " + " + vg.number(ref.offset) : "");
-    return {val: val, signal: signalName};
+    return val;
   }
-  
+
   function colorRef(type, x, y, z) {
     var xx = x ? valueRef("", x) : vg.config.color[type][0],
         yy = y ? valueRef("", y) : vg.config.color[type][1],
         zz = z ? valueRef("", z) : vg.config.color[type][2];
     return "(this.d3." + type + "(" + [xx,yy,zz].join(",") + ') + "")';
   }
-  
-  return compile;
-})();vg.parse.signal = function(def, graph) {
-  // SignalDef = {
-  //   name: SignalName,
-  //   expr: "" | (
-  //   init: InitVal,
-  //   stream: [{
-  //     events: EventSelector,
-  //     expr: EventMap
-  //   }]
-  //   )
-  // }
-  var signal = new vg.reactive.Signal(graph, def);
-  graph.signal(def.name, signal);
 
-  return def;
-};vg.parse.scales = (function() {
+  return compile;
+})();vg.parse.scales = (function() {
   var LINEAR = "linear",
       ORDINAL = "ordinal",
       LOG = "log",
@@ -5480,14 +4599,14 @@ vg.parse.properties = (function() {
 
   function ordinal(def, scale, rng, db, data) {
     var domain, sort, str, refs, dataDrivenRange = false;
-    
+
     // range pre-processing for data-driven ranges
     if (vg.isObject(def.range) && !vg.isArray(def.range)) {
       dataDrivenRange = true;
       refs = def.range.fields || vg.array(def.range);
       rng = extract(refs, db, data);
     }
-    
+
     // domain
     sort = def.sort && !dataDrivenRange;
     domain = domainValues(def, db, data, sort);
@@ -5532,16 +4651,16 @@ vg.parse.properties = (function() {
       }
     }
   }
-  
+
   function extract(refs, db, data) {
-    return refs.reduce(function(values, r) {        
+    return refs.reduce(function(values, r) {
       var dat = vg.values(db[r.data] || data),
           get = vg.accessor(vg.isString(r.field)
               ? r.field : "data." + vg.accessor(r.field.group)(data));
       return vg.unique(dat, get, values);
     }, []);
   }
-  
+
   function domainValues(def, db, data, sort) {
     var domain = def.domain, values, refs;
     if (vg.isArray(domain)) {
@@ -5553,17 +4672,17 @@ vg.parse.properties = (function() {
     if (values && sort) values.sort(vg.cmp);
     return values;
   }
-  
+
   function domainMinMax(def, db, data) {
     var domain = [null, null], refs, z;
-    
+
     function extract(ref, min, max, z) {
       var dat = vg.values(db[ref.data] || data);
       var fields = vg.array(ref.field).map(function(f) {
         return vg.isString(f) ? f
           : "data." + vg.accessor(f.group)(data);
       });
-      
+
       fields.forEach(function(f,i) {
         f = vg.accessor(f);
         if (min) domain[0] = d3.min([domain[0], d3.min(dat, f)]);
@@ -5634,7 +4753,7 @@ vg.parse.properties = (function() {
     if (def.rangeMax !== undefined) {
       rng[rng.length-1] = def.rangeMax;
     }
-    
+
     if (def.reverse !== undefined) {
       var rev = def.reverse;
       if (vg.isObject(rev)) {
@@ -5642,47 +4761,55 @@ vg.parse.properties = (function() {
       }
       if (rev) rng = rng.reverse();
     }
-    
+
     return rng;
   }
 
   return scales;
 })();
 vg.parse.spec = function(spec, callback, viewFactory) {
-  
+
   viewFactory = viewFactory || vg.ViewFactory;
-  
+
   function parse(spec) {
     // protect against subsequent spec modification
     spec = vg.duplicate(spec);
-    
+
     var width = spec.width || 500,
         height = spec.height || 500,
-        viewport = spec.viewport || null,
-        graph = new vg.reactive.Graph();
-    
+        viewport = spec.viewport || null;
+
     var defs = {
       width: width,
       height: height,
       viewport: viewport,
       padding: vg.parse.padding(spec.padding),
-      marks: vg.parse.marks(spec, width, height, graph),
-      data: vg.parse.data(spec.data, graph, function() { callback(viewConstructor); })
+      marks: vg.parse.marks(spec, width, height),
+      data: vg.parse.data(spec.data, function() { callback(viewConstructor); })
     };
-    
-    var viewConstructor = viewFactory(defs, graph);
+
+    var viewConstructor = viewFactory(defs);
   }
-  
+
   vg.isObject(spec) ? parse(spec) :
     d3.json(spec, function(error, json) {
       error ? vg.error(error) : parse(json);
     });
+};vg.parse.transform = function(def) {
+  var tx = vg.data[def.type]();
+
+  vg.keys(def).forEach(function(k) {
+    if (k === 'type') return;
+    (tx[k])(def[k]);
+  });
+
+  return tx;
 };vg.scene = {};
 
 vg.scene.GROUP  = "group",
-vg.scene.ENTER  = 1,
-vg.scene.UPDATE = 2,
-vg.scene.EXIT   = 4;
+vg.scene.ENTER  = 0,
+vg.scene.UPDATE = 1,
+vg.scene.EXIT   = 2;
 
 vg.scene.DEFAULT_DATA = {"sentinel":1}
 
@@ -5694,7 +4821,7 @@ vg.scene.data = function(data, parentData) {
 
   // if inheriting default data, ensure its in an array
   if (data === DEFAULT) data = [DEFAULT];
-  
+
   return data;
 };
 
@@ -5708,7 +4835,7 @@ vg.scene.fontString = function(o) {
   function item(mark) {
     this.mark = mark;
   }
-  
+
   var prototype = item.prototype;
 
   prototype.hasPropertySet = function(name) {
@@ -5725,7 +4852,7 @@ vg.scene.fontString = function(o) {
         midx = group.items.indexOf(mark) + offset;
     return group.items[midx].items[iidx];
   };
-  
+
   prototype.sibling = function(offset) {
     if (offset === 0) return this;
     offset = offset || -1;
@@ -5733,7 +4860,7 @@ vg.scene.fontString = function(o) {
         iidx = mark.items.indexOf(this) + offset;
     return mark.items[iidx];
   };
-  
+
   prototype.remove = function() {
     var item = this,
         list = item.mark.items,
@@ -5741,23 +4868,27 @@ vg.scene.fontString = function(o) {
     if (i >= 0) (i===list.length-1) ? list.pop() : list.splice(i, 1);
     return item;
   };
-  
+
   prototype.touch = function() {
     if (this.pathCache) this.pathCache = null;
     if (this.mark.pathCache) this.mark.pathCache = null;
   };
-  
+
   return item;
 })();
 
 vg.scene.item = function(mark) {
   return new vg.scene.Item(mark);
 };vg.scene.visit = function(node, func) {
-  var i, n, items;
+  var i, n, s, m, items;
   if (func(node)) return true;
-  if (items = node.items) {
-    for (i=0, n=items.length; i<n; ++i) {
-      if (vg.scene.visit(items[i], func)) return true;
+
+  var sets = ["items", "axisItems", "legendItems"];
+  for (s=0, m=sets.length; s<m; ++s) {
+    if (items = node[sets[s]]) {
+      for (i=0, n=items.length; i<n; ++i) {
+        if (vg.scene.visit(items[i], func)) return true;
+      }
     }
   }
 };vg.scene.build = (function() {
@@ -5766,25 +4897,25 @@ vg.scene.item = function(mark) {
       UPDATE = vg.scene.UPDATE,
       EXIT   = vg.scene.EXIT,
       DEFAULT= {"sentinel":1};
-  
+
   function build(def, db, node, parentData, reentrant) {
     var data = vg.scene.data(
       def.from ? def.from(db, node, parentData) : null,
       parentData);
-    
+
     // build node and items
     node = buildNode(def, node);
     node.items = buildItems(def, data, node);
     buildTrans(def, node);
-    
+
     // recurse if group
     if (def.type === GROUP) {
       buildGroup(def, db, node, reentrant);
     }
-    
+
     return node;
   };
-  
+
   function buildNode(def, node) {
     node = node || {};
     node.def = def;
@@ -5792,7 +4923,7 @@ vg.scene.item = function(mark) {
     node.interactive = !(def.interactive === false);
     return node;
   }
-  
+
   function buildItems(def, data, node) {
     var keyf = keyFunction(def.key),
         prev = node.items || [],
@@ -5805,7 +4936,7 @@ vg.scene.item = function(mark) {
       item.status = EXIT;
       if (keyf) map[item.key] = item;
     }
-    
+
     for (i=0, len=data.length; i<len; ++i) {
       datum = data[i];
       key = i;
@@ -5824,10 +4955,10 @@ vg.scene.item = function(mark) {
         next.splice(item.index, 0, item);
       }
     }
-    
+
     return next;
   }
-  
+
   function buildGroup(def, db, node, reentrant) {
     var groups = node.items,
         marks = def.marks,
@@ -5835,7 +4966,7 @@ vg.scene.item = function(mark) {
 
     for (i=0, len=groups.length; i<len; ++i) {
       group = groups[i];
-      
+
       // update scales
       if (!reentrant && group.scales) for (name in group.scales) {
         if (name.indexOf(":prev") < 0) {
@@ -5860,7 +4991,7 @@ vg.scene.item = function(mark) {
       for (i=0; i<n; ++i) def.delay.call(this, items[i], group);
     }
   }
-  
+
   function keyFunction(key) {
     if (key == null) return null;
     var f = vg.array(key).map(vg.accessor);
@@ -5872,7 +5003,7 @@ vg.scene.item = function(mark) {
       return s;
     }
   }
-  
+
   return build;
 })();vg.scene.bounds = (function() {
 
@@ -5915,7 +5046,7 @@ vg.scene.item = function(mark) {
       : null;
     return pathBounds(o, p, bounds);
   }
-  
+
   function area(o, bounds) {
     var items = o.mark.items, o = items[0];
     var p = o.pathCache || (o.pathCache = parse(areaPath(items)));
@@ -5963,7 +5094,7 @@ vg.scene.item = function(mark) {
     }
     return bounds;
   }
-  
+
   function arc(o, bounds) {
     var cx = o.x || 0,
         cy = o.y || 0,
@@ -6087,7 +5218,7 @@ vg.scene.item = function(mark) {
     } else {
       y = y - 4*h/5; // alphabetic by default
     }
-    
+
     bounds.set(x, y, x+w, y+h);
     if (o.angle && !noRotate) {
       bounds.rotate(o.angle*Math.PI/180, o.x||0, o.y||0);
@@ -6149,9 +5280,11 @@ vg.scene.item = function(mark) {
         func  = methods[type],
         items = mark.items,
         item, i, len;
-        
+
     if (type==="area" || type==="line") {
-      items[0].bounds = func(items[0], bounds);
+      if (items.length) {
+        items[0].bounds = func(items[0], bounds);
+      }
     } else {
       for (i=0, len=items.length; i<len; ++i) {
         bounds.union(itemBounds(items[i], func, opt));
@@ -6159,7 +5292,7 @@ vg.scene.item = function(mark) {
     }
     mark.bounds = bounds;
   }
-  
+
   return {
     mark:  markBounds,
     item:  itemBounds,
@@ -6174,14 +5307,14 @@ vg.scene.item = function(mark) {
       EXIT   = vg.scene.EXIT,
       EMPTY  = {};
 
-  function main(scene, def, trans, request, items, graph) {
+  function main(scene, def, trans, request, items) {
     (request && items)
-      ? update.call(this, scene, def, trans, request, items, graph)
-      : encode.call(this, scene, scene, def, trans, request, graph);
+      ? update.call(this, scene, def, trans, request, items)
+      : encode.call(this, scene, scene, def, trans, request);
     return scene;
   }
-  
-  function update(scene, def, trans, request, items, graph) {
+
+  function update(scene, def, trans, request, items) {
     items = vg.array(items);
     var i, len, item, group, props, prop;
     for (i=0, len=items.length; i<len; ++i) {
@@ -6190,28 +5323,28 @@ vg.scene.item = function(mark) {
       props = item.mark.def.properties;
       prop = props && props[request];
       if (prop) {
-        encodeProp(prop, item, group, trans, graph);
+        prop.call(vg, item, group, trans);
         vg.scene.bounds.item(item);
       }
     }
   }
-  
-  function encode(group, scene, def, trans, request, graph) {
-    encodeItems.call(this, group, scene.items, def, trans, request, graph);
+
+  function encode(group, scene, def, trans, request) {
+    encodeItems.call(this, group, scene.items, def, trans, request);
     if (scene.marktype === GROUP) {
-      encodeGroup.call(this, scene, def, group, trans, request, graph);
+      encodeGroup.call(this, scene, def, group, trans, request);
     } else {
       vg.scene.bounds.mark(scene);
     }
   }
-  
-  function encodeLegend(group, scene, def, trans, request, graph) {
-    encodeGroup.call(this, scene, def, group, trans, request, graph);
-    encodeItems.call(this, group, scene.items, def, trans, request, graph);
+
+  function encodeLegend(group, scene, def, trans, request) {
+    encodeGroup.call(this, scene, def, group, trans, request);
+    encodeItems.call(this, group, scene.items, def, trans, request);
     vg.scene.bounds.mark(scene, null, true);
   }
-  
-  function encodeGroup(scene, def, parent, trans, request, graph) {
+
+  function encodeGroup(scene, def, parent, trans, request) {
     var i, len, m, mlen, group, scales,
         axes, axisItems, axisDef, leg, legItems, legDef;
 
@@ -6222,12 +5355,12 @@ vg.scene.item = function(mark) {
       // use parent scales if there are no group-level scale defs
       scales = group.scales || (group.scales =
         def.scales ? vg.extend({}, parent.scales) : parent.scales);
-      
+
       // update group-level scales
       if (def.scales) {
         vg.parse.scales(def.scales, scales, this._data, group);
       }
-      
+
       // update group-level axes
       if (def.axes) {
         axes = group.axes || (group.axes = []);
@@ -6237,19 +5370,19 @@ vg.scene.item = function(mark) {
           axisDef = a.def();
           axisItems[i] = vg.scene.build(axisDef, this._data, axisItems[i], null, 1);
           axisItems[i].group = group;
-          encode.call(this, group, group.axisItems[i], axisDef, trans, null, graph);
+          encode.call(this, group, group.axisItems[i], axisDef, trans);
         });
       }
-      
+
       // encode children marks
       for (m=0, mlen=group.items.length; m<mlen; ++m) {
-        encode.call(this, group, group.items[m], def.marks[m], trans, request, graph);
+        encode.call(this, group, group.items[m], def.marks[m], trans, request);
       }
     }
-    
+
     // compute bounds (without legend)
     vg.scene.bounds.mark(scene, null, !def.legends);
-    
+
     // update legends
     if (def.legends) {
       for (i=0, len=scene.items.length; i<len; ++i) {
@@ -6261,14 +5394,14 @@ vg.scene.item = function(mark) {
           legDef = l.def();
           legItems[i] = vg.scene.build(legDef, this._data, legItems[i], null, 1);
           legItems[i].group = group;
-          encodeLegend.call(this, group, group.legendItems[i], legDef, trans, graph);
+          encodeLegend.call(this, group, group.legendItems[i], legDef, trans);
         });
       }
       vg.scene.bounds.mark(scene, null, true);
     }
   }
-  
-  function encodeItems(group, items, def, trans, request, graph) {    
+
+  function encodeItems(group, items, def, trans, request) {
     var props  = def.properties || EMPTY,
         enter  = props.enter,
         update = props.update,
@@ -6278,55 +5411,35 @@ vg.scene.item = function(mark) {
     if (request) {
       if (prop = props[request]) {
         for (i=0, len=items.length; i<len; ++i) {
-          encodeProp(prop, items[i], group, trans, graph);
+          prop.call(vg, items[i], group, trans);
         }
       }
       return; // exit early if given request
     }
 
-    // If the update property uses signals, hook it up in the graph.
-    // TODO: This will add a node every time encodeItems is called. 
-    // TODO: Closure over group/items weirdness?
-    var encodeItem = function(pulse) {
-      for (i=0; i<items.length; ++i) {
-        item = items[i];
+    for (i=0; i<items.length; ++i) {
+      item = items[i];
 
-        // enter set
-        if (item.status === ENTER) {
-          if (enter) encodeProp(enter, item, group, trans, graph);
-          item.status = UPDATE;
-        }
-
-        // update set      
-        if (item.status !== EXIT && update) {
-          encodeProp(update, item, group, trans, graph);
-        }
-        
-        // exit set
-        if (item.status === EXIT) {
-          if (exit) encodeProp(exit, item, group, trans, graph);
-          if (trans && !exit) trans.interpolate(item, EMPTY);
-          else if (!trans) items[i--].remove();
-        }
+      // enter set
+      if (item.status === ENTER) {
+        if (enter) enter.call(vg, item, group);
+        item.status = UPDATE;
       }
 
-      return pulse;
-    };
+      // update set
+      if (item.status !== EXIT && update) {
+        update.call(vg, item, group, trans);
+      }
 
-    var signals = update && update.signals && update.signals.length > 0;
-    if(signals && !graph.encoder(def.name)) {
-      graph.encoder(def.name, 
-        graph.lift.apply(graph, [encodeItem].concat(update.signals)));
+      // exit set
+      if (item.status === EXIT) {
+        if (exit) exit.call(vg, item, group, trans);
+        if (trans && !exit) trans.interpolate(item, EMPTY);
+        else if (!trans) items[i--].remove();
+      }
     }
-
-    encodeItem();
   }
 
-  function encodeProp(prop, item, group, trans, graph) {
-    var sg = graph.values(prop.signals || []);
-    (prop.encode || prop).apply(vg, [item, group, trans].concat(sg));
-  }
-  
   return main;
 })();vg.scene.Transition = (function() {
   function trans(duration, ease) {
@@ -6334,18 +5447,26 @@ vg.scene.item = function(mark) {
     this.ease = ease && d3.ease(ease) || d3.ease("cubic-in-out");
     this.updates = {next: null};
   }
-  
+
   var prototype = trans.prototype;
-  
+
+  var skip = {
+    "text": 1,
+    "url":  1
+  };
+
   prototype.interpolate = function(item, values) {
     var key, curr, next, interp, list = null;
 
     for (key in values) {
       curr = item[key];
-      next = values[key];      
+      next = values[key];
       if (curr !== next) {
-        if (key === "text" || curr === undefined) {
-          // skip interpolation for text labels or undefined start values
+        if (skip[key] || curr === undefined) {
+          // skip interpolation for specific keys or undefined start values
+          item[key] = next;
+        } else if (typeof curr === "number" && !isFinite(curr)) {
+          // for NaN or infinite numeric values, skip to final value
           item[key] = next;
         } else {
           // otherwise lookup interpolator
@@ -6368,7 +5489,7 @@ vg.scene.item = function(mark) {
     }
     return this;
   };
-  
+
   prototype.start = function(callback) {
     var t = this, prev = t.updates, curr = prev.next;
     for (; curr!=null; prev=curr, curr=prev.next) {
@@ -6410,9 +5531,9 @@ vg.scene.item = function(mark) {
     this.callback();
     return stop;
   };
-  
+
   return trans;
-  
+
 })();
 
 vg.scene.transition = function(dur, ease) {
@@ -6465,7 +5586,7 @@ vg.scene.transition = function(dur, ease) {
     var fmt = tickFormat==null ? (scale.tickFormat ? scale.tickFormat.apply(scale, tickArguments) : String) : tickFormat;
     major.forEach(function(d) { d.label = fmt(d.data); });
     var tdata = title ? [title].map(vg.data.ingest) : [];
-    
+
     // update axis def
     def.marks[0].from = function() { return grid ? major : []; };
     def.marks[1].from = function() { return major; };
@@ -6508,7 +5629,7 @@ vg.scene.transition = function(dur, ease) {
 
     vg_axisDomainExtend(orient, domain, range, tickEndSize);
     vg_axisTitleExtend(orient, title, range, titleOffset); // TODO get offset
-    
+
     // add / override custom style properties
     vg.extend(gridLines.properties.update, gridLineStyle);
     vg.extend(majorTicks.properties.update, majorTickStyle);
@@ -6567,7 +5688,7 @@ vg.scene.transition = function(dur, ease) {
     }
     return axis;
   };
-  
+
   axis.tickSize = function(x, y) {
     if (!arguments.length) return tickMajorSize;
     var n = arguments.length - 1,
@@ -6592,7 +5713,7 @@ vg.scene.transition = function(dur, ease) {
     tickSubdivide = +x;
     return axis;
   };
-  
+
   axis.offset = function(x) {
     if (!arguments.length) return offset;
     offset = vg.isObject(x) ? x : +x;
@@ -6658,7 +5779,7 @@ vg.scene.transition = function(dur, ease) {
     if (domainStyle !== x) { domainStyle = x; }
     return axis;
   };
-  
+
   axis.reset = function() { reset(); };
 
   return axis;
@@ -6719,7 +5840,7 @@ function vg_axisLabelExtend(orient, labels, oldScale, newScale, size, pad) {
   size = Math.max(size, 0) + pad;
   if (orient === "left" || orient === "top") {
     size *= -1;
-  }  
+  }
   if (orient === "top" || orient === "bottom") {
     vg.extend(labels.properties.enter, {
       x: oldScale,
@@ -6767,7 +5888,7 @@ function vg_axisTicksExtend(orient, ticks, oldScale, newScale, size) {
     });
     vg.extend(ticks.properties.exit, {
       x:  newScale,
-    });        
+    });
   } else {
     vg.extend(ticks.properties.enter, {
       x:  {value: 0},
@@ -6788,7 +5909,7 @@ function vg_axisTicksExtend(orient, ticks, oldScale, newScale, size) {
 function vg_axisTitleExtend(orient, title, range, offset) {
   var mid = ~~((range[0] + range[1]) / 2),
       sign = (orient === "top" || orient === "left") ? -1 : 1;
-  
+
   if (orient === "bottom" || orient === "top") {
     vg.extend(title.properties.update, {
       x: {value: mid},
@@ -6937,15 +6058,15 @@ vg.scene.legend = function() {
 
   legend.def = function() {
     var scale = size || shape || fill || stroke;
-    
+
     format = !formatString ? null : ((scale.type === 'time')
       ? d3.time.format(formatString)
       : d3.format(formatString));
-    
+
     if (!legendDef) {
       legendDef = (scale===fill || scale===stroke) && !discrete(scale.type)
         ? quantDef(scale)
-        : ordinalDef(scale);      
+        : ordinalDef(scale);
     }
     legendDef.orient = orient;
     legendDef.offset = offset;
@@ -6966,7 +6087,7 @@ vg.scene.legend = function() {
       ? (scale.ticks ? scale.ticks.apply(scale, tickArguments) : scale.domain())
       : values).map(vg.data.ingest);
     var fmt = format==null ? (scale.tickFormat ? scale.tickFormat.apply(scale, tickArguments) : String) : format;
-    
+
     // determine spacing between legend entries
     var fs, range, offset, pad=5, domain = d3.range(data.length);
     if (size) {
@@ -6992,7 +6113,7 @@ vg.scene.legend = function() {
       sz += 5 + ((ts && ts.value) || vg.config.legend.titleFontSize);
     }
     for (var i=0, n=range.length; i<n; ++i) range[i] += sz;
-    
+
     // build scale for label layout
     var scale = {
       name: "legend",
@@ -7001,7 +6122,7 @@ vg.scene.legend = function() {
       domain: domain,
       range: range
     };
-    
+
     // update legend def
     var tdata = (title ? [title] : []).map(vg.data.ingest);
     data.forEach(function(d) {
@@ -7023,7 +6144,7 @@ vg.scene.legend = function() {
 
     // extend legend marks
     vg_legendSymbolExtend(symbols, size, shape, fill, stroke);
-    
+
     // add / override custom style properties
     vg.extend(titles.properties.update, titleStyle);
     vg.extend(symbols.properties.update, symbolStyle);
@@ -7065,7 +6186,7 @@ vg.scene.legend = function() {
       range: [padding, width+padding]
     };
     if (scale.type==="pow") layout.exponent = scale.exponent();
-    
+
     // update legend def
     var tdata = (title ? [title] : []).map(vg.data.ingest);
     data.forEach(function(d,i) {
@@ -7078,7 +6199,7 @@ vg.scene.legend = function() {
     def.marks[2].from = function() { return data; };
     return def;
   }
-  
+
   function q_legend_def(scale) {
     // setup legend marks
     var titles = vg_legendTitle(),
@@ -7091,7 +6212,7 @@ vg.scene.legend = function() {
         min = dom[0],
         max = dom[dom.length-1],
         f = scale.copy().domain([min, max]).range([0,1]);
-        
+
     var stops = (scale.type !== "linear" && scale.ticks)
       ? scale.ticks.call(scale, 15) : dom;
     if (min !== stops[0]) stops.unshift(min);
@@ -7122,7 +6243,7 @@ vg.scene.legend = function() {
       gradient.properties.update.y.value += sz;
       labels.properties.update.y.value += sz;
     }
-    
+
     // padding from legend border
     titles.properties.enter.x.value += padding;
     titles.properties.enter.y.value += padding;
@@ -7161,7 +6282,7 @@ vg.scene.legend = function() {
     if (fill !== x) { fill = x; reset(); }
     return legend;
   };
-  
+
   legend.stroke = function(x) {
     if (!arguments.length) return stroke;
     if (stroke !== x) { stroke = x; reset(); }
@@ -7230,7 +6351,7 @@ vg.scene.legend = function() {
     labelStyle = x;
     return legend;
   };
-  
+
   legend.titleProperties = function(x) {
     if (!arguments.length) return titleStyle;
     titleStyle = x;
@@ -7277,7 +6398,7 @@ function vg_legendUpdate(item, group, trans) {
       break;
     };
   }
-  
+
   if (trans) trans.interpolate(item, o);
   item.mark.def.properties.enter(item, group, trans);
 }
@@ -7426,7 +6547,6 @@ function vg_hLegendLabels() {
     this._defs = null;
     this._data = {};
     this._scene = null;
-    this._graph = null;
     this._reset = {axes: false, legends: false};
   }
 
@@ -7453,7 +6573,7 @@ function vg_hLegendLabels() {
       (src[k] || []).forEach(function(s) { deps[s] = k; sources(s); });
     }
     vg.keys(data).forEach(sources);
-    
+
     // update data sets in dependency-aware order
     for (i=0; i<len; ++i) {
       if (data[k=keys[i]]) {
@@ -7491,12 +6611,6 @@ function vg_hLegendLabels() {
     return this;
   };
 
-  prototype.graph = function(graph) {
-    if (!arguments.length) return this._graph;
-    this._graph = graph;
-    return this;
-  };
-
   prototype.build = function() {
     var m = this, data = m._data, marks = m._defs.marks;
     m._scene = vg.scene.build.call(m, marks, data, m._scene);
@@ -7508,8 +6622,8 @@ function vg_hLegendLabels() {
 
   prototype.encode = function(trans, request, item) {
     this.reset();
-    var m = this, scene = m._scene, defs = m._defs, graph = m._graph;
-    vg.scene.encode.call(m, scene, defs.marks, trans, request, item, graph);
+    var m = this, scene = m._scene, defs = m._defs;
+    vg.scene.encode.call(m, scene, defs.marks, trans, request, item);
     return this;
   };
 
@@ -7545,9 +6659,9 @@ function vg_hLegendLabels() {
     this._io = vg.canvas;
     if (el) this.initialize(el);
   };
-  
+
   var prototype = view.prototype;
-  
+
   prototype.width = function(width) {
     if (!arguments.length) return this.__width;
     if (this.__width !== width) {
@@ -7589,7 +6703,7 @@ function vg_hLegendLabels() {
     }
     return this;
   };
-  
+
   prototype.autopad = function(opt) {
     if (this._autopad < 1) return this;
     else this._autopad = 0;
@@ -7626,7 +6740,7 @@ function vg_hLegendLabels() {
     }
     return this;
   };
-  
+
   prototype.renderer = function(type) {
     if (!arguments.length) return this._io;
     if (type === "canvas") type = vg.canvas;
@@ -7668,10 +6782,10 @@ function vg_hLegendLabels() {
   prototype.initialize = function(el) {
     var v = this, prevHandler,
         w = v._width, h = v._height, pad = v._padding;
-    
+
     // clear pre-existing container
     d3.select(el).select("div.vega").remove();
-    
+
     // add div container
     this._el = el = d3.select(el)
       .append("div")
@@ -7684,11 +6798,11 @@ function vg_hLegendLabels() {
         .style("height", (v._viewport[1] || h)+"px")
         .style("overflow", "auto");
     }
-    
+
     // renderer
     v._renderer = (v._renderer || new this._io.Renderer())
       .initialize(el, w, h, pad);
-    
+
     // input handler
     prevHandler = v._handler;
     v._handler = new this._io.Handler()
@@ -7701,69 +6815,51 @@ function vg_hLegendLabels() {
       });
     }
 
-    // register signals
-    v._model.graph().initialize(v);
-    
     return this;
   };
-  
+
   prototype.render = function(items) {
     this._renderer.render(this._model.scene(), items);
     return this;
   };
-  
+
   prototype.on = function() {
     this._handler.on.apply(this._handler, arguments);
     return this;
   };
-  
+
   prototype.off = function() {
     this._handler.off.apply(this._handler, arguments);
     return this;
   };
-  
-  prototype.update = function(opt) {    
+
+  prototype.update = function(opt) {
     opt = opt || {};
     var view = this,
         trans = opt.duration
           ? vg.scene.transition(opt.duration, opt.ease)
-          : null,
-        graph = view._model.graph();
+          : null;
 
     view._build = view._build || (view._model.build(), true);
     view._model.encode(trans, opt.props, opt.items);
-    
-    // TODO: Closure of render node. 
-    var render = function(pulse) {
-      if (trans) {
-        trans.start(function(items) {
-          view._renderer.render(view._model.scene(), items);
-        });
-      } 
-      else view.render(opt.items);
 
-      return graph.doNotPropagate;
-    };
-
-    var encoders = vg.keys(graph.encoder())
-      .map(function(k) { return graph.encoder(k) });
-    if(!graph.renderer('render') && encoders.length > 0) {
-      graph.renderer('render', 
-        graph.lift.apply(vg, [render].concat(encoders)));
+    if (trans) {
+      trans.start(function(items) {
+        view._renderer.render(view._model.scene(), items);
+      });
     }
-
-    render();
+    else view.render(opt.items);
 
     return view.autopad(opt);
   };
-      
+
   return view;
 })();
 
 // view constructor factory
 // takes definitions from parsed specification as input
 // returns a view constructor
-vg.ViewFactory = function(defs, graph) {
+vg.ViewFactory = function(defs) {
   return function(opt) {
     opt = opt || {};
     var v = new vg.View()
@@ -7773,8 +6869,6 @@ vg.ViewFactory = function(defs, graph) {
       .viewport(defs.viewport)
       .renderer(opt.renderer || "canvas")
       .defs(defs);
-
-    v.model().graph(graph);
 
     if (defs.data.load) v.data(defs.data.load);
     if (opt.data) v.data(opt.data);
@@ -7792,7 +6886,7 @@ vg.ViewFactory = function(defs, graph) {
         }
       });
     }
-  
+
     return v;
   };
 };
@@ -7809,24 +6903,24 @@ vg.Spec = (function() {
     };
     if (s) vg.extend(this.spec, s);
   };
-  
+
   var prototype = spec.prototype;
 
   prototype.width = function(w) {
     this.spec.width = w;
     return this;
   };
-  
+
   prototype.height = function(h) {
     this.spec.height = h;
     return this;
   };
-  
+
   prototype.padding = function(p) {
     this.spec.padding = p;
     return this;
   };
-  
+
   prototype.viewport = function(v) {
     this.spec.viewport = v;
     return this;
@@ -7838,25 +6932,25 @@ vg.Spec = (function() {
     this.spec.data.push(params);
     return this;
   };
-  
+
   prototype.scale = function(name, params) {
     if (!params) params = vg.isString(name) ? {name: name} : name;
     else params.name = name;
     this.spec.scales.push(params);
     return this;
   };
-  
+
   prototype.axis = function(params) {
     this.spec.axes.push(params);
     return this;
   };
-  
+
   prototype.mark = function(type, mark) {
     if (!mark) mark = {type: type};
     else mark.type = type;
     mark.properties = {};
     this.spec.marks.push(mark);
-    
+
     var that = this;
     return {
       from: function(name, obj) {
@@ -7891,7 +6985,7 @@ vg.spec = function(s) {
   return new vg.Spec(s);
 };
 vg.headless = {};vg.headless.View = (function() {
-  
+
   var view = function(width, height, pad, type, vp) {
     this._canvas = null;
     this._type = type;
@@ -7906,7 +7000,7 @@ vg.headless = {};vg.headless.View = (function() {
     this._viewport = vp || null;
     this.initialize();
   };
-  
+
   var prototype = view.prototype;
 
   prototype.el = function(el) {
@@ -8013,10 +7107,10 @@ vg.headless = {};vg.headless.View = (function() {
   prototype.canvas = function() {
     return this._canvas;
   };
-  
+
   prototype.canvasAsync = function(callback) {
     var r = this._renderer, view = this;
-    
+
     function wait() {
       if (r.pendingImages() === 0) {
         view.render(); // re-render with all images
@@ -8029,7 +7123,7 @@ vg.headless = {};vg.headless.View = (function() {
     // if images loading, poll until ready
     (r.pendingImages() > 0) ? wait() : callback(this._canvas);
   };
-  
+
   prototype.svg = function() {
     if (this._type !== "svg") return null;
 
@@ -8053,7 +7147,7 @@ vg.headless = {};vg.headless.View = (function() {
       + vg.config.svgNamespace + '>' + svg + '</svg>'
   };
 
-  prototype.initialize = function() {    
+  prototype.initialize = function() {
     var w = this._width,
         h = this._height,
         pad = this._padding;
@@ -8062,23 +7156,23 @@ vg.headless = {};vg.headless.View = (function() {
       w = this._viewport[0] - (pad ? pad.left + pad.right : 0);
       h = this._viewport[1] - (pad ? pad.top + pad.bottom : 0);
     }
-    
+
     if (this._type === "svg") {
       this.initSVG(w, h, pad);
     } else {
       this.initCanvas(w, h, pad);
     }
-    
+
     return this;
   };
-  
+
   prototype.initCanvas = function(w, h, pad) {
     var Canvas = require("canvas"),
         tw = w + pad.left + pad.right,
         th = h + pad.top + pad.bottom,
         canvas = this._canvas = new Canvas(tw, th),
         ctx = canvas.getContext("2d");
-    
+
     // setup canvas context
     ctx.setTransform(1, 0, 0, 1, pad.left, pad.top);
 
@@ -8086,7 +7180,7 @@ vg.headless = {};vg.headless.View = (function() {
     this._renderer.context(ctx);
     this._renderer.resize(w, h, pad);
   };
-  
+
   prototype.initSVG = function(w, h, pad) {
     var tw = w + pad.left + pad.right,
         th = h + pad.top + pad.bottom;
@@ -8094,12 +7188,12 @@ vg.headless = {};vg.headless.View = (function() {
     // configure renderer
     this._renderer.initialize(this._el, w, h, pad);
   }
-  
+
   prototype.render = function(items) {
     this._renderer.render(this._model.scene(), items);
     return this;
   };
-  
+
   prototype.update = function(opt) {
     opt = opt || {};
     var view = this;
@@ -8108,7 +7202,7 @@ vg.headless = {};vg.headless.View = (function() {
     view.render(opt.items);
     return view.autopad(opt);
   };
-    
+
   return view;
 })();
 
@@ -8152,1145 +7246,7 @@ vg.headless.View.Factory = function(defs) {
   }
 
   vg.parse.spec(opt.spec, draw, vg.headless.View.Factory);
-};vg.reactive = {};
-vg.reactive.transforms = {};vg.reactive.Datum = (function() {
-  var ENTER  = vg.scene.ENTER,
-      UPDATE = vg.scene.UPDATE,
-      EXIT   = vg.scene.EXIT;
-
-  var datum = function(state, datum, index) {
-    this._state = state;
-    this._flag   = null;
-
-    if(datum instanceof vg.reactive.Datum) {
-      this._data = Object.create(datum._data);
-      datum._deps.push(this);
-    } else {
-      this._data = {data: datum};
-    }
-
-    this._data.index = index;
-    this._deps = []; // Derived vg.reactive.Datums
-  }
-
-  var prototype = datum.prototype;
-
-  // Valid transitions:
-  // enter -> update
-  // enter -> exit
-  // update -> exit
-  // exit -> enter
-
-  prototype.enter = function() {
-    if(this._flag == UPDATE) 
-      throw "Datum.enter should not be called if the point is in UPDATE";
-
-    if(this._flag == EXIT) {
-      delete this._state.exit()[this._data.index];
-    } 
-
-    this._flag = ENTER;
-    this._state.enter(this);
-    this._deps.forEach(function(d) { d.enter(); });
-    return this;
-  };
-
-  prototype.update = function() {
-    if(this._flag == EXIT) 
-      throw "Datum.update should not be called if the point is in EXIT";
-
-    if(this._flag == ENTER) {
-      delete this._state.enter()[this._data.index];
-    }
-
-    this._flag = UPDATE;
-    this._state.update(this);
-    this._deps.forEach(function(d) { d.update(); });
-    return this;
-  };
-
-  prototype.exit = function() {
-    if(this._flag == ENTER) {
-      delete this._state.enter()[this._data.index];
-    }
-
-    if(this._flag == UPDATE) {
-      delete this._state.update()[this._data.index];
-    }
-
-    this._flag = EXIT;
-    this._state.exit(this);
-    this._deps.forEach(function(d) { d.exit(); });
-    return this;
-  }
-
-  datum.prototype.data = function() { return this._data; };
-
-  return datum;
-})();vg.reactive.Graph = (function() {
-  function PQ() {
-    var ctx = this;
-    ctx.val = [];
-    
-    this.insert = function (kv) {
-      ctx.val.push(kv);
-      var kvpos = ctx.val.length-1;
-      while(kvpos > 0 && kv.k < ctx.val[Math.floor((kvpos-1)/2)].k) {
-        var oldpos = kvpos;
-        kvpos = Math.floor((kvpos-1)/2);
-        ctx.val[oldpos] = ctx.val[kvpos];
-        ctx.val[kvpos] = kv;
-      }
-    };
-
-    this.isEmpty = function () { 
-      return ctx.val.length === 0; 
-    };
-
-    this.pop = function () {
-      if(ctx.val.length === 1) {
-        return ctx.val.pop();
-      }
-      var ret = ctx.val.shift();
-      ctx.val.unshift(ctx.val.pop());
-      var kvpos = 0;
-      var kv = ctx.val[0];
-      while(1) { 
-        var leftChild = (kvpos*2+1 < ctx.val.length ? ctx.val[kvpos*2+1].k : kv.k+1);
-        var rightChild = (kvpos*2+2 < ctx.val.length ? ctx.val[kvpos*2+2].k : kv.k+1);
-        if(leftChild > kv.k && rightChild > kv.k)
-            break;
-
-        if(leftChild < rightChild) {
-          ctx.val[kvpos] = ctx.val[kvpos*2+1];
-          ctx.val[kvpos*2+1] = kv;
-          kvpos = kvpos*2+1;
-        }
-        else {
-          ctx.val[kvpos] = ctx.val[kvpos*2+2];
-          ctx.val[kvpos*2+2] = kv;
-          kvpos = kvpos*2+2;
-        }
-      }
-      return ret;
-    };  
-  };
-
-  var SIGNAL = 0, BUILDER = 1, ENCODER = 2, RENDERER = 3;
-
-  function Pulse(stamp, value) {
-    // Timestamps are used by liftB (and ifE).  Since liftB may receive multiple
-    // update signals in the same run of the evaluator, it only propagates the 
-    // signal if it has a new stamp.
-    this.stamp = stamp;
-    this.value = value;
-  };
-
-  var graph = function() {
-    this._rank = 0;
-    this._stamp = 1
-    this.doNotPropagate = {};
-    this._signals = [{},{},{},{}];
-    this._data = {};
-  };
-
-  function _signals(type, name, signal) {
-    if(name === undefined) return this._signals[type];
-    if(name instanceof vg.reactive.Signal) return name;
-    if(signal === undefined) return this._signals[type][name];
-    this._signals[type][name] = signal;
-    return this;
-  }
-
-  graph.prototype.nextStamp = function() { return ++this._stamp; }
-  graph.prototype.nextRank  = function() { return ++this._rank; }
-
-  graph.prototype.data = function(name, source) {
-    if(arguments.length == 1) return this._data[name];
-    this._data[name] = source;
-    return this;
-  };
-
-  graph.prototype.signal = function(name, signal) {
-    return _signals.call(this, SIGNAL, name, signal);
-  };
-
-  graph.prototype.builder = function(name, signal) {
-    return _signals.call(this, BUILDER, name, signal);
-  };
-
-  graph.prototype.encoder = function(name, signal) {
-    return _signals.call(this, ENCODER, name, signal);
-  };
-
-  graph.prototype.renderer = function(name, signal) {
-    return _signals.call(this, RENDERER, name, signal);
-  };
-
-  graph.prototype.initialize = function(view) {
-    for(var name in this.signal()) {
-      this.signal(name).initialize(view);
-    }
-  };
-
-  function propagate(pulse, node) {
-    var queue = new PQ(); //topological queue for current timestep
-
-    queue.insert({k:node.rank, n:node, v:pulse});
-
-    while (!queue.isEmpty()) {
-      var qv = queue.pop();
-      var nextPulse = qv.n.updater(new Pulse(qv.v.stamp, qv.v.value));
-
-      if (nextPulse != this.doNotPropagate) {
-        for (var i = 0; i < qv.n.sendsTo.length; i++) {
-          queue.insert({k:qv.n.sendsTo[i].rank, n:qv.n.sendsTo[i], v:nextPulse});
-        }
-      }
-    }
-  };
-
-  graph.prototype.pulse = function(node, value) {
-    if(node instanceof vg.reactive.Signal) node = node.stream();
-    if (!(node instanceof vg.reactive.Stream))
-      throw 'pulse: expected Event as first arg';  //SAFETY
-    
-    propagate.call(this, new Pulse(this.nextStamp(), value), node);
-  };
-
-  /**
-   * @param {Function|F.Behavior} fn
-   * @param {...F.Behavior} var_args
-   * @returns !F.Behavior
-   */
-  graph.prototype.lift = function (fn) {
-    var g = this; 
-    var deps = Array.prototype.slice.call(arguments, 1)
-      .map(function (a) { 
-        if(a instanceof vg.reactive.Stream) return a;
-        return g.signal(a).stream(); 
-      });
-      
-    //gen/send vals @ appropriate time
-    var prevStamp = -1;
-    var lifted = new vg.reactive.Stream(deps[0].graph(), deps, 
-      function (pulse) {
-        if (pulse.stamp != prevStamp) {
-          prevStamp = pulse.stamp;
-          // Lifted functions need to be capable of modifying the pulse state.
-          // So, we pass lifted functions the pulse and they're responsible for
-          // getting signal values themselves. 
-          return fn(pulse);
-        } else {
-          return deps[0].graph().doNotPropagate;
-        }
-      });
-    
-    return new vg.reactive.Signal(lifted.graph(), null, lifted);
-  };
-
-  graph.prototype.values = function(signals) {
-    var g = this;
-    return vg.array(signals).map(function(s) { return g.signal(s).value(); });
-  };
-
-  graph.prototype.mostRecentStamp = function(signals) {
-    var g = this;
-    return vg.array(signals).reduce(function(recent, s) { 
-      var stamp = g.signal(s).stamp();
-      return stamp && recent > stamp ? recent : stamp;
-    }, -1);
-  };
-
-  return graph;
-})();vg.reactive.Signal = (function() {
-  /**
-   * @constructor
-   * @param {vg.reactive.Stream} event
-   * @param {*} init
-   * @param {Function=} updater
-   */
-  var signal = function(graph, def, stream) {
-    var signal = this;
-    signal._stamp = 0;
-    signal._value = null;
-
-    if(def) {
-      signal._def  = def;
-      signal._value = def.init ? def.init : {e: {}, i: {}};
-    } 
-
-    // Initially, the signal is drawn from a stub Stream. This allows
-    // us to build up the reactive graph during the parse stage. When we  
-    // initialize the signal, we hook its Stream up to the View.
-    signal._stream = new vg.reactive.Stream(graph, stream ? [stream] : [], 
-      function(pulse) {
-        signal._stamp = pulse.stamp;
-        signal._value = pulse.value;
-        return pulse;
-    });
-  };
-
-  var prototype = signal.prototype;
-
-  function initMergedStream(view, selector) {
-    var signal = this;
-
-    var streams = selector.map(function(s) {
-      if(s.event)       return initStream.call(signal, view, s);
-      else if(s.start)  return initOrderedStream.call(signal, view, s);
-      else if(s.stream) return initMergedStream.call(signal, view, s.stream);
-    });
-
-    // TODO: filter
-    return new vg.reactive.Stream(signal.graph(), streams);
-  }
-
-  function initOrderedStream(view, selector) {
-    // TODO
-  }
-
-  function initStream(view, selector) {
-    var signal = this,
-        stream = new vg.reactive.Stream(signal.graph());
-    // TODO: filter
-
-    view.on(selector.event, function(evt, item) {
-      signal.graph().pulse(stream, {
-        e: evt, i: item, d: item.datum
-      });
-    });
-
-    return stream;
-  };
-
-  prototype.graph = function() { return this._stream.graph(); }
-
-  prototype.initialize = function(view) {
-    var signal = this;
-    var streams = signal._def.stream.map(function(def) {
-      var s = initMergedStream.call(signal, view, 
-        vg.parse.event_selector.parse(def.events));
-
-      if(def.expr) {
-        var expr = vg.parse.expr(def.expr, signal.graph());
-        s.map(function(value) {
-          var sg = signal.graph().values(expr.signals);
-          return expr.eval.apply(vg, [value.d, value.e, value.i].concat(sg));
-        });
-      }
-    });
-
-    var registered = new vg.reactive.Stream(this.graph(), streams);
-    registered.attachListener(this._stream);
-  };
-
-  prototype.stream = function() { return this._stream; };
-  prototype.stamp  = function() { return this._stamp; };
-  prototype.value  = function() { return this._value; };
-
-  return signal;
-})();vg.reactive.Source = (function() {
-  var source = function(graph) {
-    this._def  = null;
-    this._load = null;
-
-    // The input signal is a dependent of every transformation, and
-    // every transformation is a dependent of the output signal. 
-    // When new data enters, we pulse the input signal to re-evaluate
-    // transformations. The rendering sink can register for pulses
-    // on the output signal, to also capture any changes that occur part-way
-    // through the transform pipeline. 
-    this._input  = new vg.reactive.Signal(graph);
-    this._output = new vg.reactive.Signal(graph, null, this._input.stream());
-
-    // Signal nodes for each transform;
-    this._transform = [];
-
-    // field_accessor => [signals] that modify them
-    this._field = {};
-  };
-
-  var prototype = source.prototype;
-
-  function load(source) {
-    return function(error, data) {
-      if (error) {
-        vg.error("LOADING FAILED: " + d.url);
-      } else {
-        source._load = vg.data.read(data.toString(), source._def.format);
-      }
-    }
-  }
-
-  prototype.load = function(values) {
-    var v;
-    if(v = (values || this._def.values)) {
-      this._load = vg.data.read(v, this._def.format);
-    } else if(this._def.url) {
-      vg.data.load(this._def.url, load(this)); 
-    } else if(this._def.source) {
-      var source = this.graph().data(this._def.source);
-      if(!source) {
-        source = new vg.reactive.Source(this.graph());
-        source.graph().data(this._def.source, source);
-      }
-      source.bind(this);
-    }
-
-    return this;
-  };
-
-  prototype.graph = function() { return this._input.graph(); }
-
-  prototype.def = function(def) {
-    if(!arguments.length) return this._def;
-    this._def = def;
-    return this;
-  };
-
-  prototype.field = function(name, signals) {
-    if(signals === undefined) return this._field[name];
-    this._field[name] = vg.array(this._field[name]).concat(vg.array(signals));
-    return this;
-  };
-
-  prototype.enter = function() { 
-    if(this._load == null) return;
-    var state = this._input.value() || new vg.reactive.State();
-    this.graph().pulse(this._input, state.ingest(this._load)); 
-    this._load = null;
-    return this;
-  };
-
-  prototype.update = function() {
-    // This should be sufficient because every point in all subsequent states
-    // should be derived from the points in _input.
-    var enter = this._input.value().enter();
-    for(var i in enter) enter[i].update();
-    return this;
-  };
-
-  prototype.bind = function(dest) {
-    if(!(dest instanceof vg.reactive.Source))
-      throw 'Source::bind expected Source as first arg';
-
-    this._output.stream().attachListener(dest._input);
-  };
-
-  prototype.transform = function(tx) {
-    var src = this, t = src._transform,
-        prev = t.length == 0 ? src._input : t[t.length-1].signal(),
-        deps = [prev].concat(tx.deps().signals).concat(tx.deps().fields);
-
-    var ts = src.graph().lift.apply(src.graph(), [function(pulse) {
-      pulse.value =  tx.transform(prev.value());
-      return pulse;
-    }].concat(deps));
-
-    t.push(tx.signal(ts));
-    tx.signal().stream().attachListener(this._output.stream());
-
-    return this;
-  };
-
-  return source;
-})();vg.reactive.State = (function() {
-  var ENTER  = vg.scene.ENTER,
-      UPDATE = vg.scene.UPDATE,
-      EXIT   = vg.scene.EXIT;
-
-  var state = function() {
-    // Holds enter, update, exit sets. On finalize, enter -> update.
-    this._enter  = {};
-    this._update = {};
-    this._exit   = {};
-
-    this._flag   = 0;
-    this._counter = 0;
-  };
-
-  var prototype = state.prototype;
-
-  prototype.flag  = function(flag) { 
-    if(flag === undefined) return this._flag; 
-    this._flag = this._flag | flag;
-    return this;
-  };
-
-  function set(set, val, flag) {
-    this._flag = this._flag | flag;
-
-    if(vg.isArray(val)) {
-      vg.keys(set).forEach(function(k) { delete set[k]; });
-      val.forEach(function(v) { set[v.data().index] = v });
-    }
-    else set[val.data().index] = val;
-
-    return this;
-  };
-
-  prototype.ingest = function(values) {
-    if(vg.isTree(values)) {
-      // TODO
-    } else {
-      for(var i = 0; i < values.length; i++)
-        new vg.reactive.Datum(this, values[i], this._counter++).enter();
-    }
-
-    return this;
-  };
-
-  prototype.enter = function(values) {
-    if(!arguments.length) return this._enter;
-    return set.call(this, this._enter, values, ENTER);
-  };
-
-  prototype.update = function(values) {
-    if(!arguments.length) return this._update;
-    return set.call(this, this._update, values, UPDATE);
-  };
-
-  prototype.exit = function(values) {
-    if(!arguments.length) return this._exit;
-    return set.call(this, this._exit, values, EXIT);
-  };
-
-  return state;
-})();vg.reactive.Stream = (function() {
-  // NOTE: We now pass in a reference to the graph, as it encapsulates rank/stamp.
-
-  /**
-   * Event: Array Node b * ( (Pulse a -> Void) * Pulse b -> Void)
-   * @constructor
-   * @param {Array.<Stream>} nodes
-   */
-  function stream(graph, nodes, updater) {
-    this.updater = updater || function(pulse) { return pulse; };
-    this.sendsTo = []; // forward link
-    this._graph = graph;
-    this.rank = this._graph.nextRank();
-
-    var i;
-    for (i = 0, nodes = vg.array(nodes); i < nodes.length; i++) {
-      nodes[i].attachListener(this);
-    }
-  }
-
-  var prototype = stream.prototype;
-
-  function is_stream(s) { return s instanceof vg.reactive.Stream; }
-
-  prototype.graph = function() { return this._graph; }
-
-  /**
-   * note: does not add flow as counting for rank nor updates parent ranks
-   * @param {Stream} dependent
-   */
-  prototype.attachListener = function(dependent) {
-    if (!is_stream(dependent)) {
-      throw 'attachListener: expected an Stream';
-    }
-    this.sendsTo.push(dependent);
-    
-    if(this.rank > dependent.rank) {
-      var q = [dependent];
-      while(q.length) {
-        var cur = q.splice(0,1)[0];
-        cur.rank = cur._graph.nextRank();
-        q = q.concat(cur.sendsTo);
-      }
-    }
-  };
-
-  //note: does not remove flow as counting for rank nor updates parent ranks
-  prototype.removeListener = function (dependent) {
-    if (!is_stream(dependent)) {
-      throw 'removeListener: expected an Stream';
-    }
-
-    var foundSending = false;
-    for (var i = 0; i < this.sendsTo.length && !foundSending; i++) {
-      if (this.sendsTo[i] === dependent) {
-        this.sendsTo.splice(i, 1);
-        foundSending = true;
-      }
-    }
-    
-    return foundSending;
-  };
-
-  /**
-   * Triggers when any of the argument event stream trigger; carries the signal
-   * from the last event stream that triggered.
-   *
-   * @param {...F.Stream} var_args
-   * @returns {F.Stream}
-   */
-  prototype.merge = function() {
-    var deps = vg.array(arguments);
-    deps.push(this);
-    return new vg.reactive.Stream(this._graph, deps);
-  };
-
-  /**
-   * Transforms this event stream to produce only <code>constantValue</code>.
-   *
-   * @param {*} constantValue
-   * @returns {F.Stream}
-   */
-  prototype.constant = function(constantValue) {
-    return new vg.reactive.Stream(this._graph, [this], function(pulse) {
-      pulse.value = constantValue;
-      return pulse;
-    });
-  };
-
-  // bind :: F.Stream a * (a -> F.Stream b) -> F.Stream b
-  prototype.bind = function(k) {
-    /* m.sendsTo resultE
-     * resultE.sendsTo prevE
-     * prevE.sendsTo returnE
-     */
-    var m = this;
-    var prevE = false;
-    
-    var outE = new vg.reactive.Stream(m._graph, []);
-    outE.name = "bind outE";
-    
-    var inE = new vg.reactive.Stream(m._graph, [m], function (pulse) {
-      if (prevE) prevE.removeListener(outE, true);
-
-      prevE = k(pulse.value);
-      if(is_stream(prevE)) prevE.attachListener(outE);
-      else throw "bind : expected F.Stream";
-
-      return m._graph.doNotPropagate;
-    });
-    inE.name = "bind inE";
-    
-    return outE;
-  };
-
-  /**
-   * @param {function(*):*} f
-   * @returns {!F.Stream}
-   */
-  prototype.map = function(f) {
-    if(!(f instanceof Function))
-      throw ('map : expected a function as the first argument; received ' + f);
-    
-    return new vg.reactive.Stream(this._graph, [this], function(pulse) {
-      pulse.value = f(pulse.value);
-      return pulse;
-    });
-  };
-
-  /**
-   * @returns {F.Stream}
-   */
-  prototype.not = function() { 
-    return this.map(function(v) { 
-      return !v; 
-    }); 
-  };
-
-  /**
-   * Only produces events that match the given predicate.
-   *
-   * @param {function(*):boolean} pred
-   * @returns {F.Stream}
-   */
-  prototype.filter = function(pred) {
-    if (!(pred instanceof Function))
-      throw ('filter : expected predicate; received ' + pred);
-
-    // Can be a bind
-    var m = this;
-    return new vg.reactive.Stream(this._graph, [this], function(pulse) {
-      return pred(pulse.value) ? pulse : m._graph.doNotPropagate;
-    });
-  };
-
-  /**
-   * Only triggers on the first event on this event stream.
-   *
-   * @returns {F.Stream}
-   */
-  prototype.once = function() {
-    var done = false;
-    return this.filter(function(_) {
-      if (!done) {
-        done = true;
-        return true;
-      }
-      return false;
-    });
-  };
-
-  /**
-   * Does not trigger on the first event on this event stream.
-   *
-   * @returns {F.Stream}
-   */
-  prototype.skipFirst = function() {
-    var skipped = false;
-    return this.filter(function(_) {
-      if (!skipped) {
-        skipped = true;
-        return false;
-      }
-      return true;
-    });
-  };
-
-  /**
-   * Transforms this event stream to produce the result accumulated by
-   * <code>combine</code>.
-   *
-   * <p>The following example accumulates a list of values with the latest
-   * at the head:</p>
-   *
-   * @example
-   * original.collectE([],function(new,arr) { return [new].concat(arr); });
-   *
-   * @param {*} init
-   * @param {Function} combine <code>combine(acc, val)</code> 
-   * @returns {F.Stream}
-   */
-  prototype.collect = function(init, combine) {
-    var acc = init;
-    return this.map(
-      function (n) {
-        var next = combine(n, acc);
-        acc = next;
-        return next;
-      });
-  };
-
-  /**
-   * Given a stream of event streams, fires events from the most recent event
-   * stream.
-   * 
-   * @returns {F.Stream}
-   */
-  prototype.switch = function() {
-    return this.bind(function(v) { return v; });
-  };
-
-  var delayStatic = function (event, time) {
-    var resE = new vg.reactive.Stream(event._graph);
-    
-    new vg.reactive.Stream(event._graph, [event], function (p) { 
-      setTimeout(function () { event._graph.pulse(resE, p.value);},  time ); 
-      return event._graph.doNotPropagate;
-    });
-    
-    return resE;
-  };
-
-  /**
-   * Propagates signals from this event stream after <code>time</code>
-   * milliseconds.
-   * 
-   * @param {F.Behavior|number} time
-   * @returns {F.Stream}
-   */  
-  prototype.delay = function (time) {
-    var event = this;
-   
-    if (time instanceof vg.reactive.Signal) {
-      var receiverEE = new vg.reactive.Stream(this._graph);
-      var link = {
-        from: event, 
-        towards: delayStatic(event, time.value())
-      };
-      
-      //TODO: Change semantics such that we are always guaranteed to get an event going out?
-      var switcherE = new vg.reactive.Stream(this._graph,
-        [time.stream()],
-        function (p) {
-          link.from.removeListener(link.towards); 
-          link =
-          {
-            from: event, 
-            towards: delayStatic(event, p.value)
-          };
-          pulse(receiverEE, link.towards);
-          return event._graph.doNotPropagate;
-        });
-      
-      var resE = receiverEE.switch();
-      
-      event._graph.pulse(switcherE, time.value());
-      return resE;
-    } else { return delayStatic(event, time); }
-  };
-
-  /** 
-   * Produces values from <i>valueB</i>, which are sampled when <i>sourceE</i>
-   * is triggered.
-   *
-   * @param {F.Behavior} valueB
-   * @returns {F.Stream}
-   */
-  prototype.snapshot = function (valueB) {
-    return new vg.reactive.Stream(this._graph, [this], function(pulse) {
-      pulse.value = valueB.value(); // TODO: glitch
-      return pulse;
-    });
-  };
-
-  /**
-   * Filters out repeated events that are equal (JavaScript's <code>===</code>).
-   *
-   * @param {*=} optStart initial value (optional)
-   * @returns {F.Stream}
-   */
-  prototype.filterRepeats = function(optStart) {
-    var hadFirst = optStart === undefined ? false : true;
-    var prev = optStart;
-
-    return this.filterE(function (v) {
-      if (!hadFirst || prev !== v) {
-        hadFirst = true;
-        prev = v;
-        return true;
-      }
-      else {
-        return false;
-      }
-    });
-  };
-
-  /**
-   * <i>Calms</i> this event stream to fire at most once every <i>time</i> ms.
-   *
-   * Events that occur sooner are delayed to occur <i>time</i> milliseconds after
-   * the most recently-fired event.  Only the  most recent event is delayed.  So,
-   * if multiple events fire within <i>time</i>, only the last event will be
-   * propagated.
-   *
-   * @param {!number|F.Behavior} time
-   * @returns {F.Stream}
-   */
-  prototype.calm = function(time) {
-    if (!(time instanceof vg.reactive.Signal)) {
-      time = new vg.reactive.Signal(new vg.reactive.Stream(this._graph), time);
-    }
-
-    var evt = this,
-        out = new vg.reactive.Stream(this._graph);
-
-    new vg.reactive.Stream(this._graph,
-      [this],
-      function() {
-        var towards = null;
-        return function (p) {
-          if (towards !== null) { clearTimeout(towards); }
-          towards = setTimeout( function () { 
-              towards = null;
-              pulse(out,p.value); }, time.value());
-          return evt._graph.doNotPropagate;
-        };
-      }());
-
-    return out;
-  };
-
-  /**
-   * Only triggers at most every <code>time</code> milliseconds. Higher-frequency
-   * events are thus ignored.
-   *
-   * @param {!number|F.Behavior} time
-   * @returns {F.Stream}
-   */
-  prototype.blind = function (time) {
-    var evt = this;
-
-    return new vg.reactive.Stream(this._graph,
-      [this],
-      function () {
-        var intervalFn = 
-        time instanceof vg.reactive.Signal ?
-        function () { return time.value(); }
-        : function () { return time; };
-        var lastSent = (new Date()).getTime() - intervalFn() - 1;
-        return function (p) {
-          var curTime = (new Date()).getTime();
-          if (curTime - lastSent > intervalFn()) {
-            lastSent = curTime;
-            return p;
-          }
-          else { return evt._graph.doNotPropagate; }
-        };
-      }());
-  };
-
-  /**
-   * @param {*} init
-   * @returns {!F.Behavior}
-   */
-  prototype.startsWith = function(init) {
-    return new vg.reactive.Signal(this, init);
-  };
-
-  return stream;
-})();vg.reactive.Transform = (function() {
-  
-  var transform = function() {
-    this._source = null;
-    this._signal = null; // Signal from lifting this transform.
-    this._deps   = {signals: [], fields: []};
-    this._output = {};
-  }
-
-  var prototype = transform.prototype;
-
-  prototype.source = function(source) {
-    if(!arguments.length) return this._source;
-    this._source = source;
-    return this;
-  };
-
-  prototype.signal = function(signal) {
-    var t = this;
-    if(signal === undefined) return this._signal;
-    t._signal = signal;
-    vg.keys(t._output).forEach(function(k) {
-      t.source().field(k, signal);
-    })
-    return this;
-  };  
-
-  prototype.graph = function() { return this.source().graph(); };
-
-  prototype.deps  = function() { 
-    var g = this.graph(), src = this.source();
-
-    return {
-      signals: this._deps.signals.map(function(s) { return g.signal(s) }),
-      fields: [].concat.apply([], 
-          this._deps.fields.map(function(f) { return src.field(f) || []; }))
-    };
-  };
-
-  prototype.output = function(map) {
-    var t = this;
-    vg.keys(t._output).forEach(function(k) {
-      if (map[k] !== undefined) {
-        t._output[k] = map[k];
-      }
-    });
-    return this;
-  };
-
-  // Transform should return an integer representing the states
-  // it modified (enter | update | exit).
-  prototype.transform = function(state) { return null; };
-
-  return transform;
-})();vg.reactive.transforms.Filter = (function() {
-  var ENTER  = vg.scene.ENTER,
-      UPDATE = vg.scene.UPDATE,
-      EXIT   = vg.scene.EXIT;
-
-  var filter = function() {
-    vg.reactive.Transform.call(this);
-    this._test = null;
-  };
-
-  filter.prototype = new vg.reactive.Transform();
-  var prototype = filter.prototype;
-
-  prototype.transform = function(state) {
-    var t = this, reEnter = [], reExit = [],
-        enter = state.enter(), update = state.update(), exit = state.exit();
-
-    var filter = function(set) {
-      var sg = t.graph().values(t.deps().signals);
-      
-      for(var i in set) {
-        var test = t._test.apply(null, [set[i].data(), null, null].concat(sg));
-        if(!test && (set === enter || set === update)) { reExit.push(set[i]) }
-        else if(test && set === exit) { reEnter.push(set[i]) }
-      }
-    };
-
-    // Always filter the enter set.
-    filter(enter);
-
-    // If dependent signals have updated, filter the update and exit set
-    // to ensure they remain valid. Similarly, with fields, check if they
-    // have been re-evaluated, and if they affected update and exit sets.
-    var fd  = t.deps().fields, st = t.signal().stamp(), 
-        sg  = st <= t.graph().mostRecentStamp(t.deps().signals),
-        fr  = st <= t.graph().mostRecentStamp(fd),
-        fu  = fd.some(function(f) { return f.value().flag() & UPDATE }),
-        fe  = fd.some(function(f) { return f.value().flag() & EXIT });
-
-    if(sg || (fr && fu)) filter(update);
-    if(sg || (fr && fe)) filter(exit);
-
-    // Can we prevent this extra traversal?
-    reExit.forEach(function(d) { d.exit() });
-    reEnter.forEach(function(d) { d.enter(); });
-
-    return state;
-  };
-
-  prototype.test = function(func) {
-    if(vg.isFunction(func)) this._test = func;
-    else {
-      var expr = vg.parse.expr(func, this.graph());
-      this._test = expr.eval;
-      this._deps.signals = expr.signals;
-      this._deps.fields  = expr.fields;
-    }
-
-    return this;
-  };
-
-  return filter;
-})();vg.reactive.transforms.Fold = (function() {
-  var fold = function() {
-    vg.reactive.Transform.call(this);
-    this._accessors = [];
-    this._output  = {
-      key: "key",
-      value: "value"
-    };
-  }
-
-  fold.prototype = new vg.reactive.Transform();
-  var prototype  = fold.prototype;
-
-  prototype.signal = function(signal) {
-    // Add this transform's signal to the source's field dependency tracker.
-    if(signal !== undefined) {
-      this.source().field(this._output.key, signal)
-        .field(this._output.value, signal);
-    }
-
-    return vg.reactive.Transform.prototype.signal.call(this, signal);
-  };
-
-  prototype.transform = function(prev) {
-    var enter = prev.enter(), exit = prev.exit(),
-        state = this.signal().value(),
-        item, i, j, k = 0, n, m = this._deps.fields.length;
-
-    // If a state doesn't currently exist, this is the first pass but we have
-    // to make sure that we capture prior exit states. 
-    if(!state) {
-      state = new vg.reactive.State();
-      for(i in exit) new vg.reactive.Datum(state, exit[i], k++).exit();
-    }
-
-    // We only ever fold over the enter set, and maintain a reference to the
-    // folded fields. So if the fields change upstream, we should not need to
-    // re-fold the update set. 
-    for (i in enter) {
-      item = enter[i]; 
-      for (j=0; j<m; ++j) {
-        var o = new vg.reactive.Datum(state, item, k++),
-            d = o.data();
-        d[this._output.key]   = this._deps.fields[j];
-        d[this._output.value] = this._accessors[j].bind(null, item.data()); // accessors[j].bind(null, item)
-        o.enter();
-        // item._deps = [o];
-        // 2nd pulse: item --> exit. o --> exit;
-      }
-    }
-
-    return state;
-  };
-
-  prototype.fields = function(f) {
-    this._deps.fields = vg.array(f);
-    this._accessors = this._deps.fields.map(vg.accessor);
-    return this;
-  };
-
-  return fold;
-})();vg.reactive.transforms.Formula = (function() {
-  var ENTER  = vg.scene.ENTER,
-      UPDATE = vg.scene.UPDATE,
-      EXIT   = vg.scene.EXIT;
-
-  var formula = function() {
-    vg.reactive.Transform.call(this);
-    this._field = null;
-    this._expr  = vg.identity;
-  }
-
-  formula.prototype = new vg.reactive.Transform();
-  var prototype = formula.prototype;
-
-  prototype.signal = function(signal) {
-    // Add this transform's signal to the source's field dependency tracker.
-    if(signal !== undefined && this._field) {
-      this.source().field(this._field, signal);
-    }
-
-    return vg.reactive.Transform.prototype.signal.call(this, signal);
-  };
-
-  prototype.transform = function(state) {
-    var t = this,
-        enter  = state.enter(),
-        update = state.update(),
-        exit = state.exit();
-
-    var formula = function(set) {
-      var sg = t.graph().values(t._deps.signals);
-
-      for(var i in set) {
-        if(t._field) {
-          var d = set[i].data(); // {"data": {...}, "index": 0}
-          d[t._field] = t._expr.apply(null, [d, null, null].concat(sg));
-        }
-
-        state.flag(set === enter ? ENTER : set === update ? UPDATE : EXIT);
-      }
-    };
-
-    formula(enter);
-
-    // TODO: Can we be smarter about re-calculating the formula for update/exit
-    // sets? E.g. if there are no downstream transforms that don't care about
-    // the value of this field in the exit sets (like Filter does).
-    var fd  = t.deps().fields,
-        sg  = t.signal().stamp() <= t.graph().mostRecentStamp(t._deps.signals),
-        fr  = t.signal().stamp() <= t.graph().mostRecentStamp(fd),
-        fu  = fd.some(function(f) { return f.value().flag() & UPDATE }),
-        fe  = fd.some(function(f) { return f.value().flag() & EXIT });
-
-    if(sg || (fr && fu)) formula(update);
-    if(sg || (fr && fe)) formula(exit);
-
-    return state;
-  };
-
-  prototype.field = function(name) {
-    this._field = name;
-    return this;
-  };
-  
-  prototype.expr = function(func) {
-    if(vg.isFunction(func)) this._test = func;
-    else {
-      var expr = vg.parse.expr(func, this.graph());
-      this._expr = expr.eval;
-      this._deps.signals = expr.signals;
-      this._deps.fields  = expr.fields;
-    }
-
-    return this;
-  };
-
-  return formula;
-})();  // return module
+};  // return module
   return vg;
 
 //---------------------------------------------------

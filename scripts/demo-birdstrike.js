@@ -3,6 +3,8 @@ require(['jquery','d3', 'dv', 'lodash',
   ],function($, d3, dv, _,
     chartTemplates, dt, field, Chart, vl){
 
+  console.log('vl', vl);
+
 
   var table, schema, col_indices;
 
@@ -24,8 +26,14 @@ require(['jquery','d3', 'dv', 'lodash',
   //amd-plugin
   d3.json("/data/birdstrikes/birdstrikes-schema.json", function(_schema) {
     //TODO: remove this line after updating csv.
-    schema = _(_schema).filter(function(r){ return r.enabled; })
-      .sortBy('field_name').value();
+    schema = _(_schema).filter(function(col){ return col.enabled; })
+      .sortBy('field_name')
+      .map(function(col, i){
+        col.key = col.key.replace(/[^\w]/g, "");
+        col.index = i; //add index
+        return col;
+      })
+      .value();
 
     col_indices = _.reduce(schema, function(result, col, i){ result[col] = i; return result;}, {});
 
@@ -42,7 +50,9 @@ require(['jquery','d3', 'dv', 'lodash',
         return {
           name: col.field_name,
           type: getDVType(col.data_type),
-          values: _.pluck(data, col.field_name)
+          values: col.data_type == 'quantitative' ?
+            data.map(function(row){ return +row[col.field_name];}) :
+            _.pluck(data, col.field_name)
         }
       });
 
@@ -72,31 +82,80 @@ require(['jquery','d3', 'dv', 'lodash',
     // 13: "Wildlife: Size"
     // 14: "Wildlife: Species"
 
-    var selectedColIndicesSet = [[6,8,10], [6,10], [2,10]];
+    // TODO(kanitw): extend this to support query transformation
 
-    _.each(selectedColIndicesSet, function(selectedColIndices){
+    var selectedColIndicesSet = [[6,10], [2,3], [6,8,5], [4,5]],
+      visIdCounter = 0;
+
+    _.each(selectedColIndicesSet, function(selectedColIndices, groupId){
       var selectedCols = selectedColIndices.map(function(i){ return schema[i];}),
         selectedColNames = _.pluck(selectedCols, 'field_name'),
         selectedColTypes = _.pluck(selectedCols, 'data_type');
 
       // ----- Generate Charts -----
-      // TODO: change schema format to match
+      //TODO(kanitw): change schema format to match
       var fields = field.fromColumnsSchema(selectedCols);
-      // TODO: generate a list of charts and rank
+      //TODO(kanitw): generate a list of charts and rank
       var charts = chartTemplates.generateCharts(fields, true);
 
-      console.log('charts', charts);
+      // console.log('charts', charts);
 
       // ----- calculate query -----
+      var dimensions = _.filter(selectedCols, function(col){
+          return col.data_type !== 'quantitative' && col.data_type !== 'count';
+        }),
+        measures = _.filter(selectedCols, function(col){
+          return col.data_type === 'quantitative'|| col.data_type === 'count';
+        }),
+        vals = measures.map(function(col){
+          if(col.data_type === 'quantitative'){
+            return dv.sum(col.index);
+          } //else: col.data_type === "count"
+          return dv.count();
+        }),
+        where = function(){return true}; //TODO(kanitw): support filter
 
-      // TODO: append placeholder and run generate vega spec for these files
-      // $('#content').append('<p>' + chart.toShorthand() + '</p>');
-      //
+      var filteredTable = table.where(where);
+      var rowCount = filteredTable[0].length,
+        rawData = _.range(rowCount).map(function(i){
+          return _.reduce(selectedCols, function(row, col){
+            row[col.key] = filteredTable.get(col.field_name, i);
+            return row;
+          }, {});
+        });
+
+      var colAggData = filteredTable.query({
+          dims: _.pluck(dimensions, 'index'),
+          vals: vals
+        }),
+        aggRowCount = colAggData[0].length,
+        aggregatedData = _.range(aggRowCount).map(function(i){
+          var colKeys = _.pluck(dimensions, 'key').concat(
+              _.pluck(measures, 'key'));
+          return _.reduce(colKeys, function(row, key, j){
+            row[key] = colAggData[j][i];
+            return row;
+          }, {});
+        });
+
+      console.log('rawData', JSON.stringify(rawData));
+      console.log('aggregatedData', JSON.stringify(aggregatedData));
+
+      // ----- render results -----
+
       $('#content').append('<h2>' + selectedColNames.join(",") + '</h2>');
+      $('#content').append('<div class="row" id="group-'+groupId+'"></div>');
+      var group = $('#group-'+groupId);
+
+      var block =
 
       _.each(charts, function(chart){
-        console.log('chart', chart, chart.toShorthand());
-        $('#content').append('<p>' + chart.toShorthand() + '</p>');
+        // console.log('chart', chart, chart.toShorthand());
+        var id = 'vis-' + (visIdCounter++) ;
+
+        group.append('<div class="span4" style="min-height:275px" id="' + id +'"">' + chart.toShorthand() + '</p>');
+
+        vl.parse(chart, schema, chart.isAggregated ? aggregatedData : rawData, '#'+id);
       })
     });
 
