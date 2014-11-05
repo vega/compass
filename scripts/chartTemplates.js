@@ -73,7 +73,8 @@
       encodings: {
         x: {dataType: dt.quantitative, multiple:true},
         y: [{dataType: dt.quantitative, multiple:true},
-            {dataType:dt.categorical}],
+            //{dataType:dt.categorical}
+            ],
         //optional
         size: {dataType: dt.quantitative, optional: true},
         color: [null, dt.categorical, dt.quantitative],
@@ -128,7 +129,8 @@
       encodings: {
         x: {dataType: dt.aggregate, multiple:true},
         y: [{dataType: dt.aggregate, multiple:true},
-            {dataType:dt.categorical}],
+            //{dataType:dt.categorical}
+            ],
         //optional
         size: {dataType: dt.aggregate, optional: true},
         color: [null, dt.categorical, dt.quantitative],
