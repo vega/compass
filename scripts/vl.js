@@ -107,7 +107,7 @@
         { //is __placeholder
           var propName = val.substring(2, val.length-2);
           node[key] = props[propName] || opt[propName];
-          console.log('placeholder', val, node);
+          // console.log('placeholder', val, node);
         }
       })
     });
