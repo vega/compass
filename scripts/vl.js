@@ -117,19 +117,7 @@
 
   vl.parse = function(chart, schema, data, element, opt){
     opt = _.merge(opt || {}, defaultOpts)
-
-    var spec = getVGSpec(chart, schema, data, opt);
-    if(!spec) return; // do nothing for unsupported spec
-
-    console.log('vega (',chart.type,'):', JSON.stringify(spec, "  "));
-
-    vg.parse.spec(spec, function(vgChart){
-      vgChart({el: element}).data({
-        all: data,
-        selected: [],
-        filtered: []
-      }).update();
-    });
+    return getVGSpec(chart, schema, data, opt);
   };
 
   return vl;

@@ -151,11 +151,24 @@ require(['jquery','d3', 'dv', 'lodash',
 
       _.each(charts, function(chart){
         // console.log('chart', chart, chart.toShorthand());
-        var id = 'vis-' + (visIdCounter++) ;
+        var id = 'vis-' + (visIdCounter++),
+          data = chart.isAggregated ? aggregatedData : rawData;
 
-        group.append('<div class="span4" style="min-height:275px" id="' + id +'"">' + chart.toShorthand() + '</p>');
+        var spec = vl.parse(chart, schema, data, '#'+id);
 
-        vl.parse(chart, schema, chart.isAggregated ? aggregatedData : rawData, '#'+id);
+        group.append('<div class="span4" style="min-height:325px" id="' + id +'"">' + chart.toShorthand() + '<div class="hide spec">'+ JSON.stringify(spec, null, 2) +'</div><div class="hide data">'+ JSON.stringify(aggregatedData) +'</div></div>');
+
+        if(spec){
+          vg.parse.spec(spec, function(vgChart){
+            vgChart({el: '#'+id}).data({
+              all: data,
+              selected: [],
+              filtered: []
+            }).update();
+          });
+        }
+
+
       })
     });
 
