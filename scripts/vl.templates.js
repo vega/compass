@@ -107,7 +107,7 @@
 
 
   vlTemplates.marks_bar = function(opt){
-    var color = (opt||{}.color) || {"value": "__markscolor__"};
+    var color = ((opt||{}).color) || {"value": "__markscolor__"};
 
     return {
       "type": "rect",
