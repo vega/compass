@@ -138,7 +138,7 @@ require(['jquery','d3', 'dv', 'lodash',
           }, {});
         });
 
-      // console.log('rawData', JSON.stringify(rawData));
+      // console.log('rawData', rawData);
       // console.log('aggregatedData', JSON.stringify(aggregatedData));
 
       // ----- render results -----
@@ -147,7 +147,7 @@ require(['jquery','d3', 'dv', 'lodash',
       $('#content').append('<div class="row" id="group-'+groupId+'"></div>');
       var group = $('#group-'+groupId);
 
-      var block =
+      // var block =
 
       _.each(charts, function(chart){
         // console.log('chart', chart, chart.toShorthand());
