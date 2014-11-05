@@ -66,6 +66,10 @@
 
     console.log("fields", fieldX, fieldY);
 
+    var isXQuant = fieldX && (fieldX.dataType == "quantitative" || fieldX.dataType == "count");
+    var isYQuant = fieldY && (fieldY.dataType == "quantitative" || fieldY.dataType == "count");
+    var isColorQuant = fieldColor && (fieldColor.dataType == "quantitative" || fieldColor.dataType == "count");
+
     if(chart.chart_type == "BAR"){
       spec.data = mixins.data();
       spec.scales = [
@@ -75,25 +79,29 @@
 
       //TODO make this code less redundant
       if(fieldColor){
-        spec.scales.push(fieldColor.dataType == "quantitative" ? mixins.scale_color_quant() : mixins.scale_color_ord());
+        spec.scales.push(isColorQuant ? mixins.scale_color_quant() : mixins.scale_color_ord());
         marksOpt.color = {scale:"color", field: "__field_color__"};
       }
 
-      spec.axes = mixins.axes();
-      spec.marks = [
-        mixins.marks_bar()
-      ];
+      spec.axes = mixins.axes(isXQuant ? {ticks: 5} : {},
+        isYQuant ? {ticks: 5} : {});
+
+      marks = mixins.marks_bar(marksOpt);
+      if(fieldColor){
+        marks = mixins.marks_stackbar(marks);
+      }
+      spec.marks = [marks];
 
     }else if(chart.chart_type == "PLOT"){
       spec.data = mixins.data();
       spec.scales = [
-        fieldX.dataType == "quantitative" ? mixins.scale_qnt('x') : mixins.scale_ord('x', {points:true}),
-        fieldY.dataType == "quantitative" ? mixins.scale_qnt('y') : mixins.scale_ord('y', {points:true})
+        isXQuant ? mixins.scale_qnt('x') : mixins.scale_ord('x', {points:true}),
+        isYQuant ? mixins.scale_qnt('y') : mixins.scale_ord('y', {points:true})
       ];
 
       //TODO make this code less redundant
       if(fieldColor){
-        spec.scales.push(fieldColor.dataType == "quantitative" ? mixins.scale_color_quant() : mixins.scale_color_ord());
+        spec.scales.push(isColorQuant ? mixins.scale_color_quant() : mixins.scale_color_ord());
         marksOpt.color = {scale:"color", field: "__field_color__"};
       }
       if(fieldShape){
@@ -104,10 +112,11 @@
 
       //TODO make this code less redundant
       if(fieldColor){
-        spec.scales.push(fieldColor.dataType == "quantitative" ? mixins.scale_color_quant() : mixins.scale_color_ord());
+        spec.scales.push(isColorQuant ? mixins.scale_color_quant() : mixins.scale_color_ord());
       }
 
-      spec.axes = mixins.axes();
+      spec.axes = mixins.axes(isXQuant ? {ticks: 5} : {},
+        isYQuant ? {ticks: 5} : {});
       if(chart.fields.size){
         spec.scales.push(mixins.scale_size());
         props.field_size = 'data.' + chart.fields.size[0].key;

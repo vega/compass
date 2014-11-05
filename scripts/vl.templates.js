@@ -39,7 +39,7 @@
     return _.merge({
       "name": name,
       "type": "ordinal",
-      "domain": { "data": "all", "field": "__field_" + name + "__"},
+      "domain": { "data": "all", "field": "__field_" + name + "__"}, //__field_x__  or __field_y__
       "range": "height"
     }, opt||{});
   };
@@ -87,15 +87,22 @@
     };
   }
 
-  // TODO(kanitw): split this to axes x/y, ordinal/quant
-  vlTemplates.axes = function(){
-    return [{
+  vlTemplates.axis_x = function(opt){
+    return _.merge({
       "type": "x",
       "scale": "x"
-    }, {
+    },opt||{});
+  }
+
+  vlTemplates.axis_y = function(opt){
+    return _.merge({
       "type": "y",
       "scale": "y"
-    }];
+    },opt||{});
+  }
+
+  vlTemplates.axes = function(optX,optY){
+    return [ vlTemplates.axis_x(optX), vlTemplates.axis_y(optY) ];
   };
 
 
