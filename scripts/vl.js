@@ -51,8 +51,8 @@
   function getVGSpec(chart, schema, data, opt){
     var spec = mixins.spec(), props = {}, marksOpt={}, marks;
 
-    var fieldX = (chart.fields.x||{})[0],
-      fieldY = (chart.fields.y||{})[0],
+    var fieldX = (chart.fields.x||{})[0], //FIXME support 1 x only for now
+      fieldY = (chart.fields.y||{})[0], //FIXME
       fieldColor = (chart.fields.color||{})[0],
       fieldShape = (chart.fields.shape||{})[0];
 
@@ -133,13 +133,14 @@
 
     // TODO(kanitw): adjust properties
 
+    //traversing the spec and replace placeholder properties
     traverse(spec, function(node){
       // console.log('traverse replace', node);
       _.each(node, function(val, key, node){
         if( val && _.isString(val) &&
             val.indexOf("__")===0 &&
             val.lastIndexOf("__") ===val.length-2)
-        { //is __placeholder
+        { //is __placeholder__
           var propName = val.substring(2, val.length-2);
           node[key] = props[propName] || opt[propName];
           // console.log('placeholder', val, node);
