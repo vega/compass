@@ -89,14 +89,16 @@ require(['jquery','d3', 'dv', 'lodash','vega',
     // TODO(kanitw): extend this to support query transformation
 
     var selectedColIndicesSet = [
-      [5], //Q
+      // [5], //Q
       [6,10], //CxQ
       [6,8], //Cx#
       [2,3], //C(Big)xQ
       [4,5], //QxQ
       // [7,8], //Dx#
       [6,11,5], //CxCxQ
-      [6,8,5] //Cx#xG
+      [6,5,4], //CxQxQ
+      // [6,5,10] //CxQxQ //TODO: speed might be problematic
+      // [6,8,5] //Cx#xG
 
     ];
     var visIdCounter = 0;
