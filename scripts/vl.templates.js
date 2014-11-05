@@ -39,30 +39,53 @@
     return _.merge({
       "name": name,
       "type": "ordinal",
-      "range": "height",
-      "domain": { "data": "all", "field": "__field_" + name + "__"}
+      "domain": { "data": "all", "field": "__field_" + name + "__"},
+      "range": "height"
     }, opt||{});
   };
 
   vlTemplates.scale_qnt = function(name){
     return {
       "name": name,
-      "range": "width",
       "nice": true,
-      "domain": { "data": "all", "field": "__field_" + name + "__"}
+      "domain": { "data": "all", "field": "__field_" + name + "__"},
+      "range": "width"
     }
   }
 
-  // TODO add SCALE_X_QUANT,ORDINAL and Y
-  //
+  vlTemplates.scale_color_quant = function(){
+    return {
+      "name": "color",
+      "domain": { "data": "all", "field": "__field_color__"},
+      "range": ["#b0c6a5","#0d511f"]
+    };
+  };
 
-  vlTemplates.scale_color = function(){
+  vlTemplates.scale_color_ord = function(){
     return {
       "name": "color",
       "type": "ordinal",
+      "domain": { "data": "all", "field": "__field_color__"},
       "range": "category20"
     };
   };
+
+  vlTemplates.scale_shape = function(){
+    return {
+      "name": "shape",
+      "type": "ordinal",
+      "domain": { "data": "all", "field": "__field_shape__"},
+      "range": "shapes"
+    }
+  };
+
+  vlTemplates.scale_size = function(){
+    return {
+      "name": "size",
+      "domain": { "data": "all", "field": "__field_size__"},
+      "range": [0, 1000]
+    };
+  }
 
   // TODO(kanitw): split this to axes x/y, ordinal/quant
   vlTemplates.axes = function(){
@@ -75,7 +98,10 @@
     }];
   };
 
-  vlTemplates.marks_bar = function(){
+
+  vlTemplates.marks_bar = function(opt){
+    var color = opt.color || {"value": "__markscolor__"};
+
     return {
       "type": "rect",
       "from": { "data": "all"},
@@ -86,13 +112,17 @@
           "y": {"scale": "y", "field": "__field_y__"},
           "height": { "scale": "y", "band": true, "offset": -1}
         },
-        "update": {"fill": { "value": "__markscolor__"}},
+        "update": {"fill": color},
         "hover": {"fill": { "value": "red"}}
       }
     };
   };
 
-  vlTemplates.marks_plot = function(){
+  vlTemplates.marks_plot = function(opt){
+    var color = opt.color || {"value": "__markscolor__"},
+      shape = opt.shape || {"value": "circle"},
+      size = opt.size || {"value": "__plotsize__"};
+
     return {
         "type": "symbol",
         "from": {"data": "all"},
@@ -101,11 +131,12 @@
             "x": {"scale": "x", "field": "__field_x__"},
             "y": {"scale": "y", "field": "__field_y__"},
             // "fill": {"scale": "c", "field": "data.species"},
-            "fillOpacity": {"value": 0.5},
-            "size": {"value": 100}
+            "fillOpacity": {"value": "__fillplotopacity__"},
+            "size": size,
+            "shape": shape
           },
           "update": {
-            "fill": {"value": "__markscolor__"},
+            "fill": color,
           },
           "hover": {
             "fill": {"value": "__markshovercolor__"}

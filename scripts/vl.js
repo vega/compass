@@ -25,10 +25,12 @@
   var defaultOpts = {
     width: 200,
     height: 200,
-    "padding": {"top": 20, "left": 50, "bottom": 20, "right": 20},
+    "padding": {"top": 30, "left": 50, "bottom": 30, "right": 30},
     legends: false, // on for big visualization
     markscolor: "steelblue",
-    markshovercolor: "red"
+    markshovercolor: "red",
+    fillplotopacity: 0.2,
+    plotsize: 100
   }
 
   function traverse(node, fn){
@@ -47,14 +49,19 @@
   }
 
   function getVGSpec(chart, schema, data, opt){
-    var spec = mixins.spec(), props = {};
-
+    var spec = mixins.spec(), props = {}, marksOpt={}, marks;
 
     var fieldX = (chart.fields.x||{})[0],
-      fieldY = (chart.fields.y||{})[0];
+      fieldY = (chart.fields.y||{})[0],
+      fieldColor = (chart.fields.color||{})[0],
+      fieldShape = (chart.fields.shape||{})[0];
+
     // TODO(kanitw): support table algebra
     if(fieldX) props.field_x = 'data.' + fieldX.key;
     if(fieldY) props.field_y = 'data.' + fieldY.key;
+    if(fieldColor) props.field_color = 'data.' + fieldColor.key;
+    if(fieldShape) props.field_shape = 'data.' + fieldShape.key;
+
     //TODO:(kanitw): update scale based on x,y fields
 
     console.log("fields", fieldX, fieldY);
@@ -65,7 +72,13 @@
         mixins.scale_qnt('x'),
         mixins.scale_ord('y')
       ];
-      //TODO add color, shape
+
+      //TODO make this code less redundant
+      if(fieldColor){
+        spec.scales.push(fieldColor.dataType == "quantitative" ? mixins.scale_color_quant() : mixins.scale_color_ord());
+        marksOpt.color = {scale:"color", field: "__field_color__"};
+      }
+
       spec.axes = mixins.axes();
       spec.marks = [
         mixins.marks_bar()
@@ -77,23 +90,45 @@
         fieldX.dataType == "quantitative" ? mixins.scale_qnt('x') : mixins.scale_ord('x', {points:true}),
         fieldY.dataType == "quantitative" ? mixins.scale_qnt('y') : mixins.scale_ord('y', {points:true})
       ];
-      //TODO add color, shape
+
+      //TODO make this code less redundant
+      if(fieldColor){
+        spec.scales.push(fieldColor.dataType == "quantitative" ? mixins.scale_color_quant() : mixins.scale_color_ord());
+        marksOpt.color = {scale:"color", field: "__field_color__"};
+      }
+      if(fieldShape){
+        spec.scales.push(mixins.scale_shape()) ;
+        marksOpt.shape = {scale:"shape", field: "__field_shape__"};
+        props.plotsize = 50;
+      }
+
+      //TODO make this code less redundant
+      if(fieldColor){
+        spec.scales.push(fieldColor.dataType == "quantitative" ? mixins.scale_color_quant() : mixins.scale_color_ord());
+      }
+
       spec.axes = mixins.axes();
+      if(chart.fields.size){
+        spec.scales.push(mixins.scale_size());
+        props.field_size = 'data.' + chart.fields.size[0].key;
+        marksOpt.size = {scale:"size", field: "__field_size__"};
+      }
       spec.marks = [
-        mixins.marks_plot()
+        mixins.marks_plot(marksOpt)
       ];
+
     }else{
+      // TODO(kanitw): zening please add map case here!
       return null;
     }
 
+    // ADD COLOR
+
+
+    //
     // Determine properties
-
-    // TODO(kanitw): determine properties for field
-    console.log('getVGSpec', chart);
-
-
-
     // TODO(kanitw): create scale for color, shape, size
+
 
 
     // TODO(kanitw): adjust properties

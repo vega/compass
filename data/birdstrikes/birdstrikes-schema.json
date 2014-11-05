@@ -34,7 +34,7 @@
   "key": "INCIDENT_DATE",
   "field_name": "Flight Date",
   "tab_schema_type": "datetime",
-  "data_type": "date",
+  "data_type": "datetime",
   "cardinality": 23,
   "enabled": true
 }, {

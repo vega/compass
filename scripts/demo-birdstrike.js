@@ -1,6 +1,6 @@
-require(['jquery','d3', 'dv', 'lodash',
+require(['jquery','d3', 'dv', 'lodash','vega',
     'chartTemplates', 'dataTypes', 'field', 'chart', 'vl'
-  ],function($, d3, dv, _,
+  ],function($, d3, dv, _, vg,
     chartTemplates, dt, field, Chart, vl){
 
   console.log('vl', vl);
@@ -61,31 +61,45 @@ require(['jquery','d3', 'dv', 'lodash',
       if(n != col_names[i]) console.log(n, '!=', col_names[i]);
     });
 
+    console.log('data_cols', _(data_cols).map(function(col){
+      return [col.name, col.values[0]];
+    }).flatten().value()); //show first line of data
+
     // ----- create datavore table -----
     table = dv.table(data_cols);
 
     // -----  Assume User Selection here -----
 
-    // 0: "Aircraft: Airline/Operator"
-    // 1: "Aircraft: Make/Model"
-    // 2: "Airport: Name"
-    // 3: "Cost: Other"
-    // 4: "Cost: Repair"
-    // 5: "Cost: Total $"
-    // 6: "Effect: Amount of damage"
-    // 7: "Flight Date"
-    // 8: "Number of Strikes"
-    // 9: "Origin State"
-    // 10: "Speed (IAS) in knots"
-    // 11: "When: Phase of flight"
-    // 12: "When: Time of day"
-    // 13: "Wildlife: Size"
-    // 14: "Wildlife: Species"
+    // 0:C "Aircraft: Airline/Operator"
+    // 1:C "Aircraft: Make/Model"
+    // 2:C "Airport: Name"
+    // 3:Q "Cost: Other"
+    // 4:Q "Cost: Repair"
+    // 5:Q "Cost: Total $"
+    // 6:C "Effect: Amount of damage"
+    // 7:D "Flight Date"
+    // 8:# "Number of Strikes"
+    // 9:G "Origin State"
+    // 10:Q "Speed (IAS) in knots"
+    // 11:C "When: Phase of flight"
+    // 12:C "When: Time of day"
+    // 13:C "Wildlife: Size"
+    // 14:C "Wildlife: Species"
 
     // TODO(kanitw): extend this to support query transformation
 
-    var selectedColIndicesSet = [[6,10], [2,3], [6,8,5], [4,5]],
-      visIdCounter = 0;
+    var selectedColIndicesSet = [
+      [5], //Q
+      [6,10], //CxQ
+      [6,8], //Cx#
+      [2,3], //C(Big)xQ
+      [4,5], //QxQ
+      // [7,8], //Dx#
+      [6,11,5], //CxCxQ
+      [6,8,5] //Cx#xG
+
+    ];
+    var visIdCounter = 0;
 
     _.each(selectedColIndicesSet, function(selectedColIndices, groupId){
       var selectedCols = selectedColIndices.map(function(i){ return schema[i];}),
