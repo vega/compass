@@ -61,12 +61,13 @@
     };
   };
 
-  vlTemplates.scale_color_ord = function(){
+  vlTemplates.scale_color_ord = function(opt){
+    var range = (opt||{}).range || "category10";
     return {
       "name": "color",
       "type": "ordinal",
       "domain": { "data": "all", "field": "__field_color__"},
-      "range": "category20"
+      "range": range
     };
   };
 
@@ -152,6 +153,20 @@
         }
       };
   };
+
+  vlTemplates.marks_stackbar = function(marks, opt){
+    return {
+      "type": "group",
+      "from": {
+        "data": "all",
+        "transform": [
+          {"type": "facet", "keys": ["__field_color__"]},
+          {"type": "stack", "point": "__field_y__", "height": "__field_x__"}
+        ]
+      },
+      "marks": [marks]
+    };
+  }
 
   vlTemplates.FILL_COLOR_FIELD = {"scale": "color", "field": "__field_color__"};
 

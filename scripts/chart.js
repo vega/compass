@@ -21,7 +21,7 @@
   // var dt = require('./dataTypes');
 
   var CHART_TYPE_SPLIT = "--",
-    ENCODINGS_SPLIT = ";",
+    ENCODINGS_SPLIT = "; ",
     ENCODING_SPLIT = ":",
     ENCODING_AND = "&",
     ENCODING_OR = "/",

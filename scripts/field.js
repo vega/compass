@@ -1,3 +1,5 @@
+// FIXME rename these to encodings
+
 // Universal Module Pattern -- modified from https://github.com/umdjs/umd/blob/master/returnExports.js
 // Uses Node, AMD or browser globals to create a module.
 

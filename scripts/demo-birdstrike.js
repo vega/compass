@@ -51,7 +51,7 @@ require(['jquery','d3', 'dv', 'lodash','vega',
           name: col.field_name,
           type: getDVType(col.data_type),
           values: col.data_type == 'quantitative' ?
-            data.map(function(row){ return +row[col.field_name];}) :
+            data.map(function(row){ return +row[col.field_name] || 0;}) :
             _.pluck(data, col.field_name)
         }
       });
@@ -67,6 +67,9 @@ require(['jquery','d3', 'dv', 'lodash','vega',
 
     // ----- create datavore table -----
     table = dv.table(data_cols);
+
+    window.table = table;
+    window.dv = dv;
 
     // -----  Assume User Selection here -----
 
@@ -89,8 +92,9 @@ require(['jquery','d3', 'dv', 'lodash','vega',
     // TODO(kanitw): extend this to support query transformation
 
     var selectedColIndicesSet = [
-      // [5], //Q
-      [6,10], //CxQ
+      // [10], //Q
+      [6,5], //CxQ
+      //[6,10], //CxQ
       [6,8], //Cx#
       [2,3], //C(Big)xQ
       [4,5], //QxQ
@@ -99,7 +103,6 @@ require(['jquery','d3', 'dv', 'lodash','vega',
       [6,5,4], //CxQxQ
       // [6,5,10] //CxQxQ //TODO: speed might be problematic
       // [6,8,5] //Cx#xG
-
     ];
     var visIdCounter = 0;
 
@@ -145,14 +148,22 @@ require(['jquery','d3', 'dv', 'lodash','vega',
           vals: vals
         }),
         aggRowCount = colAggData[0].length,
-        aggregatedData = _.range(aggRowCount).map(function(i){
-          var colKeys = _.pluck(dimensions, 'key').concat(
-              _.pluck(measures, 'key'));
-          return _.reduce(colKeys, function(row, key, j){
-            row[key] = colAggData[j][i];
-            return row;
-          }, {});
-        });
+        aggregatedData = _.range(aggRowCount)
+          .filter(function(i){ //filter row with valid values only!
+            var len = colAggData.length;
+            for(var j=1; j<=vals.length; j++){
+              if(colAggData[len-j][i]===NaN) return false;
+            }
+            return true;
+          })
+          .map(function(i){
+            var colKeys = _.pluck(dimensions, 'key').concat(
+                _.pluck(measures, 'key'));
+            return _.reduce(colKeys, function(row, key, j){
+              row[key] = colAggData[j][i];
+              return row;
+            }, {});
+          });
 
       // console.log('rawData', rawData);
       // console.log('aggregatedData', JSON.stringify(aggregatedData));
