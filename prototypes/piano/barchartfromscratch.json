@@ -1,0 +1,95 @@
+{
+	"name": "Bar Chart From Scratch",
+	"width": 400,
+	"height": 200,
+	"viewport": [500,450],
+	"padding": {"top": 10, "left": 30, "right": 10, "bottom": 30},
+	"data": [
+		{
+		"name": "raw_data",
+		"format": {"type": "json"},
+		"values": [
+		{"keyname": "C", "color": "white", "position": 0.5, "position2": 1.5, "height": 5},
+		{"keyname": "D", "color": "white", "position": 1.5, "position2": 2.5, "height": 5},
+		{"keyname": "E", "color": "white", "position": 2.5, "position2": 3.5, "height": 5},
+		{"keyname": "F", "color": "white", "position": 3.5, "position2": 4.5, "height": 5},
+		{"keyname": "G", "color": "white", "position": 4.5, "position2": 5.5, "height": 5},
+		{"keyname": "A", "color": "white", "position": 5.5, "position2": 6.5, "height": 5},
+		{"keyname": "B", "color": "white", "position": 6.5, "position2": 7.5, "height": 5},
+		{"keyname": "C#", "color": "black", "position": 1.25, "position2": 1.75, "height": 3},
+		{"keyname": "D#", "color": "black", "position": 2.25, "position2": 2.75, "height": 3},
+		{"keyname": "F#", "color": "black", "position": 4.25, "position2": 4.75, "height": 3},
+		{"keyname": "G#", "color": "black", "position": 5.25, "position2": 5.75, "height": 3},
+		{"keyname": "A#", "color": "black", "position": 6.25, "position2": 6.75, "height": 3}
+		]
+	}],
+	"scales": [
+	{
+		"name": "x",
+		"type": "linear",
+		"range": "width",
+		"domain": {
+			"fields": [
+				{"data": "raw_data", "field": "data.position"},
+				{"data": "raw_data", "field": "data.position2"}
+			]
+		}
+	},
+	{
+		"name": "y",
+		"type": "linear",
+		"range": "height",
+		"domain": {"data": "raw_data", "field": "data.height"},
+		"reverse": "true"
+	}
+	],
+	"axes": [
+	{
+		"type": "x",
+		"scale": "x",
+		"ticks": 0,
+		"properties": {
+			"axis": {
+				"strokeWidth": {"value": 0}
+			}
+		}
+	},
+	{
+		"type": "y",
+		"scale": "y",
+		"ticks": 0,
+		"properties": {
+			"axis": {
+				"strokeWidth": {"value": 0}
+			}
+		}
+	}
+	],
+	"marks": [
+	{
+		"type": "rect",
+		"from": {"data": "raw_data"},
+		"properties": {
+			"enter": {
+				"x": {"scale": "x", "field": "data.position"},
+				"x2": {"scale": "x", "field": "data.position2"},
+				"y": {"scale": "y", "value": 0},
+				"y2": {"scale": "y", "field": "data.height"}
+			},
+			"update": {
+				"fill": {"field": "data.color"},
+				"stroke": {"value": "black"},
+				"strokeWidth": {"value": 1}
+			},
+			"hover": {
+				"fill": {"value": "orange"}
+			}
+		}
+	}
+	]
+}
+
+
+
+
+

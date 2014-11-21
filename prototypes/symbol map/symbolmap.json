@@ -1,0 +1,53 @@
+{
+	"name": "symbolmap",
+	"width": 960,
+	"height": 500,
+	"data":[
+	{
+      "name": "table",
+      "url": "data/table.csv",
+      "format": {"type": "csv", "parse": {"NumberOfRecords": "number", "latitude": "number", "longitude": "number"}},
+      "transform": [
+      	{"type": "geo", "lat": "data.latitude", "lon": "data.longitude", "projection": "albersUsa"}
+      ]
+    },
+    {
+      "name": "states",
+      "url": "data/us-10m.json",
+      "format": {"type": "topojson", "feature": "states"},
+      "transform": [
+        {"type": "geopath", "value": "data", "projection": "albersUsa"}
+      ]
+    }],
+    "marks": [
+    {
+      "type": "path",
+      "from": {"data": "states"},
+      "properties": {
+        "enter": { "path": {"field": "path"} },
+        "update": { 
+        	"fill": {"value": "lightgrey"},
+        	"stroke": {"value": "white"} }
+      }
+    },
+    {
+    	"type": "symbol",
+    	"from": {"data": "table"},
+    	"properties": {
+    		"enter": {
+    			"x": {"field": "x"},
+    			"y": {"field": "y"},
+    			"size": {"field": "data.NumberOfRecords"},
+    			"shape": {"value": "circle"}
+    			},
+    		"update": {
+    			"fill": {"value": "steelblue"}
+    		},
+    		"hover": {
+    			"fill": {"value": "orange"}
+    		}
+  		}
+
+    }
+  ]
+}
