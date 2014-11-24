@@ -1,6 +1,6 @@
 {
 	"name": "Bar Chart From Scratch",
-	"width": 1000,
+	"width": 900,
 	"height": 200,
 	"viewport": [1100,450],
 	"padding": {"top": 10, "left": 30, "right": 10, "bottom": 30},
@@ -77,7 +77,7 @@
 		{
 			"axis": 
 			{
-				"strokeWidth": {"value": 1}
+				"strokeWidth": {"value": 0}
 			}
 		}
 	},
@@ -87,7 +87,7 @@
 		"ticks": 2,
 		"properties": {
 			"axis": {
-				"strokeWidth": {"value": 1}
+				"strokeWidth": {"value": 0}
 			}
 		}
 	}
@@ -100,7 +100,7 @@
 		{
 			"name": "x",
 			"type": "linear",
-			"range": "width",
+			"range": 300,
 			"domain": {
 				"fields": [
 					{"data": "raw_data", "field": "data.position"},
@@ -108,6 +108,26 @@
 				]
 			}
 		}],
+		"axes": [
+		{
+			"type": "x",
+			"scale": "x",
+			"ticks": 3,
+			"properties": {
+				"axis": {
+					"strokeWidth": {"value": 1}
+				}
+			}
+		}],
+		"properties": {
+			"enter": {
+				"x": {"scale": "x_groups", "field": "octave"},
+          		"y": {"value": 1},
+          		"height": {"group": "height"},
+          		"width": {"group": "width"},
+          		"stroke": {"value": "#ccc"}
+			}
+		},
 		"marks":[
 		{
 			"type": "rect",
