@@ -5,7 +5,7 @@
 	"viewport": [500,450],
 	"padding": {"top": 10, "left": 30, "right": 10, "bottom": 30},
 	"data": [
-		{
+	{
 		"name": "raw_data",
 		"format": {"type": "json"},
 		"values": [
@@ -21,6 +21,15 @@
 		{"keyname": "F#", "color": "black", "position": 4.25, "position2": 4.75, "height": 3},
 		{"keyname": "G#", "color": "black", "position": 5.25, "position2": 5.75, "height": 3},
 		{"keyname": "A#", "color": "black", "position": 6.25, "position2": 6.75, "height": 3}
+		]
+	},
+	{
+		"name": "keyboard",
+		"format": {"type": "json"},
+		"values": [
+		{"octave": "low"},
+		{"octave": "middle"},
+		{"octave": "high"}
 		]
 	}],
 	"scales": [
@@ -63,6 +72,12 @@
 				"strokeWidth": {"value": 0}
 			}
 		}
+	}
+	],
+	"marks": [
+	{
+		"type": "group",
+		"from": {"data": "keyboard"}
 	}
 	],
 	"marks": [
