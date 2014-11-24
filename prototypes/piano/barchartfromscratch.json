@@ -46,7 +46,14 @@
 		{"keyname": "G#", "color": "black", "position": 5.25, "position2": 5.75, "height": 3, "octave": "high"},
 		{"keyname": "A#", "color": "black", "position": 6.25, "position2": 6.75, "height": 3, "octave": "high"}
 		]
-	}],
+	},
+	{
+      "name": "keyboard",
+      "source": "raw_data",
+      "transform": [
+        {"type": "facet", "keys": ["data.octave"]}
+      ]
+    }],
 	"scales": [
 	{
 		"name": "x_groups",
@@ -86,8 +93,45 @@
 	}
 	],
 	"marks": [
+	{
+		"type": "group",
+		"from": {"data": "keyboard"},
+		"scales": [
+		{
+			"name": "x",
+			"type": "linear",
+			"range": "width",
+			"domain": {
+				"fields": [
+					{"data": "raw_data", "field": "data.position"},
+					{"data": "raw_data", "field": "data.position2"}
+				]
+			}
+		}],
+		"marks":[
+		{
+			"type": "rect",
+			"from": {"data": "raw_data"},
+			"properties": {
+				"enter": {
+					"x": {"scale": "x", "field": "data.position"},
+					"x2": {"scale": "x", "field": "data.position2"},
+					"y": {"scale": "y", "value": 0},
+					"y2": {"scale": "y", "field": "data.height"}
+				},
+				"update": {
+					"fill": {"field": "data.color"},
+					"stroke": {"value": "black"},
+					"strokeWidth": {"value": 1}
+				},
+				"hover": {
+					"fill": {"value": "orange"}
+				}
+			}
+		}
+		]
+	}	
 	]
-	
 }
 
 
