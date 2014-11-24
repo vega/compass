@@ -1,0 +1,23 @@
+
+	"marks": [
+	{
+		"type": "rect",
+		"from": {"data": "raw_data"},
+		"properties": {
+			"enter": {
+				"x": {"scale": "x", "field": "data.position"},
+				"x2": {"scale": "x", "field": "data.position2"},
+				"y": {"scale": "y", "value": 0},
+				"y2": {"scale": "y", "field": "data.height"}
+			},
+			"update": {
+				"fill": {"field": "data.color"},
+				"stroke": {"value": "black"},
+				"strokeWidth": {"value": 1}
+			},
+			"hover": {
+				"fill": {"value": "orange"}
+			}
+		}
+	}
+	]
