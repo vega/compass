@@ -59,7 +59,7 @@
 		"ticks": 0,
 		"properties": {
 			"axis": {
-				"strokeWidth": {"value": 0}
+				"strokeWidth": {"value": 1}
 			}
 		}
 	},
@@ -69,7 +69,7 @@
 		"ticks": 0,
 		"properties": {
 			"axis": {
-				"strokeWidth": {"value": 0}
+				"strokeWidth": {"value": 1}
 			}
 		}
 	}
@@ -85,7 +85,22 @@
 			"range": "width",
 			"domain": {"data": "keyboard", "field": "octave"}
 		}
-		]
+		],
+		"axes": [
+		{
+			"type": "x", 
+			"scale": "groups"
+		}
+		],
+		"properties": {
+			"enter": {
+				"x": {"scale": "groups", "field": "octave"},
+          		"y": {"value": 1},
+          		"height": {"group": "height"},
+          		"width": {"group": "width"},
+          		"stroke": {"value": "#ccc"}
+			}
+		}
 	}
 	],
 	"marks": [
