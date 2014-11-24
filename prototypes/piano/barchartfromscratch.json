@@ -77,14 +77,17 @@
 	{
 		"type": "y",
 		"scale": "y",
-		"ticks": 0,
+		"ticks": 2,
 		"properties": {
 			"axis": {
-				"strokeWidth": {"value": 0}
+				"strokeWidth": {"value": 1}
 			}
 		}
 	}
+	],
+	"marks": [
 	]
+	
 }
 
 
