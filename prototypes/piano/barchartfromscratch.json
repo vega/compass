@@ -45,6 +45,12 @@
 		}
 	},
 	{
+		"name": "groups",
+		"type": "ordinal",
+		"range": "width",
+		"domain": {"data": "keyboard", "field": "data.octave"}
+	},
+	{
 		"name": "y",
 		"type": "linear",
 		"range": "height",
@@ -54,12 +60,23 @@
 	],
 	"axes": [
 	{
+		"type": "x", 
+		"scale": "groups",
+		"properties": 
+		{
+			"axis": 
+			{
+				"strokeWidth": {"value": 1}
+			}
+		}
+	},
+	{
 		"type": "x",
 		"scale": "x",
 		"ticks": 0,
 		"properties": {
 			"axis": {
-				"strokeWidth": {"value": 1}
+				"strokeWidth": {"value": 0}
 			}
 		}
 	},
@@ -69,7 +86,7 @@
 		"ticks": 0,
 		"properties": {
 			"axis": {
-				"strokeWidth": {"value": 1}
+				"strokeWidth": {"value": 0}
 			}
 		}
 	}
@@ -78,20 +95,6 @@
 	{
 		"type": "group",
 		"from": {"data": "keyboard"},
-		"scales": [
-		{
-			"name": "groups",
-			"type": "ordinal",
-			"range": "width",
-			"domain": {"data": "keyboard", "field": "octave"}
-		}
-		],
-		"axes": [
-		{
-			"type": "x", 
-			"scale": "groups"
-		}
-		],
 		"properties": {
 			"enter": {
 				"x": {"scale": "groups", "field": "octave"},
