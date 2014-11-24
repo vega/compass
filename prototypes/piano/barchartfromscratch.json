@@ -77,7 +77,15 @@
 	"marks": [
 	{
 		"type": "group",
-		"from": {"data": "keyboard"}
+		"from": {"data": "keyboard"},
+		"scales": [
+		{
+			"name": "groups",
+			"type": "ordinal",
+			"range": "width",
+			"domain": {"data": "keyboard", "field": "octave"}
+		}
+		]
 	}
 	],
 	"marks": [
