@@ -61,6 +61,29 @@
 		"domain": {"data": "raw_data", "field": "data.height"},
 		"reverse": "true"
 	}
+	],
+	"axes": [
+	{
+		"type": "x", 
+		"scale": "x_groups",
+		"properties": 
+		{
+			"axis": 
+			{
+				"strokeWidth": {"value": 1}
+			}
+		}
+	},
+	{
+		"type": "y",
+		"scale": "y",
+		"ticks": 0,
+		"properties": {
+			"axis": {
+				"strokeWidth": {"value": 0}
+			}
+		}
+	}
 	]
 }
 
