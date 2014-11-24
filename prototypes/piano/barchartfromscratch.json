@@ -46,7 +46,22 @@
 		{"keyname": "G#", "color": "black", "position": 5.25, "position2": 5.75, "height": 3, "octave": "high"},
 		{"keyname": "A#", "color": "black", "position": 6.25, "position2": 6.75, "height": 3, "octave": "high"}
 		]
-	}]
+	}],
+	"scales": [
+	{
+		"name": "x_groups",
+		"type": "ordinal",
+		"range": "width",
+		"domain": {"data": "raw_data", "field": "data.octave"}
+	},
+	{
+		"name": "y",
+		"type": "linear",
+		"range": "height",
+		"domain": {"data": "raw_data", "field": "data.height"},
+		"reverse": "true"
+	}
+	]
 }
 
 
