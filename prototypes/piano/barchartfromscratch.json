@@ -3,7 +3,7 @@
 	"width": 1000,
 	"height": 200,
 	"viewport": [1100,450],
-	"padding": {"top": 10, "left": 30, "right": 10, "bottom": 30},
+	"padding": {"top": 30, "left": 30, "right": 10, "bottom": 30},
 	"data": [
 	{
 		"name": "raw_data",
@@ -122,16 +122,15 @@
 		"properties": {
 			"enter": {
 				"x": {"scale": "x_groups", "field": "key"},
-          		"y": {"value": 1},
+          		"y": {"value": 0},
           		"height": {"group": "height"},
-          		"width": {"group": "width"},
+          		"width": {"scale": "x_groups", "band": true},
           		"stroke": {"value": "#ccc"}
 			}
 		},
 		"marks":[
 		{
 			"type": "rect",
-			"from": {"data": "raw_data"},
 			"properties": {
 				"enter": {
 					"x": {"scale": "x", "field": "data.position"},
