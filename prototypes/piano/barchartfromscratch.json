@@ -106,7 +106,9 @@
 					{"data": "raw_data", "field": "data.position"},
 					{"data": "raw_data", "field": "data.position2"}
 				]
-			}
+			},
+			"nice": false,
+			"zero": false
 		}],
 		"axes": [
 		{
