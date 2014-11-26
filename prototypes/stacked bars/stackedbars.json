@@ -1,0 +1,150 @@
+{
+	"name": "Bar Chart From Scratch",
+	"width": 1000,
+	"height": 200,
+	"viewport": [1100,450],
+	"padding": {"top": 30, "left": 30, "right": 10, "bottom": 30},
+	"data": [
+	{
+		"name": "raw_data",
+		"format": {"type": "json"},
+		"values": [
+		{"keyname": "C", "color": "white", "position": 0.5, "position2": 1.5, "height": 5, "octave": "low"},
+		{"keyname": "D", "color": "white", "position": 1.5, "position2": 2.5, "height": 5, "octave": "low"},
+		{"keyname": "E", "color": "white", "position": 2.5, "position2": 3.5, "height": 5, "octave": "low"},
+		{"keyname": "F", "color": "white", "position": 3.5, "position2": 4.5, "height": 5, "octave": "low"},
+		{"keyname": "G", "color": "white", "position": 4.5, "position2": 5.5, "height": 5, "octave": "low"},
+		{"keyname": "A", "color": "white", "position": 5.5, "position2": 6.5, "height": 5, "octave": "low"},
+		{"keyname": "B", "color": "white", "position": 6.5, "position2": 7.5, "height": 5, "octave": "low"},
+		{"keyname": "C#", "color": "black", "position": 1.25, "position2": 1.75, "height": 3, "octave": "low"},
+		{"keyname": "D#", "color": "black", "position": 2.25, "position2": 2.75, "height": 3, "octave": "low"},
+		{"keyname": "F#", "color": "black", "position": 4.25, "position2": 4.75, "height": 3, "octave": "low"},
+		{"keyname": "G#", "color": "black", "position": 5.25, "position2": 5.75, "height": 3, "octave": "low"},
+		{"keyname": "A#", "color": "black", "position": 6.25, "position2": 6.75, "height": 3, "octave": "low"},
+		{"keyname": "C", "color": "white", "position": 0.5, "position2": 1.5, "height": 5, "octave": "middle"},
+		{"keyname": "D", "color": "white", "position": 1.5, "position2": 2.5, "height": 5, "octave": "middle"},
+		{"keyname": "E", "color": "white", "position": 2.5, "position2": 3.5, "height": 5, "octave": "middle"},
+		{"keyname": "F", "color": "white", "position": 3.5, "position2": 4.5, "height": 5, "octave": "middle"},
+		{"keyname": "G", "color": "white", "position": 4.5, "position2": 5.5, "height": 5, "octave": "middle"},
+		{"keyname": "A", "color": "white", "position": 5.5, "position2": 6.5, "height": 5, "octave": "middle"},
+		{"keyname": "B", "color": "white", "position": 6.5, "position2": 7.5, "height": 5, "octave": "middle"},
+		{"keyname": "C#", "color": "black", "position": 1.25, "position2": 1.75, "height": 3, "octave": "middle"},
+		{"keyname": "D#", "color": "black", "position": 2.25, "position2": 2.75, "height": 3, "octave": "middle"},
+		{"keyname": "F#", "color": "black", "position": 4.25, "position2": 4.75, "height": 3, "octave": "middle"},
+		{"keyname": "G#", "color": "black", "position": 5.25, "position2": 5.75, "height": 3, "octave": "middle"},
+		{"keyname": "A#", "color": "black", "position": 6.25, "position2": 6.75, "height": 3, "octave": "middle"},
+		{"keyname": "C", "color": "white", "position": 0.5, "position2": 1.5, "height": 5, "octave": "high"},
+		{"keyname": "D", "color": "white", "position": 1.5, "position2": 2.5, "height": 5, "octave": "high"},
+		{"keyname": "E", "color": "white", "position": 2.5, "position2": 3.5, "height": 5, "octave": "high"},
+		{"keyname": "F", "color": "white", "position": 3.5, "position2": 4.5, "height": 5, "octave": "high"},
+		{"keyname": "G", "color": "white", "position": 4.5, "position2": 5.5, "height": 5, "octave": "high"},
+		{"keyname": "A", "color": "white", "position": 5.5, "position2": 6.5, "height": 5, "octave": "high"},
+		{"keyname": "B", "color": "white", "position": 6.5, "position2": 7.5, "height": 5, "octave": "high"},
+		{"keyname": "C#", "color": "black", "position": 1.25, "position2": 1.75, "height": 3, "octave": "high"},
+		{"keyname": "D#", "color": "black", "position": 2.25, "position2": 2.75, "height": 3, "octave": "high"},
+		{"keyname": "F#", "color": "black", "position": 4.25, "position2": 4.75, "height": 3, "octave": "high"},
+		{"keyname": "G#", "color": "black", "position": 5.25, "position2": 5.75, "height": 3, "octave": "high"},
+		{"keyname": "A#", "color": "black", "position": 6.25, "position2": 6.75, "height": 3, "octave": "high"}
+		]
+	},
+	{
+      "name": "keyboard",
+      "source": "raw_data",
+      "transform": [
+        {"type": "facet", "keys": ["data.octave"]}
+      ]
+    }],
+	"scales": [
+	{
+		"name": "x_groups",
+		"type": "ordinal",
+		"range": "width",
+		"domain": {"data": "keyboard", "field": "key"}
+	},
+	{
+		"name": "y",
+		"type": "linear",
+		"range": "height",
+		"domain": {"data": "raw_data", "field": "data.height"},
+		"reverse": "true"
+	}
+	],
+	"axes": [
+	{
+		"type": "y",
+		"scale": "y",
+		"ticks": 0,
+		"properties": {
+			"axis": {
+				"strokeWidth": {"value": 0}
+			}
+		}
+	}
+	],
+	"marks": [
+	{
+		"type": "group",
+		"from": {"data": "keyboard"},
+		"scales": [
+		{
+			"name": "x",
+			"type": "linear",
+			"range": "width",
+			"domain": {
+				"fields": [
+					{"data": "raw_data", "field": "data.position"},
+					{"data": "raw_data", "field": "data.position2"}
+				]
+			},
+			"nice": false,
+			"zero": false
+		}],
+		"axes": [
+		{
+			"type": "x",
+			"scale": "x",
+			"ticks": 0,
+			"properties": {
+				"axis": {
+					"strokeWidth": {"value": 0}
+				}
+			}
+		}],
+		"properties": {
+			"enter": {
+				"x": {"scale": "x_groups", "field": "key"},
+          		"y": {"value": 0},
+          		"height": {"group": "height"},
+          		"width": {"scale": "x_groups", "band": true},
+          		"stroke": {"value": "#ccc"}
+			}
+		},
+		"marks":[
+		{
+			"type": "rect",
+			"properties": {
+				"enter": {
+					"x": {"scale": "x", "field": "data.position"},
+					"x2": {"scale": "x", "field": "data.position2"},
+					"y": {"scale": "y", "value": 0},
+					"y2": {"scale": "y", "field": "data.height"}
+				},
+				"update": {
+					"fill": {"field": "data.color"},
+					"stroke": {"value": "black"},
+					"strokeWidth": {"value": 1}
+				},
+				"hover": {
+					"fill": {"value": "orange"}
+				}
+			}
+		}
+		]
+	}	
+	]
+}
+
+
+
+
+
