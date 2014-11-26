@@ -7,20 +7,20 @@
 	{
 		"name": "table",
 		"values": [
-		{"x": 1, "y": 1, "color": "green"},
-		{"x": 2, "y": 2, "color": "green"},
-		{"x": 3, "y": 3, "color": "green"},
-		{"x": 4, "y": 4, "color": "green"},
-		{"x": 5, "y": 5, "color": "green"},
-		{"x": 6, "y": 6, "color": "green"},
-		{"x": 7, "y": 7, "color": "green"},
-		{"x": 1, "y": 7, "color": "yellow"},
-		{"x": 2, "y": 6, "color": "yellow"},
-		{"x": 3, "y": 5, "color": "yellow"},
-		{"x": 4, "y": 4, "color": "yellow"},
-		{"x": 5, "y": 3, "color": "yellow"},
-		{"x": 6, "y": 2, "color": "yellow"},
-		{"x": 7, "y": 1, "color": "yellow"}
+		{"x": 1, "y": 1, "color": "#d62728"},
+		{"x": 2, "y": 2, "color": "#d62728"},
+		{"x": 3, "y": 3, "color": "#d62728"},
+		{"x": 4, "y": 4, "color": "#d62728"},
+		{"x": 5, "y": 5, "color": "#d62728"},
+		{"x": 6, "y": 6, "color": "#d62728"},
+		{"x": 7, "y": 7, "color": "#d62728"},
+		{"x": 1, "y": 7, "color": "#1f77b4"},
+		{"x": 2, "y": 6, "color": "#1f77b4"},
+		{"x": 3, "y": 5, "color": "#1f77b4"},
+		{"x": 4, "y": 4, "color": "#1f77b4"},
+		{"x": 5, "y": 3, "color": "#1f77b4"},
+		{"x": 6, "y": 2, "color": "#1f77b4"},
+		{"x": 7, "y": 1, "color": "#1f77b4"}
 		]
 	},
 	{
@@ -65,7 +65,7 @@
 			"properties": {
 				"enter": {
 					"x": {"scale": "x", "field": "data.x"},
-					"width": {"scale": "x", "band": true},
+					"width": {"scale": "x", "band": true, "offset": -1},
 					"y": {"scale": "y", "field": "y"},
 					"y2": {"scale": "y", "field": "y2"},
 					"fill": {"field": "data.color"}
