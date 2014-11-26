@@ -22,6 +22,14 @@
 		{"x": 6, "y": 2, "color": "yellow"},
 		{"x": 7, "y": 1, "color": "yellow"}
 		]
+	},
+	{
+		"name": "stats",
+		"source": "table",
+		"transform": [
+		{"type": "facet", "keys": ["data.x"]},
+		{"type": "stats", "value": "data.y"}
+		]
 	}
 	],
 	"scales": [
@@ -35,7 +43,7 @@
 		"name": "y",
 		"type": "linear",
 		"range": "height",
-		"domain": {"data": "table", "field": "data.y"}
+		"domain": {"data": "stats", "field": "sum"}
 	}
 	],
 	"axes": [
