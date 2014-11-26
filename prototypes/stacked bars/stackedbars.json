@@ -52,6 +52,16 @@
 	],
 	"marks": [
 	{
+		"type": "text",
+		"text": "9999",
+		"properties": {
+			"enter": {
+				"x": {"value": 50},
+				"y": {"value": 50}
+			}
+		}
+	},
+	{
 		"type": "group",
 		"from": {
 			"data": "table", 
