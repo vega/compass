@@ -69,6 +69,12 @@
 					"y": {"scale": "y", "field": "y"},
 					"y2": {"scale": "y", "field": "y2"},
 					"fill": {"field": "data.color"}
+				},
+				"update": {
+					"fillOpacity": {"value": 1}
+				},
+				"hover": {
+					"fillOpacity": {"value": 0.5}
 				}
 			}
 		}]
