@@ -35,7 +35,7 @@
 	"scales": [
 	{
 		"name": "x",
-		"type": "linear",
+		"type": "ordinal",
 		"range": "width", 
 		"domain": {"data": "table", "field": "data.x"}
 	},
@@ -49,5 +49,34 @@
 	"axes": [
 	{"type": "x", "scale": "x"},
 	{"type": "y", "scale": "y"}
+	],
+	"marks": [
+	{
+		"type": "group",
+		"from": {
+			"data": "table", 
+			"transform": [
+			{"type": "facet", "keys": ["data.color"]},
+			{"type": "stack", "point": "data.x", "height": "data.y"}
+			]
+		},
+		"marks": [{
+			"type": "rect",
+			"properties": {
+				"enter": {
+					"x": {"scale": "x", "field": "data.x"},
+					"width": {"scale": "x", "band": true},
+					"y": {"scale": "y", "field": "y"},
+					"y2": {"scale": "y", "field": "y2"},
+					"fill": {"field": "data.color"}
+				}
+			}
+		}]
+	}
 	]
 }
+
+
+
+
+
