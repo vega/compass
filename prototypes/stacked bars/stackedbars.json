@@ -2,7 +2,7 @@
 	"name": "stacked bars",
 	"width": 500,
 	"height": 200,
-	"padding": {"top": 10, "left": 30, "right": 30, "bottom": 10},
+	"padding": {"top": 10, "left": 30, "right": 30, "bottom": 30},
 	"data": [
 	{
 		"name": "table",
@@ -23,5 +23,23 @@
 		{"x": 7, "y": 1, "color": "yellow"}
 		]
 	}
+	],
+	"scales": [
+	{
+		"name": "x",
+		"type": "linear",
+		"range": "width", 
+		"domain": {"data": "table", "field": "data.x"}
+	},
+	{
+		"name": "y",
+		"type": "linear",
+		"range": "height",
+		"domain": {"data": "table", "field": "data.y"}
+	}
+	],
+	"axes": [
+	{"type": "x", "scale": "x"},
+	{"type": "y", "scale": "y"}
 	]
 }
