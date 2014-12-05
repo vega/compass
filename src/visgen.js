@@ -63,38 +63,39 @@
     area: lineRule
   };
 
-  function isType(enc, e, t){
-    return (enc[e]||{}).type > 0
-  }
 
   function pointRule(enc){
     if(enc.x && enc.y){
-      return true;
+      // shape doesn't work with both x, y as ordinal
+      if(enc.shape && enc.x.type == "O" && enc.y.type == "O"){
+        return false;
+      }
     }else{ // plot with one axis = dot plot
 
-      // let's only do horizontal dot-plot so reject dot plot with y
+      // Dot plot should always be horizontal
       if(enc.y) return false;
 
       // dot plot with shape is non-sense
       if (enc.shape) return false;
-
-
     }
     return true;
   }
 
   function barRule(enc){
-    // at least one aggregate
+    // Bar Chart requires at least one aggregate
+    var hasAgg = false;
     for(var e in enc){
-      if(enc[e].aggr) return true;
+      if(enc[e].aggr){
+        hasAgg = true;
+        break;
+      }
     }
-    return false;
+    return hasAgg;
   }
 
   function lineRule(enc){
-    //let's do only horizontal line
-    return isType(enc, "x", vl.dataTypes.T) &&
-      isType(enc, "y", vl.dataTypes.Q);
+    // Line chart should be only horizontal
+    return enc.x == "T" && enc.y == "Q";
   }
 
   var ENCODING_RULES = {
