@@ -1,10 +1,9 @@
 require(['jquery','d3', 'dv', 'lodash','vega',
-    'chartTemplates', 'dataTypes', 'field', 'chart', 'vl'
+    'chartTemplates', 'dataTypes', 'field', 'chart', 'vegalite'
   ],function($, d3, dv, _, vg,
     chartTemplates, dt, field, Chart, vl){
 
   console.log('vl', vl);
-
 
   var table, schema, col_indices;
 
@@ -17,7 +16,7 @@ require(['jquery','d3', 'dv', 'lodash','vega',
       "geographic": dv.type.nominal, //TODO: extend datavore to support geographic
       "quantitative": dv.type.numeric,
       "count": dv.type.unknown //TODO how to best deal with this.
-    }
+    };
     return typeMap[data_type];
   }
 
