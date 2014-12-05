@@ -29,7 +29,14 @@
     HISTOGRAM: 'HISTOGRAM'
   };
 
-  var markTypesEncodingsSupport = {
+  var MARK_TYPES = ["point", "bar", "line", "area",  "text"]; //filled_map
+
+  var ANY_DATA_TYPES= (1<<4)-1;
+
+  // BEGINING OF RULES
+
+  // each mark type support different sets of encodings
+  var encodingSupport = {
     point: dict(["x", "y", "size", "shape", "color", "alpha"]),
     bar: dict(["x", "y", "size", "color", "alpha"]),
     line: dict(["x", "y", "color", "alpha"]),
@@ -39,16 +46,56 @@
     text: dict(["x", "y", "size", "color", "alpha", "text"])
   };
 
-  var markTypesEncodingsRequirement = {
+  // only point, circle, square, support aggregate well
+  //TODO markTypesAggregateSupport
+
+  var encodingRequirement = {
     bar: ["x", "y"],
     line: ["x", "y"],
     area: ["x", "y"],
     text: ["text"]
   };
 
-  var MARK_TYPES = ["point", "bar", "line", "area",  "text"]; //filled_map
+  var marksRule = {
+    point: pointRule,
+    bar: barRule,
+    line: lineRule,
+    area: lineRule
+  };
 
-  var ANY_DATA_TYPES= (1<<4)-1;
+  function isType(enc, e, t){
+    return (enc[e]||{}).type > 0
+  }
+
+  function pointRule(enc){
+    if(enc.x && enc.y){
+      return true;
+    }else{ // plot with one axis = dot plot
+
+      // let's only do horizontal dot-plot so reject dot plot with y
+      if(enc.y) return false;
+
+      // dot plot with shape is non-sense
+      if (enc.shape) return false;
+
+
+    }
+    return true;
+  }
+
+  function barRule(enc){
+    // at least one aggregate
+    for(var e in enc){
+      if(enc[e].aggr) return true;
+    }
+    return false;
+  }
+
+  function lineRule(enc){
+    //let's do only horizontal line
+    return isType(enc, "x", vl.dataTypes.T) &&
+      isType(enc, "y", vl.dataTypes.Q);
+  }
 
   var ENCODING_RULES = {
     x: {
@@ -99,6 +146,8 @@
     T: ["year","month","day"] //,"hr", "min", "bmon", "bday", "bdow", "bhr"]
   };
 
+  // END OF RULES
+
   /**
    * make a membership map from the input array
    */
@@ -121,9 +170,13 @@
     //console.log("encodings", encodings.map(JSON.stringify));
 
     var chartGroups = encodings.map(function(enc){
-      return vgn._getSupportedMarkTypes(enc).map(function(markType){
-        return { marktype: markType, enc: enc };
-      });
+      return vgn._getSupportedMarkTypes(enc)
+        .filter(function(markType){
+          return !marksRule[markType] || marksRule[markType](enc);
+        })
+        .map(function(markType){
+          return { marktype: markType, enc: enc, cfg: cfg };
+        });
     });
 
     return flat ?
@@ -134,8 +187,8 @@
   //TODO(kanitw): write test case
   vgn._getSupportedMarkTypes = function(enc){
     var markTypes = MARK_TYPES.filter(function(markType){
-      var reqs = markTypesEncodingsRequirement[markType],
-        support = markTypesEncodingsSupport[markType];
+      var reqs = encodingRequirement[markType],
+        support = encodingSupport[markType];
 
       for(var i in reqs){ // all required encodings in enc
         var req = reqs[i];
