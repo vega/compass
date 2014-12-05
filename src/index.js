@@ -45,6 +45,17 @@ require(['d3', 'vega', 'vegalite', 'lodash', 'visgen'],function(d3, vg, vl, _, v
     });
   }
 
+  function encodingDetails(enc, div){
+    div.append("div").html("marktype: <b>"+enc.marktype()+"</b>");
+    enc.forEach(function(k, v){
+      div.append("div").html(
+        k+": <b>"+
+        (v.aggr || "") +
+        (v.bin ? " bin " : "") +
+        v.name +
+        "</b> ("+ vl.dataTypeNames[v.type] + ")")
+    });
+  }
   function loadData(){
     // TODO: use other lib to load csv as columns?
     // TODO: regenerate csv with all columns
@@ -104,39 +115,42 @@ require(['d3', 'vega', 'vegalite', 'lodash', 'visgen'],function(d3, vg, vl, _, v
         //TODO(kanitw): generate a list of charts and rank
         var chartGroups = vgn.generateCharts(fields, null, {
           dataUrl: "data/birdstrikes.json",
-          viewport: [300, 300]
+          viewport: [460, 460]
         });
         //console.log('charts', charts);
 
         // ----- render results -----
 
         var content = d3.select("#content");
-        content.append("h2").text(selectedColNames.join(","));
+        content.append("h2").text(selectedCols.map(function(col){
+          return col['field_name'] + " [" + col['data_type'][0] +"]";
+        }).join(","));
 
         var chartGroupDiv = content.append("div")
             .attr("id", "group-"+selectionId)
             .attr("class", "row")
             .style("background-color", "#fcfcfc");
 
+
         chartGroups.forEach(function (chartGroup, grpIdx) {
-
-
 
           chartGroup.forEach(function(chart, i){
             // console.log('chart', chart, chart.toShorthand());
             var id = 'vis-' + (visIdCounter++),
               encoding = vl.Encoding.parseJSON(chart);
 
+
             //console.log('id', id);
 
             var spec = vl.toVegaSpec(encoding, data);
 
-            var chartDiv = chartGroupDiv.append("div").attr("class", "span4");
-            chartDiv.append("div").text(grpIdx + ":"+ JSON.stringify(encoding.toJSON(true), null, "  ", 80));
+            var chartDiv = chartGroupDiv.append("div").attr("class", "span6");
+            var detail = chartDiv.append("div").text(grpIdx+"-"+ (selIdx++)).append("div");
+            encodingDetails(encoding, detail);
 
             chartDiv.append("div")
               .attr("id", id)
-              .style({"height": "325px", "class": "span4", "overflow":"hidden"})
+              .style({"height": "460px", "class": "span4", "overflow":"hidden"})
 
             chartDiv.append("div")
               .text(JSON.stringify(spec, null, "  "))
