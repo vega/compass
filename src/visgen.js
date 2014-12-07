@@ -181,31 +181,6 @@
 
   var json = function(s,sp){ return JSON.stringify(s, null, sp);};
 
-  vgn.generateCharts = function (fields, marktypes, cfg, flat, opt){
-    marktypes = marktypes || MARK_TYPES; // assign * if there is no constraints
-
-    opt = opt ? vl.keys(opt).reduce(function(c ,k){ //merge with default
-      c[k] = opt[k];
-      return c;
-    }, Object.create(vgn.DEFAULT_OPT)) : Object.create(vgn.DEFAULT_OPT)
-
-    // generate permutation of encoding mappings
-    var encodings = vgn._generateEncodings(fields);
-
-    //console.log("encodings", encodings.map(JSON.stringify));
-
-    var chartGroups = encodings.map(function(enc){
-      return vgn._getSupportedMarkTypes(enc, opt)
-        .map(function(markType){
-          return { marktype: markType, enc: enc, cfg: cfg };
-        });
-    });
-
-    return flat ?
-      [].concat.apply([], chartGroups) //flatten
-      : chartGroups.filter(function(grp){ return grp.length > 0;}); //return non-empty groups
-  };
-
   // Begin of Distance
 
   var DIST_BY_ENCTYPE = [
@@ -300,6 +275,34 @@
     return arr;
   }
 
+  // End of Clustering
+
+  // Beginning of Chart Generation
+
+  vgn.generateCharts = function (fields, marktypes, cfg, flat, opt){
+    marktypes = marktypes || MARK_TYPES; // assign * if there is no constraints
+
+    opt = opt ? vl.keys(opt).reduce(function(c ,k){ //merge with default
+      c[k] = opt[k];
+      return c;
+    }, Object.create(vgn.DEFAULT_OPT)) : Object.create(vgn.DEFAULT_OPT)
+
+    // generate permutation of encoding mappings
+    var encodings = vgn._generateEncodings(fields);
+
+    //console.log("encodings", encodings.map(JSON.stringify));
+
+    var chartGroups = encodings.map(function(enc){
+      return vgn._getSupportedMarkTypes(enc, opt)
+        .map(function(markType){
+          return { marktype: markType, enc: enc, cfg: cfg };
+        });
+    });
+
+    return flat ?
+      [].concat.apply([], chartGroups) //flatten
+      : chartGroups.filter(function(grp){ return grp.length > 0;}); //return non-empty groups
+  };
 
   //TODO(kanitw): write test case
   vgn._getSupportedMarkTypes = function(enc, opt){
