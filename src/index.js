@@ -1,6 +1,8 @@
 require(['d3', 'vega', 'vegalite', 'lodash', 'visgen'],function(d3, vg, vl, _, vgn){
   var schema, col_indices;
 
+  var keys = vg.keys;
+
   //TODO: unify type system
   function getDVType(data_type){
     //return datavore's data type
@@ -56,10 +58,12 @@ require(['d3', 'vega', 'vegalite', 'lodash', 'visgen'],function(d3, vg, vl, _, v
         "</b> ("+ vl.dataTypeNames[v.type] + ")")
     });
   }
+
   function loadData(){
     // TODO: use other lib to load csv as columns?
     // TODO: regenerate csv with all columns
     d3.csv("data/birdstrikes/birdstrikes-header-reformatted.csv", function(data) {
+      self.data = data;
       console.log("keys", vg.keys(data[0]));
       //console.log("data#0", data[0]);
       // -----  Assume User Selection here -----
@@ -82,94 +86,150 @@ require(['d3', 'vega', 'vegalite', 'lodash', 'visgen'],function(d3, vg, vl, _, v
 
       // TODO(kanitw): extend this to support query transformation
 
-      var selectedColIndicesSet = [
-        [10], //Q
+      var colIndicesSet = [
+        [6,11,5], //CxCxQ
         [6, 10], //CxQ
+        [10], //Q
         [6,8], //Cx#
-        [2,3], //C(Big)xQ
+        // [2,3], //C(Big)xQ
         //[4,5], //QxQ
         //// [7,8], //Dx#
-        //[6,11,5], //CxCxQ
-        //[6,5,4], //CxQxQ
+        [6,5,4], //CxQxQ
+        // [11,12,13], //OxOxO //FIXME
         //// [6,5,10] //CxQxQ //TODO: speed might be problematic
         //// [6,8,5] //Cx#xG
       ];
-      var visIdCounter = 0;
 
-      selectedColIndicesSet.forEach(function(selectedColIndices, selectionId){
-        var selectedCols = selectedColIndices.map(function(i){ return schema[i];}),
-          selectedColNames = _.pluck(selectedCols, 'field_name'),
-          selectedColTypes = _.pluck(selectedCols, 'data_type');
+      var control = d3.select("#control");
 
-        // ----- Generate Charts -----
-        //TODO(kanitw): change schema format to match
-        var fields = selectedCols.map(function(col){
-          return {
-            name: col.key,
-            type: getDVType(col.data_type)
-          }
-        });
+      var dsel = control.append("select").attr("class", "data")
+        .on("change", function(){
+          var index = this.options[this.selectedIndex].value;
+          render(colIndicesSet[index])
+        })
+        .selectAll("option").data(colIndicesSet)
+        .enter().append("option")
+          .attr("value", function(d, i){ return i;})
+          .attr("selected", function(d,i){ return i==0? true : undefined;})
+          .text(function(d, i){ return getTitle(d);});
 
-        console.log('fields', JSON.stringify(fields));
+      render(colIndicesSet[0])
+    });
+  }
 
-        //TODO(kanitw): generate a list of charts and rank
-        var chartGroups = vgn.generateCharts(fields, null, {
-          dataUrl: "data/birdstrikes.json",
-          viewport: [460, 460]
-        });
-        //console.log('charts', charts);
+  function getTitle(colIndices){
+    var cols = colIndices.map(function(i){ return schema[i];});
 
-        // ----- render results -----
+    return cols.map(function(col){
+      return col['field_name'] + " [" + col['data_type'][0] +"]";
+    }).join(",");
+  }
 
-        var content = d3.select("#content");
-        content.append("h2").text(selectedCols.map(function(col){
-          return col['field_name'] + " [" + col['data_type'][0] +"]";
-        }).join(","));
+  function render(selectedColIndices){
+    var visIdCounter = 0;
+    var selectedCols = selectedColIndices.map(function(i){ return schema[i];}),
+      selectedColNames = _.pluck(selectedCols, 'field_name'),
+      selectedColTypes = _.pluck(selectedCols, 'data_type');
 
-        var chartGroupDiv = content.append("div")
-            .attr("id", "group-"+selectionId)
-            .attr("class", "row")
-            .style("background-color", "#fcfcfc");
+    // ----- Generate Charts -----
+    //TODO(kanitw): change schema format to match
+    var fields = selectedCols.map(function(col){
+      if(col.data_type == "count"){
+        return {aggr: "count"};
+      }
+      return {
+        name: col.key,
+        type: getDVType(col.data_type)
+      }
+    });
 
+    console.log('fields', JSON.stringify(fields));
 
-        chartGroups.forEach(function (chartGroup, grpIdx) {
+    //TODO(kanitw): generate a list of charts and rank
+    var charts = vgn.generateCharts(fields, null, {
+      dataUrl: "data/birdstrikes.json",
+      viewport: [460, 460]
+    }, true);
+    //console.log('charts', charts);
 
-          chartGroup.forEach(function(chart, i){
-            // console.log('chart', chart, chart.toShorthand());
-            var id = 'vis-' + (visIdCounter++),
-              encoding = vl.Encoding.parseJSON(chart);
+    // ----- render results -----
 
+    var content = d3.select("#display");
+    content.selectAll("*").remove();
+    content.append("h2").text(getTitle(selectedColIndices));
 
-            //console.log('id', id);
+    var diff = vgn.getDistanceTable(charts),
+      clusters = vgn.cluster(charts, 2.5);
 
-            var spec = vl.toVegaSpec(encoding, data);
+    var table = content.append("table");
+    var headerRow = table.append("tr").attr("class","header-row");
+    headerRow.append("th");
+    headerRow.selectAll("th.item-col").data(diff)
+      .enter().append("th").attr("class","item-col")
+        .append("b").text(function(d, i){ return ""+i;});
 
-            var chartDiv = chartGroupDiv.append("div").attr("class", "span6");
-            var detail = chartDiv.append("div").text(grpIdx+"-"+ (selIdx++)).append("div");
-            encodingDetails(encoding, detail);
+    var rows = table.selectAll("tr.item-row")
+      .data(diff)
+      .enter().append("tr").attr("class", "item-row");
 
-            chartDiv.append("div")
-              .attr("id", id)
-              .style({"height": "460px", "class": "span4", "overflow":"hidden"})
-
-            chartDiv.append("div")
-              .text(JSON.stringify(spec, null, "  "))
-              .classed("hide spec", true);
-
-            if(spec){
-              console.log("rendering spec", spec);
-              console.log("rendering spec", id ,":", JSON.stringify(spec));
-              vg.parse.spec(spec, function(vgChart){
-                var vis = vgChart({el: '#'+id, renderer: "svg"});
-                vis.update();
-              });
-            }
-          });
-        });
-
+    rows.append("td").append("b").text(function(d,i){ return i;});
+    rows.selectAll("td.item-cell")
+      .data(_.identity)
+      .enter().append("td").attr("class","item-cell")
+      .style("text-align", "center")
+      .style("border", "1px solid #ddd")
+      .text(function(d){
+        return d ? d3.format('.2')(d) : "-";
       });
 
-    });
+
+    clusters.forEach(function(c){
+      var cluster = c.map(function(i){
+        return { chart: charts[i],i: i};
+      });
+
+      var chartGroupDiv = content.append("div")
+          .attr("id", "group")
+          .attr("class", "row")
+          .style({
+            "background-color": "#fcfcfc",
+            "overflow-x":"scroll",
+            "margin-bottom": "20px"
+          });
+
+      cluster.forEach(function(o, i){
+        // console.log('chart', chart, chart.toShorthand());
+        var chart=o.chart,
+          i=o.i,
+          id = 'vis-' + (visIdCounter++),
+          encoding = vl.Encoding.parseJSON(chart);
+
+        var spec = vl.toVegaSpec(encoding, data);
+
+        var chartDiv = chartGroupDiv.append("div")
+          .style("display", "inline-block")
+        var detail = chartDiv.append("div").text(i).append("div");
+        encodingDetails(encoding, detail);
+
+        chartDiv.append("div")
+          .attr("id", id)
+          .style({"height": (+spec.height+40) +"px", "overflow":"hidden"})
+
+        chartDiv.append("div")
+          .text(JSON.stringify(spec, null, "  "))
+          .classed("hide spec", true);
+
+        if(spec){
+          //console.log("rendering spec", spec);
+          //console.log("rendering spec", id ,":", JSON.stringify(spec));
+          vg.parse.spec(spec, function(vgChart){
+            var vis = vgChart({el: '#'+id, renderer: "svg"});
+            vis.update();
+          });
+        }
+      });
+    })
+
   }
 
   loadSchema();

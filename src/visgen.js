@@ -4,18 +4,34 @@
 (function (root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['vega', 'vegalite'], factory);
+    define(['vega', 'vegalite', 'clusterfck'], factory);
   } else if (typeof exports === 'object') {
     // Node. Does not work with strict CommonJS, but
     // only CommonJS-like environments that support module.exports,
     // like Node.
-    module.exports = factory(require('vega', 'vegalite'));
+    module.exports = factory(
+      require('vega'),
+      require('vegalite'),
+      require('clusterfck')
+    );
   } else {
     // Browser globals (root is window)
-    root.returnExports = factory(root.b);
+    root.vgn = factory(root.vg, root.vl, root.clusterfck);
   }
-}(this, function (vg, vl) {
+}(this, function (vg, vl, clusterfck) {
   var vgn = {}; //VisGeN
+
+  vgn.DEFAULT_OPT = {
+    /**
+     * Eliminate all transpose
+     * - keeping horizontal dot plot only.
+     * - for OxQ charts, always put O on Y
+     */
+    omitTranpose: false,
+    /** remove all dot plot with >1 encoding */
+    omitDotPlotWithExtraEncoding: false
+
+  };
 
   var ENCODING_TYPES = ["x", "y", "row", "col", "size", "shape", "color", "alpha"]; //geo
 
@@ -64,7 +80,7 @@
   };
 
 
-  function pointRule(enc){
+  function pointRule(enc, opt){
     if(enc.x && enc.y){
       // shape doesn't work with both x, y as ordinal
       if(enc.shape && enc.x.type == "O" && enc.y.type == "O"){
@@ -74,6 +90,9 @@
 
       // Dot plot should always be horizontal
       if(enc.y) return false;
+
+      // dot plot shouldn't have other encoding
+      if(opt.omitDotPlotWithExtraEncoding && vl.keys(enc).length > 1) return false;
 
       // dot plot with shape is non-sense
       if (enc.shape) return false;
@@ -162,8 +181,13 @@
 
   var json = function(s,sp){ return JSON.stringify(s, null, sp);};
 
-  vgn.generateCharts = function (fields, marktypes, cfg, flat){
+  vgn.generateCharts = function (fields, marktypes, cfg, flat, opt){
     marktypes = marktypes || MARK_TYPES; // assign * if there is no constraints
+
+    opt = opt ? vl.keys(opt).reduce(function(c ,k){ //merge with default
+      c[k] = opt[k];
+      return c;
+    }, Object.create(vgn.DEFAULT_OPT)) : Object.create(vgn.DEFAULT_OPT)
 
     // generate permutation of encoding mappings
     var encodings = vgn._generateEncodings(fields);
@@ -171,10 +195,7 @@
     //console.log("encodings", encodings.map(JSON.stringify));
 
     var chartGroups = encodings.map(function(enc){
-      return vgn._getSupportedMarkTypes(enc)
-        .filter(function(markType){
-          return !marksRule[markType] || marksRule[markType](enc);
-        })
+      return vgn._getSupportedMarkTypes(enc, opt)
         .map(function(markType){
           return { marktype: markType, enc: enc, cfg: cfg };
         });
@@ -185,8 +206,103 @@
       : chartGroups.filter(function(grp){ return grp.length > 0;}); //return non-empty groups
   };
 
+  // Begin of Distance
+
+  var DIST_BY_ENCTYPE = [
+    ["x", "y", 0.6],
+    ["color", "shape", 0.7],
+    ["row", "col", 0.6],
+    ["color", "alpha", 0.6]
+  ].reduce(function(r, x){
+    var a=x[0], b=x[1], d=x[2];
+    r[a] = r[a] || {};
+    r[b] = r[b] || {};
+    r[a][b] = r[b][a] = d;
+    return r;
+  }, {}),
+    DIST_MISSING = 100, CLUSTER_THRESHOLD=2;
+
+
+  function colenc(encoding){
+    var colenc = {},
+      enc = encoding.enc;
+
+    vl.keys(enc).forEach(function(encType){
+      var e = vl.duplicate(enc[encType]);
+      e.type = encType;
+      colenc[e.name || ""] = e;
+      delete e.name;
+    });
+
+    return {
+      marktype: encoding.marktype,
+      col: colenc
+    };
+  }
+
+  vgn._getDistance = function(colenc1, colenc2){
+    var cols = union(vl.keys(colenc1.col), vl.keys(colenc2.col)),
+      dist = 0;
+
+    cols.forEach(function(col){
+      var e1 = colenc1.col[col], e2 = colenc2.col[col];
+
+      if(e1 && e2){
+        if(e1.type != e2.type){
+          dist += (DIST_BY_ENCTYPE[e1.type]||{})[e2.type] || 1;
+        }
+        //FIXME add aggregation
+      }else{
+        dist += DIST_MISSING;
+      }
+    })
+    return dist;
+  }
+
+  vgn.getDistanceTable = function(encodings){
+    var len = encodings.length,
+      colencs = encodings.map(function(e){ return colenc(e);}),
+      diff = new Array(len), i;
+
+    for(i=0; i<len; i++) diff[i] = new Array(len);
+
+    for(i=0 ; i<len; i++){
+      for(j=i+1; j<len; j++){
+        diff[j][i] = diff[i][j] = vgn._getDistance(colencs[i], colencs[j]);
+      }
+    }
+    return diff;
+  }
+
+  vgn.cluster = function(encodings, maxDistance){
+    var dist = vgn.getDistanceTable(encodings),
+      n = encodings.length;
+
+    var clusterTrees = clusterfck.hcluster(range(n), function(i, j){
+      return dist[i][j];
+    }, "average", CLUSTER_THRESHOLD);
+
+    var clusters = clusterTrees.map(function(tree){
+      return traverse(tree, []);
+    })
+
+    console.log("clusters", clusters.map(function(c){ return c.join("+"); }));
+    return clusters;
+  }
+
+  function traverse(node, arr){
+    if(node.value !== undefined){
+      arr.push(node.value);
+    }else{
+      if(node.left) traverse(node.left, arr)
+      if(node.right) traverse(node.right, arr);
+    }
+    return arr;
+  }
+
+
   //TODO(kanitw): write test case
-  vgn._getSupportedMarkTypes = function(enc){
+  vgn._getSupportedMarkTypes = function(enc, opt){
     var markTypes = MARK_TYPES.filter(function(markType){
       var reqs = encodingRequirement[markType],
         support = encodingSupport[markType];
@@ -200,7 +316,7 @@
         if(!(encType in support)) return false;
       }
 
-      return true;
+      return !marksRule[markType] || marksRule[markType](enc, opt);
     });
 
     //console.log('enc:', json(enc), " ~ marks:", markTypes);
@@ -236,7 +352,7 @@
       for(var j in ENCODING_TYPES){
         var et = ENCODING_TYPES[j];
 
-        //TODO: support "multiple"
+        //TODO: support "multiple" assignment
         if(!(et in tmpEnc) &&
           ENCODING_RULES[et].dataTypes & vl.dataTypes[field.type] > 0){
           tmpEnc[et] = field;
@@ -251,8 +367,37 @@
     return encodings;
   };
 
+  // UTILITY
 
+  function union(a,b){
+    var o = {};
+    a.forEach(function(x){ o[x] = true;});
+    b.forEach(function(x){ o[x] = true;});
+    return vl.keys(o);
+  }
 
+  var abs = Math.abs;
+
+  function range(start, stop, step) {
+    if (arguments.length < 3) {
+      step = 1;
+      if (arguments.length < 2) {
+        stop = start;
+        start = 0;
+      }
+    }
+    if ((stop - start) / step === Infinity) throw new Error("infinite range");
+    var range = [], k = d3_range_integerScale(abs(step)), i = -1, j;
+    start *= k, stop *= k, step *= k;
+    if (step < 0) while ((j = start + step * ++i) > stop) range.push(j / k); else while ((j = start + step * ++i) < stop) range.push(j / k);
+    return range;
+  };
+
+  function d3_range_integerScale(x) {
+    var k = 1;
+    while (x * k % 1) k *= 10;
+    return k;
+  }
 
   return vgn;
 }));
