@@ -88,12 +88,12 @@ require(['d3', 'vega', 'vegalite', 'lodash', 'visgen'],function(d3, vg, vl, _, v
 
       var colIndicesSet = [
         [6,11,5], //CxCxQ
+        [2,3], //C(Big)xQ
         [6, 10], //CxQ
         [10], //Q
         [6,8], //Cx#
-        // [2,3], //C(Big)xQ
-        //[4,5], //QxQ
-        //// [7,8], //Dx#
+        // [4,5], //QxQ
+        // [7,8], //Dx#
         [6,5,4], //CxQxQ
         // [11,12,13], //OxOxO //FIXME
         //// [6,5,10] //CxQxQ //TODO: speed might be problematic
@@ -102,7 +102,9 @@ require(['d3', 'vega', 'vegalite', 'lodash', 'visgen'],function(d3, vg, vl, _, v
 
       var control = d3.select("#control");
 
-      var dsel = control.append("select").attr("class", "data")
+      var dsel = control.append("select")
+        .attr("class", "data")
+        .style("width", "300px")
         .on("change", function(){
           var index = this.options[this.selectedIndex].value;
           render(colIndicesSet[index])
@@ -182,11 +184,25 @@ require(['d3', 'vega', 'vegalite', 'lodash', 'visgen'],function(d3, vg, vl, _, v
         return d ? d3.format('.2')(d) : "-";
       });
 
+    var HEIGHT_OFFSET = 40;
 
-    clusters.forEach(function(c){
-      var cluster = c.map(function(i){
-        return { chart: charts[i],i: i};
+    clusters.forEach(function(clusterIndices){
+      var cluster = clusterIndices.map(function(i){
+        var chart = charts[i],
+          encoding = vl.Encoding.parseJSON(chart),
+          spec = vl.toVegaSpec(encoding, data);
+        return {
+          chart: chart,
+          encoding: encoding,
+          spec: spec,
+          i: i
+        };
       });
+
+      var clusterHeight = cluster.reduce(function(h, c){
+        var nh = +c.spec.height + HEIGHT_OFFSET + 120;
+        return nh > h ? nh : h;
+      }, 0)
 
       var chartGroupDiv = content.append("div")
           .attr("id", "group")
@@ -194,7 +210,10 @@ require(['d3', 'vega', 'vegalite', 'lodash', 'visgen'],function(d3, vg, vl, _, v
           .style({
             "background-color": "#fcfcfc",
             "overflow-x":"scroll",
-            "margin-bottom": "20px"
+            "overflow-y":"hidden",
+            "margin-bottom": "20px",
+            "white-space": "nowrap",
+            "height": clusterHeight+"px"
           });
 
       cluster.forEach(function(o, i){
@@ -202,18 +221,21 @@ require(['d3', 'vega', 'vegalite', 'lodash', 'visgen'],function(d3, vg, vl, _, v
         var chart=o.chart,
           i=o.i,
           id = 'vis-' + (visIdCounter++),
-          encoding = vl.Encoding.parseJSON(chart);
-
-        var spec = vl.toVegaSpec(encoding, data);
+          encoding = o.encoding,
+          spec = o.spec;
 
         var chartDiv = chartGroupDiv.append("div")
-          .style("display", "inline-block")
+          .style({
+            "display": "inline-block",
+            "margin-right": "10px",
+            "vertical-align": "top"
+          })
         var detail = chartDiv.append("div").text(i).append("div");
         encodingDetails(encoding, detail);
 
         chartDiv.append("div")
           .attr("id", id)
-          .style({"height": (+spec.height+40) +"px", "overflow":"hidden"})
+          .style({"height": (+spec.height+ HEIGHT_OFFSET) +"px", "overflow":"hidden"})
 
         chartDiv.append("div")
           .text(JSON.stringify(spec, null, "  "))
