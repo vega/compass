@@ -1,4 +1,26 @@
-require(['d3', 'vega', 'vegalite', 'lodash', 'visgen'],function(d3, vg, vl, _, vgn){
+// Define module using Universal Module Definition pattern
+// https://github.com/umdjs/umd/blob/master/returnExports.js
+
+(function (root, factory) {
+  if (typeof define === 'function' && define.amd) {
+    // AMD. Register as an anonymous module.
+    define(['d3', 'vega', 'vegalite', 'lodash', 'visgen'],factory);
+  } else if (typeof exports === 'object') {
+    // Node. Does not work with strict CommonJS, but
+    // only CommonJS-like environments that support module.exports,
+    // like Node.
+    module.exports = factory(
+      require('d3'),
+      require('vega'),
+      require('vegalite'),
+      require('lodash'),
+      require('visgen')
+    );
+  } else {
+    // Browser globals (root is window)
+    root.vgn = factory(root.d3, root.vg, root.vl, root._, root.vgn);
+  }
+}(this, function(d3, vg, vl, _, vgn){
   var schema, col_indices;
 
   var keys = vg.keys;
@@ -54,7 +76,7 @@ require(['d3', 'vega', 'vegalite', 'lodash', 'visgen'],function(d3, vg, vl, _, v
         k+": <b>"+
         (v.aggr || "") +
         (v.bin ? " bin " : "") +
-        v.name +
+        (v.name || "") +
         "</b> ("+ vl.dataTypeNames[v.type] + ")")
     });
   }
@@ -87,11 +109,11 @@ require(['d3', 'vega', 'vegalite', 'lodash', 'visgen'],function(d3, vg, vl, _, v
       // TODO(kanitw): extend this to support query transformation
 
       var colIndicesSet = [
+        [6,8], //Cx#
         [6,11,5], //CxCxQ
         [2,3], //C(Big)xQ
         [6, 10], //CxQ
         [10], //Q
-        [6,8], //Cx#
         // [4,5], //QxQ
         // [7,8], //Dx#
         [6,5,4], //CxQxQ
@@ -137,7 +159,7 @@ require(['d3', 'vega', 'vegalite', 'lodash', 'visgen'],function(d3, vg, vl, _, v
     //TODO(kanitw): change schema format to match
     var fields = selectedCols.map(function(col){
       if(col.data_type == "count"){
-        return {aggr: "count"};
+        return {aggr: "count", type:"Q"};
       }
       return {
         name: col.key,
@@ -255,5 +277,4 @@ require(['d3', 'vega', 'vegalite', 'lodash', 'visgen'],function(d3, vg, vl, _, v
   }
 
   loadSchema();
-
-})
+}));

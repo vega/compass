@@ -290,8 +290,6 @@
     // generate permutation of encoding mappings
     var encodings = vgn._generateEncodings(fields);
 
-    //console.log("encodings", encodings.map(JSON.stringify));
-
     var chartGroups = encodings.map(function(enc){
       return vgn._getSupportedMarkTypes(enc, opt)
         .map(function(markType){

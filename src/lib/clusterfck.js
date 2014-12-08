@@ -1,4 +1,7 @@
-/* MIT license */
+/*
+  MIT license
+  from https://github.com/harthur/clusterfck
+*/
 (function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
