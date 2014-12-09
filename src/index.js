@@ -206,7 +206,7 @@
         return d ? d3.format('.2')(d) : "-";
       });
 
-    var HEIGHT_OFFSET = 40;
+    var HEIGHT_OFFSET = 60;
 
     clusters.forEach(function(clusterIndices){
       var cluster = clusterIndices.map(function(i){
