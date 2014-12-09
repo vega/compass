@@ -179,7 +179,7 @@
         return false;
       }
 
-      if(enc.x.type == "O" && enc.y.type == "O"){ OxO
+      if(enc.x.type == "O" && enc.y.type == "O"){ //OxO
         // shape doesn't work with both x, y as ordinal
         if(enc.shape){
           return false;
