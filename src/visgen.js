@@ -223,9 +223,18 @@
     return enc.x == "T" && enc.y == "Q";
   }
 
-  function generalRule(enc){
+  function generalRule(enc, opt){
       // need at least one basic encoding
     if(enc.x || enc.y || enc.geo || enc.text || enc.arc){
+
+      if(enc.x && enc.y){
+        // show only OxO
+        if(opt.omitTranpose && enc.x.type=="O" && enc.y.type=="O"){
+          //TODO better criteria than name
+          return enc.x.name < enc.y.name;
+        }
+      }
+
       // don't use small multiple before filling up x,y
       if((!enc.x||!enc.y) && (enc.row || enc.col)) return false;
 
