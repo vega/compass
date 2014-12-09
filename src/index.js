@@ -4,7 +4,7 @@
 (function (root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['d3', 'vega', 'vegalite', 'lodash', 'visgen'],factory);
+    define(['d3', 'vega', 'vegalite', 'lodash', 'visgen', 'visrank'],factory);
   } else if (typeof exports === 'object') {
     // Node. Does not work with strict CommonJS, but
     // only CommonJS-like environments that support module.exports,
@@ -14,13 +14,14 @@
       require('vega'),
       require('vegalite'),
       require('lodash'),
-      require('visgen')
+      require('visgen'),
+      require('visrank')
     );
   } else {
     // Browser globals (root is window)
-    root.vgn = factory(root.d3, root.vg, root.vl, root._, root.vgn);
+    factory(root.d3, root.vg, root.vl, root._, root.vgn, root.visrank);
   }
-}(this, function(d3, vg, vl, _, vgn){
+}(this, function(d3, vg, vl, _, vgn, visrank){
   var schema, col_indices;
 
   var keys = vg.keys;
@@ -206,8 +207,24 @@
 
     content.append("h2").text(groupname);
 
+    charts = charts.map(function(c){
+      c.score = visrank.getScore(c);
+      return c;
+    });
+
     var diff = vgn.getDistanceTable(charts),
-      clusters = vgn.cluster(charts, 2.5);
+      clusters = vgn.cluster(charts, 2.5)
+        .map(function(cluster){
+          return cluster.sort(function(i, j){
+            return charts[j].score - charts[i].score;
+          });
+        })
+        .sort(function(c1, c2){
+          return charts[c2[0]].score - charts[c1[0]].score;
+        })
+
+
+    console.log("clusters", clusters);
 
     var table = content.append("table");
     var headerRow = table.append("tr").attr("class", "header-row");
