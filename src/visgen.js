@@ -27,9 +27,9 @@
      * - keeping horizontal dot plot only.
      * - for OxQ charts, always put O on Y
      */
-    omitTranpose: false,
+    omitTranpose: true,
     /** remove all dot plot with >1 encoding */
-    omitDotPlotWithExtraEncoding: false
+    omitDotPlotWithExtraEncoding: true
 
   };
 
@@ -51,26 +51,7 @@
 
   // BEGINING OF RULES
 
-  // each mark type support different sets of encodings
-  var encodingSupport = {
-    point: dict(["x", "y", "size", "shape", "color", "alpha"]),
-    bar: dict(["x", "y", "size", "color", "alpha"]),
-    line: dict(["x", "y", "color", "alpha"]),
-    area: dict(["x", "y", "color", "alpha"]),
-    circle: dict(["x", "y", "size", "color", "alpha"]),
-    square: dict(["x", "y", "size", "color", "alpha"]),
-    text: dict(["x", "y", "size", "color", "alpha", "text"])
-  };
-
-  // only point, circle, square, support aggregate well
   //TODO markTypesAggregateSupport
-
-  var encodingRequirement = {
-    bar: ["x", "y"],
-    line: ["x", "y"],
-    area: ["x", "y"],
-    text: ["text"]
-  };
 
   var marksRule = {
     point: pointRule,
@@ -79,17 +60,23 @@
     area: lineRule
   };
 
-
   function pointRule(enc, opt){
     if(enc.x && enc.y){
-      // shape doesn't work with both x, y as ordinal
-      if(enc.shape && enc.x.type == "O" && enc.y.type == "O"){
-        return false;
+
+      if(enc.x.type == "O" && enc.y.type == "O"){ OxO
+        // shape doesn't work with both x, y as ordinal
+        if(enc.shape){
+          return false;
+        }
+        if(enc.color && enc.color.type == "O"){
+          return false;
+        }
       }
+
     }else{ // plot with one axis = dot plot
 
       // Dot plot should always be horizontal
-      if(enc.y) return false;
+      if(opt.omitTranpose && enc.y) return false;
 
       // dot plot shouldn't have other encoding
       if(opt.omitDotPlotWithExtraEncoding && vl.keys(enc).length > 1) return false;
@@ -167,17 +154,6 @@
   };
 
   // END OF RULES
-
-  /**
-   * make a membership map from the input array
-   */
-  function dict(arr){
-    var o={};
-    for(var i in arr){
-      o[arr[i]] = true;
-    }
-    return o;
-  }
 
   var json = function(s,sp){ return JSON.stringify(s, null, sp);};
 
@@ -305,16 +281,16 @@
   //TODO(kanitw): write test case
   vgn._getSupportedMarkTypes = function(enc, opt){
     var markTypes = MARK_TYPES.filter(function(markType){
-      var reqs = encodingRequirement[markType],
-        support = encodingSupport[markType];
+      var mark = vl.marks[markType],
+        reqs = mark.requiredEncoding,
+        support = mark.supportedEncoding;
 
       for(var i in reqs){ // all required encodings in enc
-        var req = reqs[i];
-        if(! (req in enc)) return false;
+        if(!(reqs[i] in enc)) return false;
       }
 
       for(var encType in enc){ // all encodings in enc are supported
-        if(!(encType in support)) return false;
+        if(!support[encType]) return false;
       }
 
       return !marksRule[markType] || marksRule[markType](enc, opt);
@@ -355,7 +331,7 @@
 
         //TODO: support "multiple" assignment
         if(!(et in tmpEnc) &&
-          ENCODING_RULES[et].dataTypes & vl.dataTypes[field.type] > 0){
+          (ENCODING_RULES[et].dataTypes & vl.dataTypes[field.type]) > 0){
           tmpEnc[et] = field;
           assignField(i+1);
           delete tmpEnc[et];
