@@ -24,6 +24,11 @@
 }(this, function(d3, vg, vl, _, vgn, visrank){
   var schema, col_indices;
 
+  var CONFIG = {
+    showTable: false,
+    showOnlyClusterTop: true
+  }
+
   var keys = vg.keys;
 
   //TODO: unify type system
@@ -231,30 +236,10 @@
 
     console.log("clusters", clusters);
 
-    var table = content.append("table");
-    var headerRow = table.append("tr").attr("class", "header-row");
-    headerRow.append("th");
-    headerRow.selectAll("th.item-col").data(diff)
-      .enter().append("th").attr("class", "item-col")
-      .append("b").text(function (d, i) {
-        return "" + i;
-      });
+    if(CONFIG.showTable){
+      renderDistanceTable(content, diff);
+    }
 
-    var rows = table.selectAll("tr.item-row")
-      .data(diff)
-      .enter().append("tr").attr("class", "item-row");
-
-    rows.append("td").append("b").text(function (d, i) {
-      return i;
-    });
-    rows.selectAll("td.item-cell")
-      .data(_.identity)
-      .enter().append("td").attr("class", "item-cell")
-      .style("text-align", "center")
-      .style("border", "1px solid #ddd")
-      .text(function (d) {
-        return d ? d3.format('.2')(d) : "-";
-      });
 
     var HEIGHT_OFFSET = 60;
 
@@ -289,6 +274,7 @@
         });
 
       cluster.forEach(function (o, i) {
+        if(CONFIG.showOnlyClusterTop && i>0) return;
         // console.log('chart', chart, chart.toShorthand());
         var chart = o.chart,
           i = o.i,
@@ -313,6 +299,9 @@
           .text(JSON.stringify(spec, null, "  "))
           .classed("hide spec", true);
 
+        chartDiv.append("input").attr({"readonly":1, value: encoding.toShorthand()})
+          .style("font-size", "12px");
+
         if (spec) {
           //console.log("rendering spec", spec);
           //console.log("rendering spec", id ,":", JSON.stringify(spec));
@@ -325,6 +314,32 @@
     })
   }
 
+  function renderDistanceTable(content, diff) {
+    var table = content.append("table");
+    var headerRow = table.append("tr").attr("class", "header-row");
+    headerRow.append("th");
+    headerRow.selectAll("th.item-col").data(diff)
+      .enter().append("th").attr("class", "item-col")
+      .append("b").text(function (d, i) {
+        return "" + i;
+      });
+
+    var rows = table.selectAll("tr.item-row")
+      .data(diff)
+      .enter().append("tr").attr("class", "item-row");
+
+    rows.append("td").append("b").text(function (d, i) {
+      return i;
+    });
+    rows.selectAll("td.item-cell")
+      .data(_.identity)
+      .enter().append("td").attr("class", "item-cell")
+      .style("text-align", "center")
+      .style("border", "1px solid #ddd")
+      .text(function (d) {
+        return d ? d3.format('.2')(d) : "-";
+      });
+  }
 
   loadSchema();
 }));
