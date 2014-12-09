@@ -203,7 +203,12 @@
 
 
     var fields = vl.vals(charts[0].enc);
-    var groupname = new vl.Encoding("", fields).toShorthand().substr(1);
+    var groupname = fields.map(function(v){
+      return (v.aggr ? v.aggr+"_" : "") +
+        (v.bin ? "bin_" : "") +
+        v.name +
+        "(" + v.type + ")";
+    }).join(" / ")
 
     content.append("h2").text(groupname);
 
@@ -297,7 +302,7 @@
             "margin-right": "10px",
             "vertical-align": "top"
           })
-        var detail = chartDiv.append("div").text(i).append("div");
+        var detail = chartDiv.append("div").text("id:"+i+", score:"+chart.score).append("div");
         encodingDetails(encoding, detail);
 
         chartDiv.append("div")
