@@ -4,21 +4,20 @@
 (function (root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['vega', 'vegalite', 'clusterfck'], factory);
+    define(['vegalite', 'clusterfck'], factory);
   } else if (typeof exports === 'object') {
     // Node. Does not work with strict CommonJS, but
     // only CommonJS-like environments that support module.exports,
     // like Node.
     module.exports = factory(
-      require('vega'),
       require('vegalite'),
       require('clusterfck')
     );
   } else {
     // Browser globals (root is window)
-    root.vgn = factory(root.vg, root.vl, root.clusterfck);
+    root.vgn = factory(root.vl, root.clusterfck);
   }
-}(this, function (vg, vl, clusterfck) {
+}(this, function (vl, clusterfck) {
   var vgn = {}; //VisGeN
 
   vgn.DEFAULT_OPT = {
@@ -338,7 +337,7 @@
       if(i===fields.length){
         // at the minimal all chart should have x, y, geo, text or arc
         if(generalRule(tmpEnc)){
-          encodings.push(vg.duplicate(tmpEnc));
+          encodings.push(vl.duplicate(tmpEnc));
         }
         return;
       }
