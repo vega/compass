@@ -49,100 +49,7 @@
 
   var ANY_DATA_TYPES= (1<<4)-1;
 
-  // BEGINING OF RULES
 
-  //TODO markTypesAggregateSupport
-
-  var marksRule = {
-    point: pointRule,
-    bar: barRule,
-    line: lineRule,
-    area: lineRule
-  };
-
-  function pointRule(enc, opt){
-    if(enc.x && enc.y){
-
-      if(enc.x.type == "O" && enc.y.type == "O"){ OxO
-        // shape doesn't work with both x, y as ordinal
-        if(enc.shape){
-          return false;
-        }
-        if(enc.color && enc.color.type == "O"){
-          return false;
-        }
-      }
-
-    }else{ // plot with one axis = dot plot
-
-      // Dot plot should always be horizontal
-      if(opt.omitTranpose && enc.y) return false;
-
-      // dot plot shouldn't have other encoding
-      if(opt.omitDotPlotWithExtraEncoding && vl.keys(enc).length > 1) return false;
-
-      // dot plot with shape is non-sense
-      if (enc.shape) return false;
-    }
-    return true;
-  }
-
-  function barRule(enc){
-    // Bar Chart requires at least one aggregate
-    var hasAgg = false;
-    for(var e in enc){
-      if(enc[e].aggr){
-        hasAgg = true;
-        break;
-      }
-    }
-    return hasAgg;
-  }
-
-  function lineRule(enc){
-    // Line chart should be only horizontal
-    return enc.x == "T" && enc.y == "Q";
-  }
-
-  var ENCODING_RULES = {
-    x: {
-      dataTypes: vl.dataTypes.O + vl.dataTypes.Q + vl.dataTypes.T,
-      multiple: true //FIXME should allow multiple only for Q
-    },
-    y: {
-      dataTypes: vl.dataTypes.O + vl.dataTypes.Q + vl.dataTypes.T,
-      multiple: true //FIXME should allow multiple only for Q
-    },
-    row: {
-      dataTypes: vl.dataTypes.O,
-      multiple: true
-    },
-    col: {
-      dataTypes: vl.dataTypes.O,
-      multiple: true
-    },
-    shape: {
-      dataTypes: vl.dataTypes.O
-    },
-    size: {
-      dataTypes: vl.dataTypes.Q
-    },
-    color: {
-      dataTypes: vl.dataTypes.O + vl.dataTypes.Q
-    },
-    alpha: {
-      dataTypes: vl.dataTypes.Q
-    },
-    text: {
-      dataTypes: ANY_DATA_TYPES
-    }
-    //geo: {
-    //  dataTypes: [vl.dataTypes.G]
-    //},
-    //arc: { // pie
-    //
-    //}
-  };
 
   var AGGREGATION_FN = { //all possible aggregate function listed by each data type
     Q: ["avg", "sum", "min", "max", "count"]
@@ -152,8 +59,6 @@
     Q: ["log", "sqrt", "abs"], // "logit?"
     T: ["year","month","day"] //,"hr", "min", "bmon", "bday", "bdow", "bhr"]
   };
-
-  // END OF RULES
 
   var json = function(s,sp){ return JSON.stringify(s, null, sp);};
 
@@ -252,6 +157,104 @@
   }
 
   // End of Clustering
+
+
+  // BEGINING OF RULES
+
+  //TODO markTypesAggregateSupport
+
+  var marksRule = {
+    point: pointRule,
+    bar: barRule,
+    line: lineRule,
+    area: lineRule
+  };
+
+  function pointRule(enc, opt){
+    if(enc.x && enc.y){
+
+      if(enc.x.type == "O" && enc.y.type == "O"){ OxO
+        // shape doesn't work with both x, y as ordinal
+        if(enc.shape){
+          return false;
+        }
+        if(enc.color && enc.color.type == "O"){
+          return false;
+        }
+      }
+
+    }else{ // plot with one axis = dot plot
+
+      // Dot plot should always be horizontal
+      if(opt.omitTranpose && enc.y) return false;
+
+      // dot plot shouldn't have other encoding
+      if(opt.omitDotPlotWithExtraEncoding && vl.keys(enc).length > 1) return false;
+
+      // dot plot with shape is non-sense
+      if (enc.shape) return false;
+    }
+    return true;
+  }
+
+  function barRule(enc){
+    // Bar Chart requires at least one aggregate
+    var hasAgg = false;
+    for(var e in enc){
+      if(enc[e].aggr){
+        hasAgg = true;
+        break;
+      }
+    }
+    return hasAgg;
+  }
+
+  function lineRule(enc){
+    // Line chart should be only horizontal
+    return enc.x == "T" && enc.y == "Q";
+  }
+
+  var ENCODING_RULES = {
+    x: {
+      dataTypes: vl.dataTypes.O + vl.dataTypes.Q + vl.dataTypes.T,
+      multiple: true //FIXME should allow multiple only for Q
+    },
+    y: {
+      dataTypes: vl.dataTypes.O + vl.dataTypes.Q + vl.dataTypes.T,
+      multiple: true //FIXME should allow multiple only for Q
+    },
+    row: {
+      dataTypes: vl.dataTypes.O,
+      multiple: true
+    },
+    col: {
+      dataTypes: vl.dataTypes.O,
+      multiple: true
+    },
+    shape: {
+      dataTypes: vl.dataTypes.O
+    },
+    size: {
+      dataTypes: vl.dataTypes.Q
+    },
+    color: {
+      dataTypes: vl.dataTypes.O + vl.dataTypes.Q
+    },
+    alpha: {
+      dataTypes: vl.dataTypes.Q
+    },
+    text: {
+      dataTypes: ANY_DATA_TYPES
+    }
+    //geo: {
+    //  dataTypes: [vl.dataTypes.G]
+    //},
+    //arc: { // pie
+    //
+    //}
+  };
+
+  // END OF RULES
 
   // Beginning of Chart Generation
 
