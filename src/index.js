@@ -115,17 +115,17 @@
       // TODO(kanitw): extend this to support query transformation
 
       var colIndicesSet = [
+        [6,5,4], //CxQxQ -- good except some bar + size
         [6,11,5], //CxCxQ
         [6,8], //Cx#
         [2,3], //C(Big)xQ
         [6, 10], //CxQ
+        [6,8,5], //Cx#xG
         [10], //Q
         // [4,5], //QxQ
         // [7,8], //Dx#
-        [6,5,4], //CxQxQ
         // [11,12,13], //OxOxO //FIXME
         //// [6,5,10] //CxQxQ //TODO: speed might be problematic
-        //// [6,8,5] //Cx#xG
       ];
 
       var control = d3.select("#control");
@@ -205,7 +205,6 @@
   function renderCharts(charts, groupId) {
     var content = d3.select("#display");
     var visIdCounter=0;
-
 
     var fields = vl.vals(charts[0].enc);
     var groupname = fields.map(function(v){

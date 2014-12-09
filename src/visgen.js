@@ -34,7 +34,7 @@
      */
     omitTranpose: true,
     /** remove all dot plot with >1 encoding */
-    omitDotPlotWithExtraEncoding: false,
+    omitDotPlotWithExtraEncoding: true,
     /** remove all aggregate charts with all dims on facets (row, col) */
     omitAggrWithAllDimsOnFacets: true
   };

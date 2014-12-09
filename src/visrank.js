@@ -48,7 +48,7 @@
     });
 
     // penalize not using positional
-    if(encType.length > 1 && (!encoding.enc.x || !encoding.enc.y)){
+    if(encTypes.length > 1 && (!encoding.enc.x || !encoding.enc.y)){
       score *= 0.5;
     }
 
