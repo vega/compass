@@ -21,8 +21,9 @@
   var vgn = {}; //VisGeN
 
   vgn.DEFAULT_OPT = {
-    genTypeCasting: false,
     genAggr: true,
+    genBin: true,
+    genTypeCasting: false,
 
     aggrList: [undefined, "avg"], //undefined = no aggregation
     marktypeList: ["point", "bar", "line", "area",  "text"], //filled_map
@@ -32,7 +33,7 @@
      * - for OxQ charts, always put O on Y
      * - show only one OxO, QxQ (currently sorted by name)
      */
-    omitTranpose: true,
+    omitTranpose: false,
     /** remove all dot plot with >1 encoding */
     omitDotPlotWithExtraEncoding: true,
     /** remove all aggregate charts with all dims on facets (row, col) */
@@ -85,7 +86,6 @@
     return r;
   }, {}),
     DIST_MISSING = 100, CLUSTER_THRESHOLD=1;
-
 
   function colenc(encoding){
     var colenc = {},
@@ -464,11 +464,18 @@
               }
             }
 
-            // TODO(kanitw): Bin
+            if(opt.genBin){
+              // bin the field instead!
+              delete tf[i].aggr;
+              tf[i].bin = true;
+              tf[i].type = "O";
+              assignField(i+1, hasAggr);
+            }
 
             if(opt.genTypeCasting){
               // we can also change it to dimension (cast type="O")
               delete tf[i].aggr;
+              delete tf[i].bin;
               tf[i].type = "O";
               assignField(i+1, hasAggr);
             }
