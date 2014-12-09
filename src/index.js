@@ -74,7 +74,7 @@
     enc.forEach(function(k, v){
       div.append("div").html(
         k+": <b>"+
-        (v.aggr || "") +
+        (v.aggr ? v.aggr+"-" : "") +
         (v.bin ? " bin " : "") +
         (v.name || "") +
         "</b> ("+ vl.dataTypeNames[v.type] + ")")
@@ -109,8 +109,8 @@
       // TODO(kanitw): extend this to support query transformation
 
       var colIndicesSet = [
-        [6,8], //Cx#
         [6,11,5], //CxCxQ
+        [6,8], //Cx#
         [2,3], //C(Big)xQ
         [6, 10], //CxQ
         [10], //Q
@@ -150,7 +150,7 @@
   }
 
   function render(selectedColIndices){
-    var visIdCounter = 0;
+
     var selectedCols = selectedColIndices.map(function(i){ return schema[i];}),
       selectedColNames = _.pluck(selectedCols, 'field_name'),
       selectedColTypes = _.pluck(selectedCols, 'data_type');
@@ -161,55 +161,83 @@
       if(col.data_type == "count"){
         return {aggr: "count", type:"Q"};
       }
-      return {
-        name: col.key,
-        type: getDVType(col.data_type)
+      var type = getDVType(col.data_type), f;
+      switch(type){
+
+        case "Q":
+          f = {name: col.key, type: "Q", _aggr:"*"}
+          return f;
+        case "O":
+        default:
+          return {name: col.key, type:"O"};
       }
     });
 
     console.log('fields', JSON.stringify(fields));
 
+    var aggr = vgn.genAggregate([], fields)
+    console.log('aggregates', aggr.map(function(a){
+      return JSON.stringify(a, null, "  ");
+    }).join("\n\n"));
+
     //TODO(kanitw): generate a list of charts and rank
-    var charts = vgn.generateCharts(fields, null, {
-      dataUrl: "data/birdstrikes.json",
-      viewport: [460, 460]
-    }, true);
-    //console.log('charts', charts);
+    var chartsByFieldset = self.charts = vgn.generateCharts(fields,
+      null,
+      {
+        dataUrl: "data/birdstrikes.json",
+        viewport: [460, 460]
+      }
+    );
 
-    // ----- render results -----
+    console.log("chartsByFieldset", chartsByFieldset);
 
+    d3.select("#display").selectAll("*").remove();
+    chartsByFieldset.forEach(renderCharts);
+  }
+
+
+  function renderCharts(charts, groupId) {
     var content = d3.select("#display");
-    content.selectAll("*").remove();
-    content.append("h2").text(getTitle(selectedColIndices));
+    var visIdCounter=0;
+
+
+    var fields = vl.vals(charts[0].enc);
+    var groupname = new vl.Encoding("", fields).toShorthand().substr(1);
+
+    content.append("h2").text(groupname);
 
     var diff = vgn.getDistanceTable(charts),
       clusters = vgn.cluster(charts, 2.5);
 
     var table = content.append("table");
-    var headerRow = table.append("tr").attr("class","header-row");
+    var headerRow = table.append("tr").attr("class", "header-row");
     headerRow.append("th");
     headerRow.selectAll("th.item-col").data(diff)
-      .enter().append("th").attr("class","item-col")
-        .append("b").text(function(d, i){ return ""+i;});
+      .enter().append("th").attr("class", "item-col")
+      .append("b").text(function (d, i) {
+        return "" + i;
+      });
 
     var rows = table.selectAll("tr.item-row")
       .data(diff)
       .enter().append("tr").attr("class", "item-row");
 
-    rows.append("td").append("b").text(function(d,i){ return i;});
+    rows.append("td").append("b").text(function (d, i) {
+      return i;
+    });
     rows.selectAll("td.item-cell")
       .data(_.identity)
-      .enter().append("td").attr("class","item-cell")
+      .enter().append("td").attr("class", "item-cell")
       .style("text-align", "center")
       .style("border", "1px solid #ddd")
-      .text(function(d){
+      .text(function (d) {
         return d ? d3.format('.2')(d) : "-";
       });
 
     var HEIGHT_OFFSET = 60;
 
-    clusters.forEach(function(clusterIndices){
-      var cluster = clusterIndices.map(function(i){
+    clusters.forEach(function (clusterIndices) {
+      var cluster = clusterIndices.map(function (i) {
         var chart = charts[i],
           encoding = vl.Encoding.parseJSON(chart),
           spec = vl.toVegaSpec(encoding, data);
@@ -221,28 +249,28 @@
         };
       });
 
-      var clusterHeight = cluster.reduce(function(h, c){
+      var clusterHeight = cluster.reduce(function (h, c) {
         var nh = +c.spec.height + HEIGHT_OFFSET + 120;
         return nh > h ? nh : h;
       }, 0)
 
       var chartGroupDiv = content.append("div")
-          .attr("id", "group")
-          .attr("class", "row")
-          .style({
-            "background-color": "#fcfcfc",
-            "overflow-x":"scroll",
-            "overflow-y":"hidden",
-            "margin-bottom": "20px",
-            "white-space": "nowrap",
-            "height": clusterHeight+"px"
-          });
+        .attr("id", "group")
+        .attr("class", "row")
+        .style({
+          "background-color": "#fcfcfc",
+          "overflow-x": "scroll",
+          "overflow-y": "hidden",
+          "margin-bottom": "20px",
+          "white-space": "nowrap",
+          "height": clusterHeight + "px"
+        });
 
-      cluster.forEach(function(o, i){
+      cluster.forEach(function (o, i) {
         // console.log('chart', chart, chart.toShorthand());
-        var chart=o.chart,
-          i=o.i,
-          id = 'vis-' + (visIdCounter++),
+        var chart = o.chart,
+          i = o.i,
+          id = 'vis-' + groupId + "-" + (visIdCounter++),
           encoding = o.encoding,
           spec = o.spec;
 
@@ -257,24 +285,24 @@
 
         chartDiv.append("div")
           .attr("id", id)
-          .style({"height": (+spec.height+ HEIGHT_OFFSET) +"px", "overflow":"hidden"})
+          .style({"height": (+spec.height + HEIGHT_OFFSET) + "px", "overflow": "hidden"})
 
         chartDiv.append("div")
           .text(JSON.stringify(spec, null, "  "))
           .classed("hide spec", true);
 
-        if(spec){
+        if (spec) {
           //console.log("rendering spec", spec);
           //console.log("rendering spec", id ,":", JSON.stringify(spec));
-          vg.parse.spec(spec, function(vgChart){
-            var vis = vgChart({el: '#'+id, renderer: "svg"});
+          vg.parse.spec(spec, function (vgChart) {
+            var vis = vgChart({el: '#' + id, renderer: "svg"});
             vis.update();
           });
         }
       });
     })
-
   }
+
 
   loadSchema();
 }));

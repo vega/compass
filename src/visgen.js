@@ -21,6 +21,11 @@
   var vgn = {}; //VisGeN
 
   vgn.DEFAULT_OPT = {
+    genTypeCasting: false,
+    genAggr: true,
+
+    aggrList: [undefined, "avg"], //undefined = no aggregation
+    marktypeList: ["point", "bar", "line", "area",  "text"], //filled_map
     /**
      * Eliminate all transpose
      * - keeping horizontal dot plot only.
@@ -44,12 +49,9 @@
     HISTOGRAM: 'HISTOGRAM'
   };
 
-  var MARK_TYPES = ["point", "bar", "line", "area",  "text"]; //filled_map
-
   var ANY_DATA_TYPES= (1<<4)-1;
 
-
-
+  //FIXME move these to vl
   var AGGREGATION_FN = { //all possible aggregate function listed by each data type
     Q: ["avg", "sum", "min", "max", "count"]
   };
@@ -208,18 +210,15 @@
   }
 
   function barRule(enc, opt){
+    // need to aggregate on either x or y
+    if(enc.x.aggr || enc.y.aggr){
+      // should this be xor?
 
-    if(opt.omitTranpose && xOyQ(enc)) return false;
-
-    // Bar Chart requires at least one aggregate
-    var hasAgg = false;
-    for(var e in enc){
-      if(enc[e].aggr){
-        hasAgg = true;
-        break;
-      }
+      if(opt.omitTranpose && xOyQ(enc)) return false;
+      return true;
     }
-    return hasAgg;
+
+    return false;
   }
 
   function lineRule(enc, opt){
@@ -229,7 +228,7 @@
   }
 
   function generalRule(enc, opt){
-      // need at least one basic encoding
+    // need at least one basic encoding
     if(enc.x || enc.y || enc.geo || enc.text || enc.arc){
 
       if(enc.x && enc.y){
@@ -296,32 +295,81 @@
 
   // Beginning of Chart Generation
 
-  vgn.generateCharts = function (fields, marktypes, cfg, flat, opt){
-    marktypes = marktypes || MARK_TYPES; // assign * if there is no constraints
+  var nonEmpty = function(grp){
+    return !isArray(grp) || grp.length > 0;
+  };
 
-    opt = opt ? vl.keys(opt).reduce(function(c ,k){ //merge with default
+  function nestedMap(col, f, level, filter){
+    return level === 0 ?
+      col.map(f) :
+      col.map(function(v){
+        var r = nestedMap(v, f, level-1);
+        return filter ? r.filter(nonEmpty) : r;
+      });
+  }
+
+  function nestedReduce(col, f, level, filter){
+    return level === 0 ?
+      col.reduce(f, []) :
+      col.map(function(v){
+        var r = nestedReduce(v, f, level-1);
+        return filter ? r.filter(nonEmpty) : r;
+      });
+  }
+
+  function getopt(opt){
+    //merge with default
+    return (opt ? vl.keys(opt) : []).reduce(function(c ,k){
       c[k] = opt[k];
       return c;
-    }, Object.create(vgn.DEFAULT_OPT)) : Object.create(vgn.DEFAULT_OPT)
+    }, Object.create(vgn.DEFAULT_OPT));
+  }
+
+  vgn.generateCharts = function (fields, opt, cfg, flat){
+    opt = getopt(opt);
+    flat = flat === undefined ? {encodings: 1} : flat;
 
     // generate permutation of encoding mappings
-    var encodings = vgn._generateEncodings(fields);
+    var fieldSets = opt.genAggr ? vgn.genAggregate([], fields, opt) : [fields],
+      encodings, charts, level=0;
 
-    var chartGroups = encodings.map(function(enc){
-      return vgn._getSupportedMarkTypes(enc, opt)
-        .map(function(markType){
-          return { marktype: markType, enc: enc, cfg: cfg };
-        });
-    });
+    if(flat===true || (flat && flat.aggr)){
+      encodings = fieldSets.reduce(function(output, fields){
+        return vgn.genFieldEncodings(output, fields, opt)
+      },[]);
+    }else{
+      encodings = fieldSets.map(function(fields){
+        return vgn.genFieldEncodings([], fields, opt);
+      }, true);
+      level += 1;
+    }
 
-    return flat ?
-      [].concat.apply([], chartGroups) //flatten
-      : chartGroups.filter(function(grp){ return grp.length > 0;}); //return non-empty groups
+    if(flat===true || (flat && flat.encodings)){
+      charts = nestedReduce(encodings, function(output, encodings){
+        return vgn.genMarkTypes(output, encodings, opt, cfg);
+      }, level, true);
+    }else{
+      charts = nestedMap(encodings, function(encodings){
+          return vgn.genMarkTypes([], encodings, opt, cfg)
+        }, level, true);
+      level +=1;
+    }
+    return charts;
   };
+
+
+  vgn.genMarkTypes = function(output, enc, opt, cfg){
+    opt = getopt(opt);
+    vgn._getSupportedMarkTypes(enc, opt)
+      .forEach(function(markType){
+        output.push({ marktype: markType, enc: enc, cfg: cfg });
+      });
+    return output;
+  }
 
   //TODO(kanitw): write test case
   vgn._getSupportedMarkTypes = function(enc, opt){
-    var markTypes = MARK_TYPES.filter(function(markType){
+    var markTypes = opt.marktypeList.filter(function(markType){
       var mark = vl.marks[markType],
         reqs = mark.requiredEncoding,
         support = mark.supportedEncoding;
@@ -342,15 +390,83 @@
     return markTypes;
   };
 
+  vgn.genAggregate = function(output, fields, opt){
+    var tf = new Array(fields.length);
+    opt = getopt(opt);
+
+    function assignField(i, hasAggr){
+      // If all fields are assigned, save
+      if(i===fields.length){
+        output.push(vl.duplicate(tf));
+        return;
+      }
+
+      var f= fields[i];
+
+      // Otherwise, assign i-th field
+      switch(f.type){
+        //TODO "D", "G"
+        case "Q":
+          tf[i] = {name: f.name, type: f.type};
+          if(f.aggr){
+            tf[i].aggr = f.aggr;
+            assignField(i+1, true);
+          }else if(f._aggr){
+            var aggregates = f._aggr == "*" ? opt.aggrList : f._aggr;
+
+            for(var j in aggregates){
+              var a = aggregates[j];
+              if(a !== undefined){
+                if(hasAggr === true || hasAggr === null){
+                  // must be aggregated, or no constraint
+                  //set aggregate to that one
+                  tf[i].aggr = a;
+                  assignField(i+1, true);
+                }
+              }else{ // if(a === undefined)
+                if(hasAggr === false || hasAggr === null){
+                  // must be raw plot, or no constraint
+                  delete tf[i].aggr;
+                  assignField(i+1, false);
+                }
+              }
+            }
+
+            // TODO(kanitw): Bin
+
+            if(opt.genTypeCasting){
+              // we can also change it to dimension (cast type="O")
+              delete tf[i].aggr;
+              tf[i].type = "O";
+              assignField(i+1, hasAggr);
+            }
+          }else{ // both "aggr", "_aggr" not in f
+            //FIXME
+          }
+          break;
+        case "O":
+        default:
+          tf[i] = f;
+          assignField(i+1, hasAggr);
+          break;
+      }
+
+    }
+
+    assignField(0, null);
+
+    return output;
+  }
+
   //TODO(kanitw): write test case
-  vgn._generateEncodings = function (fields){ // generate encodings (_enc property in vega)
-    var encodings=[], tmpEnc = {};
+  vgn.genFieldEncodings = function (encodings, fields, opt){ // generate encodings (_enc property in vega)
+    var tmpEnc = {};
 
     function assignField(i){
       // If all fields are assigned, save
       if(i===fields.length){
         // at the minimal all chart should have x, y, geo, text or arc
-        if(generalRule(tmpEnc)){
+        if(generalRule(tmpEnc, opt)){
           encodings.push(vl.duplicate(tmpEnc));
         }
         return;
@@ -358,10 +474,6 @@
 
       // Otherwise, assign i-th field
       var field = fields[i];
-
-      // TODO(kanitw): Aggregation
-      // TODO(kanitw): Bin
-
       for(var j in ENCODING_TYPES){
         var et = ENCODING_TYPES[j];
 
@@ -381,6 +493,10 @@
   };
 
   // UTILITY
+
+  var isArray = Array.isArray || function(obj) {
+    return toString.call(obj) == '[object Array]';
+  };
 
   function union(a,b){
     var o = {};
