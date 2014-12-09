@@ -28,8 +28,8 @@
     O: {
       x: 1,
       y: 1,
-      row: 0.8,
-      col: 0.8,
+      row: 0.7,
+      col: 0.7,
       color: 0.8,
       shape: 0.6
     }
@@ -40,11 +40,17 @@
   };
 
   vrank.getScore = function(encoding){
-    var score = 1;
-    vl.keys(encoding.enc).forEach(function(encType){
+    var score = 1,
+      encTypes = vl.keys(encoding.enc);
+    encTypes.forEach(function(encType){
       var e = encoding.enc[encType];
       score *= ENCODING_SCORE[e.type][encType] || 0.1;
     });
+
+    // penalize not using positional
+    if(encType.length > 1 && (!encoding.enc.x || !encoding.enc.y)){
+      score *= 0.5;
+    }
 
     return score;
   };
