@@ -29,7 +29,7 @@
      */
     omitTranpose: true,
     /** remove all dot plot with >1 encoding */
-    omitDotPlotWithExtraEncoding: true
+    omitDotPlotWithExtraEncoding: false
 
   };
 
@@ -170,8 +170,15 @@
     area: lineRule
   };
 
+  function xOyQ(enc){
+    return enc.x && enc.y && enc.x.type == "O" && enc.y.type == "Q";
+  }
+
   function pointRule(enc, opt){
     if(enc.x && enc.y){
+      if(opt.omitTranpose && xOyQ(enc)){
+        return false;
+      }
 
       if(enc.x.type == "O" && enc.y.type == "O"){ OxO
         // shape doesn't work with both x, y as ordinal
@@ -184,7 +191,6 @@
       }
 
     }else{ // plot with one axis = dot plot
-
       // Dot plot should always be horizontal
       if(opt.omitTranpose && enc.y) return false;
 
@@ -197,7 +203,10 @@
     return true;
   }
 
-  function barRule(enc){
+  function barRule(enc, opt){
+
+    if(opt.omitTranpose && xOyQ(enc)) return false;
+
     // Bar Chart requires at least one aggregate
     var hasAgg = false;
     for(var e in enc){
@@ -209,9 +218,25 @@
     return hasAgg;
   }
 
-  function lineRule(enc){
+  function lineRule(enc, opt){
     // Line chart should be only horizontal
+    // and use only temporal data
     return enc.x == "T" && enc.y == "Q";
+  }
+
+  function generalRule(enc){
+      // need at least one basic encoding
+    if(enc.x || enc.y || enc.geo || enc.text || enc.arc){
+      // don't use small multiple before filling up x,y
+      if((!enc.x||!enc.y) && (enc.row || enc.col)) return false;
+
+      // one dimension "count" is useless
+      if(enc.x && enc.x.aggr=="count" && !enc.y) return false;
+      if(enc.y && enc.y.aggr=="count" && !enc.x) return false;
+
+      return true;
+    }
+    return false;;
   }
 
   var ENCODING_RULES = {
@@ -312,12 +337,7 @@
       // If all fields are assigned, save
       if(i===fields.length){
         // at the minimal all chart should have x, y, geo, text or arc
-        if("x" in tmpEnc ||
-          "y" in tmpEnc ||
-          "geo" in tmpEnc ||
-          "text" in tmpEnc ||
-          "arc" in tmpEnc
-        ){
+        if(generalRule(tmpEnc)){
           encodings.push(vg.duplicate(tmpEnc));
         }
         return;
