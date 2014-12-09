@@ -30,11 +30,13 @@
      * Eliminate all transpose
      * - keeping horizontal dot plot only.
      * - for OxQ charts, always put O on Y
+     * - show only one OxO, QxQ (currently sorted by name)
      */
     omitTranpose: true,
     /** remove all dot plot with >1 encoding */
-    omitDotPlotWithExtraEncoding: false
-
+    omitDotPlotWithExtraEncoding: false,
+    /** remove all aggregate charts with all dims on facets (row, col) */
+    omitAggrWithAllDimsOnFacets: true
   };
 
   var ENCODING_TYPES = ["x", "y", "row", "col", "size", "shape", "color", "alpha"]; //geo
@@ -182,15 +184,22 @@
 
   function pointRule(enc, opt){
     if(enc.x && enc.y){
+      // have both x & y ==> scatter plot / bubble plot
+
+      // For OxQ
       if(opt.omitTranpose && xOyQ(enc)){
+        // if omitTranpose, put Q on X, O on Y
         return false;
       }
 
-      if(enc.x.type == "O" && enc.y.type == "O"){ //OxO
+      // For OxO
+      if(enc.x.type == "O" && enc.y.type == "O"){
         // shape doesn't work with both x, y as ordinal
         if(enc.shape){
           return false;
         }
+
+        // TODO(kanitw): check that there is quant at least ...
         if(enc.color && enc.color.type == "O"){
           return false;
         }
@@ -211,10 +220,11 @@
 
   function barRule(enc, opt){
     // need to aggregate on either x or y
-    if(enc.x.aggr || enc.y.aggr){
-      // should this be xor?
+    if((enc.x.aggr!==undefined)^(enc.y.aggr!==undefined)){
 
+      // if omitTranpose, put Q on X, O on Y
       if(opt.omitTranpose && xOyQ(enc)) return false;
+
       return true;
     }
 
@@ -222,6 +232,8 @@
   }
 
   function lineRule(enc, opt){
+    // TODO(kanitw): add omitVerticalLine as config
+
     // Line chart should be only horizontal
     // and use only temporal data
     return enc.x == "T" && enc.y == "Q";
@@ -232,15 +244,35 @@
     if(enc.x || enc.y || enc.geo || enc.text || enc.arc){
 
       if(enc.x && enc.y){
-        // show only OxO
-        if(opt.omitTranpose && enc.x.type=="O" && enc.y.type=="O"){
+        // show only one OxO, QxQ
+        if(opt.omitTranpose && enc.x.type== enc.y.type){
           //TODO better criteria than name
-          return enc.x.name < enc.y.name;
+          if(enc.x.name > enc.y.name) return false;
         }
       }
 
-      // don't use small multiple before filling up x,y
-      if((!enc.x||!enc.y) && (enc.row || enc.col)) return false;
+      if(enc.row || enc.col){ //have facet(s)
+        // don't use facets before filling up x,y
+        if((!enc.x||!enc.y)) return false;
+
+        if(opt.omitAggrWithAllDimsOnFacets){
+          // don't use facet with aggregate plot with other other ordinal on LOD
+
+          var hasAggr = false, hasOtherO = false;
+          for(var encType in enc){
+            var field = enc[encType];
+            if(field.aggr){
+              hasAggr = true;
+            }
+            if(field.type==="O" && (encType !== "row" && encType !== "col")){
+              hasOtherO = true;
+            }
+            if(hasAggr && hasOtherO) break;
+          }
+
+          if(hasAggr && !hasOtherO) return false;
+        }
+      }
 
       // one dimension "count" is useless
       if(enc.x && enc.x.aggr=="count" && !enc.y) return false;
@@ -248,17 +280,17 @@
 
       return true;
     }
-    return false;;
+    return false;
   }
 
   var ENCODING_RULES = {
     x: {
       dataTypes: vl.dataTypes.O + vl.dataTypes.Q + vl.dataTypes.T,
-      multiple: true //FIXME should allow multiple only for Q
+      multiple: true //FIXME should allow multiple only for Q, T
     },
     y: {
       dataTypes: vl.dataTypes.O + vl.dataTypes.Q + vl.dataTypes.T,
-      multiple: true //FIXME should allow multiple only for Q
+      multiple: true //FIXME should allow multiple only for Q, T
     },
     row: {
       dataTypes: vl.dataTypes.O,
