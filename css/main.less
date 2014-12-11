@@ -6,16 +6,52 @@ body{
   font-size: 14px;
 }
 
+h2 {
+  margin-top: 0;
+}
+
 #ctrl {
   background-color: #eee;
   padding: 0.5em;
   margin-bottom: 1em;
-  float:left;
-  width: 250px;
+  position: absolute;
+  left: 10px;
+  top: 10px;
+  width: 230px;
 }
 
-#content {
-  margin-left: 320px;
+#aggr-container {
+  position: absolute;
+  left: 260px;
+  top: 10px;
+  width: 400px;
+
+  .fieldset{
+    margin-bottom: 15px;
+  }
+
+  .select {
+    font-size: 10px;
+    text-align: right;
+  }
+
+  .topvis {
+    width:100%;
+    max-height: 350px;
+    overflow: scroll;
+  }
+}
+
+#vis-container {
+  position: absolute;
+  left: 670px;
+  top: 10px;
+
+
+}
+
+.shorthand {
+  width: 300px;
 }
 
 
@@ -29,15 +65,4 @@ span.fn{
   width:40px;
   text-align: right;
   padding-right: 3px;
-}
-#aggr{
-  td.select {
-    font-size: 12px;
-  }
-  td:nth-child(even) {
-    background-color: #fafafa;
-  }
-  td {
-    min-width: 100px;
-  }
 }

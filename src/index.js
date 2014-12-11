@@ -24,9 +24,18 @@
 }(this, function(d3, vg, vl, _, vgn, visrank){
   var schema, col_indices;
 
+  var HEIGHT_OFFSET = 60;
+
   var CONFIG = {
     showTable: false,
-    showOnlyClusterTop: true
+
+    genAggr: true,
+    genBin: true,
+    genTypeCasting: true,
+
+    omitTranpose: true,
+    omitDotPlotWithExtraEncoding: true,
+    omitAggrWithAllDimsOnFacets: true
   }
 
   var keys = vg.keys;
@@ -39,7 +48,7 @@
       "geographic": "G",
       "quantitative": "Q",
       "datetime": "T",
-      "count": "#"
+      "count": "Q"
     };
     return typeMap[data_type];
   }
@@ -51,6 +60,10 @@
       //TODO: remove this line after updating csv.
       schema = _(_schema).filter(function(d){ return !d.disabled;})
         .sortBy('field_name')
+        .sortBy(function(col){
+          return getVLType(col.data_type) !== "Q" ? 0 :
+            col.data_type === "count" ? 2 : 1 ;
+        })
         .map(function(col, i){
           col.key = col['field_name'].replace(/(: )/g, "__").replace(/[\/ ]/g,"_").replace(/[()]/g, "");
           col.index = i; //add index
@@ -77,6 +90,16 @@
     });
 
     renderMain(selectedColIndices);
+  }
+
+  function loadData(){
+    // TODO: use other lib to load csv as columns?
+    // TODO: regenerate csv with all columns
+    d3.json("data/birdstrikes.json", function(data) {
+      self.data = data;
+      console.log("keys", vg.keys(data[0]));
+      init();
+    });
   }
 
   function init(){
@@ -144,26 +167,16 @@
     // render(colIndicesSet[0])
   }
 
-  function loadData(){
-    // TODO: use other lib to load csv as columns?
-    // TODO: regenerate csv with all columns
-    d3.json("data/birdstrikes.json", function(data) {
-      self.data = data;
-      console.log("keys", vg.keys(data[0]));
-      init();
-    });
-  }
-
   function fieldDetails(v, type){
     return "<b>" +
-        "<span class='fn'>" +
-        (v.aggr ? v.aggr : "") +
-        (v.bin ? " bin " : "") +
-        "</span>" +
-        "<span class='name'>" +
-        (v.name || "") +
-        "</span>" +
-        "</b> ("+ (type || v.type) + ")";
+      "<span class='fn'>" +
+      (v.aggr ? v.aggr : "") +
+      (v.bin ? " bin " : "") +
+      "</span>" +
+      "<span class='name'>" +
+      (v.name || "") +
+      "</span>" +
+      "</b> ("+ (type || v.type) + ")";
   }
 
   function encodingDetails(enc, div){
@@ -181,9 +194,48 @@
     }).join(",");
   }
 
+  function getChartsByFieldSet(fields) {
+    var aggr = vgn.genAggregate([], fields);
+    var chartsByFieldset = aggr.map(function (fields) {
+      var encodings = vgn.generateCharts(fields,
+        {
+          genAggr: false
+        },
+        {
+          dataUrl: "data/birdstrikes.json",
+          viewport: [460, 460]
+        },
+        true
+      ).map(function (e) { //add score
+          e.score = visrank.encodingScore(e);
+          return e;
+        });
+
+      var diff = vgn.getDistanceTable(encodings),
+        clusters = vgn.cluster(encodings, 2.5)
+          .map(function (cluster) {
+            return cluster.sort(function (i, j) {
+              return encodings[j].score - encodings[i].score;
+            });
+          })
+          .sort(function (c1, c2) {
+            return encodings[c2[0]].score - encodings[c1[0]].score;
+          });
+
+      //console.log("clusters", clusters);
+
+      return {
+        fields: fields,
+        encodings: encodings,
+        diff: diff,
+        clusters: clusters
+      };
+
+    })
+    return chartsByFieldset;
+  }
+
   function renderMain(selectedColIndices){
-    d3.select("#aggr").selectAll("*").remove();
-    d3.select("#vis").selectAll("*").remove();
     if(selectedColIndices.length === 0) return;
 
     var selectedCols = selectedColIndices.map(function(i){ return schema[i];}),
@@ -210,83 +262,87 @@
 
     console.log('fields', JSON.stringify(fields));
 
-    var aggr = vgn.genAggregate([], fields)
-    console.log('aggregates', aggr.map(function(a){
-      return JSON.stringify(a, null, "  ");
-    }).join("\n\n"));
+    var chartsByFieldSet = getChartsByFieldSet(fields);
 
+    d3.select("#aggr").selectAll("*").remove();
+    d3.select("#vis").selectAll("*").remove();
 
-    var aggrTable = d3.select("#aggr").selectAll("tr").data(aggr);
-    aggrTable.exit().remove();
-    aggrTable.enter().append("tr")
-      .append("td").attr("class", "select")
-      .append("a").attr("href","#").text("select")
-        .on('click', function(d){
-          renderVis(d, 0);
-        })
+    var aggrTable = d3.select("#aggr").selectAll("div.fieldset");
 
-    aggrTable.selectAll("td.datacol")
-      .data(_.identity)
-      .enter()
-      .append("td").attr("class", "datacol")
+    var enter = aggrTable.data(chartsByFieldSet).enter()
+      .append("div").attr("class", "fieldset");
+
+    // data fields
+    enter.append("div").attr("class", "datafields")
+      .selectAll("div.datafield").data(function(d){return d.fields;})
+      .enter().append("div").attr("class", "datafield")
       .html(fieldDetails);
 
-    //TODO(kanitw): generate a list of charts and rank
-    var chartsByFieldset = self.charts = vgn.generateCharts(fields,
-      null,
-      {
-        dataUrl: "data/birdstrikes.json",
-        viewport: [460, 460]
-      }
-    );
+    // top vis
+    enter.append("div").attr("class","topvis")
+      .each(renderTopVis);
+
+    enter.append("div").attr("class", "select")
+      .append("a").attr("href","#").text("expand")
+        .on('click', function(d){
+          renderVisVariations(d)
+        });
 
     // console.log("chartsByFieldset", chartsByFieldset);
     // chartsByFieldset.forEach(renderCharts);
   }
 
-  function renderVis(fields){
-    var chartsByFieldset = self.charts = vgn.generateCharts(fields,
-      null,
-      {
-        dataUrl: "data/birdstrikes.json",
-        viewport: [460, 460]
-      }
-    );
-    chartsByFieldset.forEach(renderCharts, 0);
+  var topVisId = 0; //HACK
+
+  function renderTopVis(charts){
+    var container = d3.select(this),
+      clusters = charts.clusters,
+      encodings = charts.encodings;
+
+    if(clusters.length == 0 || clusters[0].length===0) return;
+
+    var id = "topvis-" + (topVisId++);
+
+    var topIdx = clusters[0][0],
+      encoding = vl.Encoding.parseJSON(encodings[topIdx]),
+      spec = vl.toVegaSpec(encoding, data);
+
+    appendVis(container, encoding, spec, id);
   }
 
-  function renderCharts(charts, groupId) {
+  function appendVis(container, encoding, spec, id){
+    container.append("div").attr("id", id)
+      .style({"height": (+spec.height + HEIGHT_OFFSET) + "px", "overflow": "hidden"});
+
+    if (spec){
+      vg.parse.spec(spec, function (vgChart) {
+        var vis = vgChart({el: '#' + id});
+        vis.update();
+      });
+    }
+
+    container.append("input").attr({"readonly":1, value: encoding.toShorthand(), class:"shorthand"})
+      .style("font-size", "12px");
+  }
+
+  function renderVisVariations(charts, groupId) {
+    var encodings = charts.encodings,
+      diff = charts.diff,
+      clusters = charts.clusters;
+
     var content = d3.select("#vis");
     content.selectAll("*").remove();
     var visIdCounter=0;
 
-    var fields = vl.vals(charts[0].enc);
+    var fields = vl.vals(encodings[0].enc);
     var groupname = fields.map(function(v){
       return (v.aggr ? v.aggr+"_" : "") +
         (v.bin ? "bin_" : "") +
         v.name +
         "(" + v.type + ")";
-    }).join(" / ")
+    }).join(" / ");
 
     content.append("h2").text(groupname);
-
-    charts = charts.map(function(c){
-      c.score = visrank.getScore(c);
-      return c;
-    });
-
-    var diff = vgn.getDistanceTable(charts),
-      clusters = vgn.cluster(charts, 2.5)
-        .map(function(cluster){
-          return cluster.sort(function(i, j){
-            return charts[j].score - charts[i].score;
-          });
-        })
-        .sort(function(c1, c2){
-          return charts[c2[0]].score - charts[c1[0]].score;
-        });
-
-    console.log("clusters", clusters);
 
     if(CONFIG.showTable){
       renderDistanceTable(content, diff);
@@ -294,15 +350,15 @@
 
     // return;
 
-    var HEIGHT_OFFSET = 60;
+
 
     clusters.forEach(function (clusterIndices) {
       var cluster = clusterIndices.map(function (i) {
-        var chart = charts[i],
-          encoding = vl.Encoding.parseJSON(chart),
+        var e = encodings[i],
+          encoding = vl.Encoding.parseJSON(e),
           spec = vl.toVegaSpec(encoding, data);
         return {
-          chart: chart,
+          encodingJson: e,
           encoding: encoding,
           spec: spec,
           i: i
@@ -329,7 +385,7 @@
       cluster.forEach(function (o, i) {
         if(CONFIG.showOnlyClusterTop && i>0) return;
         // console.log('chart', chart, chart.toShorthand());
-        var chart = o.chart,
+        var encodingJson = o.encodingJson,
           i = o.i,
           id = 'vis-' + groupId + "-" + (visIdCounter++),
           encoding = o.encoding,
@@ -341,28 +397,10 @@
             "margin-right": "10px",
             "vertical-align": "top"
           })
-        var detail = chartDiv.append("div").text("id:"+i+", score:"+chart.score).append("div");
+        var detail = chartDiv.append("div").text("id:"+i+", score:"+encodingJson.score).append("div");
         encodingDetails(encoding, detail);
 
-        chartDiv.append("div")
-          .attr("id", id)
-          .style({"height": (+spec.height + HEIGHT_OFFSET) + "px", "overflow": "hidden"})
-
-        // chartDiv.append("div")
-        //   .text(JSON.stringify(spec, null, "  "))
-        //   .classed("hide spec", true);
-
-        chartDiv.append("input").attr({"readonly":1, value: encoding.toShorthand()})
-          .style("font-size", "12px");
-
-        if (spec) {
-          //console.log("rendering spec", spec);
-          //console.log("rendering spec", id ,":", JSON.stringify(spec));
-          vg.parse.spec(spec, function (vgChart) {
-            var vis = vgChart({el: '#' + id, renderer: "svg"});
-            vis.update();
-          });
-        }
+        appendVis(chartDiv, encoding, spec, id);
       });
     })
   }
