@@ -167,7 +167,7 @@
     // render(colIndicesSet[0])
   }
 
-  function fieldDetailHtml(v, type){
+  function fieldDetailHtml(v){
     return "<b>" +
       "<span class='fn'>" +
       (v.aggr ? v.aggr : "") +
@@ -176,7 +176,7 @@
       "<span class='name'>" +
       (v.name || "") +
       "</span>" +
-      "</b> ("+ (type || v.type) + ")";
+      "</b> ("+ v.type + ")";
   }
 
   function encodingDetails(enc, div){
