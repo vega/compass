@@ -207,7 +207,9 @@
         },
         true
       ).map(function (e) { //add score
-          e.score = visrank.encodingScore(e);
+          var score = visrank.encodingScore(e);
+          e.score = score.score;
+          e.scoreFeatures = score.features;
           return e;
         });
 
