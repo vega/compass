@@ -31,23 +31,15 @@
 
   var keys = vg.keys;
 
-  //TODO: unify type system
-  function getDVType(data_type){
-    //return datavore's data type
-    //var typeMap = {
-    //  "categorical": dv.type.nominal,
-    //  "date": dv.type.nominal, //TODO extend datavore to support date
-    //  "geographic": dv.type.nominal, //TODO: extend datavore to support geographic
-    //  "quantitative": dv.type.numeric,
-    //  "count": dv.type.unknown //TODO how to best deal with this.
-    //};
 
+  function getVLType(data_type){
     // return vegalite's data type
     var typeMap = {
       "categorical": "O",
       "geographic": "G",
       "quantitative": "Q",
-      "date": "T" //TODO: refactor this to datetime
+      "datetime": "T",
+      "count": "#"
     };
     return typeMap[data_type];
   }
@@ -57,7 +49,7 @@
     //TODO: use amd-plugin to load json, csv
     d3.json("data/birdstrikes/birdstrikes-schema.json", function(_schema) {
       //TODO: remove this line after updating csv.
-      schema = _(_schema).filter(function(col){ return col.enabled; })
+      schema = _(_schema).filter(function(d){ return !d.disabled;})
         .sortBy('field_name')
         .map(function(col, i){
           col.key = col['field_name'].replace(/(: )/g, "__").replace(/[\/ ]/g,"_").replace(/[()]/g, "");
@@ -70,80 +62,114 @@
 
       console.log('schema keys', _.pluck(schema,'key').sort());
       console.log('data_types', _(schema).pluck('data_type').uniq().value());
-
       loadData();
     });
   }
 
-  function encodingDetails(enc, div){
-    div.append("div").html("marktype: <b>"+enc.marktype()+"</b>");
-    enc.forEach(function(k, v){
-      div.append("div").html(
-        k+": <b>"+
-        (v.aggr ? v.aggr+"-" : "") +
-        (v.bin ? " bin " : "") +
-        (v.name || "") +
-        "</b> ("+ vl.dataTypeNames[v.type] + ")")
+  function updateSelectedFields(){
+    var selectedColIndices = [];
+
+    d3.selectAll("#datacols input.datacol").each(function(d, i){
+      var selected = d3.select(this).node().checked;
+      if(selected){
+        selectedColIndices.push(d.index);
+      }
     });
+
+    renderMain(selectedColIndices);
+  }
+
+  function init(){
+    var datacols = d3.select("#datacols").selectAll("div")
+      .data(schema).enter().append("div").append("label");
+
+    datacols.append("input").attr("type","checkbox").attr("class","datacol")
+      .on("change", updateSelectedFields);
+
+    datacols.append("span").attr("class","type").text(function(d){
+      return "["+getVLType(d.data_type)+"] ";
+    });
+
+    datacols.append("span").attr("class","name").html(function(d){
+      return d.field_name;
+    });
+
+    // -----  Assume User Selection here -----
+
+    // 0:O "Aircraft: Airline/Operator"
+    // 1:O "Aircraft: Make/Model"
+    // 2:O "Airport: Name"
+    // 3:Q "Cost: Other"
+    // 4:Q "Cost: Repair"
+    // 5:Q "Cost: Total $"
+    // 6:O "Effect: Amount of damage"
+    // 7:T "Flight Date"
+    // 8:# "Number of Strikes"
+    // 9:G "Origin State"
+    // 10:Q "Speed (IAS) in knots"
+    // 11:O "When: Phase of flight"
+    // 12:O "When: Time of day"
+    // 13:O "Wildlife: Size"
+    // 14:O "Wildlife: Species"
+
+    // var colIndicesSet = [
+    //   [6,5,4], //CxQxQ -- good except some bar + size
+    //   [6,11,5], //CxCxQ
+    //   [6,8], //Cx#
+    //   [2,3], //C(Big)xQ
+    //   [6, 10], //CxQ
+    //   [6,8,5], //Cx#xG
+    //   [10], //Q
+    //   // [4,5], //QxQ
+    //   // [7,8], //Dx#
+    //   // [11,12,13], //OxOxO //FIXME
+    //   //// [6,5,10] //CxQxQ //TODO: speed might be problematic
+    // ];
+
+    // var control = d3.select("#control");
+
+    // var dsel = control.append("select")
+    //   .attr("class", "data")
+    //   .style("width", "300px")
+    //   .on("change", function(){
+    //     var index = this.options[this.selectedIndex].value;
+    //     render(colIndicesSet[index])
+    //   })
+    //   .selectAll("option").data(colIndicesSet)
+    //   .enter().append("option")
+    //     .attr("value", function(d, i){ return i;})
+    //     .attr("selected", function(d,i){ return i==0? true : undefined;})
+    //     .text(function(d, i){ return getTitle(d);});
+
+    // render(colIndicesSet[0])
   }
 
   function loadData(){
     // TODO: use other lib to load csv as columns?
     // TODO: regenerate csv with all columns
-    d3.csv("data/birdstrikes/birdstrikes-header-reformatted.csv", function(data) {
+    d3.json("data/birdstrikes.json", function(data) {
       self.data = data;
       console.log("keys", vg.keys(data[0]));
-      //console.log("data#0", data[0]);
-      // -----  Assume User Selection here -----
+      init();
+    });
+  }
 
-      // 0:O "Aircraft: Airline/Operator"
-      // 1:O "Aircraft: Make/Model"
-      // 2:O "Airport: Name"
-      // 3:Q "Cost: Other"
-      // 4:Q "Cost: Repair"
-      // 5:Q "Cost: Total $"
-      // 6:O "Effect: Amount of damage"
-      // 7:T "Flight Date"
-      // 8:# "Number of Strikes"
-      // 9:G "Origin State"
-      // 10:Q "Speed (IAS) in knots"
-      // 11:O "When: Phase of flight"
-      // 12:O "When: Time of day"
-      // 13:O "Wildlife: Size"
-      // 14:O "Wildlife: Species"
+  function fieldDetails(v, type){
+    return "<b>" +
+        "<span class='fn'>" +
+        (v.aggr ? v.aggr : "") +
+        (v.bin ? " bin " : "") +
+        "</span>" +
+        "<span class='name'>" +
+        (v.name || "") +
+        "</span>" +
+        "</b> ("+ (type || v.type) + ")";
+  }
 
-      // TODO(kanitw): extend this to support query transformation
-
-      var colIndicesSet = [
-        [6,5,4], //CxQxQ -- good except some bar + size
-        [6,11,5], //CxCxQ
-        [6,8], //Cx#
-        [2,3], //C(Big)xQ
-        [6, 10], //CxQ
-        [6,8,5], //Cx#xG
-        [10], //Q
-        // [4,5], //QxQ
-        // [7,8], //Dx#
-        // [11,12,13], //OxOxO //FIXME
-        //// [6,5,10] //CxQxQ //TODO: speed might be problematic
-      ];
-
-      var control = d3.select("#control");
-
-      var dsel = control.append("select")
-        .attr("class", "data")
-        .style("width", "300px")
-        .on("change", function(){
-          var index = this.options[this.selectedIndex].value;
-          render(colIndicesSet[index])
-        })
-        .selectAll("option").data(colIndicesSet)
-        .enter().append("option")
-          .attr("value", function(d, i){ return i;})
-          .attr("selected", function(d,i){ return i==0? true : undefined;})
-          .text(function(d, i){ return getTitle(d);});
-
-      render(colIndicesSet[0])
+  function encodingDetails(enc, div){
+    div.append("div").html("marktype: <b>"+enc.marktype()+"</b>");
+    enc.forEach(function(k, v){
+      div.append("div").html(k+": "+fieldDetails(v, vl.dataTypeNames[v.type]))
     });
   }
 
@@ -155,7 +181,10 @@
     }).join(",");
   }
 
-  function render(selectedColIndices){
+  function renderMain(selectedColIndices){
+    d3.select("#aggr").selectAll("*").remove();
+    d3.select("#vis").selectAll("*").remove();
+    if(selectedColIndices.length === 0) return;
 
     var selectedCols = selectedColIndices.map(function(i){ return schema[i];}),
       selectedColNames = _.pluck(selectedCols, 'field_name'),
@@ -167,7 +196,7 @@
       if(col.data_type == "count"){
         return {aggr: "count", type:"Q"};
       }
-      var type = getDVType(col.data_type), f;
+      var type = getVLType(col.data_type), f;
       switch(type){
 
         case "Q":
@@ -186,6 +215,22 @@
       return JSON.stringify(a, null, "  ");
     }).join("\n\n"));
 
+
+    var aggrTable = d3.select("#aggr").selectAll("tr").data(aggr);
+    aggrTable.exit().remove();
+    aggrTable.enter().append("tr")
+      .append("td").attr("class", "select")
+      .append("a").attr("href","#").text("select")
+        .on('click', function(d){
+          renderVis(d, 0);
+        })
+
+    aggrTable.selectAll("td.datacol")
+      .data(_.identity)
+      .enter()
+      .append("td").attr("class", "datacol")
+      .html(fieldDetails);
+
     //TODO(kanitw): generate a list of charts and rank
     var chartsByFieldset = self.charts = vgn.generateCharts(fields,
       null,
@@ -195,15 +240,24 @@
       }
     );
 
-    console.log("chartsByFieldset", chartsByFieldset);
-
-    d3.select("#display").selectAll("*").remove();
-    chartsByFieldset.forEach(renderCharts);
+    // console.log("chartsByFieldset", chartsByFieldset);
+    // chartsByFieldset.forEach(renderCharts);
   }
 
+  function renderVis(fields){
+    var chartsByFieldset = self.charts = vgn.generateCharts(fields,
+      null,
+      {
+        dataUrl: "data/birdstrikes.json",
+        viewport: [460, 460]
+      }
+    );
+    chartsByFieldset.forEach(renderCharts, 0);
+  }
 
   function renderCharts(charts, groupId) {
-    var content = d3.select("#display");
+    var content = d3.select("#vis");
+    content.selectAll("*").remove();
     var visIdCounter=0;
 
     var fields = vl.vals(charts[0].enc);
@@ -230,8 +284,7 @@
         })
         .sort(function(c1, c2){
           return charts[c2[0]].score - charts[c1[0]].score;
-        })
-
+        });
 
     console.log("clusters", clusters);
 
@@ -239,6 +292,7 @@
       renderDistanceTable(content, diff);
     }
 
+    // return;
 
     var HEIGHT_OFFSET = 60;
 
@@ -294,9 +348,9 @@
           .attr("id", id)
           .style({"height": (+spec.height + HEIGHT_OFFSET) + "px", "overflow": "hidden"})
 
-        chartDiv.append("div")
-          .text(JSON.stringify(spec, null, "  "))
-          .classed("hide spec", true);
+        // chartDiv.append("div")
+        //   .text(JSON.stringify(spec, null, "  "))
+        //   .classed("hide spec", true);
 
         chartDiv.append("input").attr({"readonly":1, value: encoding.toShorthand()})
           .style("font-size", "12px");

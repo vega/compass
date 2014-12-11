@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>VisGen Demo</title>
+    <title>Visrec Demo</title>
 
     <!-- Twitter Bootstrap CSS library -->
-    <link rel="stylesheet" type="text/css" href="css/bootstrap-2.0.min.css">
+    <!-- <link rel="stylesheet" type="text/css" href="css/bootstrap-2.0.min.css"> -->
 
     <!-- LessCSS stylesheet files -->
     <link rel="stylesheet/less" type="text/css" href="css/main.less">
@@ -47,24 +47,16 @@
   </head>
 
   <body>
-    <div class="navbar navbar-fixed-top">
-      <div class="navbar-inner">
-        <div class="container">
-          <a class="brand" href="#">VisGen</a>
-          <div class="nav-collapse">
-            <!-- <ul class="nav">
-              <li class="active"><a href="#">Home</a></li>
-              <li><a href="#about">About</a></li>
-              <li><a href="#contact">Contact</a></li>
-            </ul> -->
-          </div>
-        </div>
-      </div>
+    <div id="ctrl">
+      <div id="datacols"></div>
+      <div id="presets"></div>
     </div>
 
     <div id="content" class="container">
-      <div id="control"></div>
-      <div id="display"></div>
+      <h2>Data Variations</h2>
+      <table id="aggr"></table>
+      <h2>Vis Variations</h2>
+      <div id="vis"></div>
     </div>
 
     <script src="src/index.js"></script>
