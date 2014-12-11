@@ -10,8 +10,8 @@
     // only CommonJS-like environments that support module.exports,
     // like Node.
     module.exports = factory(
-      require('vegalite'),
-      require('clusterfck')
+      require('../../vegalite/src/vegalite'),
+      require('../src/lib/clusterfck.js')
     );
   } else {
     // Browser globals (root is window)
@@ -171,16 +171,59 @@
 
   //TODO markTypesAggregateSupport
 
-  var marksRule = {
-    point: pointRule,
-    bar: barRule,
-    line: lineRule,
-    area: lineRule
-  };
+  var marksRule = vgn.marksRule = generalRule;
+  marksRule.point = pointRule;
+  marksRule.bar = barRule;
+  marksRule.line = lineRule;
+  marksRule.area = lineRule;
 
   function xOyQ(enc){
     return enc.x && enc.y && enc.x.type == "O" && enc.y.type == "Q";
   }
+
+  function generalRule(enc, opt){
+    // need at least one basic encoding
+    if(enc.x || enc.y || enc.geo || enc.text || enc.arc){
+
+      if(enc.x && enc.y){
+        // show only one OxO, QxQ
+        if(opt.omitTranpose && enc.x.type== enc.y.type){
+          //TODO better criteria than name
+          if(enc.x.name > enc.y.name) return false;
+        }
+      }
+
+      if(enc.row || enc.col){ //have facet(s)
+        // don't use facets before filling up x,y
+        if((!enc.x||!enc.y)) return false;
+
+        if(opt.omitAggrWithAllDimsOnFacets){
+          // don't use facet with aggregate plot with other other ordinal on LOD
+
+          var hasAggr = false, hasOtherO = false;
+          for(var encType in enc){
+            var field = enc[encType];
+            if(field.aggr){
+              hasAggr = true;
+            }
+            if(field.type==="O" && (encType !== "row" && encType !== "col")){
+              hasOtherO = true;
+            }
+            if(hasAggr && hasOtherO) break;
+          }
+
+          if(hasAggr && !hasOtherO) return false;
+        }
+      }
+
+      // one dimension "count" is useless
+      if(enc.x && enc.x.aggr=="count" && !enc.y) return false;
+      if(enc.y && enc.y.aggr=="count" && !enc.x) return false;
+
+      return true;
+    }
+    return false;
+  };
 
   function pointRule(enc, opt){
     if(enc.x && enc.y){
@@ -237,50 +280,6 @@
     // Line chart should be only horizontal
     // and use only temporal data
     return enc.x == "T" && enc.y == "Q";
-  }
-
-  function generalRule(enc, opt){
-    // need at least one basic encoding
-    if(enc.x || enc.y || enc.geo || enc.text || enc.arc){
-
-      if(enc.x && enc.y){
-        // show only one OxO, QxQ
-        if(opt.omitTranpose && enc.x.type== enc.y.type){
-          //TODO better criteria than name
-          if(enc.x.name > enc.y.name) return false;
-        }
-      }
-
-      if(enc.row || enc.col){ //have facet(s)
-        // don't use facets before filling up x,y
-        if((!enc.x||!enc.y)) return false;
-
-        if(opt.omitAggrWithAllDimsOnFacets){
-          // don't use facet with aggregate plot with other other ordinal on LOD
-
-          var hasAggr = false, hasOtherO = false;
-          for(var encType in enc){
-            var field = enc[encType];
-            if(field.aggr){
-              hasAggr = true;
-            }
-            if(field.type==="O" && (encType !== "row" && encType !== "col")){
-              hasOtherO = true;
-            }
-            if(hasAggr && hasOtherO) break;
-          }
-
-          if(hasAggr && !hasOtherO) return false;
-        }
-      }
-
-      // one dimension "count" is useless
-      if(enc.x && enc.x.aggr=="count" && !enc.y) return false;
-      if(enc.y && enc.y.aggr=="count" && !enc.x) return false;
-
-      return true;
-    }
-    return false;
   }
 
   var ENCODING_RULES = {
@@ -505,7 +504,7 @@
       // If all fields are assigned, save
       if(i===fields.length){
         // at the minimal all chart should have x, y, geo, text or arc
-        if(generalRule(tmpEnc, opt)){
+        if(marksRule(tmpEnc, opt)){
           encodings.push(vl.duplicate(tmpEnc));
         }
         return;
