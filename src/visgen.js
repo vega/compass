@@ -480,7 +480,7 @@
               assignField(i+1, hasAggr);
             }
           }else{ // both "aggr", "_aggr" not in f
-            //FIXME
+            assignField(i+1, false);
           }
           break;
         case "O":

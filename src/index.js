@@ -24,7 +24,7 @@
 }(this, function(d3, vg, vl, _, vgn, visrank){
   var schema, col_indices;
 
-  var HEIGHT_OFFSET = 60;
+  var HEIGHT_OFFSET = 60, MAX_HEIGHT = 500, MAX_WIDTH = 500;
 
   var CONFIG = {
     showTable: false,
@@ -167,7 +167,7 @@
     // render(colIndicesSet[0])
   }
 
-  function fieldDetails(v, type){
+  function fieldDetailHtml(v, type){
     return "<b>" +
       "<span class='fn'>" +
       (v.aggr ? v.aggr : "") +
@@ -182,7 +182,7 @@
   function encodingDetails(enc, div){
     div.append("div").html("marktype: <b>"+enc.marktype()+"</b>");
     enc.forEach(function(k, v){
-      div.append("div").html(k+": "+fieldDetails(v, vl.dataTypeNames[v.type]))
+      div.append("div").html(k+": "+fieldDetailHtml(v, vl.dataTypeNames[v.type]))
     });
   }
 
@@ -268,6 +268,7 @@
 
     d3.select("#aggr").selectAll("*").remove();
     d3.select("#vis").selectAll("*").remove();
+    d3.select("#selected-fields").selectAll("*").remove();
 
     var aggrTable = d3.select("#aggr").selectAll("div.fieldset");
 
@@ -278,7 +279,7 @@
     enter.append("div").attr("class", "datafields")
       .selectAll("div.datafield").data(function(d){return d.fields;})
       .enter().append("div").attr("class", "datafield")
-      .html(fieldDetails);
+      .html(fieldDetailHtml);
 
     // top vis
     enter.append("div").attr("class","topvis")
@@ -287,7 +288,7 @@
     enter.append("div").attr("class", "select")
       .append("a").attr("href","#").text("expand")
         .on('click', function(d){
-          renderVisVariations(d)
+          renderEncodingVariations(d)
         });
 
     // console.log("chartsByFieldset", chartsByFieldset);
@@ -314,7 +315,11 @@
 
   function appendVis(container, encoding, spec, id){
     container.append("div").attr("id", id)
-      .style({"height": (+spec.height + HEIGHT_OFFSET) + "px", "overflow": "hidden"});
+      .style({
+        "height": Math.min(+spec.height + HEIGHT_OFFSET, MAX_HEIGHT) + "px",
+        "max-width": MAX_WIDTH+"px",
+        "overflow": "scroll"
+      });
 
     if (spec){
       vg.parse.spec(spec, function (vgChart) {
@@ -327,32 +332,26 @@
       .style("font-size", "12px");
   }
 
-  function renderVisVariations(charts, groupId) {
+  function renderEncodingVariations(charts, groupId) {
     var encodings = charts.encodings,
       diff = charts.diff,
       clusters = charts.clusters;
 
-    var content = d3.select("#vis");
+    var dataFields = d3.select("#selected-fields"),
+      content = d3.select("#vis");
+
     content.selectAll("*").remove();
+    dataFields.selectAll("*").remove();
+
+    dataFields.selectAll("div.datafield").data(charts.fields)
+      .enter().append("div").attr("class", "datafield")
+      .html(fieldDetailHtml);
+
     var visIdCounter=0;
-
-    var fields = vl.vals(encodings[0].enc);
-    var groupname = fields.map(function(v){
-      return (v.aggr ? v.aggr+"_" : "") +
-        (v.bin ? "bin_" : "") +
-        v.name +
-        "(" + v.type + ")";
-    }).join(" / ");
-
-    content.append("h2").text(groupname);
 
     if(CONFIG.showTable){
       renderDistanceTable(content, diff);
     }
-
-    // return;
-
-
 
     clusters.forEach(function (clusterIndices) {
       var cluster = clusterIndices.map(function (i) {
