@@ -53,6 +53,43 @@
     return typeMap[data_type];
   }
 
+  function init(){
+    d3.select("#toggle-presets").on("click", function(){
+      var hide = d3.select("#presets").classed("hide")
+      d3.select("#presets").classed("hide", !hide);
+    });
+
+    d3.select("#toggle-config").on("click", function(){
+      var hide = d3.select("#config").classed("hide")
+      d3.select("#config").classed("hide", !hide);
+    });
+
+    var configs = d3.select("#config").selectAll("div.cfg")
+      .data(vl.keys(CONFIG))
+      .enter().append("div").attr("class", "cfg")
+        .append("label");
+
+    configs.append("input").attr("type","checkbox").attr("class","cfg-check")
+      .attr("checked", function(d){ return CONFIG[d];})
+      .on("change", updateSelectedFields);
+
+
+    configs.append("span").attr("class","label config").text(function(d){return d;});
+
+    loadSchema();
+  }
+
+  function getConfig(){
+    var config = {};
+    d3.select("#config").selectAll("div.cfg input.cfg-check")
+      .each(function(d){
+        config[d] = d3.select(this).node().checked;
+      });
+
+    console.log("config", config);
+    return config;
+  }
+
   // ----- load schema -----
   function loadSchema(){
     //TODO: use amd-plugin to load json, csv
@@ -98,11 +135,11 @@
     d3.json("data/birdstrikes.json", function(data) {
       self.data = data;
       console.log("keys", vg.keys(data[0]));
-      init();
+      renderColumns();
     });
   }
 
-  function init(){
+  function renderColumns(){
     var datacols = d3.select("#datacols").selectAll("div")
       .data(schema).enter().append("div").append("label");
 
@@ -195,17 +232,14 @@
   }
 
   function getChartsByFieldSet(fields) {
-    var aggr = vgn.genAggregate([], fields);
+    var config = getConfig();
+    var aggr = vgn.genAggregate([], fields), config;
     var chartsByFieldset = aggr.map(function (fields) {
-      var encodings = vgn.generateCharts(fields,
-        {
-          genAggr: false
-        },
+      var encodings = vgn.generateCharts(fields, config,
         {
           dataUrl: "data/birdstrikes.json",
           viewport: [460, 460]
-        },
-        true
+        }, true
       ).map(function (e) { //add score
           var score = visrank.encodingScore(e);
           e.score = score.score;
@@ -433,5 +467,5 @@
       });
   }
 
-  loadSchema();
+  init();
 }));

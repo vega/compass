@@ -33,7 +33,7 @@
      * - for OxQ charts, always put O on Y
      * - show only one OxO, QxQ (currently sorted by name)
      */
-    omitTranpose: false,
+    omitTranpose: true,
     /** remove all dot plot with >1 encoding */
     omitDotPlotWithExtraEncoding: true,
     /** remove all aggregate charts with all dims on facets (row, col) */
@@ -150,7 +150,7 @@
       return traverse(tree, []);
     })
 
-    console.log("clusters", clusters.map(function(c){ return c.join("+"); }));
+    //console.log("clusters", clusters.map(function(c){ return c.join("+"); }));
     return clusters;
   }
 

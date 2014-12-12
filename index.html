@@ -48,9 +48,28 @@
 
   <body>
     <div id="ctrl">
-      <div id="datacols"></div>
-      <div id="presets"></div>
-      <div id="config"></div>
+      <div class="ctrlgrp">
+        <h2>Data Fields</h2>
+        <div class="desc">
+          Please select data fields.
+        </div>
+        <div id="datacols"></div>
+      </div>
+
+      <div class="ctrlgrp">
+        <div class="toggle pull-right">
+          <a id="toggle-presets" href="#">Show/Hide</a>
+        </div>
+        <h2>Presets</h2>
+        <div id="presets" class="hide"></div>
+      </div>
+      <div class="ctrlgrp">
+        <div class="toggle pull-right">
+          <a id="toggle-config" href="#">Show/Hide</a>
+        </div>
+        <h2>Configs</h2>
+        <div id="config"></div>
+      </div>
     </div>
 
     <div id="aggr-container">
