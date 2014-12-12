@@ -367,7 +367,7 @@
       });
 
       var clusterHeight = cluster.reduce(function (h, c) {
-        var nh = +c.spec.height + HEIGHT_OFFSET + 120;
+        var nh = Math.min(+c.spec.height + HEIGHT_OFFSET + 120, MAX_HEIGHT);
         return nh > h ? nh : h;
       }, 0)
 
