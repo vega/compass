@@ -54,10 +54,10 @@
   }
 
   function init(){
-    d3.select("#toggle-presets").on("click", function(){
-      var hide = d3.select("#presets").classed("hide")
-      d3.select("#presets").classed("hide", !hide);
-    });
+    // d3.select("#toggle-presets").on("click", function(){
+    //   var hide = d3.select("#presets").classed("hide")
+    //   d3.select("#presets").classed("hide", !hide);
+    // });
 
     d3.select("#toggle-config").on("click", function(){
       var hide = d3.select("#config").classed("hide")
