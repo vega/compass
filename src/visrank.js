@@ -25,7 +25,7 @@
       color: 0.4,
       alpha: 0.4
     },
-    O: {
+    O: { // TODO need to take cardinality into account
       x: 0.99, // harder to read axis
       y: 1,
       row: 0.7,
@@ -77,7 +77,7 @@
       features: features
     };
   };
-  };
+
 
 
   return vrank;
