@@ -397,7 +397,8 @@
       var cluster = clusterIndices.map(function (i) {
         var e = encodings[i],
           encoding = vl.Encoding.parseJSON(e),
-          spec = vl.toVegaSpec(encoding, data);
+          stats = vl.getStats(data),
+          spec = vl.toVegaSpec(encoding, stats);
         return {
           encodingJson: e,
           encoding: encoding,
