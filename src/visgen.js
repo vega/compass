@@ -467,7 +467,7 @@
               // bin the field instead!
               delete tf[i].aggr;
               tf[i].bin = true;
-              tf[i].type = "O";
+              tf[i].type = "Q";
               assignField(i+1, hasAggr);
             }
 

@@ -233,7 +233,7 @@
 
   function getChartsByFieldSet(fields) {
     var config = getConfig();
-    var aggr = vgn.genAggregate([], fields), config;
+    var aggr = vgn.genAggregate([], fields, config);
     var chartsByFieldset = aggr.map(function (fields) {
       var encodings = vgn.generateCharts(fields, config,
         {
@@ -342,7 +342,10 @@
 
     var topIdx = clusters[0][0],
       encoding = vl.Encoding.parseJSON(encodings[topIdx]),
-      spec = vl.toVegaSpec(encoding, data);
+      stats = vl.getStats(data),
+      spec = vl.toVegaSpec(encoding, stats);
+
+    console.log(JSON.stringify(spec, null, "  "));
 
     appendVis(container, encoding, spec, id);
   }
@@ -359,6 +362,9 @@
       vg.parse.spec(spec, function (vgChart) {
         var vis = vgChart({el: '#' + id});
         vis.update();
+        vis.on("mouseover", function(event, item) {
+          console.log(item);
+        });
       });
     }
 
@@ -401,7 +407,7 @@
       });
 
       var clusterHeight = cluster.reduce(function (h, c) {
-        var nh = Math.min(+c.spec.height + HEIGHT_OFFSET + 120, MAX_HEIGHT);
+        var nh = Math.min(+c.spec.height + HEIGHT_OFFSET, MAX_HEIGHT)+120;
         return nh > h ? nh : h;
       }, 0)
 
