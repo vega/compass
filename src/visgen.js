@@ -539,11 +539,12 @@
       // Otherwise, assign i-th field
       var field = fields[i];
       for (var j in ENCODING_TYPES) {
-        var et = ENCODING_TYPES[j];
+        var et = ENCODING_TYPES[j],
+          dataType = vl.dataTypes[field.bin ? "O" : field.type];
 
         //TODO: support "multiple" assignment
         if (!(et in tmpEnc) &&
-          (ENCODING_RULES[et].dataTypes & vl.dataTypes[field.type]) > 0) {
+          (ENCODING_RULES[et].dataTypes & dataType) > 0) {
           tmpEnc[et] = field;
           assignField(i + 1);
           delete tmpEnc[et];
