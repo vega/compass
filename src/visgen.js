@@ -27,6 +27,9 @@
 
     aggrList: [undefined, "avg"], //undefined = no aggregation
     marktypeList: ["point", "bar", "line", "area", "text"], //filled_map
+
+    // PRUNING RULES FOR ENCODING VARIATIONS
+
     /**
      * Eliminate all transpose
      * - keeping horizontal dot plot only.
@@ -36,8 +39,17 @@
     omitTranpose: true,
     /** remove all dot plot with >1 encoding */
     omitDotPlotWithExtraEncoding: true,
+
     /** remove all aggregate charts with all dims on facets (row, col) */
-    omitAggrWithAllDimsOnFacets: true
+    //FIXME this is good for text though!
+    omitAggrWithAllDimsOnFacets: true,
+
+    // PRUNING RULES FOR TRANFORMATION VARIATIONS
+    /** omit field sets with only dimensions */
+    omitDimensionOnly: true,
+    /** omit aggregate field sets with only measures */
+    omitAggregateWithMeasureOnly: true
+
   };
 
   var ENCODING_TYPES = ["x", "y", "row", "col", "size", "shape", "color", "alpha"]; //geo
@@ -428,6 +440,20 @@
     function assignField(i, hasAggr) {
       // If all fields are assigned, save
       if (i === fields.length) {
+        if(opt.omitAggregateWithMeasureOnly || opt.omitDimensionOnly){
+          var hasMeasure=false, hasDimension=false, hasRaw=false;
+          tf.forEach(function(f){
+            if (f.type === "O" || f.bin) {
+              hasDimension = true;
+            } else {
+              hasMeasure = true;
+              if(!f.aggr) hasRaw = true;
+            }
+          });
+          if(!hasMeasure && opt.omitDimensionOnly) return;
+          if(!hasDimension && !hasRaw && opt.omitAggregateWithMeasureOnly) return;
+        }
+
         output.push(vl.duplicate(tf));
         return;
       }
