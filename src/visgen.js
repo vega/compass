@@ -1,7 +1,7 @@
 // Define module using Universal Module Definition pattern
 // https://github.com/umdjs/umd/blob/master/returnExports.js
 
-(function (root, factory) {
+(function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
     define(['vegalite', 'clusterfck'], factory);
@@ -17,7 +17,7 @@
     // Browser globals (root is window)
     root.vgn = factory(root.vl, root.clusterfck);
   }
-}(this, function (vl, clusterfck) {
+}(this, function(vl, clusterfck) {
   var vgn = {}; //VisGeN
 
   vgn.DEFAULT_OPT = {
@@ -26,7 +26,7 @@
     genTypeCasting: false,
 
     aggrList: [undefined, "avg"], //undefined = no aggregation
-    marktypeList: ["point", "bar", "line", "area",  "text"], //filled_map
+    marktypeList: ["point", "bar", "line", "area", "text"], //filled_map
     /**
      * Eliminate all transpose
      * - keeping horizontal dot plot only.
@@ -52,7 +52,7 @@
     HISTOGRAM: 'HISTOGRAM'
   };
 
-  var ANY_DATA_TYPES= (1<<4)-1;
+  var ANY_DATA_TYPES = (1 << 4) - 1;
 
   //FIXME move these to vl
   var AGGREGATION_FN = { //all possible aggregate function listed by each data type
@@ -61,7 +61,7 @@
 
   var TRANSFORM_FN = { //all possible transform function listed by each data type
     Q: ["log", "sqrt", "abs"], // "logit?"
-    T: ["year","month","day"] //,"hr", "min", "bmon", "bday", "bdow", "bhr"]
+    T: ["year", "month", "day"] //,"hr", "min", "bmon", "bday", "bdow", "bhr"]
   };
 
   var json = function(s,sp){ return JSON.stringify(s, null, sp);};
@@ -69,29 +69,29 @@
   // Begin of Distance
 
   var DIST_BY_ENCTYPE = [
-    // positional
-    ["x", "y", 0.2],
-    ["row", "col", 0.2],
-    // ordinal LOD
-    ["color", "shape", 0.2],
-    // quantitative LOD
-    ["color", "alpha", 0.2],
-    ["size", "alpha", 0.2],
-    ["size", "color", 0.2]
-  ].reduce(function(r, x){
+      // positional
+      ["x", "y", 0.2],
+      ["row", "col", 0.2],
+      // ordinal LOD
+      ["color", "shape", 0.2],
+      // quantitative LOD
+      ["color", "alpha", 0.2],
+      ["size", "alpha", 0.2],
+      ["size", "color", 0.2]
+    ].reduce(function(r, x) {
     var a=x[0], b=x[1], d=x[2];
-    r[a] = r[a] || {};
-    r[b] = r[b] || {};
-    r[a][b] = r[b][a] = d;
-    return r;
-  }, {}),
+      r[a] = r[a] || {};
+      r[b] = r[b] || {};
+      r[a][b] = r[b][a] = d;
+      return r;
+    }, {}),
     DIST_MISSING = 100, CLUSTER_THRESHOLD=1;
 
-  function colenc(encoding){
+  function colenc(encoding) {
     var colenc = {},
       enc = encoding.enc;
 
-    vl.keys(enc).forEach(function(encType){
+    vl.keys(enc).forEach(function(encType) {
       var e = vl.duplicate(enc[encType]);
       e.type = encType;
       colenc[e.name || ""] = e;
@@ -104,49 +104,49 @@
     };
   }
 
-  vgn._getDistance = function(colenc1, colenc2){
+  vgn._getDistance = function(colenc1, colenc2) {
     var cols = union(vl.keys(colenc1.col), vl.keys(colenc2.col)),
       dist = 0;
 
-    cols.forEach(function(col){
+    cols.forEach(function(col) {
       var e1 = colenc1.col[col], e2 = colenc2.col[col];
 
-      if(e1 && e2){
-        if(e1.type != e2.type){
-          dist += (DIST_BY_ENCTYPE[e1.type]||{})[e2.type] || 1;
+      if (e1 && e2) {
+        if (e1.type != e2.type) {
+          dist += (DIST_BY_ENCTYPE[e1.type] || {})[e2.type] || 1;
         }
         //FIXME add aggregation
-      }else{
+      } else {
         dist += DIST_MISSING;
       }
     })
     return dist;
   }
 
-  vgn.getDistanceTable = function(encodings){
+  vgn.getDistanceTable = function(encodings) {
     var len = encodings.length,
       colencs = encodings.map(function(e){ return colenc(e);}),
       diff = new Array(len), i;
 
-    for(i=0; i<len; i++) diff[i] = new Array(len);
+    for (i = 0; i < len; i++) diff[i] = new Array(len);
 
-    for(i=0 ; i<len; i++){
-      for(j=i+1; j<len; j++){
+    for (i = 0; i < len; i++) {
+      for (j = i + 1; j < len; j++) {
         diff[j][i] = diff[i][j] = vgn._getDistance(colencs[i], colencs[j]);
       }
     }
     return diff;
   }
 
-  vgn.cluster = function(encodings, maxDistance){
+  vgn.cluster = function(encodings, maxDistance) {
     var dist = vgn.getDistanceTable(encodings),
       n = encodings.length;
 
-    var clusterTrees = clusterfck.hcluster(range(n), function(i, j){
+    var clusterTrees = clusterfck.hcluster(range(n), function(i, j) {
       return dist[i][j];
     }, "average", CLUSTER_THRESHOLD);
 
-    var clusters = clusterTrees.map(function(tree){
+    var clusters = clusterTrees.map(function(tree) {
       return traverse(tree, []);
     })
 
@@ -154,12 +154,12 @@
     return clusters;
   }
 
-  function traverse(node, arr){
-    if(node.value !== undefined){
+  function traverse(node, arr) {
+    if (node.value !== undefined) {
       arr.push(node.value);
-    }else{
-      if(node.left) traverse(node.left, arr)
-      if(node.right) traverse(node.right, arr);
+    } else {
+      if (node.left) traverse(node.left, arr)
+      if (node.right) traverse(node.right, arr);
     }
     return arr;
   }
@@ -177,83 +177,83 @@
   marksRule.line = lineRule;
   marksRule.area = lineRule;
 
-  function xOyQ(enc){
+  function xOyQ(enc) {
     return enc.x && enc.y && enc.x.type == "O" && enc.y.type == "Q";
   }
 
-  function generalRule(enc, opt){
+  function generalRule(enc, opt) {
     // need at least one basic encoding
-    if(enc.x || enc.y || enc.geo || enc.text || enc.arc){
+    if (enc.x || enc.y || enc.geo || enc.text || enc.arc) {
 
-      if(enc.x && enc.y){
+      if (enc.x && enc.y) {
         // show only one OxO, QxQ
-        if(opt.omitTranpose && enc.x.type== enc.y.type){
+        if (opt.omitTranpose && enc.x.type == enc.y.type) {
           //TODO better criteria than name
-          if(enc.x.name > enc.y.name) return false;
+          if (enc.x.name > enc.y.name) return false;
         }
       }
 
-      if(enc.row || enc.col){ //have facet(s)
+      if (enc.row || enc.col) { //have facet(s)
         // don't use facets before filling up x,y
-        if((!enc.x||!enc.y)) return false;
+        if ((!enc.x || !enc.y)) return false;
 
-        if(opt.omitAggrWithAllDimsOnFacets){
+        if (opt.omitAggrWithAllDimsOnFacets) {
           // don't use facet with aggregate plot with other other ordinal on LOD
 
           var hasAggr = false, hasOtherO = false;
-          for(var encType in enc){
+          for (var encType in enc) {
             var field = enc[encType];
-            if(field.aggr){
+            if (field.aggr) {
               hasAggr = true;
             }
-            if(field.type==="O" && (encType !== "row" && encType !== "col")){
+            if (field.type === "O" && (encType !== "row" && encType !== "col")) {
               hasOtherO = true;
             }
-            if(hasAggr && hasOtherO) break;
+            if (hasAggr && hasOtherO) break;
           }
 
-          if(hasAggr && !hasOtherO) return false;
+          if (hasAggr && !hasOtherO) return false;
         }
       }
 
       // one dimension "count" is useless
-      if(enc.x && enc.x.aggr=="count" && !enc.y) return false;
-      if(enc.y && enc.y.aggr=="count" && !enc.x) return false;
+      if (enc.x && enc.x.aggr == "count" && !enc.y) return false;
+      if (enc.y && enc.y.aggr == "count" && !enc.x) return false;
 
       return true;
     }
     return false;
   };
 
-  function pointRule(enc, opt){
-    if(enc.x && enc.y){
+  function pointRule(enc, opt) {
+    if (enc.x && enc.y) {
       // have both x & y ==> scatter plot / bubble plot
 
       // For OxQ
-      if(opt.omitTranpose && xOyQ(enc)){
+      if (opt.omitTranpose && xOyQ(enc)) {
         // if omitTranpose, put Q on X, O on Y
         return false;
       }
 
       // For OxO
-      if(enc.x.type == "O" && enc.y.type == "O"){
+      if (enc.x.type == "O" && enc.y.type == "O") {
         // shape doesn't work with both x, y as ordinal
-        if(enc.shape){
+        if (enc.shape) {
           return false;
         }
 
         // TODO(kanitw): check that there is quant at least ...
-        if(enc.color && enc.color.type == "O"){
+        if (enc.color && enc.color.type == "O") {
           return false;
         }
       }
 
-    }else{ // plot with one axis = dot plot
+    } else { // plot with one axis = dot plot
       // Dot plot should always be horizontal
-      if(opt.omitTranpose && enc.y) return false;
+      if (opt.omitTranpose && enc.y) return false;
 
       // dot plot shouldn't have other encoding
-      if(opt.omitDotPlotWithExtraEncoding && vl.keys(enc).length > 1) return false;
+      if (opt.omitDotPlotWithExtraEncoding && vl.keys(enc).length > 1) return false;
 
       // dot plot with shape is non-sense
       if (enc.shape) return false;
@@ -261,12 +261,12 @@
     return true;
   }
 
-  function barRule(enc, opt){
+  function barRule(enc, opt) {
     // need to aggregate on either x or y
-    if((enc.x.aggr!==undefined)^(enc.y.aggr!==undefined)){
+    if ((enc.x.aggr !== undefined) ^ (enc.y.aggr !== undefined)) {
 
       // if omitTranpose, put Q on X, O on Y
-      if(opt.omitTranpose && xOyQ(enc)) return false;
+      if (opt.omitTranpose && xOyQ(enc)) return false;
 
       return true;
     }
@@ -274,7 +274,7 @@
     return false;
   }
 
-  function lineRule(enc, opt){
+  function lineRule(enc, opt) {
     // TODO(kanitw): add omitVerticalLine as config
 
     // Line chart should be only horizontal
@@ -326,91 +326,91 @@
 
   // Beginning of Chart Generation
 
-  var nonEmpty = function(grp){
+  var nonEmpty = function(grp) {
     return !isArray(grp) || grp.length > 0;
   };
 
-  function nestedMap(col, f, level, filter){
+  function nestedMap(col, f, level, filter) {
     return level === 0 ?
       col.map(f) :
-      col.map(function(v){
-        var r = nestedMap(v, f, level-1);
+      col.map(function(v) {
+        var r = nestedMap(v, f, level - 1);
         return filter ? r.filter(nonEmpty) : r;
       });
   }
 
-  function nestedReduce(col, f, level, filter){
+  function nestedReduce(col, f, level, filter) {
     return level === 0 ?
       col.reduce(f, []) :
-      col.map(function(v){
-        var r = nestedReduce(v, f, level-1);
+      col.map(function(v) {
+        var r = nestedReduce(v, f, level - 1);
         return filter ? r.filter(nonEmpty) : r;
       });
   }
 
-  function getopt(opt){
+  function getopt(opt) {
     //merge with default
-    return (opt ? vl.keys(opt) : []).reduce(function(c ,k){
+    return (opt ? vl.keys(opt) : []).reduce(function(c, k) {
       c[k] = opt[k];
       return c;
     }, Object.create(vgn.DEFAULT_OPT));
   }
 
-  vgn.generateCharts = function (fields, opt, cfg, flat){
+  vgn.generateCharts = function(fields, opt, cfg, flat) {
     opt = getopt(opt);
     flat = flat === undefined ? {encodings: 1} : flat;
 
     // generate permutation of encoding mappings
     var fieldSets = opt.genAggr ? vgn.genAggregate([], fields, opt) : [fields],
-      encodings, charts, level=0;
+      encodings, charts, level = 0;
 
-    if(flat===true || (flat && flat.aggr)){
-      encodings = fieldSets.reduce(function(output, fields){
+    if (flat === true || (flat && flat.aggr)) {
+      encodings = fieldSets.reduce(function(output, fields) {
         return vgn.genFieldEncodings(output, fields, opt)
-      },[]);
-    }else{
-      encodings = fieldSets.map(function(fields){
+      }, []);
+    } else {
+      encodings = fieldSets.map(function(fields) {
         return vgn.genFieldEncodings([], fields, opt);
       }, true);
       level += 1;
     }
 
-    if(flat===true || (flat && flat.encodings)){
-      charts = nestedReduce(encodings, function(output, encodings){
+    if (flat === true || (flat && flat.encodings)) {
+      charts = nestedReduce(encodings, function(output, encodings) {
         return vgn.genMarkTypes(output, encodings, opt, cfg);
       }, level, true);
-    }else{
-      charts = nestedMap(encodings, function(encodings){
-          return vgn.genMarkTypes([], encodings, opt, cfg)
-        }, level, true);
-      level +=1;
+    } else {
+      charts = nestedMap(encodings, function(encodings) {
+        return vgn.genMarkTypes([], encodings, opt, cfg)
+      }, level, true);
+      level += 1;
     }
     return charts;
   };
 
 
-  vgn.genMarkTypes = function(output, enc, opt, cfg){
+  vgn.genMarkTypes = function(output, enc, opt, cfg) {
     opt = getopt(opt);
     vgn._getSupportedMarkTypes(enc, opt)
-      .forEach(function(markType){
+      .forEach(function(markType) {
         output.push({ marktype: markType, enc: enc, cfg: cfg });
       });
     return output;
   }
 
   //TODO(kanitw): write test case
-  vgn._getSupportedMarkTypes = function(enc, opt){
-    var markTypes = opt.marktypeList.filter(function(markType){
+  vgn._getSupportedMarkTypes = function(enc, opt) {
+    var markTypes = opt.marktypeList.filter(function(markType) {
       var mark = vl.marks[markType],
         reqs = mark.requiredEncoding,
         support = mark.supportedEncoding;
 
-      for(var i in reqs){ // all required encodings in enc
-        if(!(reqs[i] in enc)) return false;
+      for (var i in reqs) { // all required encodings in enc
+        if (!(reqs[i] in enc)) return false;
       }
 
-      for(var encType in enc){ // all encodings in enc are supported
-        if(!support[encType]) return false;
+      for (var encType in enc) { // all encodings in enc are supported
+        if (!support[encType]) return false;
       }
 
       return !marksRule[markType] || marksRule[markType](enc, opt);
@@ -421,71 +421,71 @@
     return markTypes;
   };
 
-  vgn.genAggregate = function(output, fields, opt){
+  vgn.genAggregate = function(output, fields, opt) {
     var tf = new Array(fields.length);
     opt = getopt(opt);
 
-    function assignField(i, hasAggr){
+    function assignField(i, hasAggr) {
       // If all fields are assigned, save
-      if(i===fields.length){
+      if (i === fields.length) {
         output.push(vl.duplicate(tf));
         return;
       }
 
-      var f= fields[i];
+      var f = fields[i];
 
       // Otherwise, assign i-th field
-      switch(f.type){
+      switch (f.type) {
         //TODO "D", "G"
         case "Q":
           tf[i] = {name: f.name, type: f.type};
-          if(f.aggr){
+          if (f.aggr) {
             tf[i].aggr = f.aggr;
-            assignField(i+1, true);
-          }else if(f._aggr){
+            assignField(i + 1, true);
+          } else if (f._aggr) {
             var aggregates = f._aggr == "*" ? opt.aggrList : f._aggr;
 
-            for(var j in aggregates){
+            for (var j in aggregates) {
               var a = aggregates[j];
-              if(a !== undefined){
-                if(hasAggr === true || hasAggr === null){
+              if (a !== undefined) {
+                if (hasAggr === true || hasAggr === null) {
                   // must be aggregated, or no constraint
                   //set aggregate to that one
                   tf[i].aggr = a;
-                  assignField(i+1, true);
+                  assignField(i + 1, true);
                 }
-              }else{ // if(a === undefined)
-                if(hasAggr === false || hasAggr === null){
+              } else { // if(a === undefined)
+                if (hasAggr === false || hasAggr === null) {
                   // must be raw plot, or no constraint
                   delete tf[i].aggr;
-                  assignField(i+1, false);
+                  assignField(i + 1, false);
                 }
               }
             }
 
-            if(opt.genBin){
+            if (opt.genBin) {
               // bin the field instead!
               delete tf[i].aggr;
               tf[i].bin = true;
               tf[i].type = "Q";
-              assignField(i+1, hasAggr);
+              assignField(i + 1, hasAggr);
             }
 
-            if(opt.genTypeCasting){
+            if (opt.genTypeCasting) {
               // we can also change it to dimension (cast type="O")
               delete tf[i].aggr;
               delete tf[i].bin;
               tf[i].type = "O";
-              assignField(i+1, hasAggr);
+              assignField(i + 1, hasAggr);
             }
-          }else{ // both "aggr", "_aggr" not in f
-            assignField(i+1, false);
+          } else { // both "aggr", "_aggr" not in f
+            assignField(i + 1, false);
           }
           break;
         case "O":
         default:
           tf[i] = f;
-          assignField(i+1, hasAggr);
+          assignField(i + 1, hasAggr);
           break;
       }
 
@@ -497,14 +497,14 @@
   }
 
   //TODO(kanitw): write test case
-  vgn.genFieldEncodings = function (encodings, fields, opt){ // generate encodings (_enc property in vega)
+  vgn.genFieldEncodings = function(encodings, fields, opt) { // generate encodings (_enc property in vega)
     var tmpEnc = {};
 
-    function assignField(i){
+    function assignField(i) {
       // If all fields are assigned, save
-      if(i===fields.length){
+      if (i === fields.length) {
         // at the minimal all chart should have x, y, geo, text or arc
-        if(marksRule(tmpEnc, opt)){
+        if (marksRule(tmpEnc, opt)) {
           encodings.push(vl.duplicate(tmpEnc));
         }
         return;
@@ -512,14 +512,14 @@
 
       // Otherwise, assign i-th field
       var field = fields[i];
-      for(var j in ENCODING_TYPES){
+      for (var j in ENCODING_TYPES) {
         var et = ENCODING_TYPES[j];
 
         //TODO: support "multiple" assignment
-        if(!(et in tmpEnc) &&
-          (ENCODING_RULES[et].dataTypes & vl.dataTypes[field.type]) > 0){
+        if (!(et in tmpEnc) &&
+          (ENCODING_RULES[et].dataTypes & vl.dataTypes[field.type]) > 0) {
           tmpEnc[et] = field;
-          assignField(i+1);
+          assignField(i + 1);
           delete tmpEnc[et];
         }
       }
@@ -536,7 +536,7 @@
     return toString.call(obj) == '[object Array]';
   };
 
-  function union(a,b){
+  function union(a, b) {
     var o = {};
     a.forEach(function(x){ o[x] = true;});
     b.forEach(function(x){ o[x] = true;});
