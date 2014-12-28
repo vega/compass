@@ -31,7 +31,7 @@
 
     genAggr: true,
     genBin: true,
-    genTypeCasting: true,
+    genTypeCasting: false,
 
     omitTranpose: true,
     omitDotPlotWithExtraEncoding: true,
@@ -70,7 +70,7 @@
         .append("label");
 
     configs.append("input").attr("type","checkbox").attr("class","cfg-check")
-      .attr("checked", function(d){ return CONFIG[d];})
+      .attr("checked", function(d){ return CONFIG[d] || undefined;})
       .on("change", updateSelectedFields);
 
 
@@ -235,11 +235,14 @@
     var config = getConfig();
     var aggr = vgn.genAggregate([], fields, config);
     var chartsByFieldset = aggr.map(function (fields) {
-      var encodings = vgn.generateCharts(fields, config,
+      var encodings = vgn.generateCharts(fields,
+        vl.merge(Object.create(config), {genAggr: false}),
         {
           dataUrl: "data/birdstrikes.json",
-          viewport: [460, 460]
-        }, true
+          viewport: [460, 460],
+          genAggr: false
+        },
+        true
       ).map(function (e) { //add score
           var score = visrank.encodingScore(e);
           e.score = score.score;
@@ -282,13 +285,13 @@
     //TODO(kanitw): change schema format to match
     var fields = selectedCols.map(function(col){
       if(col.data_type == "count"){
-        return {aggr: "count", type:"Q"};
+        return {aggr: "count", name:"*"};
       }
       var type = getVLType(col.data_type), f;
       switch(type){
 
         case "Q":
-          f = {name: col.key, type: "Q", _aggr:"*"}
+          f = {name: col.key, type: "Q", _aggr:"*", _bin:"*"}
           return f;
         case "O":
         default:
