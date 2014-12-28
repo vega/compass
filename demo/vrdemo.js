@@ -323,7 +323,10 @@
       .each(renderTopVis);
 
     enter.append("div").attr("class", "select")
-      .append("a").attr("href","#").text("expand")
+      .append("a").attr("href","#")
+        .text(function(d){
+          return d.encodings.length > 1 ? "Expand ("+d.encodings.length+")" : "";
+        })
         .on('click', function(d){
           renderEncodingVariations(d)
         });
