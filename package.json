@@ -1,0 +1,51 @@
+{
+  "name": "visrec",
+  "version": "0.0.0",
+  "description": "Visrec: Visualization Recommendation. =========",
+  "main": "visrec.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "browserify-shim":{
+    "vegalite": "global:vl",
+    "clusterfck": "global:clusterfck"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/uwdata/visrec.git"
+  },
+  "author": "Kanit Wongsuphasawat",
+  "license": "BSD",
+  "bugs": {
+    "url": "https://github.com/uwdata/visrec/issues"
+  },
+  "homepage": "https://github.com/uwdata/visrec",
+  "devDependencies": {
+    "browserify": "^8.1.1",
+    "browserify-shim": "^3.8.2",
+    "chai": "~1.10.0",
+    "gulp": "^3.8.10",
+    "gulp-mocha": "^2.0.0",
+    "gulp-rename": "^1.2.0",
+    "gulp-run": "^1.6.6",
+    "gulp-sourcemaps": "^1.3.0",
+    "gulp-uglify": "^1.1.0",
+    "gulp-util": "^3.0.2",
+    "karma": "~0.12.28",
+    "karma-chai": "~0.1.0",
+    "karma-chrome-launcher": "~0.1.7",
+    "karma-mocha": "~0.1.10",
+    "karma-requirejs": "~0.2.2",
+    "karma-safari-launcher": "~0.1.1",
+    "karma-sinon": "~1.0.4",
+    "mocha": "~2.1.0",
+    "requirejs": "~2.1.15",
+    "sinon": "~1.12.2",
+    "vinyl-buffer": "^1.0.0",
+    "vinyl-source-stream": "^1.0.0",
+    "watchify": "^2.2.1"
+  }
+}

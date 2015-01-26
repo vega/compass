@@ -1,0 +1,10 @@
+[
+  {
+    "hi": "bar.y-Effect__Amount_of_damage-O.x-avg_Speed_IAS_in_knots-Q",
+    "lo": "bar.x-Effect__Amount_of_damage-O.y-avg_Speed_IAS_in_knots-Q",
+    "note": "prefer horizontal bar over vertical bar"
+  },{
+    "hi": "bar.y-Effect__Amount_of_damage-O.x-avg_Speed_IAS_in_knots-Q",
+    "lo": "point.y-Effect__Amount_of_damage-O.x-avg_Speed_IAS_in_knots-Q"
+  }
+]
