@@ -232,9 +232,9 @@
 
   function getChartsByFieldSet(fields) {
     var config = getConfig();
-    var aggr = vr.gen.genAggregate([], fields, config);
+    var aggr = vr.gen.aggregates([], fields, config);
     var chartsByFieldset = aggr.map(function (fields) {
-      var encodings = vr.gen.generateCharts(fields,
+      var encodings = vr.gen.charts(fields,
         vl.merge(Object.create(config), {genAggr: false}),
         {
           dataUrl: "data/birdstrikes.json",
@@ -249,8 +249,8 @@
           return e;
         });
 
-      var diff = vr.gen.getDistanceTable(encodings),
-        clusters = vr.gen.cluster(encodings, 2.5)
+      var diff = vr.cluster.distanceTable(encodings),
+        clusters = vr.cluster(encodings, 2.5)
           .map(function (cluster) {
             return cluster.sort(function (i, j) {
               return encodings[j].score - encodings[i].score;
