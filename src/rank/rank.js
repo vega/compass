@@ -1,6 +1,6 @@
 var vl = require('vegalite');
 
-var vrank = module.exports = {};
+var rank = module.exports = {};
 
 //TODO lower score if we use G as O?
 var ENCODING_SCORE = {
@@ -35,7 +35,7 @@ var MARK_SCORE = {
   text: 0.8
 };
 
-vrank.encodingScore = function(encoding) {
+rank.encodingScore = function(encoding) {
   var features = {},
     encTypes = vl.keys(encoding.enc);
   encTypes.forEach(function(encType) {
@@ -59,7 +59,9 @@ vrank.encodingScore = function(encoding) {
   };
 
   return {
-    score: vl.keys(features).reduce(function(p, s) { return p * features[s].score}, 1),
+    score: vl.keys(features).reduce(function(p, s) {
+      return p * features[s].score;
+    }, 1),
     features: features
   };
 };
@@ -67,7 +69,7 @@ vrank.encodingScore = function(encoding) {
 
 // raw > avg, sum > min,max > bin
 
-vrank.fieldsScore = function(fields) {
+rank.fieldsScore = function(fields) {
 
 };
 
