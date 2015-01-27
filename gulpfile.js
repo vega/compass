@@ -24,6 +24,8 @@ var bundler = watchify(browserify({
 function bundle() {
   return bundler
     .bundle()
+    .on('error', gutil.log.bind(gutil, 'Browserify Error'))
+
     .pipe(source('visrec.js'))
     .pipe(buffer())
     .pipe(gulp.dest('.'))
