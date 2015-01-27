@@ -4,7 +4,7 @@
 (function (root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['d3', 'vega', 'vegalite', 'lodash', 'visgen', 'visrank'],factory);
+    define(['d3', 'vega', 'vegalite', 'lodash', 'visrec'],factory);
   } else if (typeof exports === 'object') {
     // Node. Does not work with strict CommonJS, but
     // only CommonJS-like environments that support module.exports,
@@ -14,14 +14,13 @@
       require('vega'),
       require('vegalite'),
       require('lodash'),
-      require('visgen'),
-      require('visrank')
+      require('visrec')
     );
   } else {
     // Browser globals (root is window)
-    factory(root.d3, root.vg, root.vl, root._, root.vgn, root.visrank);
+    factory(root.d3, root.vg, root.vl, root._, root.vr);
   }
-}(this, function(d3, vg, vl, _, vgn, visrank){
+}(this, function(d3, vg, vl, _, vr){
   var schema, col_indices;
 
   var HEIGHT_OFFSET = 60, MAX_HEIGHT = 500, MAX_WIDTH = 500;
@@ -233,9 +232,9 @@
 
   function getChartsByFieldSet(fields) {
     var config = getConfig();
-    var aggr = vgn.genAggregate([], fields, config);
+    var aggr = vr.gen.genAggregate([], fields, config);
     var chartsByFieldset = aggr.map(function (fields) {
-      var encodings = vgn.generateCharts(fields,
+      var encodings = vr.gen.generateCharts(fields,
         vl.merge(Object.create(config), {genAggr: false}),
         {
           dataUrl: "data/birdstrikes.json",
@@ -244,14 +243,14 @@
         },
         true
       ).map(function (e) { //add score
-          var score = visrank.encodingScore(e);
+          var score = vr.rank.encodingScore(e);
           e.score = score.score;
           e.scoreFeatures = score.features;
           return e;
         });
 
-      var diff = vgn.getDistanceTable(encodings),
-        clusters = vgn.cluster(encodings, 2.5)
+      var diff = vr.gen.getDistanceTable(encodings),
+        clusters = vr.gen.cluster(encodings, 2.5)
           .map(function (cluster) {
             return cluster.sort(function (i, j) {
               return encodings[j].score - encodings[i].score;
@@ -347,9 +346,9 @@
     var id = "topvis-" + (topVisId++);
 
     var topIdx = clusters[0][0],
-      encoding = vl.Encoding.parseJSON(encodings[topIdx]),
-      stats = vl.getStats(data),
-      spec = vl.toVegaSpec(encoding, stats);
+      encoding = vl.Encoding.fromSpec(encodings[topIdx]),
+      stats = vl.data.getStats(data),
+      spec = vl.compile(encoding, stats);
 
     console.log(JSON.stringify(spec, null, "  "));
 
