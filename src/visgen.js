@@ -8,8 +8,8 @@ vgn.DEFAULT_OPT = {
   genBin: true,
   genTypeCasting: false,
 
-  aggrList: [undefined, "avg"], //undefined = no aggregation
-  marktypeList: ["point", "bar", "line", "area", "text"], //filled_map
+  aggrList: [undefined, 'avg'], //undefined = no aggregation
+  marktypeList: ['point', 'bar', 'line', 'area', 'text'], //filled_map
 
   // PRUNING RULES FOR ENCODING VARIATIONS
 
@@ -52,38 +52,38 @@ var ANY_DATA_TYPES = (1 << 4) - 1;
 
 //FIXME move these to vl
 var AGGREGATION_FN = { //all possible aggregate function listed by each data type
-  Q: ["avg", "sum", "min", "max", "count"]
+  Q: ['avg', 'sum', 'min', 'max', 'count']
 };
 
 var TRANSFORM_FN = { //all possible transform function listed by each data type
-  Q: ["log", "sqrt", "abs"], // "logit?"
-  T: ["year", "month", "day"] //,"hr", "min", "bmon", "bday", "bdow", "bhr"]
+  Q: ['log', 'sqrt', 'abs'], // "logit?"
+  T: ['year', 'month', 'day'] //,"hr", "min", "bmon", "bday", "bdow", "bhr"]
 };
 
-var json = function(s,sp){ return JSON.stringify(s, null, sp);};
+var json = function(s, sp) { return JSON.stringify(s, null, sp);};
 
 // Begin of Distance
 
 var DIST_BY_ENCTYPE = [
     // positional
-    ["x", "y", 0.2],
-    ["row", "col", 0.2],
+    ['x', 'y', 0.2],
+    ['row', 'col', 0.2],
 
     // ordinal mark properties
-    ["color", "shape", 0.2],
+    ['color', 'shape', 0.2],
 
     // quantitative mark properties
-    ["color", "alpha", 0.2],
-    ["size", "alpha", 0.2],
-    ["size", "color", 0.2]
+    ['color', 'alpha', 0.2],
+    ['size', 'alpha', 0.2],
+    ['size', 'color', 0.2]
   ].reduce(function(r, x) {
-  var a=x[0], b=x[1], d=x[2];
+  var a = x[0], b = x[1], d = x[2];
     r[a] = r[a] || {};
     r[b] = r[b] || {};
     r[a][b] = r[b][a] = d;
     return r;
   }, {}),
-  DIST_MISSING = 100, CLUSTER_THRESHOLD=1;
+  DIST_MISSING = 100, CLUSTER_THRESHOLD = 1;
 
 function colenc(encoding) {
   var _colenc = {},
@@ -92,7 +92,7 @@ function colenc(encoding) {
   vl.keys(enc).forEach(function(encType) {
     var e = vl.duplicate(enc[encType]);
     e.type = encType;
-    _colenc[e.name || ""] = e;
+    _colenc[e.name || ''] = e;
     delete e.name;
   });
 
@@ -123,7 +123,7 @@ vgn._getDistance = function(colenc1, colenc2) {
 
 vgn.getDistanceTable = function(encodings) {
   var len = encodings.length,
-    colencs = encodings.map(function(e){ return colenc(e);}),
+    colencs = encodings.map(function(e) { return colenc(e);}),
     diff = new Array(len), i;
 
   for (i = 0; i < len; i++) diff[i] = new Array(len);
@@ -142,7 +142,7 @@ vgn.cluster = function(encodings, maxDistance) {
 
   var clusterTrees = clusterfck.hcluster(range(n), function(i, j) {
     return dist[i][j];
-  }, "average", CLUSTER_THRESHOLD);
+  }, 'average', CLUSTER_THRESHOLD);
 
   var clusters = clusterTrees.map(function(tree) {
     return traverse(tree, []);
@@ -175,8 +175,8 @@ marksRule.bar = barRule;
 marksRule.line = lineRule;
 marksRule.area = lineRule;
 
-function isDim(field){
-  return field.bin || field.type === "O";
+function isDim(field) {
+  return field.bin || field.type === 'O';
 }
 
 function xOyQ(enc) {
@@ -208,7 +208,7 @@ function generalRule(enc, opt) {
           if (field.aggr) {
             hasAggr = true;
           }
-          if (isDim(field) && (encType !== "row" && encType !== "col")) {
+          if (isDim(field) && (encType !== 'row' && encType !== 'col')) {
             hasOtherO = true;
           }
           if (hasAggr && hasOtherO) break;
@@ -219,8 +219,8 @@ function generalRule(enc, opt) {
     }
 
     // one dimension "count" is useless
-    if (enc.x && enc.x.aggr == "count" && !enc.y) return false;
-    if (enc.y && enc.y.aggr == "count" && !enc.x) return false;
+    if (enc.x && enc.x.aggr == 'count' && !enc.y) return false;
+    if (enc.y && enc.y.aggr == 'count' && !enc.x) return false;
 
     return true;
   }
@@ -281,7 +281,7 @@ function lineRule(enc, opt) {
 
   // Line chart should be only horizontal
   // and use only temporal data
-  return enc.x == "T" && enc.y == "Q";
+  return enc.x == 'T' && enc.y == 'Q';
 }
 
 var ENCODING_RULES = {
@@ -405,7 +405,7 @@ vgn.genMarkTypes = function(output, enc, opt, cfg) {
 //TODO(kanitw): write test case
 vgn._getSupportedMarkTypes = function(enc, opt) {
   var markTypes = opt.marktypeList.filter(function(markType) {
-    var mark = vl.marks[markType],
+    var mark = vl.compile.marks[markType],
       reqs = mark.requiredEncoding,
       support = mark.supportedEncoding;
 
@@ -432,18 +432,18 @@ vgn.genAggregate = function(output, fields, opt) {
   function assignField(i, hasAggr) {
     // If all fields are assigned, save
     if (i === fields.length) {
-      if(opt.omitAggregateWithMeasureOnly || opt.omitDimensionOnly){
-        var hasMeasure=false, hasDimension=false, hasRaw=false;
-        tf.forEach(function(f){
+      if (opt.omitAggregateWithMeasureOnly || opt.omitDimensionOnly) {
+        var hasMeasure = false, hasDimension = false, hasRaw = false;
+        tf.forEach(function(f) {
           if (isDim(f)) {
             hasDimension = true;
           } else {
             hasMeasure = true;
-            if(!f.aggr) hasRaw = true;
+            if (!f.aggr) hasRaw = true;
           }
         });
-        if(!hasMeasure && opt.omitDimensionOnly) return;
-        if(!hasDimension && !hasRaw && opt.omitAggregateWithMeasureOnly) return;
+        if (!hasMeasure && opt.omitDimensionOnly) return;
+        if (!hasDimension && !hasRaw && opt.omitAggregateWithMeasureOnly) return;
       }
 
       output.push(vl.duplicate(tf));
@@ -455,13 +455,13 @@ vgn.genAggregate = function(output, fields, opt) {
     // Otherwise, assign i-th field
     switch (f.type) {
       //TODO "D", "G"
-      case "Q":
+      case 'Q':
         tf[i] = {name: f.name, type: f.type};
         if (f.aggr) {
           tf[i].aggr = f.aggr;
           assignField(i + 1, true);
         } else if (f._aggr) {
-          var aggregates = f._aggr == "*" ? opt.aggrList : f._aggr;
+          var aggregates = f._aggr == '*' ? opt.aggrList : f._aggr;
 
           for (var j in aggregates) {
             var a = aggregates[j];
@@ -485,7 +485,7 @@ vgn.genAggregate = function(output, fields, opt) {
             // bin the field instead!
             delete tf[i].aggr;
             tf[i].bin = true;
-            tf[i].type = "Q";
+            tf[i].type = 'Q';
             assignField(i + 1, hasAggr);
           }
 
@@ -493,7 +493,7 @@ vgn.genAggregate = function(output, fields, opt) {
             // we can also change it to dimension (cast type="O")
             delete tf[i].aggr;
             delete tf[i].bin;
-            tf[i].type = "O";
+            tf[i].type = 'O';
             assignField(i + 1, hasAggr);
           }
         } else { // both "aggr", "_aggr" not in f
@@ -501,7 +501,7 @@ vgn.genAggregate = function(output, fields, opt) {
         }
         break;
 
-      case "O":
+      case 'O':
       default:
         tf[i] = f;
         assignField(i + 1, hasAggr);
@@ -557,8 +557,8 @@ var isArray = Array.isArray || function(obj) {
 
 function union(a, b) {
   var o = {};
-  a.forEach(function(x){ o[x] = true;});
-  b.forEach(function(x){ o[x] = true;});
+  a.forEach(function(x) { o[x] = true;});
+  b.forEach(function(x) { o[x] = true;});
   return vl.keys(o);
 }
 
@@ -572,7 +572,7 @@ function range(start, stop, step) {
       start = 0;
     }
   }
-  if ((stop - start) / step === Infinity) throw new Error("infinite range");
+  if ((stop - start) / step === Infinity) throw new Error('infinite range');
   var range = [], k = d3_range_integerScale(abs(step)), i = -1, j;
   start *= k; stop *= k; step *= k;
   if (step < 0) while ((j = start + step * ++i) > stop) range.push(j / k); else while ((j = start + step * ++i) < stop) range.push(j / k);

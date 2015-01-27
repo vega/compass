@@ -35,20 +35,20 @@ var MARK_SCORE = {
   text: 0.8
 };
 
-vrank.encodingScore = function(encoding){
+vrank.encodingScore = function(encoding) {
   var features = {},
     encTypes = vl.keys(encoding.enc);
-  encTypes.forEach(function(encType){
+  encTypes.forEach(function(encType) {
     var field = encoding.enc[encType];
     features[field.name] = {
-      value: field.type+":"+encType,
+      value: field.type + ':'+ encType,
       score: ENCODING_SCORE[field.type][encType] || BAD_ENCODING_SCORE
     };
   });
 
   // penalize not using positional
-  if(encTypes.length > 1){
-    if((!encoding.enc.x || !encoding.enc.y) && !encoding.enc.geo) {
+  if (encTypes.length > 1) {
+    if ((!encoding.enc.x || !encoding.enc.y) && !encoding.enc.geo) {
       features.unusedPosition = {score: UNUSED_POSITION};
     }
   }
@@ -56,10 +56,10 @@ vrank.encodingScore = function(encoding){
   features.markType = {
     value: encoding.marktype,
     score: MARK_SCORE[encoding.marktype]
-  }
+  };
 
   return {
-    score: vl.keys(features).reduce(function(p, s){ return p * features[s].score}, 1),
+    score: vl.keys(features).reduce(function(p, s) { return p * features[s].score}, 1),
     features: features
   };
 };
@@ -67,7 +67,7 @@ vrank.encodingScore = function(encoding){
 
 // raw > avg, sum > min,max > bin
 
-vrank.fieldsScore = function(fields){
+vrank.fieldsScore = function(fields) {
 
 };
 
