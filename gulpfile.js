@@ -36,14 +36,14 @@ function bundle() {
 }
 
 gulp.task('build', bundle);
-gulp.task('default', ['copyvl', 'build']);
+gulp.task('default', ['copyvl', 'build', 'watchvl']);
 
 
 //copy vegalite to lib
 
 var vlPath = '../vegalite/';
 gulp.task('watchvl', function(){
-  gulp.watch([vlPath + 'vegalite.js'], ['copyvl']);
+  gulp.watch([vlPath + 'vegalite.js'], ['copyvl', 'build']);
 });
 
 gulp.task('copyvl', function(){
