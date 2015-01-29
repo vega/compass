@@ -25,7 +25,7 @@ function projections(fields) {
   var setsToAdd = util.chooseKorLess(unselected, 1);
 
   fieldSets = setsToAdd.map(function(setToAdd){
-    return setToAdd.concat(selected);
+    return selected.concat(setToAdd);
   });
 
   return fieldSets;
