@@ -1,12 +1,10 @@
-var chai = require('chai'),
-  assert = chai.assert,
-  vgn = require('../src/visgen.js');
+var expect = require('chai').expect;
 
-var dataB = require("../data/birdstrikes.json");
+// var dataB = require("../data/birdstrikes.json");
 
-console.log(dataB[0]);
+// console.log(dataB[0]);
 
-describe('marksRule', function(){
+describe('vr.gen.marktypes()', function(){
   it('should require at least one basic encoding', function (){
     var basicEncodings = ['x','y','geo','text','arc'];
     // TODO
