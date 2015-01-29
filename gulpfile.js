@@ -44,9 +44,12 @@ gulp.task('default', ['copyvl', 'test', 'build', 'watch', 'watchvl']);
 // test
 
 gulp.task('watch', function() {
-  gulp.watch(['src/**', 'test/**'], ['build']);
+  gulp.watch(['src/**', 'test/**'], ['test', 'build']);
 });
 
+
+var gutil = require('gulp-util');
+var mocha = require('gulp-mocha');
 gulp.task('test', function() {
   return gulp.src(['test/**/*.spec.js'], { read: false })
     .pipe(mocha({ reporter: 'list' }))
@@ -65,5 +68,3 @@ gulp.task('copyvl', function() {
     .pipe(gulp.dest('lib/'));
 });
 
-var gutil = require('gulp-util');
-var mocha = require('gulp-mocha');
