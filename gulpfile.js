@@ -15,9 +15,10 @@ var bundler = watchify(browserify({
   noparse: ['../lib/vegalite.js', '../lib/clusterfck.js'],
   // require: ['./lib/vegalite', './lib/clusterfck'],
   debug: true,
-  transform: ['browserify-shim'],
-  //deal with require() in /clusterfck
-  ignoreMissing: true
+  transform: ['browserify-shim']
+  // ,
+  // //deal with require() in /clusterfck
+  // ignoreMissing: true
 }));
 
 // builds vegalite
@@ -38,17 +39,28 @@ function bundle() {
 }
 
 gulp.task('build', bundle);
-gulp.task('default', ['copyvl', 'build', 'watchvl']);
+gulp.task('default', ['copyvl', 'test', 'build', 'watch', 'watchvl']);
 
+// test
 
-//copy vegalite to lib
+gulp.task('watch', function() {
+  gulp.watch(['src/**', 'test/**'], ['build']);
+});
+
+gulp.task('test', function() {
+  return gulp.src(['test/**/*.spec.js'], { read: false })
+    .pipe(mocha({ reporter: 'list' }))
+    .on('error', gutil.log);
+});
+
+// copy vegalite to lib
 
 var vlPath = '../vegalite/';
-gulp.task('watchvl', function(){
+gulp.task('watchvl', function() {
   gulp.watch([vlPath + 'vegalite.js'], ['copyvl', 'build']);
 });
 
-gulp.task('copyvl', function(){
+gulp.task('copyvl', function() {
   gulp.src(vlPath+'vegalite.js')
     .pipe(gulp.dest('lib/'));
 });
