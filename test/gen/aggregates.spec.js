@@ -12,6 +12,10 @@ describe('vr.gen.aggregates()', function () {
       // each field can be Q, avg(Q), bin(Q), O
       expect(tables.length).to.equal(4);
     });
+
+    it('should append key to each fieldSet', function() {
+      expect(tables[0].key).to.be.ok();
+    });
   });
 
   describe('2Q with genTypeCasting', function () {
@@ -24,6 +28,10 @@ describe('vr.gen.aggregates()', function () {
     // except that two pairs of (avg(Q),Q) doesn't work
     it('should output 14 data table', function () {
       expect(tables.length).to.equal(14);
+    });
+
+    it('should append key to each fieldSet', function() {
+      expect(tables[12].key).to.be.ok();
     });
   });
 

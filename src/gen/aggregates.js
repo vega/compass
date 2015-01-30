@@ -4,9 +4,12 @@ var vl = require('vegalite');
 
 var util = require('../util');
 
-module.exports = function(output, fields, opt) {
+module.exports = genAggregates;
+
+function genAggregates(output, fields, opt) {
   var tf = new Array(fields.length);
   opt = util.gen.getOpt(opt);
+  // console.log('vr.gen.aggregates', fields, opt);
 
   function assignField(i, hasAggr) {
     // If all fields are assigned, save
@@ -25,7 +28,10 @@ module.exports = function(output, fields, opt) {
         if (!hasDimension && !hasRaw && opt.omitAggregateWithMeasureOnly) return;
       }
 
-      output.push(vl.duplicate(tf));
+      var fieldSet = vl.duplicate(tf);
+      fieldSet.key = vl.field.shorthands(fieldSet);
+
+      output.push(fieldSet);
       return;
     }
 
@@ -90,4 +96,4 @@ module.exports = function(output, fields, opt) {
   assignField(0, null);
 
   return output;
-};
+}
