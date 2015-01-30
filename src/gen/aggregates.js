@@ -39,8 +39,8 @@ module.exports = function(output, fields, opt) {
         if (f.aggr) {
           tf[i].aggr = f.aggr;
           assignField(i + 1, true);
-        } else if (f._aggr) {
-          var aggregates = f._aggr == '*' ? opt.aggrList : f._aggr;
+        } else {
+          var aggregates = (!f._aggr || f._aggr === '*') ? opt.aggrList : f._aggr;
 
           for (var j in aggregates) {
             var a = aggregates[j];
@@ -75,8 +75,6 @@ module.exports = function(output, fields, opt) {
             tf[i].type = 'O';
             assignField(i + 1, hasAggr);
           }
-        } else { // both "aggr", "_aggr" not in f
-          assignField(i + 1, false);
         }
         break;
 
