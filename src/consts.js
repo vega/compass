@@ -7,7 +7,7 @@ var consts = module.exports = {
 consts.gen.DEFAULT_OPT = {
   genAggr: true,
   genBin: true,
-  genTypeCasting: false,
+  genTypeCasting: true,
 
   aggrList: [undefined, 'avg'], //undefined = no aggregation
   marktypeList: ['point', 'bar', 'line', 'area', 'text'], //filled_map
@@ -20,18 +20,18 @@ consts.gen.DEFAULT_OPT = {
    * - for OxQ charts, always put O on Y
    * - show only one OxO, QxQ (currently sorted by name)
    */
-  omitTranpose: true,
+  omitTranpose: false,
   /** remove all dot plot with >1 encoding */
-  omitDotPlotWithExtraEncoding: true,
+  omitDotPlotWithExtraEncoding: false,
 
   /** remove all aggregate charts with all dims on facets (row, col) */
   //FIXME this is good for text though!
-  omitAggrWithAllDimsOnFacets: true,
+  omitAggrWithAllDimsOnFacets: false,
 
   // PRUNING RULES FOR TRANFORMATION VARIATIONS
 
   /** omit field sets with only dimensions */
-  omitDimensionOnly: true,
+  omitDimensionOnly: false,
   /** omit aggregate field sets with only measures */
-  omitAggregateWithMeasureOnly: true
+  omitAggregateWithMeasureOnly: false
 };
