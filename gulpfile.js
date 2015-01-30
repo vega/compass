@@ -44,7 +44,7 @@ gulp.task('default', ['copyvl', 'test', 'build', 'watch', 'watchvl']);
 // test
 
 gulp.task('watch', function() {
-  gulp.watch(['src/**', 'test/**'], ['test', 'build']);
+  gulp.watch(['src/**', 'test/**'], ['build', 'test']);
 });
 
 
