@@ -4,6 +4,7 @@ var vl = require('vegalite'),
   globals = require('../globals'),
   util = require('../util');
 
+module.exports = genEncs;
 
 var ENCODING_RULES = {
   x: {
@@ -89,8 +90,8 @@ function rules(enc, opt) {
   return false;
 }
 
-module.exports = function(encodings, fields, opt) {
-  // generate encodings (_enc property in vegalite)
+function genEncs(encs, fields, opt) {
+  // generate a collection vegalite's enc
   var tmpEnc = {};
 
   function assignField(i) {
@@ -98,7 +99,7 @@ module.exports = function(encodings, fields, opt) {
     if (i === fields.length) {
       // at the minimal all chart should have x, y, geo, text or arc
       if (rules(tmpEnc, opt)) {
-        encodings.push(vl.duplicate(tmpEnc));
+        encs.push(vl.duplicate(tmpEnc));
       }
       return;
     }
@@ -120,5 +121,5 @@ module.exports = function(encodings, fields, opt) {
 
   assignField(0);
 
-  return encodings;
-};
+  return encs;
+}
