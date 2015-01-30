@@ -350,7 +350,7 @@
       stats = vl.data.getStats(data),
       spec = vl.compile(encoding, stats);
 
-    console.log(JSON.stringify(spec, null, "  "));
+    //console.log(JSON.stringify(spec, null, "  "));
 
     appendVis(container, encoding, spec, id);
   }
