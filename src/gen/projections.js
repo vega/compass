@@ -25,9 +25,19 @@ function projections(fields) {
   var setsToAdd = util.chooseKorLess(unselected, 1);
 
   fieldSets = setsToAdd.map(function(setToAdd){
-    return selected.concat(setToAdd);
+    var fieldSet = selected.concat(setToAdd);
+
+    // always append projection's key to each projection returned, d3 style.
+    fieldSet.key = projections.key(fieldSet);
+
+    return fieldSet;
   });
 
   return fieldSets;
 }
 
+projections.key = function(projection) {
+  return projection.map(function(field) {
+    return field.name;
+  }).join(',');
+};
