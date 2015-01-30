@@ -6,6 +6,7 @@ var gen = module.exports = {
   aggregates: require('./aggregates'),
   projections: require('./projections'),
   // encodings / visual variatons
+  encodings: require('./encodings'),
   encs: require('./encs'),
   marktypes: require('./marktypes')
 };
