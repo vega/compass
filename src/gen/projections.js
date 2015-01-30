@@ -12,7 +12,7 @@ function projections(fields) {
   // powerset, chooseK, chooseKorLess are already included in the util
   // Right now just add one more field
 
-  var selected = [], unselected = [], fieldSets = [];
+  var selected = [], unselected = [{aggr:"count", name:"*", type:"Q"}], fieldSets = [];
 
   fields.forEach(function(field){
     if (field.selected) {
