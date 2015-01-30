@@ -12,7 +12,7 @@ function projections(fields) {
   // powerset, chooseK, chooseKorLess are already included in the util
   // Right now just add one more field
 
-  var selected = [], unselected = [], fieldSets;
+  var selected = [], unselected = [], fieldSets = [];
 
   fields.forEach(function(field){
     if (field.selected) {
@@ -24,13 +24,13 @@ function projections(fields) {
 
   var setsToAdd = util.chooseKorLess(unselected, 1);
 
-  fieldSets = setsToAdd.map(function(setToAdd){
+  setsToAdd.forEach(function(setToAdd){
     var fieldSet = selected.concat(setToAdd);
-
-    // always append projection's key to each projection returned, d3 style.
-    fieldSet.key = projections.key(fieldSet);
-
-    return fieldSet;
+    if(fieldSet.length > 0){
+      // always append projection's key to each projection returned, d3 style.
+      fieldSet.key = projections.key(fieldSet);
+      fieldSets.push(fieldSet);
+    }
   });
 
   return fieldSets;
