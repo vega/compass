@@ -2,8 +2,6 @@ var expect = require('chai').expect;
 
 // var dataB = require("../data/birdstrikes.json");
 
-// console.log(dataB[0]);
-
 describe('vr.gen.marktypes()', function(){
   it('should require at least one basic encoding', function (){
     var basicEncodings = ['x','y','geo','text','arc'];
