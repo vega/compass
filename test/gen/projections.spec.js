@@ -21,4 +21,8 @@ describe('vr.gen.projections()', function () {
     expect(projections[2][0].name).to.equal(1);
     expect(projections[2][1].name).to.equal(2);
   });
+
+  it('should add projection key', function () {
+    expect(projections[0].key).to.equal('1,2');
+  });
 });
