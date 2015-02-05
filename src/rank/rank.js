@@ -1,12 +1,14 @@
 var vl = require('vegalite');
 
-var rank = module.exports = {};
+var rank = module.exports = {
+  projections: require('./rank-projections')
+};
 
 //TODO lower score if we use G as O?
 var ENCODING_SCORE = {
   Q: {
-    x: 1,
-    y: 1,
+    x: 1, // better for single plot
+    y: 0.99,
     size: 0.6, //FIXME SIZE for Bar is horrible!
     color: 0.4,
     alpha: 0.4
@@ -18,6 +20,14 @@ var ENCODING_SCORE = {
     col: 0.7,
     color: 0.8,
     shape: 0.6
+  },
+  T: { // FIX rethink this
+    x: 1,
+    y: 0.8,
+    row: 0.4,
+    col: 0.4,
+    color: 0.3,
+    shape: 0.3
   }
 };
 
@@ -35,7 +45,7 @@ var MARK_SCORE = {
   text: 0.8
 };
 
-rank.encodingScore = function(encoding) {
+rank.encoding = function(encoding) {
   var features = {},
     encTypes = vl.keys(encoding.enc);
   encTypes.forEach(function(encType) {
