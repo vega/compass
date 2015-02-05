@@ -1,13 +1,18 @@
 "use strict";
 
 var vl = require('vegalite'),
-  util = require('../util');
+  util = require('../util'),
+  rank = require('../rank/rank');
 
 module.exports = function(output, enc, opt, cfg) {
   opt = util.gen.getOpt(opt);
   getSupportedMarkTypes(enc, opt)
     .forEach(function(markType) {
-      output.push({ marktype: markType, enc: enc, cfg: cfg });
+      var encoding = { marktype: markType, enc: enc, cfg: cfg },
+        score = rank.encoding(encoding);
+      encoding.score = score.score;
+      encoding.scoreFeatures = score.features;
+      output.push(encoding);
     });
   return output;
 };
@@ -80,7 +85,8 @@ function pointRule(enc, opt) {
 
 function barRule(enc, opt) {
   // need to aggregate on either x or y
-  if ((enc.x.aggr !== undefined) ^ (enc.y.aggr !== undefined)) {
+  if (((enc.x.aggr !== undefined) ^ (enc.y.aggr !== undefined)) &&
+      (vl.field.isOrdinalScale(enc.x) ^ vl.field.isOrdinalScale(enc.y))) {
 
     // if omitTranpose, put Q on X, O on Y
     if (opt.omitTranpose && util.xOyQ(enc)) return false;
