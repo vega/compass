@@ -35,4 +35,23 @@ describe('vr.gen.projections()', function () {
       expect(projections[0].key).to.equal('1,2');
     });
   });
+
+
+  describe('with a set of fields with count', function () {
+    var fields = [
+      {name:1, type:'Q', selected: false},
+      {name:2, type:'Q', selected: false},
+      {name:3, type:'O', selected: false},
+      {name:4, type:'O', selected: false},
+      {name:'*', aggr:'count', selected: false}
+    ];
+
+    var projections = genProjections(fields);
+
+    it('should generate correct # of projections', function () {
+      expect(projections.length).to.equal(8);
+      expect(projections.filter(function(p){ return p.length === 2;}).length).to.equal(4);
+      expect(projections.filter(function(p){ return p.length === 2;}).length).to.equal(4);
+    });
+  });
 });

@@ -4,6 +4,16 @@ var consts = module.exports = {
   rank: {}
 };
 
+consts.gen.projections = {
+  type: 'object',
+  properties: {
+    addCountIfNothingIsSelected: {
+      type: 'boolean',
+      default: true,
+      description: 'When no field is selected, add extra count field'
+    }
+  }
+};
 consts.gen.DEFAULT_OPT = {
   genAggr: true,
   genBin: true,

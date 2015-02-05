@@ -1,4 +1,6 @@
-var util = require('../util');
+var util = require('../util'),
+  consts = require('../consts'),
+  vl = require('vegalite');
 
 module.exports = projections;
 
@@ -7,12 +9,13 @@ module.exports = projections;
  * @param  {[type]} fields array of fields and query information
  * @return {[type]}        [description]
  */
-function projections(fields) {
+function projections(fields, opt) {
+  opt = vl.schema.util.extend(opt||{}, consts.gen.projections);
   // TODO support other mode of projections generation
   // powerset, chooseK, chooseKorLess are already included in the util
   // Right now just add one more field
 
-  var selected = [], unselected = [{aggr:"count", name:"*", type:"Q"}], fieldSets = [];
+  var selected = [], unselected = [], fieldSets = [];
 
   fields.forEach(function(field){
     if (field.selected) {
@@ -24,13 +27,29 @@ function projections(fields) {
 
   var setsToAdd = util.chooseKorLess(unselected, 1);
 
-  setsToAdd.forEach(function(setToAdd){
+  setsToAdd.forEach(function(setToAdd) {
     var fieldSet = selected.concat(setToAdd);
-    if(fieldSet.length > 0){
+    if (fieldSet.length > 0) {
+      if (fieldSet.length === 1 && vl.field.isCount(fieldSet[0])) {
+        return;
+      }
       // always append projection's key to each projection returned, d3 style.
-      fieldSet.key = projections.key(fieldSet);
       fieldSets.push(fieldSet);
     }
+  });
+
+  if (opt.addCountIfNothingIsSelected && selected.length===0) {
+    var countField = vl.field.count();
+
+    unselected.forEach(function(field) {
+      if (!vl.field.isCount(field)) {
+        fieldSets.push([field, countField]);
+      }
+    });
+  }
+
+  fieldSets.forEach(function(fieldSet) {
+    fieldSet.key = projections.key(fieldSet);
   });
 
   return fieldSets;
