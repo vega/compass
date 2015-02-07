@@ -2,10 +2,12 @@
 
 var vl = require('vegalite'),
   util = require('../util'),
-  rank = require('../rank/rank');
+  rank = require('../rank/rank'),
+  consts = require('../consts');
 
 module.exports = function(output, enc, opt, cfg) {
-  opt = util.gen.getOpt(opt);
+  opt = vl.schema.util.extend(opt||{}, consts.gen.encodings);
+
   getSupportedMarkTypes(enc, opt)
     .forEach(function(markType) {
       var encoding = { marktype: markType, enc: enc, cfg: cfg },

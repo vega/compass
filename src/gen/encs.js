@@ -2,7 +2,8 @@
 
 var vl = require('vegalite'),
   globals = require('../globals'),
-  util = require('../util');
+  util = require('../util'),
+  consts = require('../consts');
 
 module.exports = genEncs;
 
@@ -95,6 +96,7 @@ function generalRules(enc, opt) {
 }
 
 function genEncs(encs, fields, stats, opt) {
+  opt = vl.schema.util.extend(opt||{}, consts.gen.encodings);
   // generate a collection vegalite's enc
   var tmpEnc = {};
 

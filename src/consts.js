@@ -55,26 +55,31 @@ consts.gen.aggregates = {
   }
 };
 
-consts.gen.DEFAULT_OPT = {
-  genAggr: true,
-
-  marktypeList: ['point', 'bar', 'line', 'area', 'text'], //filled_map
-
-  // PRUNING RULES FOR ENCODING VARIATIONS
-
-  /**
-   * Eliminate all transpose
-   * - keeping horizontal dot plot only.
-   * - for OxQ charts, always put O on Y
-   * - show only one OxO, QxQ (currently sorted by name)
-   */
-  omitTranpose: false,
-  /** remove all dot plot with >1 encoding */
-  omitDotPlotWithExtraEncoding: false,
-
-  /** remove all aggregate charts with all dims on facets (row, col) */
-  //FIXME this is good for text though!
-  omitAggrWithAllDimsOnFacets: false,
+consts.gen.encodings = {
+  type: 'object',
+  properties: {
+    omitTranpose:  {
+      type: 'boolean',
+      default: true,
+      description: 'Eliminate all transpose by (1) keeping horizontal dot plot only (2) for OxQ charts, always put O on Y (3) show only one DxD, MxM (currently sorted by name)'
+    },
+    omitDotPlotWithExtraEncoding: {
+      type: 'boolean',
+      default: true,
+      description: 'remove all dot plot with >1 encoding'
+    },
+    omitNonTextAggrWithAllDimsOnFacets: {
+      type: 'boolean',
+      default: true,
+      description: 'remove all aggregated charts (except text tables) with all dims on facets (row, col)'
+    },
+    marktypeList: {
+      type: 'array',
+      items: {type: 'string'},
+      default: ['point', 'bar', 'line', 'area', 'text'], //filled_map
+      description: 'allowed marktypes'
+    }
+  }
 };
 
 

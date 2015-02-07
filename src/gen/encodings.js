@@ -5,8 +5,8 @@ var genEncs = require('./encs'),
 
 module.exports = genEncodings;
 
-function genEncodings(output, fields, opt, cfg, nested) {
-  var encs = genEncs([], fields, opt);
+function genEncodings(output, fields, stats, opt, cfg, nested) {
+  var encs = genEncs([], fields, stats, opt);
 
   if (nested) {
     return encs.reduce(function(dict, enc) {
