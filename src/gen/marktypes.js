@@ -21,7 +21,8 @@ var marksRule = {
   point:  pointRule,
   bar:    barRule,
   line:   lineRule,
-  area:   lineRule // area is similar to line
+  area:   lineRule, // area is similar to line
+  text:   textRule
 };
 
 //TODO(kanitw): write test case
@@ -103,4 +104,10 @@ function lineRule(enc, opt) {
   // Line chart should be only horizontal
   // and use only temporal data
   return enc.x == 'T' && enc.y == 'Q';
+}
+
+function textRule(enc, opt) {
+  // FIXME should be aggregated
+  // at least must have row or col
+  return enc.row || enc.col;
 }
