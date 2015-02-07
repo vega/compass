@@ -14,6 +14,47 @@ consts.gen.projections = {
     }
   }
 };
+
+consts.gen.aggregates = {
+  type: 'object',
+  properties: {
+    genBin: {
+      type: 'boolean',
+      default: true,
+      description: 'Generate Binning'
+    },
+    genTypeCasting: {
+      type: 'boolean',
+      default: true,
+      description: 'Include type casting e.g., from Q to O'
+    },
+    omitMeasureOnly: {
+      type: 'boolean',
+      default: true,
+      description: 'Omit aggregation with measure(s) only'
+    },
+    omitDimensionOnly: {
+      type: 'boolean',
+      default: true,
+      description: 'Omit aggregation with dimension(s) only'
+    },
+    aggrList: {
+      type: 'array',
+      items: {
+        type: ['string']
+      },
+      default: [undefined, 'avg']
+    },
+    timeFnList: {
+      type: 'array',
+      items: {
+        type: ['string']
+      },
+      default: ['year']
+    }
+  }
+};
+
 consts.gen.DEFAULT_OPT = {
   genAggr: true,
   genBin: true,
@@ -45,3 +86,6 @@ consts.gen.DEFAULT_OPT = {
   /** omit aggregate field sets with only measures */
   omitAggregateWithMeasureOnly: false
 };
+
+
+
