@@ -57,10 +57,7 @@ consts.gen.aggregates = {
 
 consts.gen.DEFAULT_OPT = {
   genAggr: true,
-  genBin: true,
-  genTypeCasting: true,
 
-  aggrList: [undefined, 'avg'], //undefined = no aggregation
   marktypeList: ['point', 'bar', 'line', 'area', 'text'], //filled_map
 
   // PRUNING RULES FOR ENCODING VARIATIONS
@@ -78,13 +75,6 @@ consts.gen.DEFAULT_OPT = {
   /** remove all aggregate charts with all dims on facets (row, col) */
   //FIXME this is good for text though!
   omitAggrWithAllDimsOnFacets: false,
-
-  // PRUNING RULES FOR TRANFORMATION VARIATIONS
-
-  /** omit field sets with only dimensions */
-  omitDimensionOnly: false,
-  /** omit aggregate field sets with only measures */
-  omitAggregateWithMeasureOnly: false
 };
 
 
