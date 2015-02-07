@@ -13,7 +13,7 @@ var isDim = util.isDim = function (field) {
 };
 
 util.xOyQ = function xOyQ (enc) {
-  return enc.x && enc.y && isDim(enc.x) && isDim(enc.y);
+  return enc.x && enc.y && isDim(enc.x) && !isDim(enc.y);
 };
 
 util.isArray = Array.isArray || function (obj) {
