@@ -6,7 +6,7 @@ var vl = require('vegalite'),
 
 module.exports = genEncs;
 
-var ENCODING_RULES = {
+var rules = {
   x: {
     dataTypes: vl.dataTypes.O + vl.dataTypes.Q + vl.dataTypes.T,
     multiple: true //FIXME should allow multiple only for Q, T
@@ -17,7 +17,7 @@ var ENCODING_RULES = {
   },
   row: {
     dataTypes: vl.dataTypes.O,
-    multiple: true
+    multiple: true,
   },
   col: {
     dataTypes: vl.dataTypes.O,
@@ -46,7 +46,11 @@ var ENCODING_RULES = {
   //}
 };
 
-function rules(enc, opt) {
+function maxCardinality(field, stats) {
+  return stats[field].cardinality <= 20;
+}
+
+function generalRules(enc, opt) {
   // need at least one basic encoding
   if (enc.x || enc.y || enc.geo || enc.text || enc.arc) {
 
@@ -90,7 +94,7 @@ function rules(enc, opt) {
   return false;
 }
 
-function genEncs(encs, fields, opt) {
+function genEncs(encs, fields, stats, opt) {
   // generate a collection vegalite's enc
   var tmpEnc = {};
 
@@ -98,7 +102,7 @@ function genEncs(encs, fields, opt) {
     // If all fields are assigned, save
     if (i === fields.length) {
       // at the minimal all chart should have x, y, geo, text or arc
-      if (rules(tmpEnc, opt)) {
+      if (generalRules(tmpEnc, opt)) {
         encs.push(vl.duplicate(tmpEnc));
       }
       return;
@@ -110,8 +114,10 @@ function genEncs(encs, fields, opt) {
       var et = vl.encodingTypes[j];
 
       //TODO: support "multiple" assignment
-      if (!(et in tmpEnc) &&
-        (ENCODING_RULES[et].dataTypes & vl.dataTypes[field.type]) > 0) {
+      if (!(et in tmpEnc) && // encoding not used
+        (rules[et].dataTypes & vl.dataTypes[field.type]) > 0 &&
+        (!rules[et].rules || !rules[et].rules(field, stats))
+        ) {
         tmpEnc[et] = field;
         assignField(i + 1);
         delete tmpEnc[et];
