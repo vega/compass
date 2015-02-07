@@ -57,6 +57,6 @@ function projections(fields, opt) {
 
 projections.key = function(projection) {
   return projection.map(function(field) {
-    return field.name;
+    return vl.field.isCount(field) ? 'count' : field.name;
   }).join(',');
 };
