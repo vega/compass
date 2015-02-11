@@ -33,6 +33,13 @@ function projections(fields, stats, opt) {
         vl.field.cardinality(field, stats, 15) > opt.maxCardinalityForAutoAddOrdinal);
   });
 
+  // put count on top!
+  unselected.sort(function(a, b){
+    if(a.aggr==='count') return -1;
+    if(b.aggr==='count') return 1;
+    return 0;
+  });
+
   var setsToAdd = util.chooseKorLess(unselected, 1);
 
   setsToAdd.forEach(function(setToAdd) {
