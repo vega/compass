@@ -17,10 +17,14 @@ consts.gen.projections = {
       default: true,
       description: 'remove all dot plots'
     },
-    autoAddHighCardinalityField: {
+    maxCardinalityForAutoAddOrdinal: {
+      type: 'integer',
+      default: 50,
+      description: 'max cardinality for ordinal field to be considered for auto adding'
+    },
+    alwaysAddHistogram: {
       type: 'boolean',
-      default: false,
-      description: 'autoAddHighCardinalityField'
+      default: true
     }
   }
 };

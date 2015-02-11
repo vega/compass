@@ -9,7 +9,7 @@ module.exports = projections;
  * @param  {[type]} fields array of fields and query information
  * @return {[type]}        [description]
  */
-function projections(fields, opt) {
+function projections(fields, stats, opt) {
   opt = vl.schema.util.extend(opt||{}, consts.gen.projections);
   // TODO support other mode of projections generation
   // powerset, chooseK, chooseKorLess are already included in the util
@@ -23,6 +23,14 @@ function projections(fields, opt) {
     } else {
       unselected.push(field);
     }
+  });
+
+  unselected = unselected.filter(function(field){
+    //FIXME load maxbins value from somewhere else
+    return (opt.alwaysAddHistogram && selected.length === 0) ||
+      !(opt.maxCardinalityForAutoAddOrdinal &&
+        vl.field.isOrdinalScale(field) &&
+        vl.field.cardinality(field, stats, 15) > opt.maxCardinalityForAutoAddOrdinal);
   });
 
   var setsToAdd = util.chooseKorLess(unselected, 1);
