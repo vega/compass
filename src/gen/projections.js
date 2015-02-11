@@ -33,7 +33,9 @@ function projections(fields, opt) {
       if (fieldSet.length === 1 && vl.field.isCount(fieldSet[0])) {
         return;
       }
-      // always append projection's key to each projection returned, d3 style.
+
+      if (opt.omitDotPlot && fieldSet.length === 1) return;
+
       fieldSets.push(fieldSet);
     }
   });
@@ -49,6 +51,7 @@ function projections(fields, opt) {
   }
 
   fieldSets.forEach(function(fieldSet) {
+      // always append projection's key to each projection returned, d3 style.
     fieldSet.key = projections.key(fieldSet);
   });
 

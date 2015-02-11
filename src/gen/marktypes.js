@@ -74,6 +74,8 @@ function pointRule(enc, opt) {
     }
 
   } else { // plot with one axis = dot plot
+    if (opt.omitDotPlot) return false;
+
     // Dot plot should always be horizontal
     if (opt.omitTranpose && enc.y) return false;
 

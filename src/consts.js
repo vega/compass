@@ -11,6 +11,16 @@ consts.gen.projections = {
       type: 'boolean',
       default: true,
       description: 'When no field is selected, add extra count field'
+    },
+    omitDotPlot: {
+      type: 'boolean',
+      default: true,
+      description: 'remove all dot plots'
+    },
+    autoAddHighCardinalityField: {
+      type: 'boolean',
+      default: false,
+      description: 'autoAddHighCardinalityField'
     }
   }
 };
@@ -63,10 +73,15 @@ consts.gen.encodings = {
       default: true,
       description: 'Eliminate all transpose by (1) keeping horizontal dot plot only (2) for OxQ charts, always put O on Y (3) show only one DxD, MxM (currently sorted by name)'
     },
+    omitDotPlot: {
+      type: 'boolean',
+      default: true,
+      description: 'remove all dot plots'
+    },
     omitDotPlotWithExtraEncoding: {
       type: 'boolean',
       default: true,
-      description: 'remove all dot plot with >1 encoding'
+      description: 'remove all dot plots with >1 encoding'
     },
     omitNonTextAggrWithAllDimsOnFacets: {
       type: 'boolean',
