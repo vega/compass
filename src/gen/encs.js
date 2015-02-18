@@ -38,6 +38,9 @@ var rules = {
   },
   text: {
     dataTypes: ANY_DATA_TYPES
+  },
+  detail: {
+    dataTypes: ANY_DATA_TYPES
   }
   //geo: {
   //  dataTypes: [vl.dataTypes.G]
