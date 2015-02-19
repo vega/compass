@@ -1,9 +1,10 @@
-var expect = require('chai').expect;
+var expect = require('chai').expect,
+  vl = require('vegalite');
 
 var genEncodings = require('../../src/gen/encodings');
 
 describe('vr.gen.encodings()', function () {
-  describe(', with 1Q,', function() {
+  describe('with 1Q', function() {
     var fields = [{name:1, type:'Q'}],
       stats = {};
 

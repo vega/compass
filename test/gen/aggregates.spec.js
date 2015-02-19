@@ -25,7 +25,6 @@ describe('vr.gen.aggregates()', function () {
         omitMeasureOnly: false,
         omitDimensionOnly: false
       });
-      console.log(tables);
       // each field can be Q, avg(Q), bin(Q), O
       expect(tables.length).to.equal(4);
     });
@@ -102,6 +101,7 @@ describe('vr.gen.aggregates()', function () {
 
     var projections = genProjections(fields, stats);
     console.log(projections);
+    //FIXME fix this
   })
 });
 
