@@ -94,7 +94,13 @@ describe('vr.gen.aggregates()', function () {
       {name:'*', aggr:'count', selected: false}
     ];
 
-    var projections = genProjections(fields);
+    var stats = {
+      1: {cardinality: 10},
+      2: {cardinality: 10},
+      3: {cardinality: 10}
+    };
+
+    var projections = genProjections(fields, stats);
     console.log(projections);
   })
 });
