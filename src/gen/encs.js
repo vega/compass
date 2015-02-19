@@ -70,8 +70,9 @@ function generalRules(enc, opt) {
       // don't use facets before filling up x,y
       if ((!enc.x || !enc.y)) return false;
 
-      if (opt.omitAggrWithAllDimsOnFacets) {
-        // don't use facet with aggregate plot with other other ordinal on LOD
+      if (opt.omitNonTextAggrWithAllDimsOnFacets) {
+
+        // remove all aggregated charts (except text tables) with all dims on facets (row, col)
 
         var hasAggr = false, hasOtherO = false;
         for (var encType in enc) {
