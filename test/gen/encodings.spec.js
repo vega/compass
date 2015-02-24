@@ -1,12 +1,13 @@
 var expect = require('chai').expect,
-  vl = require('vegalite');
+  vl = require('vegalite'),
+  fixture = require('../fixture');
 
 var genEncodings = require('../../src/gen/encodings');
 
 describe('vr.gen.encodings()', function () {
-  describe('with 1Q', function() {
-    var fields = [{name:1, type:'Q'}],
-      stats = {};
+  describe('1Q', function() {
+    var fields = fixture['Q'].fields,
+      stats = fixture['Q'].stats;
 
     it('should generate no encoding if dot plots are omittted', function () {
       var encodings = genEncodings([], fields, stats, {
@@ -30,6 +31,30 @@ describe('vr.gen.encodings()', function () {
 
       // x, y ,text
       expect(encodings.length).to.equal(2);
+    });
+  });
+
+  describe('OxQ', function() {
+    var f = fixture['OxQ'];
+    var encodings = genEncodings([], f.fields, f.stats);
+
+    it('should not contain text table', function() {
+      var hasTextTable = encodings.filter(function(encoding) {
+        return encoding.marktype === 'text';
+      }).length > 0;
+      expect(hasTextTable).to.be.false();
+    });
+  });
+
+  describe('OxA(Q)', function() {
+    var f = fixture['OxA(Q)'];
+    var encodings = genEncodings([], f.fields, f.stats);
+
+    it('should contain text table', function() {
+      var hasTextTable = encodings.filter(function(encoding) {
+        return encoding.marktype === 'text';
+      }).length > 0;
+      expect(hasTextTable).to.be.true();
     });
   });
 });
