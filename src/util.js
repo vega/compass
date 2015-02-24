@@ -1,15 +1,10 @@
 "use strict";
 
-var consts = require('./consts');
+var consts = require('./consts'),
+  isDim = require('vegalite').field.isDimension;
 
 var util = module.exports = {
   gen: {}
-};
-
-// FIXME distinguish between raw / aggregate plot
-var isDim = util.isDim = function (field) {
-  return field.bin || field.type === 'O' ||
-    (field.type === 'T' && field.fn);
 };
 
 util.xOyQ = function xOyQ (enc) {

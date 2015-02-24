@@ -103,7 +103,7 @@ genEncs.isAggrWithAllDimOnFacets = function (enc) {
     if (field.aggr) {
       hasAggr = true;
     }
-    if (util.isDim(field) && (encType !== 'row' && encType !== 'col')) {
+    if (vl.field.isDimension(field) && (encType !== 'row' && encType !== 'col')) {
       hasOtherO = true;
     }
     if (hasAggr && hasOtherO) break;

@@ -15,7 +15,7 @@ function genAggregates(output, fields, opt) {
     if (opt.omitMeasureOnly || opt.omitDimensionOnly) {
       var hasMeasure = false, hasDimension = false, hasRaw = false;
       tf.forEach(function(f) {
-        if (util.isDim(f)) {
+        if (vl.field.isDimension(f)) {
           hasDimension = true;
         } else {
           hasMeasure = true;

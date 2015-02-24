@@ -2,7 +2,8 @@
 
 var vl = require('vegalite'),
   util = require('../util'),
-  consts = require('../consts');
+  consts = require('../consts'),
+  isDimension = vl.field.isDimension;
 
 var vlmarktypes = module.exports = getMarktypes;
 
@@ -53,14 +54,14 @@ function pointRule(enc, opt) {
     }
 
     // For OxO
-    if (util.isDim(enc.x) && util.isDim(enc.y)) {
+    if (isDimension(enc.x) && isDimension(enc.y)) {
       // shape doesn't work with both x, y as ordinal
       if (enc.shape) {
         return false;
       }
 
       // TODO(kanitw): check that there is quant at least ...
-      if (enc.color && util.isDim(enc.color)) {
+      if (enc.color && isDimension(enc.color)) {
         return false;
       }
     }
