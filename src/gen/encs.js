@@ -3,7 +3,8 @@
 var vl = require('vegalite'),
   globals = require('../globals'),
   util = require('../util'),
-  consts = require('../consts');
+  consts = require('../consts'),
+  genMarkTypes = require('./marktypes');
 
 module.exports = genEncs;
 
@@ -55,39 +56,35 @@ function maxCardinality(field, stats) {
 }
 
 function generalRules(enc, opt) {
-  // need at least one basic encoding
-  if (enc.x || enc.y || enc.geo || enc.text || enc.arc) {
+  // enc.text is only used for TEXT TABLE
+  if (enc.text) {
+    return genMarkTypes.satisfyRules(enc, 'text', opt);
+  }
+
+  // CARTESIAN PLOT OR MAP
+  if (enc.x || enc.y || enc.geo || enc.arc) {
 
     if (enc.x && enc.y) {
       // show only one OxO, QxQ
-      if (opt.omitTranpose && enc.x.type == enc.y.type) {
+      if (opt.omitTranpose && !(
+          vl.field.isOrdinalScale(enc.x) ^
+          vl.field.isOrdinalScale(enc.y)
+        )) {
         //TODO better criteria than name
         if (enc.x.name > enc.y.name) return false;
       }
     }
 
     if (enc.row || enc.col) { //have facet(s)
-      // don't use facets before filling up x,y
-      if ((!enc.x || !enc.y)) return false;
+      if (!enc.x || !enc.y) {
+        return false; // don't use facets before filling up x,y
+      }
 
       if (opt.omitNonTextAggrWithAllDimsOnFacets) {
-
-        // remove all aggregated charts (except text tables) with all dims on facets (row, col)
-
-        var hasAggr = false, hasOtherO = false;
-        for (var encType in enc) {
-          var field = enc[encType];
-          if (field.aggr) {
-            hasAggr = true;
-          }
-          if (util.isDim(field) && (encType !== 'row' && encType !== 'col')) {
-            hasOtherO = true;
-          }
-          if (hasAggr && hasOtherO) break;
-        }
-
-        if (hasAggr && !hasOtherO) return false;
+        // remove all aggregated charts with all dims on facets (row, col)
+        if (genEncs.isAggrWithAllDimOnFacets(enc)) return false;
       }
+      return true;
     }
 
     // one dimension "count" is useless
@@ -98,6 +95,23 @@ function generalRules(enc, opt) {
   }
   return false;
 }
+
+genEncs.isAggrWithAllDimOnFacets = function (enc) {
+  var hasAggr = false, hasOtherO = false;
+  for (var encType in enc) {
+    var field = enc[encType];
+    if (field.aggr) {
+      hasAggr = true;
+    }
+    if (util.isDim(field) && (encType !== 'row' && encType !== 'col')) {
+      hasOtherO = true;
+    }
+    if (hasAggr && hasOtherO) break;
+  }
+
+  return hasAggr && !hasOtherO;
+};
+
 
 function genEncs(encs, fields, stats, opt) {
   opt = vl.schema.util.extend(opt||{}, consts.gen.encodings);

@@ -2,24 +2,11 @@
 
 var vl = require('vegalite'),
   util = require('../util'),
-  rank = require('../rank/rank'),
   consts = require('../consts');
 
-module.exports = function(output, enc, opt, cfg) {
-  opt = vl.schema.util.extend(opt||{}, consts.gen.encodings);
+var vlmarktypes = module.exports = getMarktypes;
 
-  getSupportedMarkTypes(enc, opt)
-    .forEach(function(markType) {
-      var encoding = { marktype: markType, enc: enc, cfg: cfg },
-        score = rank.encoding(encoding);
-      encoding.score = score.score;
-      encoding.scoreFeatures = score.features;
-      output.push(encoding);
-    });
-  return output;
-};
-
-var marksRule = {
+var marksRule = vlmarktypes.rule = {
   point:  pointRule,
   bar:    barRule,
   line:   lineRule,
@@ -27,9 +14,19 @@ var marksRule = {
   text:   textRule
 };
 
-//TODO(kanitw): write test case
-function getSupportedMarkTypes(enc, opt) {
-  var markTypes = opt.marktypeList.filter(function(markType) {
+function getMarktypes(enc, opt) {
+  opt = vl.schema.util.extend(opt||{}, consts.gen.encodings);
+
+  var markTypes = opt.marktypeList.filter(function(markType){
+    return vlmarktypes.satisfyRules(enc, markType, opt);
+  });
+
+  //console.log('enc:', util.json(enc), " ~ marks:", markTypes);
+
+  return markTypes;
+}
+
+vlmarktypes.satisfyRules = function (enc, markType, opt) {
     var mark = vl.compile.marks[markType],
       reqs = mark.requiredEncoding,
       support = mark.supportedEncoding;
@@ -111,7 +108,6 @@ function lineRule(enc, opt) {
 }
 
 function textRule(enc, opt) {
-  // FIXME should be aggregated
-  // at least must have row or col
-  return enc.row || enc.col;
+  // at least must have row or col and aggregated text values
+  return (enc.row || enc.col) && enc.text && enc.text.aggr;
 }
