@@ -67,8 +67,8 @@ function generalRules(enc, opt) {
     if (enc.x && enc.y) {
       // show only one OxO, QxQ
       if (opt.omitTranpose && !(
-          vl.field.isOrdinalScale(enc.x) ^
-          vl.field.isOrdinalScale(enc.y)
+          vl.field.isDimension(enc.x) ^
+          vl.field.isDimension(enc.y)
         )) {
         //TODO better criteria than name
         if (enc.x.name > enc.y.name) return false;

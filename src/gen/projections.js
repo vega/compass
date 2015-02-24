@@ -29,7 +29,7 @@ function projections(fields, stats, opt) {
     //FIXME load maxbins value from somewhere else
     return (opt.alwaysAddHistogram && selected.length === 0) ||
       !(opt.maxCardinalityForAutoAddOrdinal &&
-        vl.field.isOrdinalScale(field) &&
+        vl.field.isDimension(field) &&
         vl.field.cardinality(field, stats, 15) > opt.maxCardinalityForAutoAddOrdinal);
   });
 

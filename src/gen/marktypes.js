@@ -27,25 +27,20 @@ function getMarktypes(enc, opt) {
 }
 
 vlmarktypes.satisfyRules = function (enc, markType, opt) {
-    var mark = vl.compile.marks[markType],
-      reqs = mark.requiredEncoding,
-      support = mark.supportedEncoding;
+  var mark = vl.compile.marks[markType],
+    reqs = mark.requiredEncoding,
+    support = mark.supportedEncoding;
 
-    for (var i in reqs) { // all required encodings in enc
-      if (!(reqs[i] in enc)) return false;
-    }
+  for (var i in reqs) { // all required encodings in enc
+    if (!(reqs[i] in enc)) return false;
+  }
 
-    for (var encType in enc) { // all encodings in enc are supported
-      if (!support[encType]) return false;
-    }
+  for (var encType in enc) { // all encodings in enc are supported
+    if (!support[encType]) return false;
+  }
 
-    return !marksRule[markType] || marksRule[markType](enc, opt);
-  });
-
-  //console.log('enc:', util.json(enc), " ~ marks:", markTypes);
-
-  return markTypes;
-}
+  return !marksRule[markType] || marksRule[markType](enc, opt);
+};
 
 function pointRule(enc, opt) {
   if (enc.x && enc.y) {
@@ -88,7 +83,7 @@ function pointRule(enc, opt) {
 function barRule(enc, opt) {
   // need to aggregate on either x or y
   if (((enc.x.aggr !== undefined) ^ (enc.y.aggr !== undefined)) &&
-      (vl.field.isOrdinalScale(enc.x) ^ vl.field.isOrdinalScale(enc.y))) {
+      (vl.field.isDimension(enc.x) ^ vl.field.isDimension(enc.y))) {
 
     // if omitTranpose, put Q on X, O on Y
     if (opt.omitTranpose && util.xOyQ(enc)) return false;
@@ -109,5 +104,5 @@ function lineRule(enc, opt) {
 
 function textRule(enc, opt) {
   // at least must have row or col and aggregated text values
-  return (enc.row || enc.col) && enc.text && enc.text.aggr;
+  return (enc.row || enc.col) && enc.text && enc.text.aggr && !enc.x && !enc.y;
 }
