@@ -17,4 +17,4 @@ and create a symlink to the relative vegalite path.
 ln -s ../vegalite node_modules/vegalite
 ```
 
-We will update this dependency later (https://github.com/uwdata/visrec/issues/20).
+We will update this dependency later ([#20](https://github.com/uwdata/visrec/issues/20)).
