@@ -10,12 +10,11 @@ Given user query, Visrec produces ranked group of visualization described using 
 Visrec depends on vegalite and vega (vegalite modified).
 Currently vegalite is in active development.
 
-To facilitate rapid development, you should clone visrec and vegalite repo into the same root folder (e.g., `_visrec`) and start a webserver from that folder.
+To develop, you should clone visrec and vegalite repo into the same root folder (e.g., `_visrec`)
+and create a symlink to the relative vegalite path. 
 
 ```
-_visrec ❯❯❯ python -m SimpleHTTPServer
+ln -s ../vegalite node_modules/vegalite
 ```
 
-Then you can access Visrec from http://localhost:8000/visrec/.
-
-In the future, we will consider git submodule for better integrate.
+We will update this dependency later (#20).
