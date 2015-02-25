@@ -12,41 +12,44 @@ module.exports = genEncs;
 
 var rules = {
   x: {
-    dataTypes: vl.dataTypes.O + vl.dataTypes.Q + vl.dataTypes.T,
+    dimension: true,
+    measure: true,
     multiple: true //FIXME should allow multiple only for Q, T
   },
   y: {
-    dataTypes: vl.dataTypes.O + vl.dataTypes.Q + vl.dataTypes.T,
+    dimension: true,
+    measure: true,
     multiple: true //FIXME should allow multiple only for Q, T
   },
   row: {
-    dataTypes: vl.dataTypes.O,
-    multiple: true,
+    dimension: true,
+    multiple: true
   },
   col: {
-    dataTypes: vl.dataTypes.O,
+    dimension: true,
     multiple: true
   },
   shape: {
-    dataTypes: vl.dataTypes.O
+    dimension: true
   },
   size: {
-    dataTypes: vl.dataTypes.Q
+    measure: true
   },
   color: {
-    dataTypes: vl.dataTypes.O + vl.dataTypes.Q
+    dimension: true,
+    measure: true
   },
   alpha: {
-    dataTypes: vl.dataTypes.Q
+    measure: true
   },
   text: {
-    dataTypes: ANY_DATA_TYPES
+    measure: true
   },
   detail: {
-    dataTypes: ANY_DATA_TYPES
+    dimension: true
   }
   //geo: {
-  //  dataTypes: [vl.dataTypes.G]
+  //  geo: true
   //},
   //arc: { // pie
   //
@@ -58,8 +61,10 @@ function maxCardinality(field, stats) {
 }
 
 function dimMeaTransposeRule(enc) {
+  // create horizontal histogram for ordinal
   if (enc.y.type === 'O' && isMeasure(enc.x)) return true;
 
+  // vertical histogram for Q and T
   if (isMeasure(enc.y) && (enc.x.type !== 'O' && isDimension(enc.x))) return true;
 
   return false;
@@ -152,11 +157,12 @@ function genEncs(encs, fields, stats, opt) {
     // Otherwise, assign i-th field
     var field = fields[i];
     for (var j in vl.encodingTypes) {
-      var et = vl.encodingTypes[j];
+      var et = vl.encodingTypes[j],
+        isDim = isDimension(field);
 
       //TODO: support "multiple" assignment
       if (!(et in tmpEnc) && // encoding not used
-        (rules[et].dataTypes & vl.dataTypes[field.type]) > 0 &&
+        ((isDim && rules[et].dimension) || (!isDim && rules[et].measure)) &&
         (!rules[et].rules || !rules[et].rules(field, stats))
         ) {
         tmpEnc[et] = field;
