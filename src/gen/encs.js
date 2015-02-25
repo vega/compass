@@ -89,8 +89,8 @@ function generalRules(enc, opt) {
       if (opt.omitTranpose) {
         if (isDimension(enc.x) ^ isDimension(enc.y)) { // dim x mea
           if (!dimMeaTransposeRule(enc)) return false;
-        } else if (enc.y.type==='T') {
-          return false;
+        } else if (enc.y.type==='T' || enc.x.type === 'T') {
+          if (enc.y.type==='T' && enc.x.type !== 'T') return false;
         } else { // show only one OxO, QxQ
           if (enc.x.name > enc.y.name) return false;
         }

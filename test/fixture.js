@@ -62,14 +62,14 @@ fixture['OxA(Q)xA(Q)'] = {
   }
 };
 
-fixture['TxQ'] = {
+fixture['QxT'] = {
   fields: [
-    {name:1, type:'T'},
-    {name:2, type:'Q'}
+    {name:1, type:'Q'},
+    {name:2, type:'T'}
   ],
   stats: {
-    1: t_stat,
-    2: q_stat
+    1: q_stat,
+    2: t_stat
   }
 };
 
