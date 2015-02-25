@@ -101,5 +101,5 @@ function lineRule(enc, opt) {
 
 function textRule(enc, opt) {
   // at least must have row or col and aggregated text values
-  return (enc.row || enc.col) && enc.text && enc.text.aggr && !enc.x && !enc.y;
+  return (enc.row || enc.col) && enc.text && enc.text.aggr && !enc.x && !enc.y && !enc.color;
 }
