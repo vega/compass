@@ -81,6 +81,9 @@ function pointRule(enc, opt) {
 
 function barRule(enc, opt) {
   // need to aggregate on either x or y
+
+  if (opt.omitSizeOnBar && enc.size !== undefined) return false;
+
   if (((enc.x.aggr !== undefined) ^ (enc.y.aggr !== undefined)) &&
       (vl.field.isDimension(enc.x) ^ vl.field.isDimension(enc.y))) {
 

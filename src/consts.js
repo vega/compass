@@ -92,6 +92,11 @@ consts.gen.encodings = {
       default: true,
       description: 'remove all aggregated charts (except text tables) with all dims on facets (row, col)'
     },
+    omitSizeOnBar: {
+      type: 'boolean',
+      default: false,
+      description: 'do not use bar\'s size'
+    },
     marktypeList: {
       type: 'array',
       items: {type: 'string'},
