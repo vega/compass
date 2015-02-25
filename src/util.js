@@ -1,14 +1,9 @@
 "use strict";
 
-var consts = require('./consts'),
-  isDim = require('vegalite').field.isDimension;
+var consts = require('./consts');
 
 var util = module.exports = {
   gen: {}
-};
-
-util.xOyQ = function xOyQ (enc) {
-  return enc.x && enc.y && isDim(enc.x) && !isDim(enc.y);
 };
 
 util.isArray = Array.isArray || function (obj) {

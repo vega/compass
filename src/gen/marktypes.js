@@ -43,18 +43,16 @@ vlmarktypes.satisfyRules = function (enc, markType, opt) {
   return !marksRule[markType] || marksRule[markType](enc, opt);
 };
 
+
 function pointRule(enc, opt) {
   if (enc.x && enc.y) {
     // have both x & y ==> scatter plot / bubble plot
 
-    // For OxQ
-    if (opt.omitTranpose && util.xOyQ(enc)) {
-      // if omitTranpose, put Q on X, O on Y
-      return false;
-    }
+    var xIsDim = isDimension(enc.x),
+      yIsDim = isDimension(enc.y);
 
     // For OxO
-    if (isDimension(enc.x) && isDimension(enc.y)) {
+    if (xIsDim && yIsDim) {
       // shape doesn't work with both x, y as ordinal
       if (enc.shape) {
         return false;
@@ -86,9 +84,6 @@ function barRule(enc, opt) {
   if (((enc.x.aggr !== undefined) ^ (enc.y.aggr !== undefined)) &&
       (vl.field.isDimension(enc.x) ^ vl.field.isDimension(enc.y))) {
 
-    // if omitTranpose, put Q on X, O on Y
-    if (opt.omitTranpose && util.xOyQ(enc)) return false;
-
     return true;
   }
 
@@ -98,9 +93,10 @@ function barRule(enc, opt) {
 function lineRule(enc, opt) {
   // TODO(kanitw): add omitVerticalLine as config
 
+  // FIXME truly ordinal data is fine here too.
   // Line chart should be only horizontal
   // and use only temporal data
-  return enc.x == 'T' && enc.y == 'Q';
+  return enc.x.type == 'T' && enc.y.type == 'Q';
 }
 
 function textRule(enc, opt) {
