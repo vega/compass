@@ -6,16 +6,6 @@ var util = module.exports = {
   gen: {}
 };
 
-// FIXME distinguish between raw / aggregate plot
-var isDim = util.isDim = function (field) {
-  return field.bin || field.type === 'O' ||
-    (field.type === 'T' && field.fn);
-};
-
-util.xOyQ = function xOyQ (enc) {
-  return enc.x && enc.y && isDim(enc.x) && !isDim(enc.y);
-};
-
 util.isArray = Array.isArray || function (obj) {
   return {}.toString.call(obj) == '[object Array]';
 };

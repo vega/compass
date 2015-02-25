@@ -1,7 +1,7 @@
 var vl = require('vegalite');
 
 var rank = module.exports = {
-  projections: require('./rank-projections')
+
 };
 
 //TODO lower score if we use G as O?

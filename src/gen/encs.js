@@ -4,7 +4,9 @@ var vl = require('vegalite'),
   globals = require('../globals'),
   util = require('../util'),
   consts = require('../consts'),
-  genMarkTypes = require('./marktypes');
+  genMarkTypes = require('./marktypes'),
+  isDimension = vl.field.isDimension,
+  isMeasure = vl.field.isMeasure;
 
 module.exports = genEncs;
 
@@ -55,6 +57,14 @@ function maxCardinality(field, stats) {
   return stats[field].cardinality <= 20;
 }
 
+function dimMeaTransposeRule(enc) {
+  if (enc.y.type === 'O' && isMeasure(enc.x)) return true;
+
+  if (isMeasure(enc.y) && (enc.x.type !== 'O' && isDimension(enc.x))) return true;
+
+  return false;
+}
+
 function generalRules(enc, opt) {
   // enc.text is only used for TEXT TABLE
   if (enc.text) {
@@ -63,17 +73,6 @@ function generalRules(enc, opt) {
 
   // CARTESIAN PLOT OR MAP
   if (enc.x || enc.y || enc.geo || enc.arc) {
-
-    if (enc.x && enc.y) {
-      // show only one OxO, QxQ
-      if (opt.omitTranpose && !(
-          vl.field.isDimension(enc.x) ^
-          vl.field.isDimension(enc.y)
-        )) {
-        //TODO better criteria than name
-        if (enc.x.name > enc.y.name) return false;
-      }
-    }
 
     if (enc.row || enc.col) { //have facet(s)
       if (!enc.x || !enc.y) {
@@ -84,8 +83,30 @@ function generalRules(enc, opt) {
         // remove all aggregated charts with all dims on facets (row, col)
         if (genEncs.isAggrWithAllDimOnFacets(enc)) return false;
       }
+    }
+
+    if (enc.x && enc.y) {
+      if (opt.omitTranpose) {
+        if (isDimension(enc.x) ^ isDimension(enc.y)) { // dim x mea
+          if (!dimMeaTransposeRule(enc)) return false;
+        } else if (enc.y.type==='T' || enc.x.type === 'T') {
+          if (enc.y.type==='T' && enc.x.type !== 'T') return false;
+        } else { // show only one OxO, QxQ
+          if (enc.x.name > enc.y.name) return false;
+        }
+      }
       return true;
     }
+
+    // DOT PLOTS
+    // // plot with one axis = dot plot
+    if (opt.omitDotPlot) return false;
+
+    // Dot plot should always be horizontal
+    if (opt.omitTranpose && enc.y) return false;
+
+    // dot plot shouldn't have other encoding
+    if (opt.omitDotPlotWithExtraEncoding && vl.keys(enc).length > 1) return false;
 
     // one dimension "count" is useless
     if (enc.x && enc.x.aggr == 'count' && !enc.y) return false;
@@ -103,7 +124,7 @@ genEncs.isAggrWithAllDimOnFacets = function (enc) {
     if (field.aggr) {
       hasAggr = true;
     }
-    if (util.isDim(field) && (encType !== 'row' && encType !== 'col')) {
+    if (vl.field.isDimension(field) && (encType !== 'row' && encType !== 'col')) {
       hasOtherO = true;
     }
     if (hasAggr && hasOtherO) break;
