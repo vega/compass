@@ -47,6 +47,11 @@ consts.gen.aggregates = {
       default: true,
       description: 'Include type casting e.g., from Q to O'
     },
+    omitDotPlot: {
+      type: 'boolean',
+      default: false,
+      description: 'remove all dot plots'
+    },
     omitMeasureOnly: {
       type: 'boolean',
       default: true,
