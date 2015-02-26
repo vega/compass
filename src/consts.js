@@ -54,7 +54,7 @@ consts.gen.aggregates = {
     },
     omitDimensionOnly: {
       type: 'boolean',
-      default: false,
+      default: true,
       description: 'Omit aggregation with dimension(s) only'
     },
     addCountForDimensionOnly: {
