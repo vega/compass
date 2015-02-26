@@ -26,6 +26,7 @@ function projections(fields, stats, opt) {
   });
 
   unselected = unselected.filter(function(field){
+    if(!opt.addCountInProjection && vl.field.isCount(field)) return false;
     //FIXME load maxbins value from somewhere else
     return (opt.alwaysAddHistogram && selected.length === 0) ||
       !(opt.maxCardinalityForAutoAddOrdinal &&
@@ -33,18 +34,21 @@ function projections(fields, stats, opt) {
         vl.field.cardinality(field, stats, 15) > opt.maxCardinalityForAutoAddOrdinal);
   });
 
-  // put count on top!
-  unselected.sort(function(a, b){
-    if(a.aggr==='count') return -1;
-    if(b.aggr==='count') return 1;
-    return 0;
-  });
+  if (opt.addCountInProjection) {
+    // put count on top!
+    unselected.sort(function(a, b){
+      if(a.aggr==='count') return -1;
+      if(b.aggr==='count') return 1;
+      return 0;
+    });
+  }
 
   var setsToAdd = util.chooseKorLess(unselected, 1);
 
   setsToAdd.forEach(function(setToAdd) {
     var fieldSet = selected.concat(setToAdd);
     if (fieldSet.length > 0) {
+      //single count field is useless
       if (fieldSet.length === 1 && vl.field.isCount(fieldSet[0])) {
         return;
       }
@@ -55,7 +59,7 @@ function projections(fields, stats, opt) {
     }
   });
 
-  if (opt.addCountIfNothingIsSelected && selected.length===0) {
+  if (opt.addCountInProjection && opt.addCountIfNothingIsSelected && selected.length===0) {
     var countField = vl.field.count();
 
     unselected.forEach(function(field) {

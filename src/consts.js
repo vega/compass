@@ -7,14 +7,19 @@ var consts = module.exports = {
 consts.gen.projections = {
   type: 'object',
   properties: {
+    addCountInProjection: {
+      type: 'boolean',
+      default: false
+    },
     addCountIfNothingIsSelected: {
       type: 'boolean',
-      default: true,
+      default: false,
       description: 'When no field is selected, add extra count field'
     },
+    //FIXME remove this!
     omitDotPlot: {
       type: 'boolean',
-      default: true,
+      default: false,
       description: 'remove all dot plots'
     },
     maxCardinalityForAutoAddOrdinal: {
@@ -49,8 +54,13 @@ consts.gen.aggregates = {
     },
     omitDimensionOnly: {
       type: 'boolean',
-      default: true,
+      default: false,
       description: 'Omit aggregation with dimension(s) only'
+    },
+    addCountForDimensionOnly: {
+      type: 'boolean',
+      default: true,
+      description: 'Add count when there are dimension(s) only'
     },
     aggrList: {
       type: 'array',
@@ -79,7 +89,7 @@ consts.gen.encodings = {
     },
     omitDotPlot: {
       type: 'boolean',
-      default: true,
+      default: false,
       description: 'remove all dot plots'
     },
     omitDotPlotWithExtraEncoding: {
