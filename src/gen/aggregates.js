@@ -11,6 +11,12 @@ function genAggregates(output, fields, opt) {
   opt = vl.schema.util.extend(opt||{}, consts.gen.aggregates);
   var tf = new Array(fields.length);
 
+  function emit(fieldSet) {
+    fieldSet = vl.duplicate(fieldSet);
+    fieldSet.key = vl.field.shorthands(fieldSet);
+    output.push(fieldSet);
+  }
+
   function checkAndPush() {
     if (opt.omitMeasureOnly || opt.omitDimensionOnly) {
       var hasMeasure = false, hasDimension = false, hasRaw = false;
@@ -22,14 +28,20 @@ function genAggregates(output, fields, opt) {
           if (!f.aggr) hasRaw = true;
         }
       });
-      if (!hasMeasure && opt.omitDimensionOnly) return;
       if (!hasDimension && !hasRaw && opt.omitMeasureOnly) return;
+      if (!hasMeasure) {
+        if (opt.addCountForDimensionOnly) {
+          tf.push(vl.field.count());
+          emit(tf);
+          tf.pop();
+        }
+        if (opt.omitDimensionOnly) {
+          return;
+        }
+      }
     }
 
-    var fieldSet = vl.duplicate(tf);
-    fieldSet.key = vl.field.shorthands(fieldSet);
-
-    output.push(fieldSet);
+    emit(tf);
   }
 
   function assignQ(i, hasAggr) {
