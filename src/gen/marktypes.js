@@ -99,7 +99,7 @@ function lineRule(enc, opt) {
   // FIXME truly ordinal data is fine here too.
   // Line chart should be only horizontal
   // and use only temporal data
-  return enc.x.type == 'T' && enc.y.type == 'Q';
+  return enc.x.type == 'T' && enc.x.fn && enc.y.type == 'Q' && enc.y.aggr;
 }
 
 function textRule(enc, opt) {

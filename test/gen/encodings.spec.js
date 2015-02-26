@@ -1,8 +1,11 @@
+/*jshint -W069 */
+
 var expect = require('chai').expect,
   vl = require('vegalite'),
   fixture = require('../fixture');
 
-var genEncodings = require('../../src/gen/encodings');
+var genEncs = require('../../src/gen/encs'),
+  genEncodings = require('../../src/gen/encodings');
 
 describe('vr.gen.encodings()', function () {
   describe('1Q', function() {
@@ -49,6 +52,58 @@ describe('vr.gen.encodings()', function () {
   describe('OxA(Q)', function() {
     var f = fixture['OxA(Q)'];
     var encodings = genEncodings([], f.fields, f.stats);
+
+    it('should contain text table', function() {
+      var hasTextTable = encodings.filter(function(encoding) {
+        return encoding.marktype === 'text';
+      }).length > 0;
+      expect(hasTextTable).to.be.true();
+    });
+  });
+
+  describe('QxT', function(){
+    var f = fixture['QxT'];
+    var encodings = genEncodings([], f.fields, f.stats);
+
+    it('should not contain line', function() {
+      var hasLine = encodings.filter(function(encoding) {
+        return encoding.marktype === 'line';
+      }).length > 0;
+      expect(hasLine).to.be.false();
+    });
+  });
+
+  describe('QxYEAR(T)', function(){
+    var f = fixture['QxYEAR(T)'];
+
+    var encodings = genEncodings([], f.fields, f.stats);
+
+    it('should not contain line', function() {
+      var hasLine = encodings.filter(function(encoding) {
+        return encoding.marktype === 'line';
+      }).length > 0;
+      expect(hasLine).to.be.false();
+    });
+  });
+
+  describe('A(Q)xYEAR(T)', function(){
+    var f = fixture['A(Q)xYEAR(T)'];
+    console.log('A(Q)xYEAR(T)', genEncs([], f.fields, f.stats));
+    var encodings = genEncodings([], f.fields, f.stats);
+
+    it('should contain line', function() {
+      var hasLine = encodings.filter(function(encoding) {
+        return encoding.marktype === 'line';
+      }).length > 0;
+      expect(hasLine).to.be.true();
+    });
+  });
+
+  describe('#xB(Q)', function() {
+    var f = fixture['#xB(Q)'];
+    var encodings = genEncodings([], f.fields, f.stats);
+
+    console.log('#xB(Q)', encodings);
 
     it('should contain text table', function() {
       var hasTextTable = encodings.filter(function(encoding) {
