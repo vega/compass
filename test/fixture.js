@@ -16,6 +16,11 @@ stats['OxQ'] = {
   2: q_stat
 };
 
+stats['QxT'] = {
+  1: q_stat,
+  2: t_stat
+};
+
 stats['#xQ'] = {
   count: count_stat,
   2: q_stat
@@ -67,10 +72,23 @@ fixture['QxT'] = {
     {name:1, type:'Q'},
     {name:2, type:'T'}
   ],
-  stats: {
-    1: q_stat,
-    2: t_stat
-  }
+  stats: stats['QxT']
+};
+
+fixture['QxYEAR(T)'] = {
+  fields: [
+    {name:1, type:'Q'},
+    {name:2, type:'T', fn: 'year'}
+  ],
+  stats: stats['QxT']
+};
+
+fixture['A(Q)xYEAR(T)'] = {
+  fields: [
+    {name:1, type:'Q', aggr: 'avg'},
+    {name:2, type:'T', fn: 'year'}
+  ],
+  stats: stats['QxT']
 };
 
 
