@@ -35,12 +35,10 @@ function genAggregates(output, fields, opt) {
           emit(tf);
           tf.pop();
         }
-        if (opt.omitDimensionOnly) {
-          return;
-        }
+        if (opt.omitDimensionOnly) return;
       }
     }
-
+    if (opt.omitDotPlot && tf.length === 1) return;
     emit(tf);
   }
 

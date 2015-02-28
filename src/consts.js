@@ -47,6 +47,11 @@ consts.gen.aggregates = {
       default: true,
       description: 'Include type casting e.g., from Q to O'
     },
+    omitDotPlot: {
+      type: 'boolean',
+      default: false,
+      description: 'remove all dot plots'
+    },
     omitMeasureOnly: {
       type: 'boolean',
       default: true,
@@ -54,7 +59,7 @@ consts.gen.aggregates = {
     },
     omitDimensionOnly: {
       type: 'boolean',
-      default: false,
+      default: true,
       description: 'Omit aggregation with dimension(s) only'
     },
     addCountForDimensionOnly: {
