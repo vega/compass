@@ -7,11 +7,11 @@ var vl = require('vegalite'),
   consts = require('./clusterconsts'),
   util = require('../util');
 
-var distanceTable = cluster.distanceTable = require('./distancetable');
+cluster.distance = require('./distance');
 
 
 function cluster(encodings) {
-  var dist = distanceTable(encodings),
+  var dist = cluster.distance.table(encodings),
     n = encodings.length;
 
   var clusterTrees = clusterfck.hcluster(vl.range(n), function(i, j) {

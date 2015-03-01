@@ -1,5 +1,8 @@
 var c = module.exports = {};
 
+c.SWAPPABLE = 0.05;
+c.DIST_MISSING = 1;
+c.CLUSTER_THRESHOLD = 2.5;
 
 function reduceTupleToTable(r, x) {
   var a = x[0], b = x[1], d = x[2];
@@ -22,8 +25,3 @@ c.DIST_BY_ENCTYPE = [
   ['size', 'alpha', c.SWAPPABLE],
   ['size', 'color', c.SWAPPABLE]
 ].reduce(reduceTupleToTable, {});
-
-c.SWAPPABLE = 0.05;
-c.DIST_MISSING = 1;
-
-c.CLUSTER_THRESHOLD = 1;

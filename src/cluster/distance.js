@@ -2,25 +2,24 @@ var vl = require('vegalite'),
   consts = require('./clusterconsts'),
   util = require('../util');
 
-module.exports = distanceTable;
+module.exports = distance = {};
 
-function distanceTable(encodings) {
+distance.table = function (encodings) {
   var len = encodings.length,
-    colencs = encodings.map(function(e) { return colenc(e);}),
+    colencs = encodings.map(function(e) { return distance.getEncTypeByColumnName(e);}),
     diff = new Array(len), i, j;
 
   for (i = 0; i < len; i++) diff[i] = new Array(len);
 
   for (i = 0; i < len; i++) {
     for (j = i + 1; j < len; j++) {
-      diff[j][i] = diff[i][j] = getDistance(colencs[i], colencs[j]);
+      diff[j][i] = diff[i][j] = distance.get(colencs[i], colencs[j]);
     }
   }
   return diff;
-}
+};
 
-
-function getDistance(colenc1, colenc2) {
+distance.get = function (colenc1, colenc2) {
   var cols = util.union(vl.keys(colenc1.col), vl.keys(colenc2.col)),
     dist = 0;
 
@@ -28,8 +27,8 @@ function getDistance(colenc1, colenc2) {
     var e1 = colenc1.col[col], e2 = colenc2.col[col];
 
     if (e1 && e2) {
-      if (e1.type != e2.type) {
-        dist += (consts.DIST_BY_ENCTYPE[e1.type] || {})[e2.type] || 1;
+      if (e1.encType != e2.encType) {
+        dist += (consts.DIST_BY_ENCTYPE[e1.encType] || {})[e2.encType] || 1;
       }
     } else {
       dist += consts.DIST_MISSING;
@@ -50,16 +49,16 @@ function getDistance(colenc1, colenc2) {
     }
   }
   return dist;
-}
+};
 
 // get encoding type by fieldname
-function colenc(encoding) {
+distance.getEncTypeByColumnName = function(encoding) {
   var _colenc = {},
     enc = encoding.enc;
 
   vl.keys(enc).forEach(function(encType) {
     var e = vl.duplicate(enc[encType]);
-    e.type = encType;
+    e.encType = encType;
     _colenc[e.name || ''] = e;
     delete e.name;
   });
@@ -69,4 +68,4 @@ function colenc(encoding) {
     col: _colenc,
     enc: encoding.enc
   };
-}
+};
