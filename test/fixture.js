@@ -6,20 +6,31 @@ var fixture = module.exports = {};
 
 var stats = {};
 
+var count = {name:'*', type:'Q', aggr:'count'},
+  count_stat = 50;
+
+var O_30 = {name:'O_30', type:'O'},
+  O_30_stat = {cardinality: 30};
+
 var o_stat = {cardinality: 5},
   q_stat = {cardinality: 10, min:0, max:150},
-  t_stat = o_stat,
-  count_stat = 50;
+  t_stat = o_stat;
 
 stats['OxQ'] = {
   1: o_stat,
   2: q_stat
 };
 
+stats['O_30x#'] = {
+  count: count_stat,
+  O_30: O_30_stat
+};
+
 stats['QxT'] = {
   1: q_stat,
   2: t_stat
 };
+
 
 stats['#xQ'] = {
   count: count_stat,
@@ -53,6 +64,10 @@ fixture['OxA(Q)'] = {
   stats: stats['OxQ']
 };
 
+fixture['O_30x#'] = {
+  fields: [O_30, count],
+  stats: stats['O_30x#']
+};
 
 fixture['OxA(Q)xA(Q)'] = {
   fields: [
@@ -94,7 +109,7 @@ fixture['A(Q)xYEAR(T)'] = {
 
 fixture['#xB(Q)'] = {
   fields: [
-      {name:'*', type:'Q', aggr:'count'},
+      count,
       {name:2, type:'Q', bin: {maxbins: 15}}
   ],
   stats: stats['#xQ']

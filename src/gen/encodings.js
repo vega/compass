@@ -13,18 +13,18 @@ function genEncodingsFromFields(output, fields, stats, opt, cfg, nested) {
 
   if (nested) {
     return encs.reduce(function(dict, enc) {
-      dict[enc] = genEncodingsFromEncs([], enc, opt, cfg);
+      dict[enc] = genEncodingsFromEncs([], enc, stats, opt, cfg);
       return dict;
     }, {});
   } else {
     return encs.reduce(function(list, enc) {
-      return genEncodingsFromEncs(list, enc, opt, cfg);
+      return genEncodingsFromEncs(list, enc, stats, opt, cfg);
     }, []);
   }
 }
 
-function genEncodingsFromEncs(output, enc, opt, cfg) {
-  getMarktypes(enc, opt)
+function genEncodingsFromEncs(output, enc, stats, opt, cfg) {
+  getMarktypes(enc, stats, opt)
     .forEach(function(markType) {
       var encoding = { marktype: markType, enc: enc, cfg: cfg },
         score = rank.encoding(encoding);

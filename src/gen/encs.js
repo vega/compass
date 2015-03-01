@@ -24,13 +24,11 @@ var rules = {
   },
   row: {
     dimension: true,
-    multiple: true,
-    rules: facetRules
+    multiple: true
   },
   col: {
     dimension: true,
-    multiple: true,
-    rules: colorRules
+    multiple: true
   },
   shape: {
     dimension: true,
@@ -61,20 +59,16 @@ var rules = {
   //}
 };
 
-function facetRules(field, stats, opt) {
-  if (field.bin) {
-    console.log('facetRules', vl.field.shorthand(field), stats, vl.field.cardinality(field, stats, 15, false));
-  }
-  return vl.field.cardinality(field, stats, 15) <= opt.maxCardinalityForFacets;
-}
 
 function colorRules(field, stats, opt) {
   return vl.field.isMeasure(field) ||
-    vl.field.cardinality(field, stats, 7) <= opt.maxCardinalityForColor;
+    vl.field.cardinality(field, stats) <= opt.maxCardinalityForColor;
 }
 
 function shapeRules(field, stats, opt) {
-  return !field.bin;
+  if (field.bin && field.type === 'Q') return false;
+  if (field.fn && field.type === 'T') return false;
+  return vl.field.cardinality(field, stats) <= opt.maxCardinalityForColor;
 }
 
 function dimMeaTransposeRule(enc) {
@@ -109,8 +103,7 @@ function generalRules(enc, opt) {
 
     if (enc.x && enc.y) {
       if (opt.omitTranpose) {
-        if (isDimension(enc.x) ^ isDimension(enc.y)) { // dim x mea
-          console.log('check dimMeaTransposeRule');
+        if ((!!isDimension(enc.x)) ^ (!!isDimension(enc.y))) { // dim x mea
           if (!dimMeaTransposeRule(enc)) return false;
         } else if (enc.y.type==='T' || enc.x.type === 'T') {
           if (enc.y.type==='T' && enc.x.type !== 'T') return false;

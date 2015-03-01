@@ -61,6 +61,29 @@ describe('vr.gen.encodings()', function () {
     });
   });
 
+  describe('O_30x#', function(){
+    var f = fixture['O_30x#'];
+    var encodings = genEncodings([], f.fields, f.stats);
+
+    it('should contain text table', function() {
+      var hasTextTable = encodings.filter(function(encoding) {
+        return encoding.marktype === 'text';
+      }).length > 0;
+      expect(hasTextTable).to.be.true();
+    });
+
+    it('should contain bar', function() {
+      var hasBar = encodings.filter(function(encoding) {
+        return encoding.marktype === 'bar';
+      }).length > 0;
+      expect(hasBar).to.be.true();
+    });
+
+    console.log('encodings O_30x#', encodings.map(function(spec){
+      return vl.Encoding.shorthandFromSpec(spec) + ":" + spec.score;
+    }));
+  });
+
   describe('QxT', function(){
     var f = fixture['QxT'];
     var encodings = genEncodings([], f.fields, f.stats);
