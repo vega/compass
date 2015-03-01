@@ -50,7 +50,7 @@ describe('vr.gen.projections()', function () {
       var projections = genProjections(fields);
 
       expect(projections.length).to.equal(4);
-      expect(projections.filter(function(p){ return p.length === 2;}).length).to.equal(4);
+      expect(projections.filter(function(p){ return p.length === 2;}).length).to.equal(0);
     });
 
     it('should generate more # of projections if not omitting dot plots', function () {
@@ -58,8 +58,8 @@ describe('vr.gen.projections()', function () {
         omitDotPlot: false
       });
 
-      expect(projections.length).to.equal(8);
-      expect(projections.filter(function(p){ return p.length === 2;}).length).to.equal(4);
+      expect(projections.length).to.equal(4);
+      expect(projections.filter(function(p){ return p.length === 2;}).length).to.equal(0);
     });
   });
 });
