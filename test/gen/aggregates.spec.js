@@ -106,7 +106,7 @@ describe('vr.gen.aggregates()', function () {
     };
 
     var projections = genProjections(fields, stats);
-    console.log(projections);
+    console.log(projections, 'unfinished');
     //FIXME fix this
   });
 });
