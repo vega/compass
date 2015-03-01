@@ -1,5 +1,62 @@
 var vl = require('vegalite');
 
+module.exports = rankEncodings;
+
+// bad score not specified in the table above
+var BAD_ENCODING_SCORE = 0.01,
+  UNUSED_POSITION = 0.5;
+
+var MARK_SCORE = {
+  line: 0.99,
+  area: 0.98,
+  bar: 0.97,
+  point: 0.96,
+  circle: 0.95,
+  square: 0.95,
+  text: 0.8
+};
+
+function rankEncodings(encoding, stats) {
+  var features = [],
+    encTypes = vl.keys(encoding.enc);
+
+  vl.enc.forEach(encoding.enc, function(encType, field) {
+    var role = vl.field.role(field);
+    features.push({
+      reason: encType+vl.shorthand.assign+vl.field.shorthand(field),
+      score: rankEncodings.score[role](field, encType, encoding.marktype, stats)
+    });
+  });
+
+  // penalize not using positional
+  // only penalize for non-text
+  if (encTypes.length > 1 && encoding.marktype !== 'text') {
+    if ((!encoding.enc.x || !encoding.enc.y) && !encoding.enc.geo && !encoding.enc.text) {
+      features.push({
+        reason: 'unused position',
+        score: UNUSED_POSITION
+      });
+    }
+  }
+
+  features.push({
+    reason: 'marktype='+encoding.marktype,
+    score: MARK_SCORE[encoding.marktype]
+  });
+
+  return {
+    score: features.reduce(function(p, f) {
+      return p * f.score;
+    }, 1),
+    features: features
+  };
+}
+
+rankEncodings.score = {
+  dimension: dimensionScore,
+  measure: measureScore
+};
+
 function dimensionScore(field, encType, marktype, stats){
   switch (encType) {
     case 'x':
@@ -41,58 +98,3 @@ function measureScore(field, encType, marktype, stats) {
   }
   return BAD_ENCODING_SCORE;
 }
-
-// bad score not specified in the table above
-var BAD_ENCODING_SCORE = 0.01,
-  UNUSED_POSITION = 0.5;
-
-var MARK_SCORE = {
-  line: 0.99,
-  area: 0.98,
-  bar: 0.97,
-  point: 0.96,
-  circle: 0.95,
-  square: 0.95,
-  text: 0.8
-};
-
-rank.encoding = function(encoding, stats) {
-  var features = [],
-    encTypes = vl.keys(encoding.enc);
-
-  vl.enc.forEach(encoding.enc, function(encType, field) {
-    var role = vl.field.role(field);
-    features.push({
-      reason: encType+vl.shorthand.assign+vl.field.shorthand(field),
-      score: rank.encoding.score[role](field, encType, encoding.marktype, stats)
-    });
-  });
-
-  // penalize not using positional
-  // only penalize for non-text
-  if (encTypes.length > 1 && encoding.marktype !== 'text') {
-    if ((!encoding.enc.x || !encoding.enc.y) && !encoding.enc.geo && !encoding.enc.text) {
-      features.push({
-        reason: 'unused position',
-        score: UNUSED_POSITION
-      });
-    }
-  }
-
-  features.push({
-    reason: 'marktype='+encoding.marktype,
-    score: MARK_SCORE[encoding.marktype]
-  });
-
-  return {
-    score: features.reduce(function(p, f) {
-      return p * f.score;
-    }, 1),
-    features: features
-  };
-};
-
-rank.encoding.score = {
-  dimension: dimensionScore,
-  measure: measureScore
-};
