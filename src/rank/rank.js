@@ -1,35 +1,48 @@
 var vl = require('vegalite');
 
-var rank = module.exports = {
+var rank = module.exports = {};
 
-};
+function dimensionScore(field, encType, marktype, stats){
+  switch (encType) {
+    case 'x':
+      if(field.type === 'O') return 0.99;
+      return 1;
+    case 'y':
+      if(field.type === 'O') return 1; //prefer ordinal on y
+      if(field.type === 'T') return 0.8; // time should not be on Y
+      return 0.99;
+    case 'col':
+      if (marktype === 'text') return 1;
+      return 0.7; //prefer column over row due to scrolling issues
+    case 'row':
+      if (marktype === 'text') return 0.99;
+      return 0.69;
+    case 'color':
+      //stacking gets lower score
+      //FIXME add stacking option once we have control ..
+      if (marktype ==='bar' || marktype ==='area') return 0.3;
 
-//TODO lower score if we use G as O?
-var ENCODING_SCORE = {
-  Q: {
-    x: 1, // better for single plot
-    y: 0.99,
-    size: 0.6, //FIXME SIZE for Bar is horrible!
-    color: 0.4,
-    alpha: 0.4
-  },
-  O: { // TODO need to take cardinality into account
-    x: 0.99, // harder to read axis
-    y: 1,
-    row: 0.7,
-    col: 0.7,
-    color: 0.8,
-    shape: 0.6
-  },
-  T: { // FIX rethink this
-    x: 1,
-    y: 0.8,
-    row: 0.4,
-    col: 0.4,
-    color: 0.3,
-    shape: 0.3
+      // true ordinal on color is currently bad (until we have good ordinal color scale support)
+      if ((field.bin && field.type==='Q') || (field.fn && field.type==='T')) return 0.3;
+
+      return 0.8;
+    case 'shape':
+      return 0.6;
   }
-};
+  return BAD_ENCODING_SCORE;
+}
+
+function measureScore(field, encType, marktype, stats) {
+  switch (encType){
+    case 'x': return 1;
+    case 'y': return 1;
+    case 'size': return 0.6;
+    case 'color': return 0.4;
+    case 'alpha': return 0.39;
+    case 'text': return 1;
+  }
+  return BAD_ENCODING_SCORE;
+}
 
 // bad score not specified in the table above
 var BAD_ENCODING_SCORE = 0.01,
@@ -45,41 +58,44 @@ var MARK_SCORE = {
   text: 0.8
 };
 
-rank.encoding = function(encoding) {
-  var features = {},
+rank.encoding = function(encoding, stats) {
+  var features = [],
     encTypes = vl.keys(encoding.enc);
-  encTypes.forEach(function(encType) {
-    var field = encoding.enc[encType];
-    features[field.name] = {
-      value: field.type + ':'+ encType,
-      score: ENCODING_SCORE[field.type][encType] || BAD_ENCODING_SCORE
-    };
+
+  vl.enc.forEach(encoding.enc, function(encType, field) {
+    var role = vl.field.role(field);
+    features.push({
+      reason: encType+vl.shorthand.assign+vl.field.shorthand(field),
+      score: rank.encoding.score[role](field, encType, encoding.marktype, stats)
+    });
   });
 
   // penalize not using positional
-  if (encTypes.length > 1) {
-    if ((!encoding.enc.x || !encoding.enc.y) && !encoding.enc.geo) {
-      features.unusedPosition = {score: UNUSED_POSITION};
+  // only penalize for non-text
+  if (encTypes.length > 1 && encoding.marktype !== 'text') {
+    if ((!encoding.enc.x || !encoding.enc.y) && !encoding.enc.geo && !encoding.enc.text) {
+      features.push({
+        reason: 'unused position',
+        score: UNUSED_POSITION
+      });
     }
   }
 
-  features.markType = {
-    value: encoding.marktype,
+  features.push({
+    reason: 'marktype='+encoding.marktype,
     score: MARK_SCORE[encoding.marktype]
-  };
+  });
 
   return {
-    score: vl.keys(features).reduce(function(p, s) {
-      return p * features[s].score;
+    score: features.reduce(function(p, f) {
+      return p * f.score;
     }, 1),
     features: features
   };
 };
 
-
-// raw > avg, sum > min,max > bin
-
-rank.fieldsScore = function(fields) {
-
+rank.encoding.score = {
+  dimension: dimensionScore,
+  measure: measureScore
 };
 
