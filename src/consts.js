@@ -112,6 +112,11 @@ consts.gen.encodings = {
       default: false,
       description: 'do not use bar\'s size'
     },
+    omitStackedAverage: {
+      type: 'boolean',
+      default: true,
+      description: 'do not stack bar chart with average'
+    },
     marktypeList: {
       type: 'array',
       items: {type: 'string'},

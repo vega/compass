@@ -22,7 +22,29 @@ describe('vr.gen.marktypes()', function(){
   });
 
   describe('bar', function () {
-    // TODO
+    describe('with stacked average', function () {
+      it('should not be generated', function () {
+        var enc = {
+          "color": {"selected": true,"name": "When__Phase_of_flight","type": "O"},
+          "x": {"name": "Cost__Total_$","type": "Q","aggr": "avg"},
+          "y": {"selected": false,"name": "Aircraft__Airline_Operator","type": "O"}
+        };
+        var marktypes = getMarkTypes(enc);
+        expect(marktypes.indexOf('bar')).to.equal(-1);
+      });
+    });
+
+    describe('with stacked sum', function () {
+      it('should not be generated', function () {
+        var enc = {
+          "color": {"selected": true,"name": "When__Phase_of_flight","type": "O"},
+          "x": {"name": "Cost__Total_$","type": "Q","aggr": "sum"},
+          "y": {"selected": false,"name": "Aircraft__Airline_Operator","type": "O"}
+        };
+        var marktypes = getMarkTypes(enc);
+        expect(marktypes.indexOf('bar')).to.gt(-1);
+      });
+    });
   });
 
   describe('line/area', function () {

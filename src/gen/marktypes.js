@@ -11,7 +11,7 @@ var marksRule = vlmarktypes.rule = {
   point:  pointRule,
   bar:    barRule,
   line:   lineRule,
-  area:   lineRule, // area is similar to line
+  area:   areaRule, // area is similar to line
   text:   textRule
 };
 
@@ -87,7 +87,8 @@ function barRule(enc, opt) {
   if (((enc.x.aggr !== undefined) ^ (enc.y.aggr !== undefined)) &&
       (vl.field.isDimension(enc.x) ^ vl.field.isDimension(enc.y))) {
 
-    return true;
+    var aggr = enc.x.aggr || enc.y.aggr;
+    return !(opt.omitStackedAverage && aggr ==='avg' && enc.color);
   }
 
   return false;
@@ -100,6 +101,12 @@ function lineRule(enc, opt) {
   // Line chart should be only horizontal
   // and use only temporal data
   return enc.x.type == 'T' && enc.x.fn && enc.y.type == 'Q' && enc.y.aggr;
+}
+
+function areaRule(enc, opt) {
+  if(!lineRule(enc,opt)) return false;
+
+  return !(opt.omitStackedAverage && enc.y.aggr ==='avg' && enc.color);
 }
 
 function textRule(enc, opt) {
