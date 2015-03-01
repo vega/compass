@@ -87,6 +87,27 @@ consts.gen.aggregates = {
 consts.gen.encodings = {
   type: 'object',
   properties: {
+    marktypeList: {
+      type: 'array',
+      items: {type: 'string'},
+      default: ['point', 'bar', 'line', 'area', 'text'], //filled_map
+      description: 'allowed marktypes'
+    },
+    maxCardinalityForFacets: {
+      type: 'integer',
+      default: 20,
+      description: 'maximum cardinality of a field to be put on facet (row/col)'
+    },
+    maxCardinalityForColor: {
+      type: 'integer',
+      default: 20,
+      description: 'maximum cardinality of an ordinal field to be put on color'
+    },
+    maxCardinalityForShape: {
+      type: 'integer',
+      default: 6,
+      description: 'maximum cardinality of an ordinal field to be put on shape'
+    },
     omitTranpose:  {
       type: 'boolean',
       default: true,
@@ -116,12 +137,6 @@ consts.gen.encodings = {
       type: 'boolean',
       default: true,
       description: 'do not stack bar chart with average'
-    },
-    marktypeList: {
-      type: 'array',
-      items: {type: 'string'},
-      default: ['point', 'bar', 'line', 'area', 'text'], //filled_map
-      description: 'allowed marktypes'
     }
   }
 };

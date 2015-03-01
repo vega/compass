@@ -7,7 +7,7 @@ var fixture = module.exports = {};
 var stats = {};
 
 var o_stat = {cardinality: 5},
-  q_stat = {cardinality: 10},
+  q_stat = {cardinality: 10, min:0, max:150},
   t_stat = o_stat,
   count_stat = 50;
 
@@ -95,7 +95,7 @@ fixture['A(Q)xYEAR(T)'] = {
 fixture['#xB(Q)'] = {
   fields: [
       {name:'*', type:'Q', aggr:'count'},
-      {name:2, type:'Q', bin: true}
+      {name:2, type:'Q', bin: {maxbins: 15}}
   ],
   stats: stats['#xQ']
 };

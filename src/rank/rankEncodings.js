@@ -83,6 +83,8 @@ function dimensionScore(field, encType, marktype, stats){
       return 0.8;
     case 'shape':
       return 0.6;
+    case 'detail':
+      return 0.5;
   }
   return BAD_ENCODING_SCORE;
 }
