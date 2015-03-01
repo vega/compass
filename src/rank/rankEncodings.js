@@ -91,7 +91,11 @@ function measureScore(field, encType, marktype, stats) {
   switch (encType){
     case 'x': return 1;
     case 'y': return 1;
-    case 'size': return 0.6;
+    case 'size':
+      if (marktype === 'bar') return 0.1; //size of bar is very bad
+      if (marktype === 'text') return 0.1;
+      if (marktype === 'line') return 0.1;
+      return 0.6;
     case 'color': return 0.4;
     case 'alpha': return 0.39;
     case 'text': return 1;
