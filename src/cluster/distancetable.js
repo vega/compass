@@ -19,6 +19,7 @@ function distanceTable(encodings) {
   return diff;
 }
 
+
 function getDistance(colenc1, colenc2) {
   var cols = util.union(vl.keys(colenc1.col), vl.keys(colenc2.col)),
     dist = 0;
@@ -30,14 +31,28 @@ function getDistance(colenc1, colenc2) {
       if (e1.type != e2.type) {
         dist += (consts.DIST_BY_ENCTYPE[e1.type] || {})[e2.type] || 1;
       }
-      //FIXME add aggregation
     } else {
       dist += consts.DIST_MISSING;
     }
   });
+
+  // do not group stacked chart with similar non-stacked chart!
+  var isStack1 = vl.Encoding.isStack(colenc1),
+    isStack2 = vl.Encoding.isStack(colenc2);
+
+  if(isStack1 || isStack2) {
+    if(isStack1 && isStack2) {
+      if(colenc1.enc.color.name !== colenc2.enc.color.name) {
+        dist+=1;
+      }
+    } else {
+      dist+=1; // surely different
+    }
+  }
   return dist;
 }
 
+// get encoding type by fieldname
 function colenc(encoding) {
   var _colenc = {},
     enc = encoding.enc;
@@ -51,6 +66,7 @@ function colenc(encoding) {
 
   return {
     marktype: encoding.marktype,
-    col: _colenc
+    col: _colenc,
+    enc: encoding.enc
   };
 }

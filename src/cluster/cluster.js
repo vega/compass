@@ -10,7 +10,7 @@ var vl = require('vegalite'),
 var distanceTable = cluster.distanceTable = require('./distancetable');
 
 
-function cluster(encodings, maxDistance) {
+function cluster(encodings) {
   var dist = distanceTable(encodings),
     n = encodings.length;
 
@@ -24,4 +24,4 @@ function cluster(encodings, maxDistance) {
 
   //console.log("clusters", clusters.map(function(c){ return c.join("+"); }));
   return clusters;
-};
+}
