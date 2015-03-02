@@ -49,7 +49,7 @@ function genAggregates(output, fields, opt) {
 
     tf[i] = {name: f.name, type: f.type};
 
-    if (f.aggr) {
+    if (f.aggr === 'count') { // if count is included in the selected fields
       if (canHaveAggr) {
         tf[i].aggr = f.aggr;
         assignField(i + 1, true);
@@ -94,22 +94,20 @@ function genAggregates(output, fields, opt) {
     var f = fields[i];
     tf[i] = {name: f.name, type: f.type};
 
-    if (f.fn) {
-      // FIXME deal with assigned function
-    } else {
-      var fns = (!f._fn || f._fn === '*') ? opt.timeFnList : f._fn;
-      for (var j in fns) {
-        var fn = fns[j];
-        if (fn === undefined) {
-          assignField(i+1, hasAggr);
-        } else {
-          tf[i].fn = fn;
-          assignField(i+1, hasAggr);
+    var fns = (!f._fn || f._fn === '*') ? opt.timeFnList : f._fn;
+    for (var j in fns) {
+      var fn = fns[j];
+      if (fn === undefined) {
+        if (!hasAggr) { // can't aggregate over raw time
+          assignField(i+1, false);
         }
+      } else {
+        tf[i].fn = fn;
+        assignField(i+1, hasAggr);
       }
     }
-    // FIXME what if you aggregate time?
 
+    // FIXME what if you aggregate time?
   }
 
   function assignField(i, hasAggr) {
@@ -139,7 +137,7 @@ function genAggregates(output, fields, opt) {
 
   }
 
-  assignField(0, null);
+  assignField(0, opt.tableTypes === 'aggregated' ? true : opt.tableTypes === 'disaggregated' ? false : null);
 
   return output;
 }

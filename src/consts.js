@@ -37,6 +37,11 @@ consts.gen.projections = {
 consts.gen.aggregates = {
   type: 'object',
   properties: {
+    tableTypes: {
+      type: 'boolean',
+      default: 'both',
+      enum: ['both', 'aggregated', 'disaggregated']
+    },
     genBin: {
       type: 'boolean',
       default: true,
