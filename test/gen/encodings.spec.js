@@ -61,6 +61,29 @@ describe('vr.gen.encodings()', function () {
     });
   });
 
+  describe('O_30x#', function(){
+    var f = fixture['O_30x#'];
+    var encodings = genEncodings([], f.fields, f.stats);
+
+    it('should contain text table', function() {
+      var hasTextTable = encodings.filter(function(encoding) {
+        return encoding.marktype === 'text';
+      }).length > 0;
+      expect(hasTextTable).to.be.true();
+    });
+
+    it('should contain bar', function() {
+      var hasBar = encodings.filter(function(encoding) {
+        return encoding.marktype === 'bar';
+      }).length > 0;
+      expect(hasBar).to.be.true();
+    });
+
+    console.log('encodings O_30x#', encodings.map(function(spec){
+      return vl.Encoding.shorthandFromSpec(spec) + ":" + spec.score;
+    }));
+  });
+
   describe('QxT', function(){
     var f = fixture['QxT'];
     var encodings = genEncodings([], f.fields, f.stats);
@@ -88,7 +111,6 @@ describe('vr.gen.encodings()', function () {
 
   describe('A(Q)xYEAR(T)', function(){
     var f = fixture['A(Q)xYEAR(T)'];
-    console.log('A(Q)xYEAR(T)', genEncs([], f.fields, f.stats));
     var encodings = genEncodings([], f.fields, f.stats);
 
     it('should contain line', function() {
@@ -102,8 +124,6 @@ describe('vr.gen.encodings()', function () {
   describe('#xB(Q)', function() {
     var f = fixture['#xB(Q)'];
     var encodings = genEncodings([], f.fields, f.stats);
-
-    console.log('#xB(Q)', encodings);
 
     it('should contain text table', function() {
       var hasTextTable = encodings.filter(function(encoding) {

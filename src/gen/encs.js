@@ -10,6 +10,7 @@ var vl = require('vegalite'),
 
 module.exports = genEncs;
 
+// FIXME remove dimension, measure and use information in vegalite instead!
 var rules = {
   x: {
     dimension: true,
@@ -30,14 +31,16 @@ var rules = {
     multiple: true
   },
   shape: {
-    dimension: true
+    dimension: true,
+    rules: shapeRules
   },
   size: {
     measure: true
   },
   color: {
     dimension: true,
-    measure: true
+    measure: true,
+    rules: colorRules
   },
   alpha: {
     measure: true
@@ -56,8 +59,16 @@ var rules = {
   //}
 };
 
-function maxCardinality(field, stats) {
-  return stats[field].cardinality <= 20;
+
+function colorRules(field, stats, opt) {
+  return vl.field.isMeasure(field) ||
+    vl.field.cardinality(field, stats) <= opt.maxCardinalityForColor;
+}
+
+function shapeRules(field, stats, opt) {
+  if (field.bin && field.type === 'Q') return false;
+  if (field.fn && field.type === 'T') return false;
+  return vl.field.cardinality(field, stats) <= opt.maxCardinalityForColor;
 }
 
 function dimMeaTransposeRule(enc) {
@@ -80,9 +91,9 @@ function generalRules(enc, opt) {
   if (enc.x || enc.y || enc.geo || enc.arc) {
 
     if (enc.row || enc.col) { //have facet(s)
-      if (!enc.x || !enc.y) {
-        return false; // don't use facets before filling up x,y
-      }
+
+      // don't use facets before filling up x,y
+      if (!enc.x || !enc.y) return false;
 
       if (opt.omitNonTextAggrWithAllDimsOnFacets) {
         // remove all aggregated charts with all dims on facets (row, col)
@@ -92,7 +103,7 @@ function generalRules(enc, opt) {
 
     if (enc.x && enc.y) {
       if (opt.omitTranpose) {
-        if (isDimension(enc.x) ^ isDimension(enc.y)) { // dim x mea
+        if ((!!isDimension(enc.x)) ^ (!!isDimension(enc.y))) { // dim x mea
           if (!dimMeaTransposeRule(enc)) return false;
         } else if (enc.y.type==='T' || enc.x.type === 'T') {
           if (enc.y.type==='T' && enc.x.type !== 'T') return false;
@@ -163,7 +174,7 @@ function genEncs(encs, fields, stats, opt) {
       //TODO: support "multiple" assignment
       if (!(et in tmpEnc) && // encoding not used
         ((isDim && rules[et].dimension) || (!isDim && rules[et].measure)) &&
-        (!rules[et].rules || !rules[et].rules(field, stats))
+        (!rules[et].rules || rules[et].rules(field, stats, opt))
         ) {
         tmpEnc[et] = field;
         assignField(i + 1);

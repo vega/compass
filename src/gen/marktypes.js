@@ -11,15 +11,15 @@ var marksRule = vlmarktypes.rule = {
   point:  pointRule,
   bar:    barRule,
   line:   lineRule,
-  area:   lineRule, // area is similar to line
+  area:   areaRule, // area is similar to line
   text:   textRule
 };
 
-function getMarktypes(enc, opt) {
+function getMarktypes(enc, stats, opt) {
   opt = vl.schema.util.extend(opt||{}, consts.gen.encodings);
 
   var markTypes = opt.marktypeList.filter(function(markType){
-    return vlmarktypes.satisfyRules(enc, markType, opt);
+    return vlmarktypes.satisfyRules(enc, markType, stats, opt);
   });
 
   //console.log('enc:', util.json(enc), " ~ marks:", markTypes);
@@ -27,7 +27,7 @@ function getMarktypes(enc, opt) {
   return markTypes;
 }
 
-vlmarktypes.satisfyRules = function (enc, markType, opt) {
+vlmarktypes.satisfyRules = function (enc, markType, stats, opt) {
   var mark = vl.compile.marks[markType],
     reqs = mark.requiredEncoding,
     support = mark.supportedEncoding;
@@ -40,11 +40,21 @@ vlmarktypes.satisfyRules = function (enc, markType, opt) {
     if (!support[encType]) return false;
   }
 
-  return !marksRule[markType] || marksRule[markType](enc, opt);
+  return !marksRule[markType] || marksRule[markType](enc, stats, opt);
 };
 
+function facetRule(field, stats, opt) {
+  return vl.field.cardinality(field, stats) <= opt.maxCardinalityForFacets;
+}
 
-function pointRule(enc, opt) {
+function facetsRule(enc, stats, opt) {
+  if(enc.row && !facetRule(enc.row, stats, opt)) return false;
+  if(enc.col && !facetRule(enc.col, stats, opt)) return false;
+  return true;
+}
+
+function pointRule(enc, stats, opt) {
+  if(!facetsRule(enc, stats, opt)) return false;
   if (enc.x && enc.y) {
     // have both x & y ==> scatter plot / bubble plot
 
@@ -79,21 +89,25 @@ function pointRule(enc, opt) {
   return true;
 }
 
-function barRule(enc, opt) {
-  // need to aggregate on either x or y
+function barRule(enc, stats, opt) {
+  if(!facetsRule(enc, stats, opt)) return false;
 
+  // need to aggregate on either x or y
   if (opt.omitSizeOnBar && enc.size !== undefined) return false;
 
   if (((enc.x.aggr !== undefined) ^ (enc.y.aggr !== undefined)) &&
       (vl.field.isDimension(enc.x) ^ vl.field.isDimension(enc.y))) {
 
-    return true;
+    var aggr = enc.x.aggr || enc.y.aggr;
+    return !(opt.omitStackedAverage && aggr ==='avg' && enc.color);
   }
 
   return false;
 }
 
-function lineRule(enc, opt) {
+function lineRule(enc, stats, opt) {
+  if(!facetsRule(enc, stats, opt)) return false;
+
   // TODO(kanitw): add omitVerticalLine as config
 
   // FIXME truly ordinal data is fine here too.
@@ -102,7 +116,15 @@ function lineRule(enc, opt) {
   return enc.x.type == 'T' && enc.x.fn && enc.y.type == 'Q' && enc.y.aggr;
 }
 
-function textRule(enc, opt) {
+function areaRule(enc, stats, opt) {
+  if(!facetsRule(enc, stats, opt)) return false;
+
+  if(!lineRule(enc, stats, opt)) return false;
+
+  return !(opt.omitStackedAverage && enc.y.aggr ==='avg' && enc.color);
+}
+
+function textRule(enc, stats, opt) {
   // at least must have row or col and aggregated text values
   return (enc.row || enc.col) && enc.text && enc.text.aggr && !enc.x && !enc.y && !enc.color;
 }
