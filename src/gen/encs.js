@@ -180,7 +180,7 @@ function genEncs(encs, fields, stats, opt) {
     // Otherwise, assign i-th field
     var field = fields[i];
     for (var j in opt.encodingTypeList) {
-      var et = vl.encodingTypes[j],
+      var et = opt.encodingTypeList[j],
         isDim = isDimension(field);
 
       //TODO: support "multiple" assignment
