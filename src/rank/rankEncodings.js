@@ -76,13 +76,13 @@ function dimensionScore(field, encType, marktype, stats, opt){
     case 'col':
       if (marktype === 'text') return 1;
       //prefer column over row due to scrolling issues
-      return cardinality < opt.maxGoodCardinalityForFacets ? 0.7 :
-        cardinality < opt.maxCardinalityForFacets ? 0.6 : 0.5;
+      return cardinality <= opt.maxGoodCardinalityForFacets ? 0.7 :
+        cardinality <= opt.maxCardinalityForFacets ? 0.6 : 0.5;
 
     case 'row':
       if (marktype === 'text') return 0.99;
-      return cardinality < opt.maxGoodCardinalityForFacets ? 0.69 :
-        cardinality < opt.maxCardinalityForFacets ? 0.59 : 0.49;
+      return cardinality <= opt.maxGoodCardinalityForFacets ? 0.69 :
+        cardinality <= opt.maxCardinalityForFacets ? 0.59 : 0.49;
 
     case 'color':
       //stacking gets lower score
@@ -92,9 +92,9 @@ function dimensionScore(field, encType, marktype, stats, opt){
       // true ordinal on color is currently bad (until we have good ordinal color scale support)
       if ((field.bin && field.type==='Q') || (field.fn && field.type==='T')) return 0.3;
 
-      return cardinality < opt.maxGoodCardinalityForColor ? 0.7: cardinality < opt.maxCardinalityForColor ? 0.51 : 0.1;
+      return cardinality <= opt.maxGoodCardinalityForColor ? 0.7: cardinality <= opt.maxCardinalityForColor ? 0.51 : 0.1;
     case 'shape':
-      return cardinality < opt.maxCardinalityForShape ? 0.6 : 0.1;
+      return cardinality <= opt.maxCardinalityForShape ? 0.6 : 0.1;
     case 'detail':
       return 0.5;
   }
