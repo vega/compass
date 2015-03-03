@@ -9,6 +9,7 @@ var vl = require('vegalite'),
 module.exports = genEncodingsFromFields;
 
 function genEncodingsFromFields(output, fields, stats, opt, cfg, nested) {
+  opt = vl.schema.util.extend(opt||{}, consts.gen.encodings);
   var encs = genEncs([], fields, stats, opt);
 
   if (nested) {
