@@ -76,13 +76,13 @@ function dimensionScore(field, encType, marktype, stats, opt){
     case 'col':
       if (marktype === 'text') return 1;
       //prefer column over row due to scrolling issues
-      return cardinality < maxGoodCardinalityForFacets ? 0.7 :
-        cardinality < maxCardinalityForFacets ? 0.6 : 0.5;
+      return cardinality < opt.maxGoodCardinalityForFacets ? 0.7 :
+        cardinality < opt.maxCardinalityForFacets ? 0.6 : 0.5;
 
     case 'row':
       if (marktype === 'text') return 0.99;
-      return cardinality < maxGoodCardinalityForFacets ? 0.69 :
-        cardinality < maxCardinalityForFacets ? 0.59 : 0.49;
+      return cardinality < opt.maxGoodCardinalityForFacets ? 0.69 :
+        cardinality < opt.maxCardinalityForFacets ? 0.59 : 0.49;
 
     case 'color':
       //stacking gets lower score
