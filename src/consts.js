@@ -142,6 +142,10 @@ consts.gen.encodings = {
       type: 'boolean',
       default: true,
       description: 'do not stack bar chart with average'
+    },
+    alwaysGenerateTableAsHeatmap: {
+      type: 'boolean',
+      default: true
     }
   }
 };

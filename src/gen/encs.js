@@ -81,10 +81,10 @@ function dimMeaTransposeRule(enc) {
   return false;
 }
 
-function generalRules(enc, opt) {
+function generalRules(enc, stats, opt) {
   // enc.text is only used for TEXT TABLE
   if (enc.text) {
-    return genMarkTypes.satisfyRules(enc, 'text', opt);
+    return genMarkTypes.satisfyRules(enc, 'text', stats, opt);
   }
 
   // CARTESIAN PLOT OR MAP
@@ -159,7 +159,7 @@ function genEncs(encs, fields, stats, opt) {
     // If all fields are assigned, save
     if (i === fields.length) {
       // at the minimal all chart should have x, y, geo, text or arc
-      if (generalRules(tmpEnc, opt)) {
+      if (generalRules(tmpEnc, stats, opt)) {
         encs.push(vl.duplicate(tmpEnc));
       }
       return;

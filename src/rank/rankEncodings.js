@@ -20,6 +20,11 @@ function rankEncodings(encoding, stats) {
   var features = [],
     encTypes = vl.keys(encoding.enc);
 
+  // var encodingMappingByField = vl.enc.reduce(encoding.enc, function(m, encType, field) {
+  //   m[vl.field.shorthand(field)] = {encType: encType, field: field};
+  //   return m;
+  // }, {});
+
   vl.enc.forEach(encoding.enc, function(encType, field) {
     var role = vl.field.role(field);
     features.push({
@@ -28,8 +33,7 @@ function rankEncodings(encoding, stats) {
     });
   });
 
-  // penalize not using positional
-  // only penalize for non-text
+  // penalize not using positional only penalize for non-text
   if (encTypes.length > 1 && encoding.marktype !== 'text') {
     if ((!encoding.enc.x || !encoding.enc.y) && !encoding.enc.geo && !encoding.enc.text) {
       features.push({
@@ -80,7 +84,7 @@ function dimensionScore(field, encType, marktype, stats){
       // true ordinal on color is currently bad (until we have good ordinal color scale support)
       if ((field.bin && field.type==='Q') || (field.fn && field.type==='T')) return 0.3;
 
-      return 0.8;
+      return 0.7;
     case 'shape':
       return 0.6;
     case 'detail':
@@ -97,10 +101,10 @@ function measureScore(field, encType, marktype, stats) {
       if (marktype === 'bar') return 0.1; //size of bar is very bad
       if (marktype === 'text') return 0.1;
       if (marktype === 'line') return 0.1;
-      return 0.6;
-    case 'color': return 0.4;
-    case 'alpha': return 0.39;
-    case 'text': return 1;
+      return 0.8;
+    case 'color': return 0.6;
+    case 'alpha': return 0.59;
+    case 'text': return 0.4;
   }
   return BAD_ENCODING_SCORE;
 }

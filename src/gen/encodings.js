@@ -26,11 +26,20 @@ function genEncodingsFromFields(output, fields, stats, opt, cfg, nested) {
 function genEncodingsFromEncs(output, enc, stats, opt, cfg) {
   getMarktypes(enc, stats, opt)
     .forEach(function(markType) {
-      var encoding = { marktype: markType, enc: enc, cfg: cfg },
+      var encoding = finalTouch({marktype: markType, enc: enc, cfg: cfg}, opt),
         score = rank.encoding(encoding);
+
       encoding.score = score.score;
       encoding.scoreFeatures = score.features;
       output.push(encoding);
     });
   return output;
+}
+
+//FIXME this should be refactors
+function finalTouch(encoding, opt) {
+  if (encoding.marktype === 'text' && opt.alwaysGenerateTableAsHeatmap) {
+    encoding.enc.color = encoding.enc.text;
+  }
+  return encoding;
 }
