@@ -167,7 +167,7 @@ function genEncs(encs, fields, stats, opt) {
 
     // Otherwise, assign i-th field
     var field = fields[i];
-    for (var j in vl.encodingTypes) {
+    for (var j in opt.encodingTypeList) {
       var et = vl.encodingTypes[j],
         isDim = isDimension(field);
 

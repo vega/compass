@@ -88,6 +88,12 @@ consts.gen.encodings = {
       default: ['point', 'bar', 'line', 'area', 'text'], //filled_map
       description: 'allowed marktypes'
     },
+    encodingTypeList: {
+      type: 'array',
+      items: {type: 'string'},
+      default: ['x', 'y', 'row', 'col', 'size', 'color', 'alpha', 'text', 'detail'],
+      description: 'allowed encoding types'
+    },
     maxGoodCardinalityForFacets: {
       type: 'integer',
       default: 6,
