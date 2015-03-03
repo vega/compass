@@ -1,4 +1,5 @@
-var expect = require('chai').expect;
+var expect = require('chai').expect,
+  fixture = require('../fixture');
 
 var genProjections = require('../../src/gen/projections');
 
@@ -38,23 +39,17 @@ describe('vr.gen.projections()', function () {
 
 
   describe('with a set of fields with count', function () {
-    var fields = [
-      {name:1, type:'Q', selected: false},
-      {name:2, type:'Q', selected: false},
-      {name:3, type:'O', selected: false},
-      {name:4, type:'O', selected: false},
-      {name:'*', aggr:'count', selected: false}
-    ];
+    var f = fixture['OxOxQxQx#'];
 
     it('should generate correct # of projections', function () {
-      var projections = genProjections(fields);
+      var projections = genProjections(f.fields, f.stats);
 
       expect(projections.length).to.equal(4);
       expect(projections.filter(function(p){ return p.length === 2;}).length).to.equal(0);
     });
 
     it('should generate more # of projections if not omitting dot plots', function () {
-      var projections = genProjections(fields, {}, {
+      var projections = genProjections(f.fields, f.stats, {
         omitDotPlot: false
       });
 

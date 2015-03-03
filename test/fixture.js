@@ -82,6 +82,38 @@ fixture['OxA(Q)xA(Q)'] = {
   }
 };
 
+fixture['OxQxQxQ'] = {
+  fields: [
+    {name:1, type: 'O'},
+    {name:2, type: 'Q'},
+    {name:3, type: 'Q'},
+    {name:4, type: 'Q'}
+  ],
+  stats: {
+    1: o_stat,
+    2: q_stat,
+    3: q_stat,
+    4: q_stat
+  }
+};
+
+fixture['OxOxQxQx#'] = {
+  fields: [
+    {name:1, type:'Q', selected: false},
+    {name:2, type:'Q', selected: false},
+    {name:3, type:'O', selected: false},
+    {name:4, type:'O', selected: false},
+    {name:'*', aggr:'count', selected: false}
+  ],
+  stats: {
+    1: q_stat,
+    2: q_stat,
+    3: o_stat,
+    4: o_stat,
+    5: count_stat
+  }
+};
+
 fixture['QxT'] = {
   fields: [
     {name:1, type:'Q'},
