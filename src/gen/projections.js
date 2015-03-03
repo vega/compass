@@ -28,7 +28,7 @@ function projections(fields, stats, opt) {
 
     if (field.selected) {
       selected.push(field);
-      if (field.role === 'dimension') {
+      if (isDimension(field)) {
         hasSelectedDimension = true;
       } else {
         hasSelectedMeasure = true;
