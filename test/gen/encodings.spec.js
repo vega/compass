@@ -23,7 +23,7 @@ describe('vr.gen.encodings()', function () {
       var encodings = genEncodings([], fields, stats, {
         omitDotPlot: false
       });
-      expect(encodings.length).to.equal(1);
+      expect(encodings.length).to.equal(2); //point and tick
     });
 
     it('should generate more encodings wihtout pruning', function () {
@@ -33,7 +33,7 @@ describe('vr.gen.encodings()', function () {
       });
 
       // x, y ,text
-      expect(encodings.length).to.equal(2);
+      expect(encodings.length).to.equal(4);
     });
   });
 

@@ -10,9 +10,10 @@ var MARK_SCORE = {
   line: 0.99,
   area: 0.98,
   bar: 0.97,
-  point: 0.96,
-  circle: 0.95,
-  square: 0.95,
+  tick: 0.96,
+  point: 0.95,
+  circle: 0.94,
+  square: 0.94,
   text: 0.8
 };
 

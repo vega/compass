@@ -12,7 +12,8 @@ var marksRule = vlmarktypes.rule = {
   bar:    barRule,
   line:   lineRule,
   area:   areaRule, // area is similar to line
-  text:   textRule
+  text:   textRule,
+  tick:   tickRule
 };
 
 function getMarktypes(enc, stats, opt) {
@@ -87,6 +88,19 @@ function pointRule(enc, stats, opt) {
   return true;
 }
 
+function tickRule(enc, stats, opt) {
+  if (enc.x || enc.y) {
+    if(vl.enc.isAggregate(enc)) return false;
+
+    var xIsDim = isDimension(enc.x),
+      yIsDim = isDimension(enc.y);
+
+    return (!xIsDim && (!enc.y || yIsDim)) ||
+      (!yIsDim && (!enc.x || xIsDim));
+  }
+  return false;
+}
+
 function barRule(enc, stats, opt) {
   if(!facetsRule(enc, stats, opt)) return false;
 
@@ -94,7 +108,7 @@ function barRule(enc, stats, opt) {
   if (opt.omitSizeOnBar && enc.size !== undefined) return false;
 
   if (((enc.x.aggr !== undefined) ^ (enc.y.aggr !== undefined)) &&
-      (vl.field.isDimension(enc.x) ^ vl.field.isDimension(enc.y))) {
+      (isDimension(enc.x) ^ isDimension(enc.y))) {
 
     var aggr = enc.x.aggr || enc.y.aggr;
     return !(opt.omitStackedAverage && aggr ==='avg' && enc.color);

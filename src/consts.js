@@ -85,7 +85,7 @@ consts.gen.encodings = {
     marktypeList: {
       type: 'array',
       items: {type: 'string'},
-      default: ['point', 'bar', 'line', 'area', 'text'], //filled_map
+      default: ['point', 'bar', 'line', 'area', 'text', 'tick'], //filled_map
       description: 'allowed marktypes'
     },
     encodingTypeList: {

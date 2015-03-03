@@ -5,6 +5,17 @@ var expect = require('chai').expect,
 var getMarkTypes = require('../../src/gen/marktypes');
 
 describe('vr.gen.marktypes()', function(){
+  describe('1Q', function () {
+    var enc = {"x": {"name": "Cost__Total_$","type": "Q"}};
+    var marktypes = getMarkTypes(enc);
+    it('should contain tick', function () {
+      expect(marktypes.indexOf('tick')).to.gt(-1);
+    });
+    it('should contain point', function () {
+      expect(marktypes.indexOf('point')).to.gt(-1);
+    });
+  });
+
   it('should require at least one basic encoding', function (){
     var basicEncodings = ['x','y','geo','text','arc'];
     // TODO
