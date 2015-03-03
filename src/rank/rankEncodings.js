@@ -16,7 +16,7 @@ var MARK_SCORE = {
   text: 0.8
 };
 
-function rankEncodings(encoding, stats) {
+function rankEncodings(encoding, stats, opt) {
   var features = [],
     encTypes = vl.keys(encoding.enc);
 
@@ -29,7 +29,7 @@ function rankEncodings(encoding, stats) {
     var role = vl.field.role(field);
     features.push({
       reason: encType+vl.shorthand.assign+vl.field.shorthand(field),
-      score: rankEncodings.score[role](field, encType, encoding.marktype, stats)
+      score: rankEncodings.score[role](field, encType, encoding.marktype, stats, opt)
     });
   });
 
@@ -61,21 +61,29 @@ rankEncodings.score = {
   measure: measureScore
 };
 
-function dimensionScore(field, encType, marktype, stats){
+function dimensionScore(field, encType, marktype, stats, opt){
+  var cardinality = vl.field.cardinality(field, stats);
   switch (encType) {
     case 'x':
       if(field.type === 'O') return 0.99;
       return 1;
+
     case 'y':
       if(field.type === 'O') return 1; //prefer ordinal on y
       if(field.type === 'T') return 0.8; // time should not be on Y
       return 0.99;
+
     case 'col':
       if (marktype === 'text') return 1;
-      return 0.7; //prefer column over row due to scrolling issues
+      //prefer column over row due to scrolling issues
+      return cardinality < maxGoodCardinalityForFacets ? 0.7 :
+        cardinality < maxCardinalityForFacets ? 0.6 : 0.5;
+
     case 'row':
       if (marktype === 'text') return 0.99;
-      return 0.69;
+      return cardinality < maxGoodCardinalityForFacets ? 0.69 :
+        cardinality < maxCardinalityForFacets ? 0.59 : 0.49;
+
     case 'color':
       //stacking gets lower score
       //FIXME add stacking option once we have control ..
@@ -84,16 +92,16 @@ function dimensionScore(field, encType, marktype, stats){
       // true ordinal on color is currently bad (until we have good ordinal color scale support)
       if ((field.bin && field.type==='Q') || (field.fn && field.type==='T')) return 0.3;
 
-      return 0.7;
+      return cardinality < opt.maxGoodCardinalityForColor ? 0.7: cardinality < opt.maxCardinalityForColor ? 0.51 : 0.1;
     case 'shape':
-      return 0.6;
+      return cardinality < opt.maxCardinalityForShape ? 0.6 : 0.1;
     case 'detail':
       return 0.5;
   }
   return BAD_ENCODING_SCORE;
 }
 
-function measureScore(field, encType, marktype, stats) {
+function measureScore(field, encType, marktype, stats, opt) {
   switch (encType){
     case 'x': return 1;
     case 'y': return 1;

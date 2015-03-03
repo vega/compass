@@ -97,10 +97,20 @@ consts.gen.encodings = {
       default: ['point', 'bar', 'line', 'area', 'text'], //filled_map
       description: 'allowed marktypes'
     },
+    maxGoodCardinalityForFacets: {
+      type: 'integer',
+      default: 6,
+      description: 'maximum cardinality of a field to be put on facet (row/col) effectively'
+    },
     maxCardinalityForFacets: {
       type: 'integer',
       default: 20,
       description: 'maximum cardinality of a field to be put on facet (row/col)'
+    },
+    maxGoodCardinalityForColor: {
+      type: 'integer',
+      default: 7,
+      description: 'maximum cardinality of an ordinal field to be put on color effectively'
     },
     maxCardinalityForColor: {
       type: 'integer',

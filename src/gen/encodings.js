@@ -27,7 +27,7 @@ function genEncodingsFromEncs(output, enc, stats, opt, cfg) {
   getMarktypes(enc, stats, opt)
     .forEach(function(markType) {
       var encoding = finalTouch({marktype: markType, enc: enc, cfg: cfg}, opt),
-        score = rank.encoding(encoding);
+        score = rank.encoding(encoding, stats, opt);
 
       encoding.score = score.score;
       encoding.scoreFeatures = score.features;

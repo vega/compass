@@ -22,8 +22,6 @@ function getMarktypes(enc, stats, opt) {
     return vlmarktypes.satisfyRules(enc, markType, stats, opt);
   });
 
-  //console.log('enc:', util.json(enc), " ~ marks:", markTypes);
-
   return markTypes;
 }
 
