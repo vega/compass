@@ -134,6 +134,11 @@ consts.gen.encodings = {
       default: true,
       description: 'remove all dot plots with >1 encoding'
     },
+    omitMultipleRetinalEncodings: {
+      type: 'boolean',
+      default: true,
+      description: 'omit using multiple retinal variables (size, color, alpha, shape)'
+    },
     omitNonTextAggrWithAllDimsOnFacets: {
       type: 'boolean',
       default: true,
