@@ -91,7 +91,7 @@ consts.gen.encodings = {
     encodingTypeList: {
       type: 'array',
       items: {type: 'string'},
-      default: ['x', 'y', 'row', 'col', 'size', 'color', 'alpha', 'text', 'detail'],
+      default: ['x', 'y', 'row', 'col', 'size', 'color', 'text', 'detail'],
       description: 'allowed encoding types'
     },
     maxGoodCardinalityForFacets: {
