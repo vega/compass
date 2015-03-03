@@ -7,15 +7,6 @@ var consts = module.exports = {
 consts.gen.projections = {
   type: 'object',
   properties: {
-    addCountInProjection: { //FIXME remove this!
-      type: 'boolean',
-      default: false
-    },
-    addCountIfNothingIsSelected: { //FIXME remove this!
-      type: 'boolean',
-      default: false,
-      description: 'When no field is selected, add extra count field'
-    },
     omitDotPlot: { //FIXME remove this!
       type: 'boolean',
       default: false,

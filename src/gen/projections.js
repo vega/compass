@@ -16,8 +16,8 @@ module.exports = projections;
 function projections(fields, stats, opt) {
   opt = vl.schema.util.extend(opt||{}, consts.gen.projections);
 
-  // First categorize field, selected, unselected.
-  var selected = [], unselected = [], fieldSets = [],
+  // First categorize field, selected, fieldsToAdd, and save indices
+  var selected = [], fieldsToAdd = [], fieldSets = [],
     hasSelectedDimension = false,
     hasSelectedMeasure = false,
     indices = {};
@@ -38,11 +38,32 @@ function projections(fields, stats, opt) {
           vl.field.cardinality(field, stats, 15) > opt.maxCardinalityForAutoAddOrdinal) {
         return;
       }
-      unselected.push(field);
+      fieldsToAdd.push(field);
     }
   });
 
-  unselected.sort(function(a, b){
+  fieldsToAdd.sort(compareFieldsToAdd(hasSelectedDimension, hasSelectedMeasure));
+
+  var setsToAdd = util.chooseKorLess(fieldsToAdd, 1);
+
+  setsToAdd.forEach(function(setToAdd) {
+    var fieldSet = selected.concat(setToAdd);
+    if (fieldSet.length > 0) {
+      if (opt.omitDotPlot && fieldSet.length === 1) return;
+      fieldSets.push(fieldSet);
+    }
+  });
+
+  fieldSets.forEach(function(fieldSet) {
+      // always append projection's key to each projection returned, d3 style.
+    fieldSet.key = projections.key(fieldSet);
+  });
+
+  return fieldSets;
+}
+
+function compareFieldsToAdd(hasSelectedDimension, hasSelectedMeasure) {
+  return function(a, b){
     var aIsDim = isDimension(a), bIsDim = isDimension(b);
     // sort by type of the data
     if (aIsDim ^ bIsDim) {
@@ -60,40 +81,7 @@ function projections(fields, stats, opt) {
     }
     //make the sort stable
     return indices[a.name] - indices[b.name];
-  });
-
-  var setsToAdd = util.chooseKorLess(unselected, 1);
-
-  setsToAdd.forEach(function(setToAdd) {
-    var fieldSet = selected.concat(setToAdd);
-    if (fieldSet.length > 0) {
-      //single count field is useless
-      if (fieldSet.length === 1 && vl.field.isCount(fieldSet[0])) {
-        return;
-      }
-
-      if (opt.omitDotPlot && fieldSet.length === 1) return;
-
-      fieldSets.push(fieldSet);
-    }
-  });
-
-  if (opt.addCountInProjection && opt.addCountIfNothingIsSelected && selected.length===0) {
-    var countField = vl.field.count();
-
-    unselected.forEach(function(field) {
-      if (!vl.field.isCount(field)) {
-        fieldSets.push([field, countField]);
-      }
-    });
-  }
-
-  fieldSets.forEach(function(fieldSet) {
-      // always append projection's key to each projection returned, d3 style.
-    fieldSet.key = projections.key(fieldSet);
-  });
-
-  return fieldSets;
+  };
 }
 
 projections.key = function(projection) {
