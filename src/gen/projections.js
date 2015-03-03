@@ -42,7 +42,7 @@ function projections(fields, stats, opt) {
     }
   });
 
-  fieldsToAdd.sort(compareFieldsToAdd(hasSelectedDimension, hasSelectedMeasure));
+  fieldsToAdd.sort(compareFieldsToAdd(hasSelectedDimension, hasSelectedMeasure, indices));
 
   var setsToAdd = util.chooseKorLess(fieldsToAdd, 1);
 
@@ -62,7 +62,7 @@ function projections(fields, stats, opt) {
   return fieldSets;
 }
 
-function compareFieldsToAdd(hasSelectedDimension, hasSelectedMeasure) {
+function compareFieldsToAdd(hasSelectedDimension, hasSelectedMeasure, indices) {
   return function(a, b){
     var aIsDim = isDimension(a), bIsDim = isDimension(b);
     // sort by type of the data
