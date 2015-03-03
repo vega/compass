@@ -5,6 +5,9 @@ var util = require('../util'),
 
 module.exports = projections;
 
+// TODO support other mode of projections generation
+// powerset, chooseK, chooseKorLess are already included in the util
+
 /**
  * fields
  * @param  {[type]} fields array of fields and query information
@@ -12,10 +15,8 @@ module.exports = projections;
  */
 function projections(fields, stats, opt) {
   opt = vl.schema.util.extend(opt||{}, consts.gen.projections);
-  // TODO support other mode of projections generation
-  // powerset, chooseK, chooseKorLess are already included in the util
-  // Right now just add one more field
 
+  // First categorize field, selected, unselected.
   var selected = [], unselected = [], fieldSets = [],
     hasSelectedDimension = false,
     hasSelectedMeasure = false,
@@ -32,18 +33,13 @@ function projections(fields, stats, opt) {
       } else {
         hasSelectedMeasure = true;
       }
-    } else {
+    } else if (!field.excluded && !vl.field.isCount(field)) {
+      if (vl.field.isDimension(field) &&
+          vl.field.cardinality(field, stats, 15) > opt.maxCardinalityForAutoAddOrdinal) {
+        return;
+      }
       unselected.push(field);
     }
-  });
-
-  unselected = unselected.filter(function(field){
-    if(!opt.addCountInProjection && vl.field.isCount(field)) return false;
-    //FIXME load maxbins value from somewhere else
-    return (opt.alwaysAddHistogram && selected.length === 0) ||
-      !(opt.maxCardinalityForAutoAddOrdinal &&
-        vl.field.isDimension(field) &&
-        vl.field.cardinality(field, stats, 15) > opt.maxCardinalityForAutoAddOrdinal);
   });
 
   unselected.sort(function(a, b){
