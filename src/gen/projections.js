@@ -1,6 +1,7 @@
 var util = require('../util'),
   consts = require('../consts'),
-  vl = require('vegalite');
+  vl = require('vegalite'),
+  isDimension = vl.field.isDimension;
 
 module.exports = projections;
 
@@ -15,11 +16,22 @@ function projections(fields, stats, opt) {
   // powerset, chooseK, chooseKorLess are already included in the util
   // Right now just add one more field
 
-  var selected = [], unselected = [], fieldSets = [];
+  var selected = [], unselected = [], fieldSets = [],
+    hasSelectedDimension = false,
+    hasSelectedMeasure = false,
+    indices = {};
 
-  fields.forEach(function(field){
+  fields.forEach(function(field, index){
+    //save indices for stable sort later
+    indices[field.name] = index;
+
     if (field.selected) {
       selected.push(field);
+      if (field.role === 'dimension') {
+        hasSelectedDimension = true;
+      } else {
+        hasSelectedMeasure = true;
+      }
     } else {
       unselected.push(field);
     }
@@ -34,14 +46,25 @@ function projections(fields, stats, opt) {
         vl.field.cardinality(field, stats, 15) > opt.maxCardinalityForAutoAddOrdinal);
   });
 
-  if (opt.addCountInProjection) {
-    // put count on top!
-    unselected.sort(function(a, b){
-      if(a.aggr==='count') return -1;
-      if(b.aggr==='count') return 1;
-      return 0;
-    });
-  }
+  unselected.sort(function(a, b){
+    var aIsDim = isDimension(a), bIsDim = isDimension(b);
+    // sort by type of the data
+    if (aIsDim ^ bIsDim) {
+      if (!hasSelectedDimension) {
+        if (!aIsDim && bIsDim) {
+          return 1;
+        }
+        return -1;
+      } else if (!hasSelectedMeasure) {
+        if (aIsDim && !bIsDim) {
+          return 1;
+        }
+        return 1;
+      }
+    }
+    //make the sort stable
+    return indices[a.name] - indices[b.name];
+  });
 
   var setsToAdd = util.chooseKorLess(unselected, 1);
 
