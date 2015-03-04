@@ -9,7 +9,16 @@ var genProjections = require('../../src/gen/projections'),genAggregates = requir
 
 
 describe('vr.gen.aggregates()', function () {
-  describe('1Q', function () {
+
+  describe('Ox#', function () {
+    var f = fixture['Ox#'];
+    var tables = genAggregates([], f.fields, f.stats);
+    it('should output 1 data table', function () {
+      expect(tables.length).to.equal(1); // O
+    });
+  });
+
+  describe('Q', function () {
     var f = fixture['Q'];
 
     var tables = genAggregates([], f.fields, f.stats);
@@ -20,21 +29,38 @@ describe('vr.gen.aggregates()', function () {
       }).length).to.equal(1);
     });
 
-    it('should output 3 data tables', function () {
-      expect(tables.length).to.equal(3);
+    it('should output 2 data tables: Q, BIN(Q)x#', function () {
+      expect(tables.length).to.equal(2);
     });
 
     it('should append key to each fieldSet', function() {
       expect(tables[0].key).to.be.ok();
     });
 
-    it('should output 4 data table if not omit', function () {
+    it('should output Q, avg(Q), bin(Q)x# if omitMeasureOnly', function () {
       var tables = genAggregates([], f.fields, f.stats, {
-        omitMeasureOnly: false,
-        omitDimensionOnly: false
+        omitMeasureOnly: false
       });
-      // each field can be Q, avg(Q), bin(Q), O
-      expect(tables.length).to.equal(4);
+
+      // each field can be Q, avg(Q)
+      expect(tables.length).to.equal(3);
+
+      // Q
+      expect(tables.filter(function(table){
+        var t = table[0];
+        return !t.aggr && !t.bin && t.type==='Q';
+      }).length).to.equal(1);
+
+      // avg(Q)
+      expect(tables.filter(function(table){
+        var t = table[0];
+        return t.aggr && !t.bin && t.type==='Q';
+      }).length).to.equal(1);
+
+      // avg(Q)
+      expect(tables.filter(function(table){
+        return table.length === 2;
+      }).length).to.equal(1);
     });
   });
 
@@ -44,41 +70,53 @@ describe('vr.gen.aggregates()', function () {
     });
   });
 
-  describe('2Q with genTypeCasting', function () {
+
+  describe('Qx#', function () {
+    var f = fixture['Qx#'];
+    var tables = genAggregates([], f.fields, f.stats);
+    it('should output 1 data table', function () {
+      expect(tables.length).to.equal(1); // bin
+      expect(tables[0][0].bin).to.be.true(); // bin
+    });
+  });
+
+
+  describe('QxQ', function () {
     var f = fixture['QxQ'];
 
-    // TODO add one more test here
+    var tables = genAggregates([], f.fields, f.stats, {});
 
-    var tables = genAggregates([], f.fields, f.stats, {
-        omitMeasureOnly: false,
-        omitDimensionOnly: false
-      });
-
-    // except that two pairs of (avg(Q),Q) doesn't work
-    it('should output 14 data table if not omit', function () {
-      expect(tables.length).to.equal(14);
+    it('should output 2 data table', function () {
+      expect(tables.length).to.equal(2);
     });
 
     it('should append key to each fieldSet', function() {
-      expect(tables[12].key).to.be.ok();
+      expect(tables[0].key).to.be.ok();
+    });
+
+    it('not generate avg with bin', function () {
+      var filtered = tables.filter(function(table) {
+        return table[0].aggr && table[1].bin;
+      });
+      expect(filtered.length).to.equal(0);
+    });
+
+    it('not generate raw with bin', function () {
+      var filtered = tables.filter(function(t) {
+        return !t[0].aggr && !t[0].bin && t[1].bin;
+      });
+      expect(filtered.length).to.equal(0);
+    });
+
+
+    it('should output 3 data table if not omit', function () {
+      var tables = genAggregates([], f.fields, f.stats, {
+        omitMeasureOnly: false
+      });
+      expect(tables.length).to.equal(3);
     });
   });
 
-  describe('1Q & 1 count', function () {
-    var f = fixture['Qx#'];
-    var tables = genAggregates([], f.fields, f.stats);
-    it('should output 2 data table', function () {
-      expect(tables.length).to.equal(2); // O, bin
-    });
-  });
-
-  describe('1O & 1 count', function () {
-    var f = fixture['Ox#'];
-    var tables = genAggregates([], f.fields, f.stats);
-    it('should output 1 data table', function () {
-      expect(tables.length).to.equal(1); // O
-    });
-  });
 
   describe('1 count', function () {
     var f = fixture['#'];

@@ -10,6 +10,9 @@ module.exports = genAggregates;
 function genAggregates(output, fields, stats, opt) {
   opt = vl.schema.util.extend(opt||{}, consts.gen.aggregates);
   var tf = new Array(fields.length);
+  var hasO = vl.any(fields, function(f) {
+    return f.type === 'O';
+  });
 
   function emit(fieldSet) {
     fieldSet = vl.duplicate(fieldSet);
@@ -42,55 +45,72 @@ function genAggregates(output, fields, stats, opt) {
     emit(tf);
   }
 
-  function assignQ(i, hasAggr) {
-    var f = fields[i],
-      canHaveAggr = hasAggr === true || hasAggr === null,
+  function assignAggrQ(i, hasAggr, autoMode, a) {
+    var canHaveAggr = hasAggr === true || hasAggr === null,
       cantHaveAggr = hasAggr === false || hasAggr === null;
+    if (a !== undefined) {
+      if (canHaveAggr) {
+        tf[i].aggr = a;
+        assignField(i + 1, true, autoMode);
+        delete tf[i].aggr;
+      }
+    } else { // if(a === undefined)
+      if (cantHaveAggr) {
+        assignField(i + 1, false, autoMode);
+      }
+    }
+  }
+
+  function assignBinQ(i, hasAggr, autoMode) {
+    tf[i].bin = true;
+    assignField(i + 1, hasAggr, autoMode);
+    delete tf[i].bin;
+  }
+
+  function assignQ(i, hasAggr, autoMode) {
+    var f = fields[i],
+      canHaveAggr = hasAggr === true || hasAggr === null;
 
     tf[i] = {name: f.name, type: f.type};
 
     if (f.aggr === 'count') { // if count is included in the selected fields
       if (canHaveAggr) {
         tf[i].aggr = f.aggr;
-        assignField(i + 1, true);
+        assignField(i + 1, true, autoMode);
       }
+    } else if (f._aggr) {
+      assignAggrQ(i, hasAggr, autoMode, f._aggr);
+    } else if (f._raw) {
+      assignAggrQ(i, hasAggr, autoMode, undefined);
+    } else if (f._bin) {
+      assignBinQ(i, hasAggr, autoMode);
     } else {
-      var aggregates = (!f._aggr || f._aggr === '*') ? opt.aggrList : f._aggr;
-
-      for (var j in aggregates) {
-        var a = aggregates[j];
-        if (a !== undefined) {
-          if (canHaveAggr) {
-            tf[i].aggr = a;
-            assignField(i + 1, true);
-          }
-        } else { // if(a === undefined)
-          if (cantHaveAggr) {
-            delete tf[i].aggr;
-            assignField(i + 1, false);
-          }
+      opt.aggrList.forEach(function(a) {
+        if (!opt.consistentAutoQ || autoMode === null || autoMode === a) {
+          assignAggrQ(i, hasAggr, a, a);
         }
-      }
+      });
 
-      if (opt.genBin && vl.field.cardinality(f, stats) > opt.minCardinalityForBin) {
-        // bin the field instead!
-        delete tf[i].aggr;
-        tf[i].bin = true;
-        tf[i].type = 'Q';
-        assignField(i + 1, hasAggr);
-      }
+      if ((!opt.consistentAutoQ || vl.isin(autoMode, [null, 'bin', 'cast', 'autocast'])) && !hasO) {
+        var highCardinality = vl.field.cardinality(f, stats) > opt.minCardinalityForBin;
 
-      if (opt.genTypeCasting) {
-        // we can also change it to dimension (cast type="O")
-        delete tf[i].aggr;
-        delete tf[i].bin;
-        tf[i].type = 'O';
-        assignField(i + 1, hasAggr);
+        var isAuto = opt.genDimQ === 'auto',
+          genBin = opt.genDimQ  === 'bin' || (isAuto && highCardinality),
+          genCast = opt.genDimQ === 'cast' || (isAuto && !highCardinality);
+
+        if (genBin && vl.isin(autoMode, [null, 'bin', 'autocast'])) {
+          assignBinQ(i, hasAggr, isAuto ? 'autocast' : 'bin');
+        }
+        if (genCast && vl.isin(autoMode, [null, 'cast', 'autocast'])) {
+          tf[i].type = 'O';
+          assignField(i + 1, hasAggr, isAuto ? 'autocast' : 'cast');
+          tf[i].type = 'Q';
+        }
       }
     }
   }
 
-  function assignT(i, hasAggr) {
+  function assignT(i, hasAggr, autoMode) {
     var f = fields[i];
     tf[i] = {name: f.name, type: f.type};
 
@@ -99,18 +119,18 @@ function genAggregates(output, fields, stats, opt) {
       var fn = fns[j];
       if (fn === undefined) {
         if (!hasAggr) { // can't aggregate over raw time
-          assignField(i+1, false);
+          assignField(i+1, false, autoMode);
         }
       } else {
         tf[i].fn = fn;
-        assignField(i+1, hasAggr);
+        assignField(i+1, hasAggr, autoMode);
       }
     }
 
     // FIXME what if you aggregate time?
   }
 
-  function assignField(i, hasAggr) {
+  function assignField(i, hasAggr, autoMode) {
     if (i === fields.length) { // If all fields are assigned
       checkAndPush();
       return;
@@ -121,23 +141,23 @@ function genAggregates(output, fields, stats, opt) {
     switch (f.type) {
       //TODO "D", "G"
       case 'Q':
-        assignQ(i, hasAggr);
+        assignQ(i, hasAggr, autoMode);
         break;
 
       case 'T':
-        assignT(i, hasAggr);
+        assignT(i, hasAggr, autoMode);
         break;
 
       case 'O':
       default:
         tf[i] = f;
-        assignField(i + 1, hasAggr);
+        assignField(i + 1, hasAggr, autoMode);
         break;
     }
-
   }
 
-  assignField(0, opt.tableTypes === 'aggregated' ? true : opt.tableTypes === 'disaggregated' ? false : null);
+  var hasAggr = opt.tableTypes === 'aggregated' ? true : opt.tableTypes === 'disaggregated' ? false : null;
+  assignField(0, hasAggr, null);
 
   return output;
 }
