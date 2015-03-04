@@ -33,9 +33,19 @@ stats['OxQ'] = {
   2: q_stat
 };
 
+stats['Ox#'] = {
+  1: o_stat,
+  count: count_stat
+};
+
 stats['O_30x#'] = {
   count: count_stat,
   O_30: O_30_stat
+};
+
+stats['QxQ'] = {
+  1: q_stat,
+  2: q_stat
 };
 
 stats['QxT'] = {
@@ -43,6 +53,10 @@ stats['QxT'] = {
   2: t_stat
 };
 
+stats['Qx#'] = {
+  1: q_stat,
+  count: count_stat
+};
 
 stats['#xQ'] = {
   count: count_stat,
@@ -85,6 +99,12 @@ fixture['OxA(Q)'] = {
       {name:2, type:'Q', aggr: "avg"}
   ],
   stats: stats['OxQ']
+};
+
+
+fixture['Ox#'] = {
+  fields: [{name:1, type:'O'}, count],
+  stats: stats['Ox#']
 };
 
 fixture['O_30x#'] = {
@@ -153,6 +173,16 @@ fixture['BIN(Q)'] = {
   stats: {1: q_stat}
 };
 
+fixture['QxQ'] = {
+  fields: [{name:1, type:'Q'}, {name:2, type:'Q'}],
+  stats: stats['QxQ']
+};
+
+fixture['Qx#'] = {
+  fields: [{name:1, type:'Q'}, count],
+  stats: stats['Qx#']
+};
+
 fixture['QxT'] = {
   fields: [
     {name:1, type:'Q'},
@@ -177,6 +207,10 @@ fixture['A(Q)xYEAR(T)'] = {
   stats: stats['QxT']
 };
 
+fixture['#'] = {
+  fields: [count],
+  stats: {count: count_stat}
+};
 
 fixture['#xB(Q)'] = {
   fields: [

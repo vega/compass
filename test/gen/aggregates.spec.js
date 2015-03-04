@@ -1,15 +1,18 @@
+/*jshint -W069 */
+
 var expect = require('chai').expect,
   vl = require('vegalite');
 
 var genProjections = require('../../src/gen/projections'),genAggregates = require('../../src/gen/aggregates'),
+  fixture = require('../fixture'),
   constsAggregates = require('../../src/consts').gen.aggregates;
 
 
 describe('vr.gen.aggregates()', function () {
   describe('1Q', function () {
-    var fields = [{name:1, type:'Q'}];
+    var f = fixture['Q'];
 
-    var tables = genAggregates([], fields);
+    var tables = genAggregates([], f.fields, f.stats);
 
     it('should output 1 data table that has length 1', function () {
       expect(tables.filter(function(t) {
@@ -26,7 +29,7 @@ describe('vr.gen.aggregates()', function () {
     });
 
     it('should output 4 data table if not omit', function () {
-      var tables = genAggregates([], fields, {
+      var tables = genAggregates([], f.fields, f.stats, {
         omitMeasureOnly: false,
         omitDimensionOnly: false
       });
@@ -42,11 +45,11 @@ describe('vr.gen.aggregates()', function () {
   });
 
   describe('2Q with genTypeCasting', function () {
-    var fields = [{name:1, type:'Q'}, {name:2, type:'Q'}];
+    var f = fixture['QxQ'];
 
     // TODO add one more test here
 
-    var tables = genAggregates([], fields, {
+    var tables = genAggregates([], f.fields, f.stats, {
         omitMeasureOnly: false,
         omitDimensionOnly: false
       });
@@ -62,24 +65,24 @@ describe('vr.gen.aggregates()', function () {
   });
 
   describe('1Q & 1 count', function () {
-    var fields = [{name:1, type:'Q'}, vl.field.count()];
-    var tables = genAggregates([], fields);
+    var f = fixture['Qx#'];
+    var tables = genAggregates([], f.fields, f.stats);
     it('should output 2 data table', function () {
       expect(tables.length).to.equal(2); // O, bin
     });
   });
 
   describe('1O & 1 count', function () {
-    var fields = [{name:1, type:'O'}, vl.field.count()];
-    var tables = genAggregates([], fields);
+    var f = fixture['Ox#'];
+    var tables = genAggregates([], f.fields, f.stats);
     it('should output 1 data table', function () {
       expect(tables.length).to.equal(1); // O
     });
   });
 
   describe('1 count', function () {
-    var fields = [vl.field.count()];
-    var tables = genAggregates([], fields);
+    var f = fixture['#'];
+    var tables = genAggregates([], f.fields, f.stats);
     it('should output no data table', function () {
       expect(tables.length).to.equal(0); // O, bin
     });
