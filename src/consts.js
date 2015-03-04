@@ -7,17 +7,7 @@ var consts = module.exports = {
 consts.gen.projections = {
   type: 'object',
   properties: {
-    addCountInProjection: {
-      type: 'boolean',
-      default: false
-    },
-    addCountIfNothingIsSelected: {
-      type: 'boolean',
-      default: false,
-      description: 'When no field is selected, add extra count field'
-    },
-    //FIXME remove this!
-    omitDotPlot: {
+    omitDotPlot: { //FIXME remove this!
       type: 'boolean',
       default: false,
       description: 'remove all dot plots'
@@ -95,13 +85,29 @@ consts.gen.encodings = {
     marktypeList: {
       type: 'array',
       items: {type: 'string'},
-      default: ['point', 'bar', 'line', 'area', 'text'], //filled_map
+      default: ['point', 'bar', 'line', 'area', 'text', 'tick'], //filled_map
       description: 'allowed marktypes'
+    },
+    encodingTypeList: {
+      type: 'array',
+      items: {type: 'string'},
+      default: ['x', 'y', 'row', 'col', 'size', 'color', 'text', 'detail'],
+      description: 'allowed encoding types'
+    },
+    maxGoodCardinalityForFacets: {
+      type: 'integer',
+      default: 6,
+      description: 'maximum cardinality of a field to be put on facet (row/col) effectively'
     },
     maxCardinalityForFacets: {
       type: 'integer',
       default: 20,
       description: 'maximum cardinality of a field to be put on facet (row/col)'
+    },
+    maxGoodCardinalityForColor: {
+      type: 'integer',
+      default: 7,
+      description: 'maximum cardinality of an ordinal field to be put on color effectively'
     },
     maxCardinalityForColor: {
       type: 'integer',
@@ -128,6 +134,11 @@ consts.gen.encodings = {
       default: true,
       description: 'remove all dot plots with >1 encoding'
     },
+    omitMultipleRetinalEncodings: {
+      type: 'boolean',
+      default: true,
+      description: 'omit using multiple retinal variables (size, color, alpha, shape)'
+    },
     omitNonTextAggrWithAllDimsOnFacets: {
       type: 'boolean',
       default: true,
@@ -142,6 +153,10 @@ consts.gen.encodings = {
       type: 'boolean',
       default: true,
       description: 'do not stack bar chart with average'
+    },
+    alwaysGenerateTableAsHeatmap: {
+      type: 'boolean',
+      default: true
     }
   }
 };

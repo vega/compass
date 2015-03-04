@@ -35,7 +35,8 @@ var rules = {
     rules: shapeRules
   },
   size: {
-    measure: true
+    measure: true,
+    rules: retinalEncRules
   },
   color: {
     dimension: true,
@@ -43,7 +44,8 @@ var rules = {
     rules: colorRules
   },
   alpha: {
-    measure: true
+    measure: true,
+    rules: retinalEncRules
   },
   text: {
     measure: true
@@ -59,13 +61,23 @@ var rules = {
   //}
 };
 
+function retinalEncRules(enc, field, stats, opt) {
+  if (opt.omitMultipleRetinalEncodings) {
+    if (enc.color || enc.size || enc.shape || enc.alpha) return false;
+  }
+  return true;
+}
 
-function colorRules(field, stats, opt) {
+function colorRules(enc, field, stats, opt) {
+  if(!retinalEncRules(enc, field, stats, opt)) return false;
+
   return vl.field.isMeasure(field) ||
     vl.field.cardinality(field, stats) <= opt.maxCardinalityForColor;
 }
 
-function shapeRules(field, stats, opt) {
+function shapeRules(enc, field, stats, opt) {
+  if(!retinalEncRules(enc, field, stats, opt)) return false;
+
   if (field.bin && field.type === 'Q') return false;
   if (field.fn && field.type === 'T') return false;
   return vl.field.cardinality(field, stats) <= opt.maxCardinalityForColor;
@@ -81,10 +93,10 @@ function dimMeaTransposeRule(enc) {
   return false;
 }
 
-function generalRules(enc, opt) {
+function generalRules(enc, stats, opt) {
   // enc.text is only used for TEXT TABLE
   if (enc.text) {
-    return genMarkTypes.satisfyRules(enc, 'text', opt);
+    return genMarkTypes.satisfyRules(enc, 'text', stats, opt);
   }
 
   // CARTESIAN PLOT OR MAP
@@ -159,7 +171,7 @@ function genEncs(encs, fields, stats, opt) {
     // If all fields are assigned, save
     if (i === fields.length) {
       // at the minimal all chart should have x, y, geo, text or arc
-      if (generalRules(tmpEnc, opt)) {
+      if (generalRules(tmpEnc, stats, opt)) {
         encs.push(vl.duplicate(tmpEnc));
       }
       return;
@@ -167,15 +179,15 @@ function genEncs(encs, fields, stats, opt) {
 
     // Otherwise, assign i-th field
     var field = fields[i];
-    for (var j in vl.encodingTypes) {
-      var et = vl.encodingTypes[j],
+    for (var j in opt.encodingTypeList) {
+      var et = opt.encodingTypeList[j],
         isDim = isDimension(field);
 
       //TODO: support "multiple" assignment
       if (!(et in tmpEnc) && // encoding not used
         ((isDim && rules[et].dimension) || (!isDim && rules[et].measure)) &&
-        (!rules[et].rules || rules[et].rules(field, stats, opt))
-        ) {
+        (!rules[et].rules || rules[et].rules(tmpEnc, field, stats, opt))
+      ) {
         tmpEnc[et] = field;
         assignField(i + 1);
         delete tmpEnc[et];

@@ -9,6 +9,7 @@ var vl = require('vegalite'),
 module.exports = genEncodingsFromFields;
 
 function genEncodingsFromFields(output, fields, stats, opt, cfg, nested) {
+  opt = vl.schema.util.extend(opt||{}, consts.gen.encodings);
   var encs = genEncs([], fields, stats, opt);
 
   if (nested) {
@@ -26,11 +27,20 @@ function genEncodingsFromFields(output, fields, stats, opt, cfg, nested) {
 function genEncodingsFromEncs(output, enc, stats, opt, cfg) {
   getMarktypes(enc, stats, opt)
     .forEach(function(markType) {
-      var encoding = { marktype: markType, enc: enc, cfg: cfg },
-        score = rank.encoding(encoding);
+      var encoding = finalTouch({marktype: markType, enc: enc, cfg: cfg}, opt),
+        score = rank.encoding(encoding, stats, opt);
+
       encoding.score = score.score;
       encoding.scoreFeatures = score.features;
       output.push(encoding);
     });
   return output;
+}
+
+//FIXME this should be refactors
+function finalTouch(encoding, opt) {
+  if (encoding.marktype === 'text' && opt.alwaysGenerateTableAsHeatmap) {
+    encoding.enc.color = encoding.enc.text;
+  }
+  return encoding;
 }

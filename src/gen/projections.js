@@ -1,8 +1,12 @@
 var util = require('../util'),
   consts = require('../consts'),
-  vl = require('vegalite');
+  vl = require('vegalite'),
+  isDimension = vl.field.isDimension;
 
 module.exports = projections;
+
+// TODO support other mode of projections generation
+// powerset, chooseK, chooseKorLess are already included in the util
 
 /**
  * fields
@@ -11,63 +15,44 @@ module.exports = projections;
  */
 function projections(fields, stats, opt) {
   opt = vl.schema.util.extend(opt||{}, consts.gen.projections);
-  // TODO support other mode of projections generation
-  // powerset, chooseK, chooseKorLess are already included in the util
-  // Right now just add one more field
 
-  var selected = [], unselected = [], fieldSets = [];
+  // First categorize field, selected, fieldsToAdd, and save indices
+  var selected = [], fieldsToAdd = [], fieldSets = [],
+    hasSelectedDimension = false,
+    hasSelectedMeasure = false,
+    indices = {};
 
-  fields.forEach(function(field){
+  fields.forEach(function(field, index){
+    //save indices for stable sort later
+    indices[field.name] = index;
+
     if (field.selected) {
       selected.push(field);
-    } else {
-      unselected.push(field);
+      if (isDimension(field)) {
+        hasSelectedDimension = true;
+      } else {
+        hasSelectedMeasure = true;
+      }
+    } else if (!field.excluded && !vl.field.isCount(field)) {
+      if (vl.field.isDimension(field) &&
+          vl.field.cardinality(field, stats, 15) > opt.maxCardinalityForAutoAddOrdinal) {
+        return;
+      }
+      fieldsToAdd.push(field);
     }
   });
 
-  unselected = unselected.filter(function(field){
-    if(!opt.addCountInProjection && vl.field.isCount(field)) return false;
-    //FIXME load maxbins value from somewhere else
-    return (opt.alwaysAddHistogram && selected.length === 0) ||
-      !(opt.maxCardinalityForAutoAddOrdinal &&
-        vl.field.isDimension(field) &&
-        vl.field.cardinality(field, stats, 15) > opt.maxCardinalityForAutoAddOrdinal);
-  });
+  fieldsToAdd.sort(compareFieldsToAdd(hasSelectedDimension, hasSelectedMeasure, indices));
 
-  if (opt.addCountInProjection) {
-    // put count on top!
-    unselected.sort(function(a, b){
-      if(a.aggr==='count') return -1;
-      if(b.aggr==='count') return 1;
-      return 0;
-    });
-  }
-
-  var setsToAdd = util.chooseKorLess(unselected, 1);
+  var setsToAdd = util.chooseKorLess(fieldsToAdd, 1);
 
   setsToAdd.forEach(function(setToAdd) {
     var fieldSet = selected.concat(setToAdd);
     if (fieldSet.length > 0) {
-      //single count field is useless
-      if (fieldSet.length === 1 && vl.field.isCount(fieldSet[0])) {
-        return;
-      }
-
       if (opt.omitDotPlot && fieldSet.length === 1) return;
-
       fieldSets.push(fieldSet);
     }
   });
-
-  if (opt.addCountInProjection && opt.addCountIfNothingIsSelected && selected.length===0) {
-    var countField = vl.field.count();
-
-    unselected.forEach(function(field) {
-      if (!vl.field.isCount(field)) {
-        fieldSets.push([field, countField]);
-      }
-    });
-  }
 
   fieldSets.forEach(function(fieldSet) {
       // always append projection's key to each projection returned, d3 style.
@@ -75,6 +60,28 @@ function projections(fields, stats, opt) {
   });
 
   return fieldSets;
+}
+
+function compareFieldsToAdd(hasSelectedDimension, hasSelectedMeasure, indices) {
+  return function(a, b){
+    var aIsDim = isDimension(a), bIsDim = isDimension(b);
+    // sort by type of the data
+    if (aIsDim ^ bIsDim) {
+      if (!hasSelectedDimension) {
+        if (!aIsDim && bIsDim) {
+          return 1;
+        }
+        return -1;
+      } else if (!hasSelectedMeasure) {
+        if (aIsDim && !bIsDim) {
+          return 1;
+        }
+        return 1;
+      }
+    }
+    //make the sort stable
+    return indices[a.name] - indices[b.name];
+  };
 }
 
 projections.key = function(projection) {
