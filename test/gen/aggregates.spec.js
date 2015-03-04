@@ -57,7 +57,7 @@ describe('vr.gen.aggregates()', function () {
         return t.aggr && !t.bin && t.type==='Q';
       }).length).to.equal(1);
 
-      // avg(Q)
+      // bin(Q) x #
       expect(tables.filter(function(table){
         return table.length === 2;
       }).length).to.equal(1);
@@ -124,36 +124,6 @@ describe('vr.gen.aggregates()', function () {
     it('should output no data table', function () {
       expect(tables.length).to.equal(0); // O, bin
     });
-  });
-
-  describe('omitDimensionOnly', function () {
-    it('include aggregate with dimension only', function () {
-
-    });
-  });
-
-  describe('omitAggregateWithMeasureOnly', function () {
-
-
-  });
-
-  describe('after vr.gen.projections()', function() {
-    var fields = [
-      {name:1, type:'Q', selected: true},
-      {name:2, type:'Q', selected: false},
-      {name:3, type:'O', selected: false},
-      {name:'*', aggr:'count', selected: false}
-    ];
-
-    var stats = {
-      1: {cardinality: 10},
-      2: {cardinality: 10},
-      3: {cardinality: 10}
-    };
-
-    var projections = genProjections(fields, stats);
-    console.log(projections, 'unfinished');
-    //FIXME fix this
   });
 });
 

@@ -21,16 +21,26 @@ function rankEncodings(encoding, stats, opt) {
   var features = [],
     encTypes = vl.keys(encoding.enc);
 
-  // var encodingMappingByField = vl.enc.reduce(encoding.enc, function(m, encType, field) {
-  //   m[vl.field.shorthand(field)] = {encType: encType, field: field};
-  //   return m;
-  // }, {});
+  var encodingMappingByField = vl.enc.reduce(encoding.enc, function(o, encType, field) {
+    var key = vl.field.shorthand(field);
+    var mappings = o[key] = o[key] || [];
+    mappings.push({encType: encType, field: field});
+    return o;
+  }, {});
 
-  vl.enc.forEach(encoding.enc, function(encType, field) {
-    var role = vl.field.role(field);
+  vl.keys(encodingMappingByField).forEach(function(key) {
+    var mappings = encodingMappingByField[key],
+      reasons = mappings.map(function(m) {
+        return m.encType + vl.shorthand.assign + vl.field.shorthand(m.field);
+      }),
+      scores = mappings.map(function(m) {
+        var role = vl.field.role(m.field);
+        return rankEncodings.score[role](m.field, m.encType, encoding.marktype, stats, opt);
+      });
+
     features.push({
-      reason: encType+vl.shorthand.assign+vl.field.shorthand(field),
-      score: rankEncodings.score[role](field, encType, encoding.marktype, stats, opt)
+      reason: reasons.join(" | "),
+      score: Math.max.apply(null, scores)
     });
   });
 

@@ -116,4 +116,26 @@ describe('vr.rank.encoding', function () {
       expect(score.O.point.color).to.gt(score.Q.point.size);
     });
   });
+
+  describe('rankEncodings()', function() {
+    describe('text tables', function() {
+      it('\'s text and color score should be merged', function () {
+        var encoding = {
+          "marktype": "text",
+          "enc": {
+            "col": {"name": "Aircraft__Airline_Operator","type": "O"},
+            "text": {"name": "*","aggr": "count","type": "Q"},
+            "color": {"name": "*","aggr": "count","type": "Q"}
+          }
+        };
+        var score = rankEncodings(encoding, {
+          Aircraft__Airline_Operator: {cardinality: 10},
+          count: 15
+        });
+
+
+        expect(score.features.length).to.equal(3);
+      });
+    });
+  });
 });
