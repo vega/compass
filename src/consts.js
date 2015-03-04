@@ -102,7 +102,7 @@ consts.gen.encodings = {
     },
     maxGoodCardinalityForFacets: {
       type: 'integer',
-      default: 6,
+      default: 5,
       description: 'maximum cardinality of a field to be put on facet (row/col) effectively'
     },
     maxCardinalityForFacets: {
