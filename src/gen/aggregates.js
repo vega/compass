@@ -72,14 +72,12 @@ function genAggregates(output, fields, stats, opt) {
         }
       }
 
-      if (opt.genBin) {
+      if (opt.genBin && vl.field.cardinality(f, stats) > opt.minCardinalityForBin) {
         // bin the field instead!
         delete tf[i].aggr;
         tf[i].bin = true;
         tf[i].type = 'Q';
-        if(vl.field.cardinality(tf[i], stats) > opt.minCardinalityForBin) {
-          assignField(i + 1, hasAggr);
-        }
+        assignField(i + 1, hasAggr);
       }
 
       if (opt.genTypeCasting) {

@@ -27,7 +27,7 @@ function genEncodingsFromFields(output, fields, stats, opt, cfg, nested) {
 function genEncodingsFromEncs(output, enc, stats, opt, cfg) {
   getMarktypes(enc, stats, opt)
     .forEach(function(markType) {
-      var encoding = finalTouch({marktype: markType, enc: enc, cfg: cfg}, opt),
+      var encoding = finalTouch({marktype: markType, enc: enc, cfg: cfg}, stats, opt),
         score = rank.encoding(encoding, stats, opt);
 
       encoding.score = score.score;
@@ -38,9 +38,22 @@ function genEncodingsFromEncs(output, enc, stats, opt, cfg) {
 }
 
 //FIXME this should be refactors
-function finalTouch(encoding, opt) {
+function finalTouch(encoding, stats, opt) {
   if (encoding.marktype === 'text' && opt.alwaysGenerateTableAsHeatmap) {
     encoding.enc.color = encoding.enc.text;
   }
+
+  // don't include zero if stdev/avg < 0.01
+  // https://github.com/uwdata/visrec/issues/69
+  var enc = encoding.enc;
+  ['x', 'y'].forEach(function(et) {
+    var field = enc[et];
+    if (field && vl.field.isMeasure(field) && !vl.field.isCount(field)) {
+      var stat = stats[field.name];
+      if (stat.stdev / stat.avg < 0.01) {
+        field.scale = {zero: false};
+      }
+    }
+  });
   return encoding;
 }
