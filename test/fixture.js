@@ -14,8 +14,11 @@ var O_15 = {name: 'O_15', type: 'O'},
   O_30 = {name:'O_30', type:'O'},
   O_30_stat = {cardinality: 30};
 
+var q10 = {name: 'Q_10', type: 'Q'},
+  q10_stat = {cardinality: 10, min:0, max:150};
+
 var o_stat = {cardinality: 5},
-  q_stat = {cardinality: 10, min:0, max:150},
+  q_stat = {cardinality: 100, min:0, max:150},
   t_stat = o_stat;
 
 fixture.stat = {
@@ -138,6 +141,11 @@ fixture['OxOxQxQx#'] = {
 fixture['Q'] = {
   fields: [{name:1, type:'Q'}],
   stats: {1: q_stat}
+};
+
+fixture['Q_10'] = {
+  fields: [q10],
+  stats: {Q_10: q10_stat}
 };
 
 fixture['BIN(Q)'] = {
