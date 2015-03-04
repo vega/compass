@@ -62,21 +62,21 @@ function projections(fields, stats, opt) {
   return fieldSets;
 }
 
+var typeIsMeasureScore = {
+  O: 0,
+  T: 1,
+  Q: 2
+};
+
 function compareFieldsToAdd(hasSelectedDimension, hasSelectedMeasure, indices) {
   return function(a, b){
     var aIsDim = isDimension(a), bIsDim = isDimension(b);
     // sort by type of the data
-    if (aIsDim ^ bIsDim) {
+    if (a.type !== b.type) {
       if (!hasSelectedDimension) {
-        if (!aIsDim && bIsDim) {
-          return 1;
-        }
-        return -1;
+        return typeIsMeasureScore[a.type] - typeIsMeasureScore[b.type];
       } else if (!hasSelectedMeasure) {
-        if (aIsDim && !bIsDim) {
-          return 1;
-        }
-        return 1;
+        return typeIsMeasureScore[b.type] - typeIsMeasureScore[a.type];
       }
     }
     //make the sort stable
