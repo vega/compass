@@ -57,12 +57,7 @@ function rankEncodings(encoding, stats, opt) {
   };
 }
 
-rankEncodings.score = {
-  dimension: dimensionScore,
-  measure: measureScore
-};
-
-function dimensionScore(field, encType, marktype, stats, opt){
+rankEncodings.dimensionScore = function (field, encType, marktype, stats, opt){
   var cardinality = vl.field.cardinality(field, stats);
   switch (encType) {
     case 'x':
@@ -93,16 +88,16 @@ function dimensionScore(field, encType, marktype, stats, opt){
       // true ordinal on color is currently bad (until we have good ordinal color scale support)
       if ((field.bin && field.type==='Q') || (field.fn && field.type==='T')) return 0.3;
 
-      return cardinality <= opt.maxGoodCardinalityForColor ? 0.7: cardinality <= opt.maxCardinalityForColor ? 0.51 : 0.1;
+      return cardinality <= opt.maxGoodCardinalityForColor ? 0.7: cardinality <= opt.maxCardinalityForColor ? 0.61 : 0.1;
     case 'shape':
       return cardinality <= opt.maxCardinalityForShape ? 0.6 : 0.1;
     case 'detail':
       return 0.5;
   }
   return BAD_ENCODING_SCORE;
-}
+};
 
-function measureScore(field, encType, marktype, stats, opt) {
+rankEncodings.measureScore = function (field, encType, marktype, stats, opt) {
   switch (encType){
     case 'x': return 1;
     case 'y': return 1;
@@ -110,10 +105,16 @@ function measureScore(field, encType, marktype, stats, opt) {
       if (marktype === 'bar') return 0.1; //size of bar is very bad
       if (marktype === 'text') return 0.1;
       if (marktype === 'line') return 0.1;
-      return 0.8;
-    case 'color': return 0.6;
-    case 'alpha': return 0.59;
+      return 0.6;
+    case 'color': return 0.5;
+    case 'alpha': return 0.49;
     case 'text': return 0.4;
   }
   return BAD_ENCODING_SCORE;
-}
+};
+
+
+rankEncodings.score = {
+  dimension: rankEncodings.dimensionScore,
+  measure: rankEncodings.measureScore
+};

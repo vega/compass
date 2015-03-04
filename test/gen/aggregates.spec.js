@@ -9,7 +9,6 @@ describe('vr.gen.aggregates()', function () {
   describe('1Q', function () {
     var fields = [{name:1, type:'Q'}];
 
-
     var tables = genAggregates([], fields);
 
     it('should output 1 data table that has length 1', function () {
@@ -33,6 +32,12 @@ describe('vr.gen.aggregates()', function () {
       });
       // each field can be Q, avg(Q), bin(Q), O
       expect(tables.length).to.equal(4);
+    });
+  });
+
+  describe('Q_10', function() {
+    it('should not be binned', function() {
+      //FIXME write test
     });
   });
 

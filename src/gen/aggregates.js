@@ -7,7 +7,7 @@ var util = require('../util'),
 
 module.exports = genAggregates;
 
-function genAggregates(output, fields, opt) {
+function genAggregates(output, fields, stats, opt) {
   opt = vl.schema.util.extend(opt||{}, consts.gen.aggregates);
   var tf = new Array(fields.length);
 
@@ -77,7 +77,9 @@ function genAggregates(output, fields, opt) {
         delete tf[i].aggr;
         tf[i].bin = true;
         tf[i].type = 'Q';
-        assignField(i + 1, hasAggr);
+        if(vl.field.cardinality(tf[i], stats) > opt.minCardinalityForBin) {
+          assignField(i + 1, hasAggr);
+        }
       }
 
       if (opt.genTypeCasting) {

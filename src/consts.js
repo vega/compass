@@ -37,6 +37,11 @@ consts.gen.aggregates = {
       default: true,
       description: 'Generate Binning'
     },
+    minCardinalityForBin: {
+      type: 'integer',
+      default: 20,
+      description: 'minimum cardinality of a field if we were to bin'
+    },
     genTypeCasting: {
       type: 'boolean',
       default: true,
