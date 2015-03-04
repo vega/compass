@@ -4,17 +4,26 @@
 
 var fixture = module.exports = {};
 
-var stats = {};
+var stats = fixture.stats = {};
 
 var count = {name:'*', type:'Q', aggr:'count'},
   count_stat = 50;
 
-var O_30 = {name:'O_30', type:'O'},
+var O_15 = {name: 'O_15', type: 'O'},
+  O_15_stat = {cardinality: 15},
+  O_30 = {name:'O_30', type:'O'},
   O_30_stat = {cardinality: 30};
 
 var o_stat = {cardinality: 5},
   q_stat = {cardinality: 10, min:0, max:150},
   t_stat = o_stat;
+
+fixture.stat = {
+  o_stat: o_stat,
+  q_stat: q_stat,
+  t_stat: t_stat,
+  count_stat: count_stat
+};
 
 stats['OxQ'] = {
   1: o_stat,
@@ -43,9 +52,20 @@ stats['#xT'] = {
 
 // fixtures
 
-fixture['Q'] = {
-  fields: [{name:1, type:'Q'}],
-  stats: {1: q_stat}
+
+fixture['O'] = {
+  fields: [{name:1, type:'O'}],
+  stats: {1: o_stat}
+};
+
+fixture['O_15'] = {
+  fields: [O_15],
+  stats: {O_15: O_15_stat}
+};
+
+fixture['O_30'] = {
+  fields: [O_30],
+  stats: {O_30: O_30_stat}
 };
 
 fixture['OxQ'] = {
@@ -112,6 +132,17 @@ fixture['OxOxQxQx#'] = {
     4: o_stat,
     5: count_stat
   }
+};
+
+
+fixture['Q'] = {
+  fields: [{name:1, type:'Q'}],
+  stats: {1: q_stat}
+};
+
+fixture['BIN(Q)'] = {
+  fields: [{name:1, type:'Q', bin: {maxbins: 15}}],
+  stats: {1: q_stat}
 };
 
 fixture['QxT'] = {
