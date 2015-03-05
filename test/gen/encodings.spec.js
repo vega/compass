@@ -79,9 +79,21 @@ describe('vr.gen.encodings()', function () {
       expect(hasBar).to.be.true();
     });
 
-    console.log('encodings O_30x#', encodings.map(function(spec){
-      return vl.Encoding.shorthandFromSpec(spec) + ":" + spec.score;
-    }));
+    // console.log('encodings O_30x#', encodings.map(function(spec){
+    //   return vl.Encoding.shorthandFromSpec(spec) + ":" + spec.score;
+    // }));
+  });
+
+  describe('OxQxQ', function() {
+    var f = fixture['OxQxQ'];
+    var encodings = genEncodings([], f.fields, f.stats);
+
+    it('should contain colored scatter plot', function() {
+      var filtered = encodings.filter(function(encoding) {
+        var enc = encoding.enc;
+        return encoding.marktype==='point' && enc.x && enc.y && enc.color;
+      });
+    });
   });
 
   describe('QxT', function(){

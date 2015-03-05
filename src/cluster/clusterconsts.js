@@ -2,7 +2,7 @@ var c = module.exports = {};
 
 c.SWAPPABLE = 0.05;
 c.DIST_MISSING = 1;
-c.CLUSTER_THRESHOLD = 1.1;
+c.CLUSTER_THRESHOLD = 1.01;
 
 function reduceTupleToTable(r, x) {
   var a = x[0], b = x[1], d = x[2];
@@ -19,6 +19,8 @@ c.DIST_BY_ENCTYPE = [
 
   // ordinal mark properties
   ['color', 'shape', c.SWAPPABLE],
+  ['color', 'detail', c.SWAPPABLE],
+  ['detail', 'shape', c.SWAPPABLE],
 
   // quantitative mark properties
   ['color', 'alpha', c.SWAPPABLE],

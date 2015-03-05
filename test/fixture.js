@@ -30,7 +30,8 @@ fixture.stat = {
 
 stats['OxQ'] = {
   1: o_stat,
-  2: q_stat
+  2: q_stat,
+  count: count_stat
 };
 
 stats['Ox#'] = {
@@ -43,17 +44,26 @@ stats['O_30x#'] = {
   O_30: O_30_stat
 };
 
+stats.OxQxQ = {
+  1: o_stat,
+  2: q_stat,
+  3: q_stat,
+  count: count_stat
+};
+
 stats['QxQ'] = {
   1: q_stat,
-  2: q_stat
+  2: q_stat,
+  count: count_stat
 };
 
 stats['QxT'] = {
   1: q_stat,
-  2: t_stat
+  2: t_stat,
+  count: count_stat
 };
 
-stats['Qx#'] = {
+stats['Q'] = {
   1: q_stat,
   count: count_stat
 };
@@ -112,17 +122,22 @@ fixture['O_30x#'] = {
   stats: stats['O_30x#']
 };
 
+fixture.OxQxQ = {
+  fields: [
+    {name:1, type:'O'},
+    {name:2, type:'Q'},
+    {name:3, type:'Q'}
+  ],
+  stats: stats.OxQxQ
+};
+
 fixture['OxA(Q)xA(Q)'] = {
   fields: [
-    {aggr:'avg', name:1, type:'Q'},
+    {name:1, type:'O'},
     {aggr:'avg', name:2, type:'Q'},
-    {name:3, type:'O'}
+    {aggr:'avg', name:3, type:'Q'}
   ],
-  stats: {
-    1: q_stat,
-    2: q_stat,
-    3: o_stat
-  }
+  stats: stats.OxQxQ
 };
 
 fixture['OxQxQxQ'] = {
@@ -180,7 +195,7 @@ fixture['QxQ'] = {
 
 fixture['Qx#'] = {
   fields: [{name:1, type:'Q'}, count],
-  stats: stats['Qx#']
+  stats: stats.Q
 };
 
 fixture['QxT'] = {
@@ -207,10 +222,23 @@ fixture['A(Q)xYEAR(T)'] = {
   stats: stats['QxT']
 };
 
+
+fixture['B(Q)xB(Q)x#'] = {
+  fields: [
+    {name:1, type:'Q', bin: {maxbins: 15}},
+    {name:2, type:'Q', bin: {maxbins: 15}},
+    count
+  ],
+  stats: stats.QxQ
+};
+
+
 fixture['#'] = {
   fields: [count],
   stats: {count: count_stat}
 };
+
+// FIXME: swap order for these
 
 fixture['#xB(Q)'] = {
   fields: [
@@ -219,7 +247,6 @@ fixture['#xB(Q)'] = {
   ],
   stats: stats['#xQ']
 };
-
 
 fixture['#xYR(T)'] = {
   fields: [

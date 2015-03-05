@@ -32,20 +32,16 @@ consts.gen.aggregates = {
       default: 'both',
       enum: ['both', 'aggregated', 'disaggregated']
     },
-    genBin: {
-      type: 'boolean',
-      default: true,
-      description: 'Generate Binning'
+    genDimQ: {
+      type: 'string',
+      default: 'auto',
+      enum: ['auto', 'bin', 'cast', 'none'],
+      description: 'Use Q as Dimension either by binning or casting'
     },
     minCardinalityForBin: {
       type: 'integer',
       default: 20,
       description: 'minimum cardinality of a field if we were to bin'
-    },
-    genTypeCasting: {
-      type: 'boolean',
-      default: true,
-      description: 'Include type casting e.g., from Q to O'
     },
     omitDotPlot: {
       type: 'boolean',
@@ -80,6 +76,11 @@ consts.gen.aggregates = {
         type: ['string']
       },
       default: ['year']
+    },
+    consistentAutoQ: {
+      type: 'boolean',
+      default: true,
+      description: "generate similar auto transform for quant"
     }
   }
 };
@@ -101,7 +102,7 @@ consts.gen.encodings = {
     },
     maxGoodCardinalityForFacets: {
       type: 'integer',
-      default: 6,
+      default: 5,
       description: 'maximum cardinality of a field to be put on facet (row/col) effectively'
     },
     maxCardinalityForFacets: {

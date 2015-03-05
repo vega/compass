@@ -3,30 +3,34 @@
 var expect = require('chai').expect,
   vl = require('vegalite'),
   fixture = require('../fixture'),
-  setter = vl.setter;
+  setter = vl.setter,
+  stringify = JSON.stringify;
+
 
 var consts = require('../../src/consts'),
   rankEncodings = require('../../src/rank/rank').encoding,
   dimensionScore = rankEncodings.dimensionScore,
   measureScore = rankEncodings.measureScore,
+  D = dimensionScore.consts,
+  M = measureScore.consts,
   opt = vl.schema.util.extend(opt||{}, consts.gen.encodings);
 
 describe('vr.rank.encoding', function () {
   var marktypes = consts.gen.encodings.properties.marktypeList.default;
   var encTypes = ['x', 'y', 'row', 'col', 'size', 'color', 'shape', 'alpha', 'text', 'detail'];
-  var oFixtures = ['O', 'O_15', 'O_30'],
-    qFixtures = ['Q', 'BIN(Q)'];
+  var dFixtures = ['O', 'O_15', 'O_30', 'BIN(Q)'],
+    mFixtures = ['Q'];
 
 
   var score = {};
   marktypes.forEach(function(marktype) {
     encTypes.forEach(function(encType) {
-      qFixtures.forEach(function(q) {
+      mFixtures.forEach(function(q) {
         var Qf = fixture[q];
         setter(score, [q, marktype, encType], measureScore(Qf.fields[0], encType, marktype, Qf.stats, opt));
       });
 
-      oFixtures.forEach(function(o) {
+      dFixtures.forEach(function(o) {
         var Of = fixture[o];
         setter(score, [o, marktype, encType], dimensionScore(Of.fields[0], encType, marktype, Of.stats, opt));
       });
@@ -95,6 +99,11 @@ describe('vr.rank.encoding', function () {
 
       it('for BIN(Q) < for O', function() {
         expect(score['BIN(Q)'].area.color).to.lt(score.O.point.color);
+        expect(score['BIN(Q)'].point.color).to.lt(score.O.point.color);
+      });
+
+      it('BIN(Q) is bad', function (){
+        expect(score['BIN(Q)'].point.color).to.equal(D.color_bad);
       });
     });
 
@@ -112,8 +121,61 @@ describe('vr.rank.encoding', function () {
   });
 
   describe('score()', function () {
-    it('color(O) > size(Q)', function () {
+    it('color(O) > size(Q)', function (){
       expect(score.O.point.color).to.gt(score.Q.point.size);
+    });
+
+    it('D.facet_ok < M.size', function() {
+      expect(D.facet_ok).to.lt(M.size);
+    });
+  });
+
+  describe('rankEncodings()', function() {
+
+    describe('B(Q)xB(Q)x#', function () {
+      var f = fixture['B(Q)xB(Q)x#'];
+      var bp = {
+        marktype: 'point',
+        enc: {
+          x: f.fields[0],
+          y: f.fields[1],
+          color: f.fields[2] //count
+        }
+      };
+
+      var sb = {
+        marktype: 'bar',
+        enc: {
+          x: f.fields[0],
+          y: f.fields[2], // count
+          color: f.fields[1]
+        }
+      };
+
+      var bpScore = rankEncodings(bp, f.stats),
+        sbScore = rankEncodings(sb, f.stats);
+
+      it('bubble plot > stacked bar', function () {
+        expect(bpScore.score).to.gt(sbScore.score);
+      });
+    });
+
+    describe('text tables', function() {
+      it('\'s text and color score should be merged', function () {
+        var encoding = {
+          "marktype": "text",
+          "enc": {
+            "col": {"name": "Aircraft__Airline_Operator","type": "O"},
+            "text": {"name": "*","aggr": "count","type": "Q"},
+            "color": {"name": "*","aggr": "count","type": "Q"}
+          }
+        };
+        var score = rankEncodings(encoding, {
+          Aircraft__Airline_Operator: {cardinality: 10},
+          count: 15
+        });
+        expect(score.features.length).to.equal(3);
+      });
     });
   });
 });

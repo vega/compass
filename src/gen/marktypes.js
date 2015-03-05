@@ -138,6 +138,6 @@ function areaRule(enc, stats, opt) {
 
 function textRule(enc, stats, opt) {
   // at least must have row or col and aggregated text values
-  return (enc.row || enc.col) && enc.text && enc.text.aggr && !enc.x && !enc.y &&
+  return (enc.row || enc.col) && enc.text && enc.text.aggr && !enc.x && !enc.y && !enc.size &&
     (!opt.alwaysGenerateTableAsHeatmap || !enc.color);
 }

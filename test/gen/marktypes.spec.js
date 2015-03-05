@@ -63,12 +63,30 @@ describe('vr.gen.marktypes()', function(){
   });
 
   describe('text', function() {
-    var shorthand = 'row=1,O|text=avg_2,Q',
-      enc = vl.enc.parseShorthand(shorthand),
-      marktypes = getMarkTypes(enc);
-
     it('should be generated', function () {
+      var shorthand = 'row=1,O|text=avg_2,Q',
+        enc = vl.enc.parseShorthand(shorthand),
+        marktypes = getMarkTypes(enc);
       expect(marktypes.indexOf('text')).to.gt(-1);
+    });
+
+    it('should not contain size', function() {
+      var enc = {
+        "col": {
+          "name": "Effect__Amount_of_damage",
+          "type": "O",
+        },
+        "size": {
+          "name": "Cost__Repair","type": "Q","aggr": "avg"
+        },
+        "text": {
+          "name": "Cost__Total_$","type": "Q","aggr": "avg"
+        }
+      };
+
+      var marktypes = getMarkTypes(enc);
+
+      expect(marktypes.indexOf('text')).to.equal(-1);
     });
   });
 });
