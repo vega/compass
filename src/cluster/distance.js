@@ -6,14 +6,17 @@ module.exports = distance = {};
 
 distance.table = function (encodings) {
   var len = encodings.length,
-    colencs = encodings.map(function(e) { return distance.getEncTypeByColumnName(e);}),
-    diff = new Array(len), i, j;
+    colencs = encodings.map(function(e) { return distance.getEncTypeByColumnName(e); }),
+    shorthands = encodings.map(vl.Encoding.shorthand),
+    diff = {}, i, j;
 
-  for (i = 0; i < len; i++) diff[i] = new Array(len);
+  for (i = 0; i < len; i++) diff[shorthands[i]] = {};
 
   for (i = 0; i < len; i++) {
     for (j = i + 1; j < len; j++) {
-      diff[j][i] = diff[i][j] = distance.get(colencs[i], colencs[j]);
+      var sj = shorthands[j], si = shorthands[i];
+
+      diff[sj][si] = diff[si][sj] = distance.get(colencs[i], colencs[j]);
     }
   }
   return diff;

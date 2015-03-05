@@ -34,6 +34,12 @@ stats['OxQ'] = {
   count: count_stat
 };
 
+stats.OxO = {
+  1: o_stat,
+  2: o_stat,
+  count: count_stat
+};
+
 stats['Ox#'] = {
   1: o_stat,
   count: count_stat
@@ -120,6 +126,15 @@ fixture['Ox#'] = {
 fixture['O_30x#'] = {
   fields: [O_30, count],
   stats: stats['O_30x#']
+};
+
+fixture['OxOx#'] = {
+  fields: [
+    {name:1, type:'O'},
+    {name:2, type:'O'},
+    count
+  ],
+  stats: stats.OxO
 };
 
 fixture.OxQxQ = {
