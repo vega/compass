@@ -68,7 +68,7 @@ consts.gen.aggregates = {
       items: {
         type: ['string']
       },
-      default: [undefined, 'avg']
+      default: [undefined, 'sum']
     },
     timeFnList: {
       type: 'array',
