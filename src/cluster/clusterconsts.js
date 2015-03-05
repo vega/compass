@@ -2,7 +2,7 @@ var c = module.exports = {};
 
 c.SWAPPABLE = 0.05;
 c.DIST_MISSING = 1;
-c.CLUSTER_THRESHOLD = 1.01;
+c.CLUSTER_THRESHOLD = 1;
 
 function reduceTupleToTable(r, x) {
   var a = x[0], b = x[1], d = x[2];
