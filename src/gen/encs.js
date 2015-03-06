@@ -114,8 +114,16 @@ function generalRules(enc, stats, opt) {
     }
 
     if (enc.x && enc.y) {
+      var isDimX = !!isDimension(enc.x),
+        isDimY = !!isDimension(enc.y);
+
+      if (isDimX && isDimY && !vl.enc.isAggregate(enc)) {
+        // FIXME actually check if there would be occlusion #90
+        return false;
+      }
+
       if (opt.omitTranpose) {
-        if ((!!isDimension(enc.x)) ^ (!!isDimension(enc.y))) { // dim x mea
+        if (isDimX ^ isDimY) { // dim x mea
           if (!dimMeaTransposeRule(enc)) return false;
         } else if (enc.y.type==='T' || enc.x.type === 'T') {
           if (enc.y.type==='T' && enc.x.type !== 'T') return false;

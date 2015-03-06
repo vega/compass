@@ -79,6 +79,7 @@ function genAggregates(output, fields, stats, opt) {
         assignField(i + 1, true, autoMode);
       }
     } else if (f._aggr) {
+      // TODO support array of f._aggrs too
       assignAggrQ(i, hasAggr, autoMode, f._aggr);
     } else if (f._raw) {
       assignAggrQ(i, hasAggr, autoMode, undefined);
@@ -110,21 +111,29 @@ function genAggregates(output, fields, stats, opt) {
     }
   }
 
+  function assignFnT(i, hasAggr, autoMode, fn) {
+    tf[i].fn = fn;
+    assignField(i+1, hasAggr, autoMode);
+    delete tf[i].fn;
+  }
+
   function assignT(i, hasAggr, autoMode) {
     var f = fields[i];
     tf[i] = {name: f.name, type: f.type};
 
-    var fns = (!f._fn || f._fn === '*') ? opt.timeFnList : f._fn;
-    for (var j in fns) {
-      var fn = fns[j];
-      if (fn === undefined) {
-        if (!hasAggr) { // can't aggregate over raw time
-          assignField(i+1, false, autoMode);
+    // TODO support array of f._fns
+    if (f._fn) {
+      assignFnT(i, hasAggr, autoMode, f._fn);
+    } else {
+      opt.timeFnList.forEach(function(fn) {
+        if (fn === undefined) {
+          if (!hasAggr) { // can't aggregate over raw time
+            assignField(i+1, false, autoMode);
+          }
+        } else {
+          assignFnT(i, hasAggr, autoMode, fn);
         }
-      } else {
-        tf[i].fn = fn;
-        assignField(i+1, hasAggr, autoMode);
-      }
+      });
     }
 
     // FIXME what if you aggregate time?

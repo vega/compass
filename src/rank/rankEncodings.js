@@ -1,4 +1,5 @@
-var vl = require('vegalite');
+var vl = require('vegalite'),
+  isDimension = vl.field.isDimension;
 
 module.exports = rankEncodings;
 
@@ -16,9 +17,11 @@ var MARK_SCORE = {
   text: 0.8
 };
 
-function rankEncodings(encoding, stats, opt) {
+function rankEncodings(encoding, stats, opt, selected) {
   var features = [],
-    encTypes = vl.keys(encoding.enc);
+    encTypes = vl.keys(encoding.enc),
+    marktype = encoding.marktype,
+    enc = encoding.enc;
 
   var encodingMappingByField = vl.enc.reduce(encoding.enc, function(o, encType, field) {
     var key = vl.field.shorthand(field);
@@ -27,14 +30,17 @@ function rankEncodings(encoding, stats, opt) {
     return o;
   }, {});
 
-  vl.keys(encodingMappingByField).forEach(function(key) {
-    var mappings = encodingMappingByField[key],
-      reasons = mappings.map(function(m) {
-        return m.encType + vl.shorthand.assign + vl.field.shorthand(m.field);
+  // data - encoding mapping score
+  vl.forEach(encodingMappingByField, function(mappings) {
+    var reasons = mappings.map(function(m) {
+        return m.encType + vl.shorthand.assign + vl.field.shorthand(m.field) +
+          ' ' + (selected && selected[m.field.name] ? '[x]' : '[ ]');
       }),
       scores = mappings.map(function(m) {
         var role = vl.field.role(m.field);
-        return rankEncodings.score[role](m.field, m.encType, encoding.marktype, stats, opt);
+        var score = rankEncodings.score[role](m.field, m.encType, encoding.marktype, stats, opt);
+
+        return !selected || selected[m.field.name] ? score : Math.pow(score, 0.125);
       });
 
     features.push({
@@ -43,9 +49,23 @@ function rankEncodings(encoding, stats, opt) {
     });
   });
 
+  // plot type
+  if (marktype === 'text') {
+    // TODO
+  } else {
+    if (enc.x && enc.y) {
+      if (isDimension(enc.x) ^ isDimension(enc.y)) {
+        features.push({
+          reason: 'OxQ plot',
+          score: 0.8
+        });
+      }
+    }
+  }
+
   // penalize not using positional only penalize for non-text
-  if (encTypes.length > 1 && encoding.marktype !== 'text') {
-    if ((!encoding.enc.x || !encoding.enc.y) && !encoding.enc.geo && !encoding.enc.text) {
+  if (encTypes.length > 1 && marktype !== 'text') {
+    if ((!enc.x || !enc.y) && !enc.geo && !enc.text) {
       features.push({
         reason: 'unused position',
         score: UNUSED_POSITION
@@ -53,9 +73,10 @@ function rankEncodings(encoding, stats, opt) {
     }
   }
 
+  // mark type score
   features.push({
-    reason: 'marktype='+encoding.marktype,
-    score: MARK_SCORE[encoding.marktype]
+    reason: 'marktype='+marktype,
+    score: MARK_SCORE[marktype]
   });
 
   return {
@@ -73,7 +94,7 @@ D.minor = 0.01;
 D.pos = 1;
 D.Y_T = 0.8;
 D.facet_text = 1;
-D.facet_good = 0.7;
+D.facet_good = 0.675; // < color_ok, > color_bad
 D.facet_ok = 0.55;
 D.facet_bad = 0.4;
 D.color_good = 0.7;
