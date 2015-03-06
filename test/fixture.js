@@ -50,6 +50,14 @@ stats['O_30x#'] = {
   O_30: O_30_stat
 };
 
+stats.OxOxQ = {
+  1: o_stat,
+  2: o_stat,
+  3: q_stat,
+  count: count_stat
+};
+
+
 stats.OxQxQ = {
   1: o_stat,
   2: q_stat,
@@ -135,6 +143,25 @@ fixture['OxOx#'] = {
     count
   ],
   stats: stats.OxO
+};
+
+fixture.OxOxQ = {
+  fields: [
+    {name:1, type:'O'},
+    {name:2, type:'O'},
+    {name:3, type:'Q'}
+  ],
+  stats: stats.OxOxQ
+};
+
+
+fixture['OxOxA(Q)'] = {
+  fields: [
+    {name:1, type:'O'},
+    {name:2, type:'O'},
+    {name:3, type:'Q', aggr:'sum'}
+  ],
+  stats: stats.OxOxQ
 };
 
 fixture.OxQxQ = {

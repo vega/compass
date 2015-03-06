@@ -107,6 +107,7 @@ function barRule(enc, stats, opt) {
   // need to aggregate on either x or y
   if (opt.omitSizeOnBar && enc.size !== undefined) return false;
 
+  // FIXME actually check if there would be occlusion #90
   if (((enc.x.aggr !== undefined) ^ (enc.y.aggr !== undefined)) &&
       (isDimension(enc.x) ^ isDimension(enc.y))) {
 

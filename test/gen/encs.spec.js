@@ -84,6 +84,35 @@ describe('vr.gen.encs()', function () {
   //   console.log('QxA(Q)', encs.map(vl.enc.shorthand));
   // });
 
+  describe('OxOxQ', function () {
+    var f = fixture.OxOxQ;
+
+    it('without stats about occlusion, it should not include charts with both O\'s on axes', function() {
+      var encs = genEncs([], f.fields, f.stats);
+
+      var filtered = encs.filter(function(enc){
+        return enc.x.type === 'O' && enc.y.type === 'O';
+      });
+
+      expect(filtered.length).to.equal(0);
+    });
+  });
+
+  describe('OxOxA(Q)', function () {
+    var f = fixture['OxOxA(Q)'];
+
+    it('without stats about occlusion, it should include charts with both O\'s on axes', function() {
+      var encs = genEncs([], f.fields, f.stats);
+
+      console.log('OxOxA(Q)', encs);
+
+      var filtered = encs.filter(function(enc){
+        return enc.x && enc.x.type === 'O' && enc.y && enc.y.type === 'O';
+      });
+
+      expect(filtered.length).to.gt(0);
+    });
+  });
 
   describe('OxA(Q)xA(Q)', function () {
     var f = fixture['OxA(Q)xA(Q)'],
