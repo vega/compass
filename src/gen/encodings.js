@@ -27,7 +27,8 @@ function genEncodingsFromFields(output, fields, stats, opt, cfg, nested) {
 function genEncodingsFromEncs(output, enc, stats, opt, cfg) {
   getMarktypes(enc, stats, opt)
     .forEach(function(markType) {
-      var encoding = finalTouch({marktype: markType, enc: enc, cfg: cfg}, stats, opt),
+      var e = vl.duplicate({marktype: markType, enc: enc, cfg: cfg}),
+        encoding = finalTouch(e, stats, opt),
         score = rank.encoding(encoding, stats, opt);
 
       encoding.score = score.score;
