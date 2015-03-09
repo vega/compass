@@ -113,6 +113,8 @@ describe('vr.gen.aggregates()', function () {
       var tables = genAggregates([], f.fields, f.stats, {
         omitMeasureOnly: false
       });
+
+      console.log('QxQ', tables);
       expect(tables.length).to.equal(3);
     });
   });
