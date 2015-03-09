@@ -47,6 +47,13 @@ describe('vr.gen.encodings()', function () {
       }).length > 0;
       expect(hasTextTable).to.be.false();
     });
+
+    it('should not contain bar', function() {
+      var filtered = encodings.filter(function(encoding) {
+        return encoding.marktype === 'bar';
+      });
+      expect(filtered.length).to.equal(0);
+    });
   });
 
   describe('OxA(Q)', function() {

@@ -50,7 +50,7 @@ function genAggregates(output, fields, stats, opt) {
   function assignAggrQ(i, hasAggr, autoMode, a) {
     var canHaveAggr = hasAggr === true || hasAggr === null,
       cantHaveAggr = hasAggr === false || hasAggr === null;
-    if (a !== undefined) {
+    if (a) {
       if (canHaveAggr) {
         tf[i].aggr = a;
         assignField(i + 1, true, autoMode);
@@ -90,7 +90,7 @@ function genAggregates(output, fields, stats, opt) {
     } else {
       opt.aggrList.forEach(function(a) {
         if (!opt.consistentAutoQ || autoMode === ANY || autoMode === a) {
-          assignAggrQ(i, hasAggr, a, a);
+          assignAggrQ(i, hasAggr, a /*assign autoMode*/, a);
         }
       });
 

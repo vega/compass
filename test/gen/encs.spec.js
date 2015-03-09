@@ -104,7 +104,7 @@ describe('vr.gen.encs()', function () {
     it('without stats about occlusion, it should include charts with both O\'s on axes', function() {
       var encs = genEncs([], f.fields, f.stats);
 
-      console.log('OxOxA(Q)', encs);
+      // console.log('OxOxA(Q)', encs);
 
       var filtered = encs.filter(function(enc){
         return enc.x && enc.x.type === 'O' && enc.y && enc.y.type === 'O';
