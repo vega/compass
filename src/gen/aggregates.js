@@ -5,6 +5,8 @@ var vl = require('vegalite');
 var util = require('../util'),
   consts = require('../consts');
 
+var ANY='*';
+
 module.exports = genAggregates;
 
 function genAggregates(output, fields, stats, opt) {
@@ -87,22 +89,22 @@ function genAggregates(output, fields, stats, opt) {
       assignBinQ(i, hasAggr, autoMode);
     } else {
       opt.aggrList.forEach(function(a) {
-        if (!opt.consistentAutoQ || autoMode === null || autoMode === a) {
+        if (!opt.consistentAutoQ || autoMode === ANY || autoMode === a) {
           assignAggrQ(i, hasAggr, a, a);
         }
       });
 
-      if ((!opt.consistentAutoQ || vl.isin(autoMode, [null, 'bin', 'cast', 'autocast'])) && !hasO) {
+      if ((!opt.consistentAutoQ || vl.isin(autoMode, [ANY, 'bin', 'cast', 'autocast'])) && !hasO) {
         var highCardinality = vl.field.cardinality(f, stats) > opt.minCardinalityForBin;
 
         var isAuto = opt.genDimQ === 'auto',
           genBin = opt.genDimQ  === 'bin' || (isAuto && highCardinality),
           genCast = opt.genDimQ === 'cast' || (isAuto && !highCardinality);
 
-        if (genBin && vl.isin(autoMode, [null, 'bin', 'autocast'])) {
+        if (genBin && vl.isin(autoMode, [ANY, 'bin', 'autocast'])) {
           assignBinQ(i, hasAggr, isAuto ? 'autocast' : 'bin');
         }
-        if (genCast && vl.isin(autoMode, [null, 'cast', 'autocast'])) {
+        if (genCast && vl.isin(autoMode, [ANY, 'cast', 'autocast'])) {
           tf[i].type = 'O';
           assignField(i + 1, hasAggr, isAuto ? 'autocast' : 'cast');
           tf[i].type = 'Q';
@@ -166,7 +168,7 @@ function genAggregates(output, fields, stats, opt) {
   }
 
   var hasAggr = opt.tableTypes === 'aggregated' ? true : opt.tableTypes === 'disaggregated' ? false : null;
-  assignField(0, hasAggr, null);
+  assignField(0, hasAggr, ANY);
 
   return output;
 }
