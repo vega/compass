@@ -33,7 +33,7 @@ function projections(fields, stats, opt) {
       } else {
         hasSelectedMeasure = true;
       }
-    } else if (!field.excluded && !vl.field.isCount(field)) {
+    } else if (field.selected !== false && !vl.field.isCount(field)) {
       if (vl.field.isDimension(field) &&
           vl.field.cardinality(field, stats, 15) > opt.maxCardinalityForAutoAddOrdinal) {
         return;
@@ -89,3 +89,4 @@ projections.key = function(projection) {
     return vl.field.isCount(field) ? 'count' : field.name;
   }).join(',');
 };
+

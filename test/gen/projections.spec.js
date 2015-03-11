@@ -13,12 +13,23 @@ describe('vr.gen.projections()', function () {
     });
   });
 
+  describe('with a set of fields without any field selected', function () {
+    var fields = [
+      {name:1, selected: true},
+      {name:2, selected: true},
+      {name:3, selected: undefined},
+      {name:4, selected: undefined}
+    ];
+
+    var projections = genProjections(fields);
+  });
+
   describe('with a set of fields', function () {
     var fields = [
       {name:1, selected: true},
       {name:2, selected: true},
-      {name:3, selected: false},
-      {name:4, selected: false}
+      {name:3, selected: undefined},
+      {name:4, selected: undefined}
     ];
 
     var projections = genProjections(fields);
