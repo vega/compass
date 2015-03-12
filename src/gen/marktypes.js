@@ -3,7 +3,8 @@
 var vl = require('vegalite'),
   util = require('../util'),
   consts = require('../consts'),
-  isDimension = vl.field.isDimension;
+  isDimension = vl.field.isDimension,
+  isOrdinalScale = vl.field.isOrdinalScale;
 
 var vlmarktypes = module.exports = getMarktypes;
 
@@ -95,8 +96,8 @@ function tickRule(enc, stats, opt) {
     var xIsDim = isDimension(enc.x),
       yIsDim = isDimension(enc.y);
 
-    return (!xIsDim && (!enc.y || yIsDim)) ||
-      (!yIsDim && (!enc.x || xIsDim));
+    return (!xIsDim && (!enc.y || isOrdinalScale(enc.y))) ||
+      (!yIsDim && (!enc.x || isOrdinalScale(enc.x)));
   }
   return false;
 }
