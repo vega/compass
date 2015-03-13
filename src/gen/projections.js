@@ -28,7 +28,7 @@ function projections(fields, stats, opt) {
 
     if (field.selected) {
       selected.push(field);
-      if (isDimension(field)) {
+      if (isDimension(field) || field.type ==='T') { // FIXME / HACK
         hasSelectedDimension = true;
       } else {
         hasSelectedMeasure = true;

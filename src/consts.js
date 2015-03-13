@@ -50,7 +50,7 @@ consts.gen.aggregates = {
     },
     omitMeasureOnly: {
       type: 'boolean',
-      default: true,
+      default: false,
       description: 'Omit aggregation with measure(s) only'
     },
     omitDimensionOnly: {
