@@ -35,7 +35,9 @@ function projections(fields, stats, opt) {
       }
     } else if (field.selected !== false && !vl.field.isCount(field)) {
       if (vl.field.isDimension(field) &&
-          vl.field.cardinality(field, stats, 15) > opt.maxCardinalityForAutoAddOrdinal) {
+          !opt.maxCardinalityForAutoAddOrdinal &&
+          vl.field.cardinality(field, stats, 15) > opt.maxCardinalityForAutoAddOrdinal
+        ) {
         return;
       }
       fieldsToAdd.push(field);
