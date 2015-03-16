@@ -23,14 +23,14 @@ describe('vr.gen.aggregates()', function () {
 
     var tables = genAggregates([], f.fields, f.stats);
 
-    it('should output 1 data table that has length 1', function () {
+    it('should output 1 data table that has length 2', function () {
       expect(tables.filter(function(t) {
         return t.length === 1;
-      }).length).to.equal(1);
+      }).length).to.equal(2);
     });
 
-    it('should output 2 data tables: Q, BIN(Q)x#', function () {
-      expect(tables.length).to.equal(2);
+    it('should output 3 data tables: Q, A(Q), BIN(Q)x#', function () {
+      expect(tables.length).to.equal(3);
     });
 
     it('should append key to each fieldSet', function() {
@@ -74,9 +74,9 @@ describe('vr.gen.aggregates()', function () {
   describe('Qx#', function () {
     var f = fixture['Qx#'];
     var tables = genAggregates([], f.fields, f.stats);
-    it('should output 1 data table', function () {
-      expect(tables.length).to.equal(1); // bin
-      expect(tables[0][0].bin).to.be.true(); // bin
+    it('should output 2 data table', function () {
+      expect(tables.length).to.equal(2); // bin
+      expect(tables[1][0].bin).to.be.true(); // bin
     });
   });
 
@@ -86,8 +86,8 @@ describe('vr.gen.aggregates()', function () {
 
     var tables = genAggregates([], f.fields, f.stats, {});
 
-    it('should output 2 data table', function () {
-      expect(tables.length).to.equal(2);
+    it('should output 3 data table', function () {
+      expect(tables.length).to.equal(3);
     });
 
     it('should append key to each fieldSet', function() {
@@ -121,8 +121,8 @@ describe('vr.gen.aggregates()', function () {
   describe('1 count', function () {
     var f = fixture['#'];
     var tables = genAggregates([], f.fields, f.stats);
-    it('should output no data table', function () {
-      expect(tables.length).to.equal(0); // O, bin
+    it('should output one data table', function () {
+      expect(tables.length).to.equal(1); // O, bin
     });
   });
 });
