@@ -65,7 +65,7 @@ describe('vr.gen.marktypes()', function(){
   describe('text', function() {
     it('should be generated', function () {
       var shorthand = 'row=1,O|text=avg_2,Q',
-        enc = vl.enc.parseShorthand(shorthand),
+        enc = vl.enc.fromShorthand(shorthand),
         marktypes = getMarkTypes(enc);
       expect(marktypes.indexOf('text')).to.gt(-1);
     });
