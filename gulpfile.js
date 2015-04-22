@@ -10,8 +10,8 @@ var uglify = require('gulp-uglify');
 var watchify = require('watchify');
 
 var bundler = watchify(browserify({
-  entries: ['./src/vr'],
-  standalone: 'vr',
+  entries: ['./src/cp'],
+  standalone: 'cp',
   noparse: ['../lib/vegalite.js', '../lib/clusterfck.js'],
   // require: ['./lib/vegalite', './lib/clusterfck'],
   debug: true,
@@ -27,7 +27,7 @@ function bundle() {
     .bundle()
     .on('error', gutil.log.bind(gutil, 'Browserify Error'))
 
-    .pipe(source('visrec.js'))
+    .pipe(source('compass.js'))
     .pipe(buffer())
     .pipe(gulp.dest('.'))
     .pipe(sourcemaps.init({loadMaps: true}))

@@ -15,7 +15,7 @@ var consts = require('../../src/consts'),
   M = measureScore.consts,
   opt = vl.schema.util.extend(opt||{}, consts.gen.encodings);
 
-describe('vr.rank.encoding', function () {
+describe('cp.rank.encoding', function () {
   var marktypes = consts.gen.encodings.properties.marktypeList.default;
   var encTypes = ['x', 'y', 'row', 'col', 'size', 'color', 'shape', 'alpha', 'text', 'detail'];
   var dFixtures = ['O', 'O_15', 'O_30', 'BIN(Q)'],

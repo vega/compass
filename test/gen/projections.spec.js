@@ -3,7 +3,7 @@ var expect = require('chai').expect,
 
 var genProjections = require('../../src/gen/projections');
 
-describe('vr.gen.projections()', function () {
+describe('cp.gen.projections()', function () {
   describe('with empty set of fields', function () {
     var fields = [];
     var projections = genProjections(fields);

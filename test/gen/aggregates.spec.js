@@ -8,7 +8,7 @@ var genProjections = require('../../src/gen/projections'),genAggregates = requir
   constsAggregates = require('../../src/consts').gen.aggregates;
 
 
-describe('vr.gen.aggregates()', function () {
+describe('cp.gen.aggregates()', function () {
 
   describe('Ox#', function () {
     var f = fixture['Ox#'];

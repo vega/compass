@@ -1,7 +1,7 @@
 var expect = require('chai').expect,
   distance = require('../../src/cluster/distance');
 
-describe('vr.cluster.distance.get()', function () {
+describe('cp.cluster.distance.get()', function () {
   it('should return correct distance', function() {
     var table1 = {
       "marktype": "text",

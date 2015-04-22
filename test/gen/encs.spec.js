@@ -6,7 +6,7 @@ var expect = require('chai').expect,
 
 var genEncs = require('../../src/gen/encs');
 
-describe('vr.gen.encs()', function () {
+describe('cp.gen.encs()', function () {
   describe('1Q,', function() {
     //FIXME write tests
   });

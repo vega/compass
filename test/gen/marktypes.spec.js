@@ -4,7 +4,7 @@ var expect = require('chai').expect,
 // var dataB = require("../data/birdstrikes.json");
 var getMarkTypes = require('../../src/gen/marktypes');
 
-describe('vr.gen.marktypes()', function(){
+describe('cp.gen.marktypes()', function(){
   describe('1Q', function () {
     var enc = {"x": {"name": "Cost__Total_$","type": "Q"}};
     var marktypes = getMarkTypes(enc);

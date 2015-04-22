@@ -1,7 +1,7 @@
 {
-  "name": "visrec",
+  "name": "viscompass",
   "version": "0.0.0",
-  "description": "Visrec: Visualization Recommendation. =========",
+  "description": "VisCompass: Visualization Recommender",
 
   "author": {
     "name": "UW Interactive Data Lab",
@@ -12,7 +12,7 @@
     "Dominik Moritz <domoritz@cs.washington.edu> (http://domoritz.de)",
     "Jeffrey Heer <jheer@uw.edu> (http://jheer.org)"
   ],
-  "main": "visrec.js",
+  "main": "compass.js",
   "directories": {
     "test": "test"
   },

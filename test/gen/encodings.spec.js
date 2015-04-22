@@ -7,7 +7,7 @@ var expect = require('chai').expect,
 var genEncs = require('../../src/gen/encs'),
   genEncodings = require('../../src/gen/encodings');
 
-describe('vr.gen.encodings()', function () {
+describe('cp.gen.encodings()', function () {
   describe('1Q', function() {
     var fields = fixture['Q'].fields,
       stats = fixture['Q'].stats;
