@@ -8,26 +8,31 @@ var vl = require('vegalite'),
 
 module.exports = genEncodingsFromFields;
 
-function genEncodingsFromFields(output, fields, stats, opt, cfg, nested) {
+function genEncodingsFromFields(output, fields, stats, opt, nested) {
   opt = vl.schema.util.extend(opt||{}, consts.gen.encodings);
   var encs = genEncs([], fields, stats, opt);
 
   if (nested) {
     return encs.reduce(function(dict, enc) {
-      dict[enc] = genEncodingsFromEncs([], enc, stats, opt, cfg);
+      dict[enc] = genEncodingsFromEncs([], enc, stats, opt);
       return dict;
     }, {});
   } else {
     return encs.reduce(function(list, enc) {
-      return genEncodingsFromEncs(list, enc, stats, opt, cfg);
+      return genEncodingsFromEncs(list, enc, stats, opt);
     }, []);
   }
 }
 
-function genEncodingsFromEncs(output, enc, stats, opt, cfg) {
+function genEncodingsFromEncs(output, enc, stats, opt) {
   getMarktypes(enc, stats, opt)
     .forEach(function(markType) {
-      var e = vl.duplicate({marktype: markType, enc: enc, cfg: cfg}),
+      var e = vl.duplicate({
+          data: opt.data,
+          marktype: markType,
+          enc: enc,
+          config: opt.config
+        }),
         encoding = finalTouch(e, stats, opt),
         score = rank.encoding(encoding, stats, opt);
 
