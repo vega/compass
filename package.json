@@ -2,6 +2,16 @@
   "name": "visrec",
   "version": "0.0.0",
   "description": "Visrec: Visualization Recommendation. =========",
+
+  "author": {
+    "name": "UW Interactive Data Lab",
+    "url": "http://idl.cs.washington.edu"
+  },
+  "collaborators": [
+    "Kanit Wongsuphasawat <kanitw@gmail.com> (http://kanitw.yellowpigz.com)",
+    "Dominik Moritz <domoritz@cs.washington.edu> (http://domoritz.de)",
+    "Jeffrey Heer <jheer@uw.edu> (http://jheer.org)"
+  ],
   "main": "visrec.js",
   "directories": {
     "test": "test"
