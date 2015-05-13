@@ -12,8 +12,6 @@ var watchify = require('watchify');
 var bundler = watchify(browserify({
   entries: ['./src/cp'],
   standalone: 'cp',
-  noparse: ['../lib/vega-lite.js', '../lib/clusterfck.js'],
-  // require: ['./lib/vega-lite', './lib/clusterfck'],
   debug: true,
   transform: ['browserify-shim']
   // ,

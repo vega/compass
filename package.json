@@ -19,8 +19,7 @@
     "test": "gulp test"
   },
   "browserify-shim": {
-    "vega-lite": "global:vl",
-    "clusterfck": "global:clusterfck"
+    "vega-lite": "global:vl"
   },
   "repository": {
     "type": "git",
