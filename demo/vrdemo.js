@@ -4,7 +4,7 @@
 (function (root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['d3', 'vega', 'vegalite', 'lodash', 'visrec'],factory);
+    define(['d3', 'vega', 'vega-lite', 'lodash', 'visrec'],factory);
   } else if (typeof exports === 'object') {
     // Node. Does not work with strict CommonJS, but
     // only CommonJS-like environments that support module.exports,
@@ -12,7 +12,7 @@
     module.exports = factory(
       require('d3'),
       require('vega'),
-      require('vegalite'),
+      require('vega-lite'),
       require('lodash'),
       require('visrec')
     );
@@ -41,7 +41,7 @@
 
 
   function getVLType(data_type){
-    // return vegalite's data type
+    // return vega-lite's data type
     var typeMap = {
       "categorical": "O",
       "geographic": "G",

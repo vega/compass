@@ -1,4 +1,4 @@
-var vl = require('vegalite'),
+var vl = require('vega-lite'),
   isDimension = vl.field.isDimension;
 
 module.exports = rankEncodings;

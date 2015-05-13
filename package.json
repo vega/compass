@@ -2,7 +2,6 @@
   "name": "viscompass",
   "version": "0.0.0",
   "description": "VisCompass: Visualization Recommender",
-
   "author": {
     "name": "UW Interactive Data Lab",
     "url": "http://idl.cs.washington.edu"
@@ -17,17 +16,16 @@
     "test": "test"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "gulp test"
   },
   "browserify-shim": {
-    "vegalite": "global:vl",
+    "vega-lite": "global:vl",
     "clusterfck": "global:clusterfck"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/uwdata/visrec.git"
   },
-  "author": "Kanit Wongsuphasawat",
   "license": "BSD",
   "bugs": {
     "url": "https://github.com/uwdata/visrec/issues"
@@ -59,6 +57,7 @@
     "watchify": "^2.2.1"
   },
   "dependencies": {
-    "vegalite": "file:../vegalite/vegalite"
+    "clusterfck": "^0.6.0",
+    "vega-lite": "^0.6.7"
   }
 }

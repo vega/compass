@@ -1,6 +1,6 @@
 'use strict';
 
-var vl = require('vegalite'),
+var vl = require('vega-lite'),
   genEncs = require('./encs'),
   getMarktypes = require('./marktypes'),
   rank = require('../rank/rank'),

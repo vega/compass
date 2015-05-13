@@ -1,5 +1,5 @@
 var expect = require('chai').expect,
-  vl = require('vegalite');
+  vl = require('vega-lite');
 
 // var dataB = require("../data/birdstrikes.json");
 var getMarkTypes = require('../../src/gen/marktypes');

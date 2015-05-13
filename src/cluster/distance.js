@@ -1,4 +1,4 @@
-var vl = require('vegalite'),
+var vl = require('vega-lite'),
   consts = require('./clusterconsts'),
   util = require('../util');
 

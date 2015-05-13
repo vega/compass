@@ -1,7 +1,7 @@
 /*jshint -W069 */
 
 var expect = require('chai').expect,
-  vl = require('vegalite');
+  vl = require('vega-lite');
 
 var genProjections = require('../../src/gen/projections'),genAggregates = require('../../src/gen/aggregates'),
   fixture = require('../fixture'),

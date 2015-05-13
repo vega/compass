@@ -1,4 +1,4 @@
-var vl = require('vegalite'),
+var vl = require('vega-lite'),
   util = require('../util');
 
 var gen = module.exports = {

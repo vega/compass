@@ -1,5 +1,6 @@
 npm-debug.log
 node_modules
-visrec.min.js
-visrec.min.js.map
-visrec.js
+compass.min.js
+compass.min.js.map
+compass.js
+bower_components

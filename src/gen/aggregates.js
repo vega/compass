@@ -1,6 +1,6 @@
 'use strict';
 
-var vl = require('vegalite');
+var vl = require('vega-lite');
 
 var util = require('../util'),
   consts = require('../consts');

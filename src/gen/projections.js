@@ -1,6 +1,6 @@
 var util = require('../util'),
   consts = require('../consts'),
-  vl = require('vegalite'),
+  vl = require('vega-lite'),
   isDimension = vl.field.isDimension;
 
 module.exports = projections;

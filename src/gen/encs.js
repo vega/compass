@@ -1,6 +1,6 @@
 "use strict";
 
-var vl = require('vegalite'),
+var vl = require('vega-lite'),
   globals = require('../globals'),
   util = require('../util'),
   consts = require('../consts'),
@@ -10,7 +10,7 @@ var vl = require('vegalite'),
 
 module.exports = genEncs;
 
-// FIXME remove dimension, measure and use information in vegalite instead!
+// FIXME remove dimension, measure and use information in vega-lite instead!
 var rules = {
   x: {
     dimension: true,
@@ -172,7 +172,7 @@ genEncs.isAggrWithAllDimOnFacets = function (enc) {
 
 function genEncs(encs, fields, stats, opt) {
   opt = vl.schema.util.extend(opt||{}, consts.gen.encodings);
-  // generate a collection vegalite's enc
+  // generate a collection vega-lite's enc
   var tmpEnc = {};
 
   function assignField(i) {

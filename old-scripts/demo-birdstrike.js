@@ -1,5 +1,5 @@
 require(['jquery','d3', 'dv', 'lodash','vega',
-    'chartTemplates', 'dataTypes', 'field', 'chart', 'vegalite'
+    'chartTemplates', 'dataTypes', 'field', 'chart', 'vega-lite'
   ],function($, d3, dv, _, vg,
     chartTemplates, dt, field, Chart, vl){
 

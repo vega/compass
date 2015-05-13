@@ -2,7 +2,7 @@
 
 module.exports = cluster;
 
-var vl = require('vegalite'),
+var vl = require('vega-lite'),
   clusterfck = require('clusterfck'),
   consts = require('./clusterconsts'),
   util = require('../util');

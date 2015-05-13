@@ -12,8 +12,8 @@ var watchify = require('watchify');
 var bundler = watchify(browserify({
   entries: ['./src/cp'],
   standalone: 'cp',
-  noparse: ['../lib/vegalite.js', '../lib/clusterfck.js'],
-  // require: ['./lib/vegalite', './lib/clusterfck'],
+  noparse: ['../lib/vega-lite.js', '../lib/clusterfck.js'],
+  // require: ['./lib/vega-lite', './lib/clusterfck'],
   debug: true,
   transform: ['browserify-shim']
   // ,
@@ -21,7 +21,7 @@ var bundler = watchify(browserify({
   // ignoreMissing: true
 }));
 
-// builds vegalite
+// builds vega-lite
 function bundle() {
   return bundler
     .bundle()
@@ -31,7 +31,7 @@ function bundle() {
     .pipe(buffer())
     .pipe(gulp.dest('.'))
     .pipe(sourcemaps.init({loadMaps: true}))
-    // This will minify and rename to vegalite.min.js
+    // This will minify and rename to vega-lite.min.js
     .pipe(uglify())
     .pipe(rename({ extname: '.min.js' }))
     .pipe(sourcemaps.write('./'))
@@ -56,15 +56,15 @@ gulp.task('test', function() {
     .on('error', gutil.log);
 });
 
-// copy vegalite to lib
+// copy vega-lite to lib
 
-var vlPath = '../vegalite/';
+var vlPath = 'node_modules/vega-lite/';
 gulp.task('watchvl', function() {
-  gulp.watch([vlPath + 'vegalite.js'], ['copyvl', 'build']);
+  gulp.watch([vlPath + 'vega-lite.js'], ['copyvl', 'build']);
 });
 
 gulp.task('copyvl', function() {
-  gulp.src(vlPath+'vegalite.js')
+  gulp.src(vlPath+'vega-lite.js')
     .pipe(gulp.dest('lib/'));
 });
 
