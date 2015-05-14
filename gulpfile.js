@@ -1,68 +1,12 @@
+'use strict';
+
 var gulp = require('gulp');
 
-var browserify = require('browserify');
-var buffer = require('vinyl-buffer');
-var rename = require('gulp-rename');
-var run = require('gulp-run');
-var source = require('vinyl-source-stream');
-var sourcemaps = require('gulp-sourcemaps');
-var uglify = require('gulp-uglify');
-var watchify = require('watchify');
+gulp.paths = {
+  src: 'src',
+  test: 'test'
+};
 
-var bundler = watchify(browserify({
-  entries: ['./src/cp'],
-  standalone: 'cp',
-  debug: true,
-  transform: ['browserify-shim']
-  // ,
-  // //deal with require() in /clusterfck
-  // ignoreMissing: true
-}));
+require('require-dir')('./gulp');
 
-// builds vega-lite
-function bundle() {
-  return bundler
-    .bundle()
-    .on('error', gutil.log.bind(gutil, 'Browserify Error'))
-
-    .pipe(source('compass.js'))
-    .pipe(buffer())
-    .pipe(gulp.dest('.'))
-    .pipe(sourcemaps.init({loadMaps: true}))
-    // This will minify and rename to vega-lite.min.js
-    .pipe(uglify())
-    .pipe(rename({ extname: '.min.js' }))
-    .pipe(sourcemaps.write('./'))
-    .pipe(gulp.dest('.'));
-}
-
-gulp.task('build', bundle);
 gulp.task('default', ['copyvl', 'test', 'build', 'watch', 'watchvl']);
-
-// test
-
-gulp.task('watch', function() {
-  gulp.watch(['src/**', 'test/**'], ['build', 'test']);
-});
-
-
-var gutil = require('gulp-util');
-var mocha = require('gulp-mocha');
-gulp.task('test', function() {
-  return gulp.src(['test/**/*.spec.js'], { read: false })
-    .pipe(mocha({ reporter: 'list' }))
-    .on('error', gutil.log);
-});
-
-// copy vega-lite to lib
-
-var vlPath = 'node_modules/vega-lite/';
-gulp.task('watchvl', function() {
-  gulp.watch([vlPath + 'vega-lite.js'], ['copyvl', 'build']);
-});
-
-gulp.task('copyvl', function() {
-  gulp.src(vlPath+'vega-lite.js')
-    .pipe(gulp.dest('lib/'));
-});
-
