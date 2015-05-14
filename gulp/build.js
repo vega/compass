@@ -8,19 +8,23 @@ var browserify = require('browserify');
 var source = require('vinyl-source-stream');
 var watchify = require('watchify');
 
-var bundler = watchify(browserify({
+var bundleDef = {
   entries: ['./src/cp'],
   standalone: 'cp',
   debug: true,
   transform: ['browserify-shim']
-  // ,
-  // //deal with require() in /clusterfck
-  // ignoreMissing: true
-}));
+};
 
+var browserBundler = browserify(bundleDef);
+var watchBundler = watchify(browserify(bundleDef));
+
+// builds Vega-lite with watcher
 function bundle() {
-  return bundler
-    .bundle()
+  return build(watchBundler.bundle());
+}
+
+function build(bundle) {
+  return bundle
     .on('error', $.util.log.bind($.util, 'Browserify Error'))
     .pipe(source('compass.js'))
     .pipe(buffer())
@@ -33,4 +37,9 @@ function bundle() {
     .pipe(gulp.dest('.'));
 }
 
-gulp.task('build', bundle);
+gulp.task('build', function() {
+  build(browserBundler.bundle());
+});
+
+watchBundler.on('update', bundle);
+gulp.task('bundle', bundle);

@@ -9,4 +9,4 @@ gulp.paths = {
 
 require('require-dir')('./gulp');
 
-gulp.task('default', ['copyvl', 'test', 'build', 'watch', 'watchvl']);
+gulp.task('default', ['bundle', 'watch']);
