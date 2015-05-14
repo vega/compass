@@ -1,7 +1,6 @@
 "use strict";
 
 var vl = require('vega-lite'),
-  util = require('../util'),
   consts = require('../consts'),
   isDimension = vl.field.isDimension,
   isOrdinalScale = vl.field.isOrdinalScale;
@@ -90,6 +89,7 @@ function pointRule(enc, stats, opt) {
 }
 
 function tickRule(enc, stats, opt) {
+  // jshint unused:false
   if (enc.x || enc.y) {
     if(vl.enc.isAggregate(enc)) return false;
 

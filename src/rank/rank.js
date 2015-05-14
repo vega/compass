@@ -1,4 +1,4 @@
-var rank = module.exports = {
+module.exports = {
   encoding: require('./rankEncodings')
 };
 

@@ -1,3 +1,5 @@
+'use strict';
+
 var expect = require('chai').expect,
   vl = require('vega-lite');
 

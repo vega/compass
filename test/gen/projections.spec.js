@@ -1,3 +1,5 @@
+'use strict';
+
 var expect = require('chai').expect,
   fixture = require('../fixture');
 
@@ -25,7 +27,7 @@ describe('cp.gen.projections()', function () {
           expect(a.name).to.lt(b.name);
         }
       }
-    })
+    });
   });
 
   describe('with a set of fields', function () {

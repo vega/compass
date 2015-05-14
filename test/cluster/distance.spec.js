@@ -1,3 +1,5 @@
+'use strict';
+
 var expect = require('chai').expect,
   distance = require('../../src/cluster/distance');
 

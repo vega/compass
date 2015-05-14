@@ -1,8 +1,11 @@
+'use strict';
+
 var vl = require('vega-lite'),
   consts = require('./clusterconsts'),
   util = require('../util');
 
-module.exports = distance = {};
+var distance = {};
+module.exports = distance;
 
 distance.table = function (encodings) {
   var len = encodings.length,

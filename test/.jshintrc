@@ -10,6 +10,5 @@
   "predef": [
     "TABLE", "RAW", "STACKED", "INDEX",
     "X", "Y", "ROW", "COL", "SIZE", "SHAPE", "COLOR", "ALPHA", "TEXT", "DETAIL",
-    "O", "Q", "T"],
-  "globalstrict": true
+    "O", "Q", "T"]
 }

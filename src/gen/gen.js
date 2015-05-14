@@ -1,5 +1,6 @@
-var vl = require('vega-lite'),
-  util = require('../util');
+'use strict';
+
+var util = require('../util');
 
 var gen = module.exports = {
   // data variations
@@ -9,16 +10,6 @@ var gen = module.exports = {
   encodings: require('./encodings'),
   encs: require('./encs'),
   marktypes: require('./marktypes')
-};
-
-//FIXME move these to vl
-var AGGREGATION_FN = { //all possible aggregate function listed by each data type
-  Q: vl.schema.aggr.supportedEnums.Q
-};
-
-var TRANSFORM_FN = { //all possible transform function listed by each data type
-  // Q: ['log', 'sqrt', 'abs'], // "logit?"
-  T: vl.schema.timefns
 };
 
 gen.charts = function(fields, opt, cfg, flat) {

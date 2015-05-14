@@ -1,4 +1,6 @@
-var expect = require('chai').expect,
+'use strict';
+
+var //expect = require('chai').expect,
   vl = require('vega-lite');
 
 var fixture = require('../fixture'),
@@ -22,8 +24,3 @@ var fixture = require('../fixture'),
     console.log(clusters.dist[cs[0]][cs[2]]);
 
 console.log(Math.sqrt(1+0.05*0.05));
-
-
-//   });
-
-// });

@@ -2,8 +2,7 @@
 
 var vl = require('vega-lite');
 
-var util = require('../util'),
-  consts = require('../consts');
+var consts = require('../consts');
 
 var ANY='*';
 
@@ -160,6 +159,7 @@ function genAggregates(output, fields, stats, opt) {
         break;
 
       case 'O':
+        /* falls through */
       default:
         tf[i] = f;
         assignField(i + 1, hasAggr, autoMode);

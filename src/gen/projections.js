@@ -1,3 +1,5 @@
+'use strict';
+
 var util = require('../util'),
   consts = require('../consts'),
   vl = require('vega-lite'),
@@ -72,7 +74,6 @@ var typeIsMeasureScore = {
 
 function compareFieldsToAdd(hasSelectedDimension, hasSelectedMeasure, indices) {
   return function(a, b){
-    var aIsDim = isDimension(a), bIsDim = isDimension(b);
     // sort by type of the data
     if (a.type !== b.type) {
       if (!hasSelectedDimension) {

@@ -1,3 +1,5 @@
+'use strict';
+
 var g = global || window;
 
 g.CHART_TYPES = {

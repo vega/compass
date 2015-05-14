@@ -1,3 +1,5 @@
+'use strict';
+
 /*jshint -W069 */
 
 // commonly used data set

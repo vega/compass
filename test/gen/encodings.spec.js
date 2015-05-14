@@ -1,11 +1,11 @@
+'use strict';
+
 /*jshint -W069 */
 
 var expect = require('chai').expect,
-  vl = require('vega-lite'),
   fixture = require('../fixture');
 
-var genEncs = require('../../src/gen/encs'),
-  genEncodings = require('../../src/gen/encodings');
+var genEncodings = require('../../src/gen/encodings');
 
 describe('cp.gen.encodings()', function () {
   describe('1Q', function() {
@@ -100,6 +100,7 @@ describe('cp.gen.encodings()', function () {
         var enc = encoding.enc;
         return encoding.marktype==='point' && enc.x && enc.y && enc.color;
       });
+      //FIXME
     });
   });
 

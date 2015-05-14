@@ -1,3 +1,5 @@
+'use strict';
+
 var consts = module.exports = {
   gen: {},
   cluster: {},

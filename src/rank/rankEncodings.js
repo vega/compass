@@ -1,3 +1,5 @@
+'use strict';
+
 var vl = require('vega-lite'),
   isDimension = vl.field.isDimension;
 
@@ -161,6 +163,7 @@ rankEncodings.dimensionScore = function (field, encType, marktype, stats, opt){
 rankEncodings.dimensionScore.consts = D;
 
 rankEncodings.measureScore = function (field, encType, marktype, stats, opt) {
+  // jshint unused:false
   switch (encType){
     case 'x': return M.pos;
     case 'y': return M.pos;

@@ -1,3 +1,5 @@
+'use strict';
+
 var c = module.exports = {};
 
 c.SWAPPABLE = 0.05;

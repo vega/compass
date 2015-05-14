@@ -1,8 +1,7 @@
 "use strict";
+require('../globals');
 
 var vl = require('vega-lite'),
-  globals = require('../globals'),
-  util = require('../util'),
   consts = require('../consts'),
   genMarkTypes = require('./marktypes'),
   isDimension = vl.field.isDimension,

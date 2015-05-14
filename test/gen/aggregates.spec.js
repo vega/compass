@@ -1,11 +1,12 @@
+'use strict';
+
 /*jshint -W069 */
 
-var expect = require('chai').expect,
-  vl = require('vega-lite');
+var expect = require('chai').expect;
 
-var genProjections = require('../../src/gen/projections'),genAggregates = require('../../src/gen/aggregates'),
-  fixture = require('../fixture'),
-  constsAggregates = require('../../src/consts').gen.aggregates;
+var //genProjections = require('../../src/gen/projections'),
+  genAggregates = require('../../src/gen/aggregates'),
+  fixture = require('../fixture');
 
 
 describe('cp.gen.aggregates()', function () {

@@ -1,10 +1,10 @@
+'use strict';
 /*jshint -W069 */
 
 var expect = require('chai').expect,
   vl = require('vega-lite'),
   fixture = require('../fixture'),
-  setter = vl.setter,
-  stringify = JSON.stringify;
+  setter = vl.setter;
 
 
 var consts = require('../../src/consts'),
