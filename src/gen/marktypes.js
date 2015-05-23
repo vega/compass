@@ -109,11 +109,11 @@ function barRule(enc, stats, opt) {
   if (opt.omitSizeOnBar && enc.size !== undefined) return false;
 
   // FIXME actually check if there would be occlusion #90
-  if (((enc.x.aggr !== undefined) ^ (enc.y.aggr !== undefined)) &&
+  if (((enc.x.aggregate !== undefined) ^ (enc.y.aggregate !== undefined)) &&
       (isDimension(enc.x) ^ isDimension(enc.y))) {
 
-    var aggr = enc.x.aggr || enc.y.aggr;
-    return !(opt.omitStackedAverage && aggr ==='avg' && enc.color);
+    var aggregate = enc.x.aggregate || enc.y.aggregate;
+    return !(opt.omitStackedAverage && aggregate ==='avg' && enc.color);
   }
 
   return false;
@@ -127,7 +127,7 @@ function lineRule(enc, stats, opt) {
   // FIXME truly ordinal data is fine here too.
   // Line chart should be only horizontal
   // and use only temporal data
-  return enc.x.type == 'T' && enc.x.fn && enc.y.type == 'Q' && enc.y.aggr;
+  return enc.x.type == 'T' && enc.x.fn && enc.y.type == 'Q' && enc.y.aggregate;
 }
 
 function areaRule(enc, stats, opt) {
@@ -135,11 +135,11 @@ function areaRule(enc, stats, opt) {
 
   if(!lineRule(enc, stats, opt)) return false;
 
-  return !(opt.omitStackedAverage && enc.y.aggr ==='avg' && enc.color);
+  return !(opt.omitStackedAverage && enc.y.aggregate ==='avg' && enc.color);
 }
 
 function textRule(enc, stats, opt) {
   // at least must have row or col and aggregated text values
-  return (enc.row || enc.col) && enc.text && enc.text.aggr && !enc.x && !enc.y && !enc.size &&
+  return (enc.row || enc.col) && enc.text && enc.text.aggregate && !enc.x && !enc.y && !enc.size &&
     (!opt.alwaysGenerateTableAsHeatmap || !enc.color);
 }

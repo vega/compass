@@ -97,7 +97,7 @@ describe('cp.gen.encodings()', function () {
 
     it('should contain colored scatter plot', function() {
       var filtered = encodings.filter(function(encoding) {
-        var enc = encoding.enc;
+        var enc = encoding.encoding;
         return encoding.marktype==='point' && enc.x && enc.y && enc.color;
       });
       //FIXME

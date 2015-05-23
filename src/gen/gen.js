@@ -22,7 +22,7 @@ gen.charts = function(fields, opt, cfg, flat) {
   var fieldSets = opt.genAggr ? gen.aggregates([], fields, opt) : [fields],
     encs, charts, level = 0;
 
-  if (flat === true || (flat && flat.aggr)) {
+  if (flat === true || (flat && flat.aggregate)) {
     encs = fieldSets.reduce(function(output, fields) {
       return gen.encs(output, fields, opt);
     }, []);

@@ -29,7 +29,7 @@ function genAggregates(output, fields, stats, opt) {
           hasDimension = true;
         } else {
           hasMeasure = true;
-          if (!f.aggr) hasRaw = true;
+          if (!f.aggregate) hasRaw = true;
         }
       });
       if (!hasDimension && !hasRaw && opt.omitMeasureOnly) return;
@@ -51,9 +51,9 @@ function genAggregates(output, fields, stats, opt) {
       cantHaveAggr = hasAggr === false || hasAggr === null;
     if (a) {
       if (canHaveAggr) {
-        tf[i].aggr = a;
+        tf[i].aggregate = a;
         assignField(i + 1, true, autoMode);
-        delete tf[i].aggr;
+        delete tf[i].aggregate;
       }
     } else { // if(a === undefined)
       if (cantHaveAggr) {
@@ -74,14 +74,14 @@ function genAggregates(output, fields, stats, opt) {
 
     tf[i] = {name: f.name, type: f.type};
 
-    if (f.aggr === 'count') { // if count is included in the selected fields
+    if (f.aggregate === 'count') { // if count is included in the selected fields
       if (canHaveAggr) {
-        tf[i].aggr = f.aggr;
+        tf[i].aggregate = f.aggregate;
         assignField(i + 1, true, autoMode);
       }
-    } else if (f._aggr) {
+    } else if (f._aggregate) {
       // TODO support array of f._aggrs too
-      assignAggrQ(i, hasAggr, autoMode, f._aggr);
+      assignAggrQ(i, hasAggr, autoMode, f._aggregate);
     } else if (f._raw) {
       assignAggrQ(i, hasAggr, autoMode, undefined);
     } else if (f._bin) {

@@ -21,11 +21,11 @@ var MARK_SCORE = {
 
 function rankEncodings(encoding, stats, opt, selected) {
   var features = [],
-    encTypes = vl.keys(encoding.enc),
+    encTypes = vl.keys(encoding.encoding),
     marktype = encoding.marktype,
-    enc = encoding.enc;
+    enc = encoding.encoding;
 
-  var encodingMappingByField = vl.enc.reduce(encoding.enc, function(o, field, encType) {
+  var encodingMappingByField = vl.enc.reduce(encoding.encoding, function(o, field, encType) {
     var key = vl.field.shorthand(field);
     var mappings = o[key] = o[key] || [];
     mappings.push({encType: encType, field: field});

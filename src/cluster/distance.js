@@ -47,7 +47,7 @@ distance.get = function (colenc1, colenc2) {
 
   if(isStack1 || isStack2) {
     if(isStack1 && isStack2) {
-      if(colenc1.enc.color.name !== colenc2.enc.color.name) {
+      if(colenc1.encoding.color.name !== colenc2.encoding.color.name) {
         dist+=1;
       }
     } else {
@@ -60,7 +60,7 @@ distance.get = function (colenc1, colenc2) {
 // get encoding type by fieldname
 distance.getEncTypeByColumnName = function(encoding) {
   var _colenc = {},
-    enc = encoding.enc;
+    enc = encoding.encoding;
 
   vl.keys(enc).forEach(function(encType) {
     var e = vl.duplicate(enc[encType]);
@@ -72,6 +72,6 @@ distance.getEncTypeByColumnName = function(encoding) {
   return {
     marktype: encoding.marktype,
     col: _colenc,
-    enc: encoding.enc
+    enc: encoding.encoding
   };
 };

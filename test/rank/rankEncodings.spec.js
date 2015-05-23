@@ -166,8 +166,8 @@ describe('cp.rank.encoding', function () {
           "marktype": "text",
           "enc": {
             "col": {"name": "Aircraft__Airline_Operator","type": "O"},
-            "text": {"name": "*","aggr": "count","type": "Q"},
-            "color": {"name": "*","aggr": "count","type": "Q"}
+            "text": {"name": "*","aggregate": "count","type": "Q"},
+            "color": {"name": "*","aggregate": "count","type": "Q"}
           }
         };
         var score = rankEncodings(encoding, {
