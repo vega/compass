@@ -30,7 +30,7 @@ function genEncodingsFromEncs(output, enc, stats, opt) {
       var e = vl.duplicate({
           data: opt.data,
           marktype: markType,
-          enc: enc,
+          encoding: enc,
           config: opt.config
         }),
         encoding = finalTouch(e, stats, opt),
@@ -56,7 +56,7 @@ function finalTouch(encoding, stats, opt) {
     var field = enc[et];
     if (field && vl.field.isMeasure(field) && !vl.field.isCount(field)) {
       var stat = stats[field.name];
-      if (stat.stdev / stat.avg < 0.01) {
+      if (stat && stat.stdev / stat.avg < 0.01) {
         field.scale = {zero: false};
       }
     }

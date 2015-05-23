@@ -7,7 +7,7 @@ describe('cp.cluster.distance.get()', function () {
   it('should return correct distance', function() {
     var table1 = {
       "marktype": "text",
-      "enc": {
+      "encoding": {
         "row": {"name": "Effect__Amount_of_damage","type": "O"},
         "col": {"name": "Aircraft__Airline_Operator","type": "O"},
         "text": {"name": "*","aggregate": "count","type": "Q","displayName": "Number of Records"}
@@ -16,7 +16,7 @@ describe('cp.cluster.distance.get()', function () {
 
     var table2 = {
       "marktype": "text",
-      "enc": {
+      "encoding": {
         "col": {"name": "Effect__Amount_of_damage","type": "O"},
         "row": {"name": "Aircraft__Airline_Operator","type": "O"},
         "text": {"name": "*","aggregate": "count","type": "Q","displayName": "Number of Records"}

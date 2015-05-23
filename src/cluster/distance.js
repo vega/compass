@@ -72,6 +72,6 @@ distance.getEncTypeByColumnName = function(encoding) {
   return {
     marktype: encoding.marktype,
     col: _colenc,
-    enc: encoding.encoding
+    encoding: encoding.encoding
   };
 };

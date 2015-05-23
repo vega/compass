@@ -136,7 +136,7 @@ describe('cp.rank.encoding', function () {
       var f = fixture['B(Q)xB(Q)x#'];
       var bp = {
         marktype: 'point',
-        enc: {
+        encoding: {
           x: f.fields[0],
           y: f.fields[1],
           color: f.fields[2] //count
@@ -145,7 +145,7 @@ describe('cp.rank.encoding', function () {
 
       var sb = {
         marktype: 'bar',
-        enc: {
+        encoding: {
           x: f.fields[0],
           y: f.fields[2], // count
           color: f.fields[1]
@@ -164,7 +164,7 @@ describe('cp.rank.encoding', function () {
       it('\'s text and color score should be merged', function () {
         var encoding = {
           "marktype": "text",
-          "enc": {
+          "encoding": {
             "col": {"name": "Aircraft__Airline_Operator","type": "O"},
             "text": {"name": "*","aggregate": "count","type": "Q"},
             "color": {"name": "*","aggregate": "count","type": "Q"}
