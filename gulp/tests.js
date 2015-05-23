@@ -7,6 +7,6 @@ var mocha = require('gulp-spawn-mocha');
 // runs the tests
 gulp.task('test', ['jshint'], function() {
   return gulp.src(['test/**/*.spec.js'], { read: false })
-    .pipe(mocha({ reporter: 'list' }))
+    .pipe(mocha({ reporter: 'spec' }))
     .on('error', gutil.log);
 });

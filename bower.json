@@ -1,7 +1,7 @@
 {
   "name": "viscompass",
   "main": "compass.js",
-  "version": "0.5.1",
+  "version": "0.5.3",
   "homepage": "https://github.com/uwdata/compass",
   "authors": [
     "Kanit \"Ham\" Wongsuphasawat <kanitw@gmail.com>",
@@ -28,5 +28,8 @@
     "bower_components",
     "test",
     "tests"
-  ]
+  ],
+  "dependencies": {
+    "vega-lite": "~0.6.8"
+  }
 }

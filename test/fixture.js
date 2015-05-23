@@ -12,15 +12,15 @@ var count = {name:'*', type:'Q', aggregate:'count'},
   count_stat = 50;
 
 var O_15 = {name: 'O_15', type: 'O'},
-  O_15_stat = {cardinality: 15},
+  O_15_stat = {distinct: 15},
   O_30 = {name:'O_30', type:'O'},
-  O_30_stat = {cardinality: 30};
+  O_30_stat = {distinct: 30};
 
 var q10 = {name: 'Q_10', type: 'Q'},
-  q10_stat = {cardinality: 10, min:0, max:150};
+  q10_stat = {distinct: 10, min:0, max:150};
 
-var o_stat = {cardinality: 5},
-  q_stat = {cardinality: 100, min:0, max:150},
+var o_stat = {distinct: 5},
+  q_stat = {distinct: 100, min:0, max:150},
   t_stat = o_stat;
 
 fixture.stat = {
