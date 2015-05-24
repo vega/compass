@@ -49,13 +49,13 @@ describe('cp.gen.aggregates()', function () {
       // Q
       expect(tables.filter(function(table){
         var t = table[0];
-        return !t.aggr && !t.bin && t.type==='Q';
+        return !t.aggregate && !t.bin && t.type==='Q';
       }).length).to.equal(1);
 
       // avg(Q)
       expect(tables.filter(function(table){
         var t = table[0];
-        return t.aggr && !t.bin && t.type==='Q';
+        return t.aggregate && !t.bin && t.type==='Q';
       }).length).to.equal(1);
 
       // bin(Q) x #
@@ -97,14 +97,14 @@ describe('cp.gen.aggregates()', function () {
 
     it('not generate avg with bin', function () {
       var filtered = tables.filter(function(table) {
-        return table[0].aggr && table[1].bin;
+        return table[0].aggregate && table[1].bin;
       });
       expect(filtered.length).to.equal(0);
     });
 
     it('not generate raw with bin', function () {
       var filtered = tables.filter(function(t) {
-        return !t[0].aggr && !t[0].bin && t[1].bin;
+        return !t[0].aggregate && !t[0].bin && t[1].bin;
       });
       expect(filtered.length).to.equal(0);
     });

@@ -30,7 +30,7 @@ function genEncodingsFromEncs(output, enc, stats, opt) {
       var e = vl.duplicate({
           data: opt.data,
           marktype: markType,
-          enc: enc,
+          encoding: enc,
           config: opt.config
         }),
         encoding = finalTouch(e, stats, opt),
@@ -46,17 +46,17 @@ function genEncodingsFromEncs(output, enc, stats, opt) {
 //FIXME this should be refactors
 function finalTouch(encoding, stats, opt) {
   if (encoding.marktype === 'text' && opt.alwaysGenerateTableAsHeatmap) {
-    encoding.enc.color = encoding.enc.text;
+    encoding.encoding.color = encoding.encoding.text;
   }
 
   // don't include zero if stdev/avg < 0.01
   // https://github.com/uwdata/visrec/issues/69
-  var enc = encoding.enc;
+  var enc = encoding.encoding;
   ['x', 'y'].forEach(function(et) {
     var field = enc[et];
     if (field && vl.field.isMeasure(field) && !vl.field.isCount(field)) {
       var stat = stats[field.name];
-      if (stat.stdev / stat.avg < 0.01) {
+      if (stat && stat.stdev / stat.avg < 0.01) {
         field.scale = {zero: false};
       }
     }

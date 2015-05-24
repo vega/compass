@@ -144,8 +144,8 @@ function generalRules(enc, stats, opt) {
     if (opt.omitDotPlotWithExtraEncoding && vl.keys(enc).length > 1) return false;
 
     // one dimension "count" is useless
-    if (enc.x && enc.x.aggr == 'count' && !enc.y) return false;
-    if (enc.y && enc.y.aggr == 'count' && !enc.x) return false;
+    if (enc.x && enc.x.aggregate == 'count' && !enc.y) return false;
+    if (enc.y && enc.y.aggregate == 'count' && !enc.x) return false;
 
     return true;
   }
@@ -156,7 +156,7 @@ genEncs.isAggrWithAllDimOnFacets = function (enc) {
   var hasAggr = false, hasOtherO = false;
   for (var encType in enc) {
     var field = enc[encType];
-    if (field.aggr) {
+    if (field.aggregate) {
       hasAggr = true;
     }
     if (vl.field.isDimension(field) && (encType !== 'row' && encType !== 'col')) {

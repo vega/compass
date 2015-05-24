@@ -63,6 +63,6 @@
   },
   "dependencies": {
     "clusterfck": "^0.6.0",
-    "vega-lite": "^0.6.7"
+    "vega-lite": "^0.7.0"
   }
 }
