@@ -67,9 +67,10 @@ function projections(fields, stats, opt) {
 }
 
 var typeIsMeasureScore = {
-  O: 0,
-  T: 1,
-  Q: 2
+  N: 0,
+  O: 1,
+  T: 2,
+  Q: 3
 };
 
 function compareFieldsToAdd(hasSelectedDimension, hasSelectedMeasure, indices) {

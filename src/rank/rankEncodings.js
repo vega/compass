@@ -1,5 +1,7 @@
 'use strict';
 
+require('../globals');
+
 var vl = require('vega-lite'),
   isDimension = vl.field.isDimension;
 
@@ -52,7 +54,7 @@ function rankEncodings(encoding, stats, opt, selected) {
   });
 
   // plot type
-  if (marktype === 'text') {
+  if (marktype === TEXT) {
     // TODO
   } else {
     if (enc.x && enc.y) {
@@ -66,7 +68,7 @@ function rankEncodings(encoding, stats, opt, selected) {
   }
 
   // penalize not using positional only penalize for non-text
-  if (encTypes.length > 1 && marktype !== 'text') {
+  if (encTypes.length > 1 && marktype !== TEXT) {
     if ((!enc.x || !enc.y) && !enc.geo && !enc.text) {
       features.push({
         reason: 'unused position',
@@ -119,31 +121,31 @@ M.terrible = TERRIBLE;
 rankEncodings.dimensionScore = function (field, encType, marktype, stats, opt){
   var cardinality = vl.field.cardinality(field, stats);
   switch (encType) {
-    case 'x':
-      if(field.type === 'O') return D.pos - D.minor;
+    case X:
+      if (vl.field.isTypes(field, [N, O]))  return D.pos - D.minor;
       return D.pos;
 
-    case 'y':
-      if(field.type === 'O') return D.pos - D.minor; //prefer ordinal on y
-      if(field.type === 'T') return D.Y_T; // time should not be on Y
+    case Y:
+      if (vl.field.isTypes(field, [N, O])) return D.pos - D.minor; //prefer ordinal on y
+      if(field.type === T) return D.Y_T; // time should not be on Y
       return D.pos - D.minor;
 
-    case 'col':
-      if (marktype === 'text') return D.facet_text;
+    case COL:
+      if (marktype === TEXT) return D.facet_text;
       //prefer column over row due to scrolling issues
       return cardinality <= opt.maxGoodCardinalityForFacets ? D.facet_good :
         cardinality <= opt.maxCardinalityForFacets ? D.facet_ok : D.facet_bad;
 
-    case 'row':
-      if (marktype === 'text') return D.facet_text;
+    case ROW:
+      if (marktype === TEXT) return D.facet_text;
       return (cardinality <= opt.maxGoodCardinalityForFacets ? D.facet_good :
         cardinality <= opt.maxCardinalityForFacets ? D.facet_ok : D.facet_bad) - D.minor;
 
-    case 'color':
-      var hasOrder = (field.bin && field.type==='Q') || (field.fn && field.type==='T');
+    case COLOR:
+      var hasOrder = (field.bin && field.type===Q) || (field.fn && field.type===T);
 
       //FIXME add stacking option once we have control ..
-      var isStacked = marktype ==='bar' || marktype ==='area';
+      var isStacked = marktype === 'bar' || marktype === 'area';
 
       // true ordinal on color is currently BAD (until we have good ordinal color scale support)
       if (hasOrder) return D.color_bad;
@@ -152,9 +154,9 @@ rankEncodings.dimensionScore = function (field, encType, marktype, stats, opt){
       if (isStacked) return D.color_stack;
 
       return cardinality <= opt.maxGoodCardinalityForColor ? D.color_good: cardinality <= opt.maxCardinalityForColor ? D.color_ok : D.color_bad;
-    case 'shape':
+    case SHAPE:
       return cardinality <= opt.maxCardinalityForShape ? D.shape : TERRIBLE;
-    case 'detail':
+    case DETAIL:
       return D.detail;
   }
   return TERRIBLE;
@@ -165,16 +167,16 @@ rankEncodings.dimensionScore.consts = D;
 rankEncodings.measureScore = function (field, encType, marktype, stats, opt) {
   // jshint unused:false
   switch (encType){
-    case 'x': return M.pos;
-    case 'y': return M.pos;
-    case 'size':
+    case X: return M.pos;
+    case Y: return M.pos;
+    case SIZE:
       if (marktype === 'bar') return BAD; //size of bar is very bad
-      if (marktype === 'text') return BAD;
+      if (marktype === TEXT) return BAD;
       if (marktype === 'line') return BAD;
       return M.size;
-    case 'color': return M.color;
+    case COLOR: return M.color;
     case 'alpha': return M.alpha;
-    case 'text': return M.text;
+    case TEXT: return M.text;
   }
   return BAD;
 };

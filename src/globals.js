@@ -2,6 +2,8 @@
 
 var g = global || window;
 
+require('vega-lite/src/globals');
+
 g.CHART_TYPES = {
   TABLE: 'TABLE',
   BAR: 'BAR',
