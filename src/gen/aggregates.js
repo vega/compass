@@ -11,8 +11,8 @@ module.exports = genAggregates;
 function genAggregates(output, fields, stats, opt) {
   opt = vl.schema.util.extend(opt||{}, consts.gen.aggregates);
   var tf = new Array(fields.length);
-  var hasO = vl.any(fields, function(f) {
-    return f.type === 'O';
+  var hasNorO = vl.any(fields, function(f) {
+    return vl.field.isTypes(f, [N, O]);
   });
 
   function emit(fieldSet) {
@@ -93,7 +93,7 @@ function genAggregates(output, fields, stats, opt) {
         }
       });
 
-      if ((!opt.consistentAutoQ || vl.isin(autoMode, [ANY, 'bin', 'cast', 'autocast'])) && !hasO) {
+      if ((!opt.consistentAutoQ || vl.isin(autoMode, [ANY, 'bin', 'cast', 'autocast'])) && !hasNorO) {
         var highCardinality = vl.field.cardinality(f, stats) > opt.minCardinalityForBin;
 
         var isAuto = opt.genDimQ === 'auto',
@@ -150,15 +150,16 @@ function genAggregates(output, fields, stats, opt) {
     // Otherwise, assign i-th field
     switch (f.type) {
       //TODO "D", "G"
-      case 'Q':
+      case Q:
         assignQ(i, hasAggr, autoMode);
         break;
 
-      case 'T':
+      case T:
         assignT(i, hasAggr, autoMode);
         break;
-
-      case 'O':
+      case O:
+        /* falls through */
+      case N:
         /* falls through */
       default:
         tf[i] = f;

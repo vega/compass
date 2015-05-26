@@ -77,17 +77,17 @@ function colorRules(enc, field, stats, opt) {
 function shapeRules(enc, field, stats, opt) {
   if(!retinalEncRules(enc, field, stats, opt)) return false;
 
-  if (field.bin && field.type === 'Q') return false;
-  if (field.fn && field.type === 'T') return false;
+  if (field.bin && field.type === Q) return false;
+  if (field.fn && field.type === T) return false;
   return vl.field.cardinality(field, stats) <= opt.maxCardinalityForColor;
 }
 
 function dimMeaTransposeRule(enc) {
   // create horizontal histogram for ordinal
-  if (enc.y.type === 'O' && isMeasure(enc.x)) return true;
+  if (vl.field.isTypes(enc.y, [N, O]) && isMeasure(enc.x)) return true;
 
   // vertical histogram for Q and T
-  if (isMeasure(enc.y) && (enc.x.type !== 'O' && isDimension(enc.x))) return true;
+  if (isMeasure(enc.y) && (!vl.field.isTypes(enc.x, [N, O]) && isDimension(enc.x))) return true;
 
   return false;
 }
@@ -95,7 +95,7 @@ function dimMeaTransposeRule(enc) {
 function generalRules(enc, stats, opt) {
   // enc.text is only used for TEXT TABLE
   if (enc.text) {
-    return genMarkTypes.satisfyRules(enc, 'text', stats, opt);
+    return genMarkTypes.satisfyRules(enc, TEXT, stats, opt);
   }
 
   // CARTESIAN PLOT OR MAP
@@ -124,8 +124,8 @@ function generalRules(enc, stats, opt) {
       if (opt.omitTranpose) {
         if (isDimX ^ isDimY) { // dim x mea
           if (!dimMeaTransposeRule(enc)) return false;
-        } else if (enc.y.type==='T' || enc.x.type === 'T') {
-          if (enc.y.type==='T' && enc.x.type !== 'T') return false;
+        } else if (enc.y.type===T || enc.x.type === T) {
+          if (enc.y.type===T && enc.x.type !== T) return false;
         } else { // show only one OxO, QxQ
           if (enc.x.name > enc.y.name) return false;
         }
@@ -159,7 +159,7 @@ genEncs.isAggrWithAllDimOnFacets = function (enc) {
     if (field.aggregate) {
       hasAggr = true;
     }
-    if (vl.field.isDimension(field) && (encType !== 'row' && encType !== 'col')) {
+    if (vl.field.isDimension(field) && (encType !== ROW && encType !== COL)) {
       hasOtherO = true;
     }
     if (hasAggr && hasOtherO) break;
