@@ -112,7 +112,7 @@ function genAggregates(output, fields, stats, opt) {
     }
   }
 
-  function assignFnT(i, hasAggr, autoMode, timeUnit) {
+  function assignTimeUnitT(i, hasAggr, autoMode, timeUnit) {
     tf[i].timeUnit = timeUnit;
     assignField(i+1, hasAggr, autoMode);
     delete tf[i].timeUnit;
@@ -122,9 +122,9 @@ function genAggregates(output, fields, stats, opt) {
     var f = fields[i];
     tf[i] = {name: f.name, type: f.type};
 
-    // TODO support array of f._fns
-    if (f._fn) {
-      assignFnT(i, hasAggr, autoMode, f._fn);
+    // TODO support array of f._timeUnits
+    if (f._timeUnit) {
+      assignTimeUnitT(i, hasAggr, autoMode, f._timeUnit);
     } else {
       opt.timeUnitList.forEach(function(timeUnit) {
         if (timeUnit === undefined) {
@@ -132,7 +132,7 @@ function genAggregates(output, fields, stats, opt) {
             assignField(i+1, false, autoMode);
           }
         } else {
-          assignFnT(i, hasAggr, autoMode, timeUnit);
+          assignTimeUnitT(i, hasAggr, autoMode, timeUnit);
         }
       });
     }
