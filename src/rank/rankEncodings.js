@@ -142,7 +142,7 @@ rankEncodings.dimensionScore = function (field, encType, marktype, stats, opt){
         cardinality <= opt.maxCardinalityForFacets ? D.facet_ok : D.facet_bad) - D.minor;
 
     case COLOR:
-      var hasOrder = (field.bin && field.type===Q) || (field.fn && field.type===T);
+      var hasOrder = (field.bin && field.type===Q) || (field.timeUnit && field.type===T);
 
       //FIXME add stacking option once we have control ..
       var isStacked = marktype === 'bar' || marktype === 'area';

@@ -127,7 +127,7 @@ function lineRule(enc, stats, opt) {
   // FIXME truly ordinal data is fine here too.
   // Line chart should be only horizontal
   // and use only temporal data
-  return enc.x.type == 'T' && enc.x.fn && enc.y.type == 'Q' && enc.y.aggregate;
+  return enc.x.type == 'T' && enc.x.timeUnit && enc.y.type == 'Q' && enc.y.aggregate;
 }
 
 function areaRule(enc, stats, opt) {

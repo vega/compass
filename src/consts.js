@@ -78,7 +78,7 @@ consts.gen.aggregates = {
       },
       default: [undefined, 'avg']
     },
-    timeFnList: {
+    timeUnitList: {
       type: 'array',
       items: {
         type: ['string']
