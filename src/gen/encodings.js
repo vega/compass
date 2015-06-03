@@ -36,8 +36,7 @@ function genEncodingsFromEncs(output, enc, stats, opt) {
         encoding = finalTouch(e, stats, opt),
         score = rank.encoding(encoding, stats, opt);
 
-      encoding.score = score.score;
-      encoding.scoreFeatures = score.features;
+      encoding._info = score;
       output.push(encoding);
     });
   return output;
