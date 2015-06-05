@@ -78,7 +78,7 @@ function shapeRules(enc, field, stats, opt) {
   if(!retinalEncRules(enc, field, stats, opt)) return false;
 
   if (field.bin && field.type === Q) return false;
-  if (field.fn && field.type === T) return false;
+  if (field.timeUnit && field.type === T) return false;
   return vl.field.cardinality(field, stats) <= opt.maxCardinalityForColor;
 }
 

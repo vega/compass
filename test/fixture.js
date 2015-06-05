@@ -253,7 +253,7 @@ fixture['QxT'] = {
 fixture['QxYEAR(T)'] = {
   fields: [
     {name:1, type:'Q'},
-    {name:2, type:'T', fn: 'year'}
+    {name:2, type:'T', timeUnit: 'year'}
   ],
   stats: stats['QxT']
 };
@@ -261,7 +261,7 @@ fixture['QxYEAR(T)'] = {
 fixture['A(Q)xYEAR(T)'] = {
   fields: [
     {name:1, type:'Q', aggregate: 'avg'},
-    {name:2, type:'T', fn: 'year'}
+    {name:2, type:'T', timeUnit: 'year'}
   ],
   stats: stats['QxT']
 };
@@ -295,7 +295,7 @@ fixture['#xB(Q)'] = {
 fixture['#xYR(T)'] = {
   fields: [
       {name:'*', type:'Q', aggregate:'count'},
-      {name:2, type:'T', fn:'year'}
+      {name:2, type:'T', timeUnit:'year'}
   ],
   stats: stats['#xT']
 };
