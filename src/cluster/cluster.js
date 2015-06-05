@@ -25,13 +25,13 @@ function cluster(encodings, opt) {
    .map(function(cluster) {
     return cluster.sort(function(encoding1, encoding2) {
       // sort each cluster -- have the highest score as 1st item
-      return encoding2.score - encoding1.score;
+      return encoding2._info.score - encoding1._info.score;
     });
   }).filter(function(cluster) {  // filter empty cluster
     return cluster.length >0;
   }).sort(function(cluster1, cluster2) {
     //sort by highest scoring item in each cluster
-    return cluster2[0].score - cluster1[0].score;
+    return cluster2[0]._info.score - cluster1[0]._info.score;
   });
 
   clusters.dist = dist; //append dist in the array for debugging
