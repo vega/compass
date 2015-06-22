@@ -27,7 +27,7 @@ function getMarktypes(enc, stats, opt) {
 }
 
 vlmarktypes.satisfyRules = function (enc, markType, stats, opt) {
-  var mark = vl.compile.marks[markType],
+  var mark = vl.compiler.marks[markType],
     reqs = mark.requiredEncoding,
     support = mark.supportedEncoding;
 
