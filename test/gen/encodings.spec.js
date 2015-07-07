@@ -26,7 +26,7 @@ describe('cp.gen.encodings()', function () {
       expect(encodings.length).to.equal(2); //point and tick
     });
 
-    it('should generate more encodings wihtout pruning', function () {
+    it('should generate more encodings without pruning', function () {
       var encodings = genEncodings([], fields, stats, {
         omitTranpose: false,
         omitDotPlot: false
@@ -45,7 +45,7 @@ describe('cp.gen.encodings()', function () {
       var hasTextTable = encodings.filter(function(encoding) {
         return encoding.marktype === 'text';
       }).length > 0;
-      expect(hasTextTable).to.be.false();
+      expect(hasTextTable).to.be.false;
     });
 
     it('should not contain bar', function() {
@@ -64,7 +64,7 @@ describe('cp.gen.encodings()', function () {
       var hasTextTable = encodings.filter(function(encoding) {
         return encoding.marktype === 'text';
       }).length > 0;
-      expect(hasTextTable).to.be.true();
+      expect(hasTextTable).to.be.true;
     });
   });
 
@@ -76,14 +76,14 @@ describe('cp.gen.encodings()', function () {
       var hasTextTable = encodings.filter(function(encoding) {
         return encoding.marktype === 'text';
       }).length > 0;
-      expect(hasTextTable).to.be.true();
+      expect(hasTextTable).to.be.true;
     });
 
     it('should contain bar', function() {
       var hasBar = encodings.filter(function(encoding) {
         return encoding.marktype === 'bar';
       }).length > 0;
-      expect(hasBar).to.be.true();
+      expect(hasBar).to.be.true;
     });
 
     // console.log('encodings O_30x#', encodings.map(function(spec){
@@ -112,7 +112,7 @@ describe('cp.gen.encodings()', function () {
       var hasLine = encodings.filter(function(encoding) {
         return encoding.marktype === 'line';
       }).length > 0;
-      expect(hasLine).to.be.false();
+      expect(hasLine).to.be.false;
     });
   });
 
@@ -125,7 +125,7 @@ describe('cp.gen.encodings()', function () {
       var hasLine = encodings.filter(function(encoding) {
         return encoding.marktype === 'line';
       }).length > 0;
-      expect(hasLine).to.be.false();
+      expect(hasLine).to.be.false;
     });
   });
 
@@ -137,7 +137,7 @@ describe('cp.gen.encodings()', function () {
       var hasLine = encodings.filter(function(encoding) {
         return encoding.marktype === 'line';
       }).length > 0;
-      expect(hasLine).to.be.true();
+      expect(hasLine).to.be.true;
     });
   });
 
@@ -149,7 +149,7 @@ describe('cp.gen.encodings()', function () {
       var hasTextTable = encodings.filter(function(encoding) {
         return encoding.marktype === 'text';
       }).length > 0;
-      expect(hasTextTable).to.be.true();
+      expect(hasTextTable).to.be.true;
     });
   });
 });

@@ -35,7 +35,7 @@ describe('cp.gen.aggregates()', function () {
     });
 
     it('should append key to each fieldSet', function() {
-      expect(tables[0].key).to.be.ok();
+      expect(tables[0].key).to.be.ok;
     });
 
     it('should output Q, avg(Q), bin(Q)x# if omitMeasureOnly', function () {
@@ -77,7 +77,7 @@ describe('cp.gen.aggregates()', function () {
     var tables = genAggregates([], f.fields, f.stats);
     it('should output 2 data table', function () {
       expect(tables.length).to.equal(2); // bin
-      expect(tables[1][0].bin).to.be.true(); // bin
+      expect(tables[1][0].bin).to.be.true; // bin
     });
   });
 
@@ -92,7 +92,7 @@ describe('cp.gen.aggregates()', function () {
     });
 
     it('should append key to each fieldSet', function() {
-      expect(tables[0].key).to.be.ok();
+      expect(tables[0].key).to.be.ok;
     });
 
     it('not generate avg with bin', function () {
