@@ -41,7 +41,8 @@ function rankEncodings(encoding, stats, opt, selected) {
           ' ' + (selected && selected[m.field.name] ? '[x]' : '[ ]');
       }),
       scores = mappings.map(function(m) {
-        var role = vl.field.role(m.field);
+        var role = vl.field.isDimension(m.field) ? 'dimension' : 'measure';
+
         var score = rankEncodings.score[role](m.field, m.encType, encoding.marktype, stats, opt);
 
         return !selected || selected[m.field.name] ? score : Math.pow(score, 0.125);
