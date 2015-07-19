@@ -79,7 +79,7 @@ function compareFieldsToAdd(hasSelectedDimension, hasSelectedMeasure, indices) {
     if (a.type !== b.type) {
       if (!hasSelectedDimension) {
         return typeIsMeasureScore[a.type] - typeIsMeasureScore[b.type];
-      } else if (!hasSelectedMeasure) {
+      } else { //if (!hasSelectedMeasure) {
         return typeIsMeasureScore[b.type] - typeIsMeasureScore[a.type];
       }
     }

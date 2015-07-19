@@ -1,6 +1,6 @@
 {
   "name": "viscompass",
-  "version": "0.5.5",
+  "version": "0.5.6",
   "description": "VisCompass: Visualization Recommender",
   "author": {
     "name": "UW Interactive Data Lab",
@@ -16,7 +16,9 @@
     "test": "test"
   },
   "scripts": {
-    "test": "gulp test"
+    "deploy": "npm run lint && npm run test && scripts/deploy.sh",
+    "lint": "gulp jshint",
+    "test": "gulp t"
   },
   "browserify-shim": {
     "vega-lite": "global:vl"
@@ -64,6 +66,6 @@
   },
   "dependencies": {
     "clusterfck": "^0.6.0",
-    "vega-lite": "^0.7.7"
+    "vega-lite": "^0.7.9"
   }
 }

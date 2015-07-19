@@ -13,3 +13,12 @@ gulp.task('test', ['jshint'], function() {
     }))
     .on('error', gutil.log);
 });
+
+gulp.task('t', function() {
+  return gulp.src(['test/**/*.spec.js'], { read: false })
+    .pipe(mocha({
+      reporter: 'spec',
+      istanbul: false
+    }))
+    .on('error', gutil.log);
+});
