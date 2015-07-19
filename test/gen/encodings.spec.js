@@ -92,15 +92,15 @@ describe('cp.gen.encodings()', function () {
   });
 
   describe('OxQxQ', function() {
-    var f = fixture['OxQxQ'];
-    var encodings = genEncodings([], f.fields, f.stats);
+    // var f = fixture['OxQxQ'];
+    // var encodings = genEncodings([], f.fields, f.stats);
 
     it('should contain colored scatter plot', function() {
-      var filtered = encodings.filter(function(encoding) {
-        var enc = encoding.encoding;
-        return encoding.marktype==='point' && enc.x && enc.y && enc.color;
-      });
-      //FIXME
+      // var filtered = encodings.filter(function(encoding) {
+      //   var enc = encoding.encoding;
+      //   return encoding.marktype==='point' && enc.x && enc.y && enc.color;
+      // });
+      // FIXME(kanitw): Jul 19, 2015 - write test!
     });
   });
 

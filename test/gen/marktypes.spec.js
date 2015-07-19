@@ -19,8 +19,8 @@ describe('cp.gen.marktypes()', function(){
   });
 
   it('should require at least one basic encoding', function (){
-    var basicEncodings = ['x','y','geo','text','arc'];
-    // TODO
+    // var basicEncodings = ['x','y','geo','text','arc'];
+    // FIXME(kanitw): Jul 19, 2015 - write test
 
   });
 
