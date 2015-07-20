@@ -68,7 +68,7 @@ function projections(fields, stats, opt) {
 
 var typeIsMeasureScore = {
   N: 0,
-  O: 1,
+  O: 0,
   T: 2,
   Q: 3
 };
