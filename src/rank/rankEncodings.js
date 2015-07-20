@@ -114,7 +114,6 @@ D.terrible = TERRIBLE;
 M.pos = 1;
 M.size = 0.6;
 M.color = 0.5;
-M.alpha = 0.45;
 M.text = 0.4;
 M.bad = BAD;
 M.terrible = TERRIBLE;
@@ -176,7 +175,6 @@ rankEncodings.measureScore = function (field, encType, marktype, stats, opt) {
       if (marktype === 'line') return BAD;
       return M.size;
     case COLOR: return M.color;
-    case 'alpha': return M.alpha;
     case TEXT: return M.text;
   }
   return BAD;

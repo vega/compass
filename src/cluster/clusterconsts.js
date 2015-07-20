@@ -25,7 +25,5 @@ c.DIST_BY_ENCTYPE = [
   ['detail', 'shape', c.SWAPPABLE],
 
   // quantitative mark properties
-  ['color', 'alpha', c.SWAPPABLE],
-  ['size', 'alpha', c.SWAPPABLE],
   ['size', 'color', c.SWAPPABLE]
 ].reduce(reduceTupleToTable, {});

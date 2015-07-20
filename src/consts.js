@@ -151,7 +151,7 @@ consts.gen.encodings = {
     omitMultipleRetinalEncodings: {
       type: 'boolean',
       default: true,
-      description: 'omit using multiple retinal variables (size, color, alpha, shape)'
+      description: 'omit using multiple retinal variables (size, color, shape)'
     },
     omitNonTextAggrWithAllDimsOnFacets: {
       type: 'boolean',
