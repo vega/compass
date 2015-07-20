@@ -17,7 +17,7 @@ var consts = require('../../src/consts'),
 
 describe('cp.rank.encoding', function () {
   var marktypes = consts.gen.encodings.properties.marktypeList.default;
-  var encTypes = ['x', 'y', 'row', 'col', 'size', 'color', 'shape', 'alpha', 'text', 'detail'];
+  var encTypes = ['x', 'y', 'row', 'col', 'size', 'color', 'shape', 'text', 'detail'];
   var dFixtures = ['O', 'O_15', 'O_30', 'BIN(Q)'],
     mFixtures = ['Q'];
 
@@ -43,24 +43,21 @@ describe('cp.rank.encoding', function () {
         expect(score.Q.point.x).to.gt(score.Q.point.row);
         expect(score.Q.point.x).to.gt(score.Q.point.size);
         expect(score.Q.point.x).to.gt(score.Q.point.color);
-        expect(score.Q.point.x).to.gt(score.Q.point.alpha);
         expect(score.Q.point.x).to.gt(score.Q.point.text);
         expect(score.Q.point.x).to.gt(score.Q.point.detail);
       });
     });
 
     describe('size', function () {
-      it('>= color, alpha, text', function () {
+      it('>= color, text', function () {
         expect(score.Q.point.size).to.gt(score.Q.point.color);
-        expect(score.Q.point.size).to.gt(score.Q.point.alpha);
         expect(score.Q.point.size).to.gt(score.Q.point.text);
         expect(score.Q.point.size).to.gt(score.Q.point.detail);
       });
     });
 
     describe('color', function () {
-      it('>= alpha, text', function () {
-        expect(score.Q.point.color).to.gt(score.Q.point.alpha);
+      it('>= text', function () {
         expect(score.Q.point.color).to.gt(score.Q.point.text);
         expect(score.Q.point.color).to.gt(score.Q.point.detail);
       });
@@ -75,17 +72,15 @@ describe('cp.rank.encoding', function () {
         expect(score.O.point.x).to.gt(score.O.point.row);
         expect(score.O.point.x).to.gt(score.O.point.size);
         expect(score.O.point.x).to.gt(score.O.point.color);
-        expect(score.O.point.x).to.gt(score.O.point.alpha);
         expect(score.O.point.x).to.gt(score.O.point.text);
         expect(score.O.point.x).to.gt(score.O.point.detail);
       });
     });
 
     describe('color', function () {
-      it('>= shape, detail, alpha', function () {
+      it('>= shape, detail', function () {
         expect(score.O.point.color).to.gt(score.O.point.shape);
         expect(score.O.point.color).to.gt(score.O.point.detail);
-        expect(score.O.point.color).to.gt(score.O.point.alpha);
       });
 
       it('< detail if cardinality above 20', function () {

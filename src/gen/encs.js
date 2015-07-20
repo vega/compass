@@ -42,10 +42,6 @@ var rules = {
     measure: true,
     rules: colorRules
   },
-  alpha: {
-    measure: true,
-    rules: retinalEncRules
-  },
   text: {
     measure: true
   },
@@ -62,7 +58,7 @@ var rules = {
 
 function retinalEncRules(enc, field, stats, opt) {
   if (opt.omitMultipleRetinalEncodings) {
-    if (enc.color || enc.size || enc.shape || enc.alpha) return false;
+    if (enc.color || enc.size || enc.shape) return false;
   }
   return true;
 }
