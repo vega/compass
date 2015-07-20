@@ -9,6 +9,16 @@ var expect = require('chai').expect,
 var genEncs = require('../../src/gen/encs');
 
 describe('cp.gen.encs()', function () {
+   describe('#', function () {
+    var f = fixture['#'];
+
+    it('should generate one encs', function() {
+      var encs = genEncs([], f.fields, f.stats);
+      expect(encs.length).to.eql(1);
+      expect(encs[0].x).to.be.ok;
+    });
+  });
+
   describe('1Q,', function() {
     //FIXME write tests
   });

@@ -8,6 +8,16 @@ var expect = require('chai').expect,
 var genEncodings = require('../../src/gen/encodings');
 
 describe('cp.gen.encodings()', function () {
+  describe('#', function () {
+    var f = fixture['#'];
+
+    it('should generate two encodings', function() {
+      var encodings = genEncodings([], f.fields, f.stats);
+      expect(encodings.length).to.eql(2);
+      expect(encodings[0].encoding.x).to.be.ok;
+    });
+  });
+
   describe('1Q', function() {
     var fields = fixture['Q'].fields,
       stats = fixture['Q'].stats;

@@ -158,6 +158,11 @@ consts.gen.encodings = {
       default: true,
       description: 'remove all aggregated charts (except text tables) with all dims on facets (row, col)'
     },
+    omitOneDimensionCount: {
+      type: 'boolean',
+      default: false,
+      description: 'omit one dimension count'
+    },
     omitSizeOnBar: {
       type: 'boolean',
       default: false,
