@@ -9,7 +9,7 @@ var fixture = module.exports = {};
 var stats = fixture.stats = {};
 
 var count = {name:'*', type:'Q', aggregate:'count'},
-  count_stat = 50;
+  count_stat = {min:0, max:100};
 
 var O_15 = {name: 'O_15', type: 'O'},
   O_15_stat = {distinct: 15},
@@ -30,25 +30,29 @@ fixture.stat = {
   count_stat: count_stat
 };
 
+stats['#'] = {
+  '*': count_stat
+};
+
 stats['OxQ'] = {
   1: o_stat,
   2: q_stat,
-  count: count_stat
+  '*': count_stat
 };
 
 stats.OxO = {
   1: o_stat,
   2: o_stat,
-  count: count_stat
+  '*': count_stat
 };
 
 stats['Ox#'] = {
   1: o_stat,
-  count: count_stat
+  '*': count_stat
 };
 
 stats['O_30x#'] = {
-  count: count_stat,
+  '*': count_stat,
   O_30: O_30_stat
 };
 
@@ -56,7 +60,7 @@ stats.OxOxQ = {
   1: o_stat,
   2: o_stat,
   3: q_stat,
-  count: count_stat
+  '*': count_stat
 };
 
 
@@ -64,32 +68,32 @@ stats.OxQxQ = {
   1: o_stat,
   2: q_stat,
   3: q_stat,
-  count: count_stat
+  '*': count_stat
 };
 
 stats['QxQ'] = {
   1: q_stat,
   2: q_stat,
-  count: count_stat
+  '*': count_stat
 };
 
 stats['QxT'] = {
   1: q_stat,
   2: t_stat,
-  count: count_stat
+  '*': count_stat
 };
 
 stats['Q'] = {
   1: q_stat,
-  count: count_stat
+  '*': count_stat
 };
 
 stats['#xQ'] = {
-  count: count_stat,
+  '*': count_stat,
   2: q_stat
 };
 stats['#xT'] = {
-  count: count_stat,
+  '*': count_stat,
   2: t_stat
 };
 
@@ -279,7 +283,7 @@ fixture['B(Q)xB(Q)x#'] = {
 
 fixture['#'] = {
   fields: [count],
-  stats: {count: count_stat}
+  stats: {'*': count_stat}
 };
 
 // FIXME: swap order for these
