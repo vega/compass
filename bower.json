@@ -1,7 +1,7 @@
 {
   "name": "viscompass",
   "main": "compass.js",
-  "version": "0.5.6",
+  "version": "0.5.7",
   "homepage": "https://github.com/uwdata/compass",
   "authors": [
     "Kanit \"Ham\" Wongsuphasawat <kanitw@gmail.com>",
