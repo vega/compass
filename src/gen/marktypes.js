@@ -105,15 +105,27 @@ function tickRule(enc, stats, opt) {
 function barRule(enc, stats, opt) {
   if(!facetsRule(enc, stats, opt)) return false;
 
-  // need to aggregate on either x or y
+  // bar requires at least x or y
+  if (!enc.x && !enc.y) return false;
+
   if (opt.omitSizeOnBar && enc.size !== undefined) return false;
 
   // FIXME actually check if there would be occlusion #90
-  if (((enc.x.aggregate !== undefined) ^ (enc.y.aggregate !== undefined)) &&
-      (isDimension(enc.x) ^ isDimension(enc.y))) {
+  // need to aggregate on either x or y
+  var aggEitherXorY =
+    (!enc.x || enc.x.aggregate === undefined) ^
+    (!enc.y || enc.y.aggregate === undefined);
 
-    var aggregate = enc.x.aggregate || enc.y.aggregate;
-    return !(opt.omitStackedAverage && aggregate ==='avg' && enc.color);
+
+  if (aggEitherXorY) {
+    var eitherXorYisDimOrNull =
+      (!enc.x || isDimension(enc.x)) ^
+      (!enc.y || isDimension(enc.y));
+
+    if (eitherXorYisDimOrNull) {
+      var aggregate = enc.x.aggregate || enc.y.aggregate;
+      return !(opt.omitStackedAverage && aggregate ==='avg' && enc.color);
+    }
   }
 
   return false;

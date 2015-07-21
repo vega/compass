@@ -1,12 +1,25 @@
 'use strict';
 
 var expect = require('chai').expect,
-  vl = require('vega-lite');
+  vl = require('vega-lite'),
+  fixture = require('../fixture');
 
 // var dataB = require("../data/birdstrikes.json");
 var getMarkTypes = require('../../src/gen/marktypes');
 
 describe('cp.gen.marktypes()', function(){
+  describe('#', function () {
+    var f = fixture['#'];
+
+    it('should generate point and bar', function() {
+      var enc = {x: f.fields[0]},
+        markTypes = getMarkTypes(enc, f.stats);
+
+      expect(markTypes.length).to.eql(2);
+      expect(markTypes).to.eql(['point', 'bar']);
+    });
+  });
+
   describe('1Q', function () {
     var enc = {"x": {"name": "Cost__Total_$","type": "Q"}};
     var marktypes = getMarkTypes(enc);

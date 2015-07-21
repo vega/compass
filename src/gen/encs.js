@@ -139,9 +139,11 @@ function generalRules(enc, stats, opt) {
     // dot plot shouldn't have other encoding
     if (opt.omitDotPlotWithExtraEncoding && vl.keys(enc).length > 1) return false;
 
-    // one dimension "count" is useless
+    if (opt.omitOneDimensionCount) {
+      // one dimension "count"
     if (enc.x && enc.x.aggregate == 'count' && !enc.y) return false;
     if (enc.y && enc.y.aggregate == 'count' && !enc.x) return false;
+    }
 
     return true;
   }
