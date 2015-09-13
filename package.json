@@ -25,13 +25,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/uwdata/visrec.git"
+    "url": "https://github.com/vega/visrec.git"
   },
   "license": "BSD",
   "bugs": {
-    "url": "https://github.com/uwdata/visrec/issues"
+    "url": "https://github.com/vega/visrec/issues"
   },
-  "homepage": "https://github.com/uwdata/visrec",
+  "homepage": "https://github.com/vega/visrec",
   "devDependencies": {
     "browserify": "^10.2.4",
     "browserify-shim": "^3.8.9",
