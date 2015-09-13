@@ -2,7 +2,7 @@
   "name": "viscompass",
   "main": "compass.js",
   "version": "0.5.8",
-  "homepage": "https://github.com/uwdata/compass",
+  "homepage": "https://github.com/vega/compass",
   "authors": [
     "Kanit \"Ham\" Wongsuphasawat <kanitw@gmail.com>",
     "Interactive Data Lab (http://idl.cs.washington.edu)"
