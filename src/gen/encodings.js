@@ -28,13 +28,16 @@ function genEncodingsFromEncs(output, enc, stats, opt) {
   getMarktypes(enc, stats, opt)
     .forEach(function(markType) {
       var e = vl.duplicate({
-          data: opt.data,
-          marktype: markType,
+          // Clone config & encoding to unique objects
           encoding: enc,
           config: opt.config
         }),
         encoding = finalTouch(e, stats, opt),
         score = rank.encoding(encoding, stats, opt);
+
+      e.marktype = markType;
+      // Data object is the same across charts: pass by reference
+      e.data = opt.data;
 
       encoding._info = score;
       output.push(encoding);
