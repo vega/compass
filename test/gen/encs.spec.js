@@ -7,13 +7,24 @@ var expect = require('chai').expect,
   fixture = require('../fixture');
 
 var genEncs = require('../../src/gen/encs');
+var consts = require('../../src/consts');
 
 describe('cp.gen.encs()', function () {
-   describe('#', function () {
-    var f = fixture['#'];
+  var opt;
+
+  beforeEach(function() {
+    opt = vl.schema.util.extend({}, consts.gen.encodings);
+  });
+
+  describe('#', function () {
+    var f;
+
+    beforeEach(function() {
+      f = fixture['#'];
+    });
 
     it('should generate one encs', function() {
-      var encs = genEncs([], f.fields, f.stats);
+      var encs = genEncs([], f.fields, f.stats, opt);
       expect(encs.length).to.eql(1);
       expect(encs[0].x).to.be.ok;
     });
@@ -24,10 +35,12 @@ describe('cp.gen.encs()', function () {
   });
 
   describe('#xB(Q)', function() {
-    var f = fixture['#xB(Q)'];
-    var encs = genEncs([], f.fields, f.stats);
-
-    var encShorthands = encs.map(vl.enc.shorthand);
+    var f, encs, encShorthands;
+    beforeEach(function() {
+      f = fixture['#xB(Q)'];
+      encs = genEncs([], f.fields, f.stats, opt);
+      encShorthands = encs.map(vl.enc.shorthand);
+    });
 
     it('should show only vertical bar/plots', function() {
       expect(encShorthands.indexOf('x=count_*,Q|y=bin_2,Q')).to.equal(-1);
@@ -37,10 +50,12 @@ describe('cp.gen.encs()', function () {
   });
 
   describe('#xT', function() {
-    var f = fixture['#xT'];
-    var encs = genEncs([], f.fields, f.stats);
-
-    var encShorthands = encs.map(vl.enc.shorthand);
+    var f, encs, encShorthands;
+    beforeEach(function() {
+      f = fixture['#xT'];
+      encs = genEncs([], f.fields, f.stats, opt);
+      encShorthands = encs.map(vl.enc.shorthand);
+    });
 
     // console.log('#xT', encs.map(vl.enc.shorthand));
 
@@ -51,10 +66,12 @@ describe('cp.gen.encs()', function () {
   });
 
   describe('#xYR(T)', function() {
-    var f = fixture['#xYR(T)'];
-    var encs = genEncs([], f.fields, f.stats);
-
-    var encShorthands = encs.map(vl.enc.shorthand);
+    var f, encs, encShorthands;
+    beforeEach(function() {
+      f = fixture['#xYR(T)'];
+      encs = genEncs([], f.fields, f.stats, opt);
+      encShorthands = encs.map(vl.enc.shorthand);
+    });
 
     // console.log('#xYR(T)', encs.map(vl.enc.shorthand));
 
@@ -65,10 +82,12 @@ describe('cp.gen.encs()', function () {
   });
 
   describe('QxT', function () {
-    var f = fixture['QxT'];
-    var encs = genEncs([], f.fields, f.stats);
-
-    var encShorthands = encs.map(vl.enc.shorthand);
+    var f, encs, encShorthands;
+    beforeEach(function() {
+      f = fixture['QxT'];
+      encs = genEncs([], f.fields, f.stats, opt);
+      encShorthands = encs.map(vl.enc.shorthand);
+    });
     it('should show only vertical bar/plots', function() {
       expect(encShorthands.indexOf('x=1,Q|y=2,T')).to.equal(-1);
       expect(encShorthands.indexOf('x=2,T|y=1,Q')).to.gt(-1);
@@ -86,21 +105,24 @@ describe('cp.gen.encs()', function () {
   //     2: {cardinality: 10}
   //   };
 
-  //   var encs = genEncs([], fields, stats);
+  //   var encs = genEncs([], fields, stats, opt);
   //   console.log('QxC', encs);
   // });
 
   // describe('QxA(Q),', function() {
   //   var f = fixture['OxA(Q)'];
-  //   var encs = genEncs([], f.fields, f.stats);
+  //   var encs = genEncs([], f.fields, f.stats, opt);
   //   console.log('QxA(Q)', encs.map(vl.enc.shorthand));
   // });
 
   describe('OxOxQ', function () {
-    var f = fixture.OxOxQ;
+    var f;
+    beforeEach(function() {
+      f = fixture.OxOxQ;
+    });
 
     it('without stats about occlusion, it should not include charts with both O\'s on axes', function() {
-      var encs = genEncs([], f.fields, f.stats);
+      var encs = genEncs([], f.fields, f.stats, opt);
 
       var filtered = encs.filter(function(enc){
         return enc.x.type === 'O' && enc.y.type === 'O';
@@ -111,10 +133,13 @@ describe('cp.gen.encs()', function () {
   });
 
   describe('OxOxA(Q)', function () {
-    var f = fixture['OxOxA(Q)'];
+    var f;
+    beforeEach(function() {
+      f = fixture['OxOxA(Q)'];
+    });
 
     it('without stats about occlusion, it should include charts with both O\'s on axes', function() {
-      var encs = genEncs([], f.fields, f.stats);
+      var encs = genEncs([], f.fields, f.stats, opt);
 
       // console.log('OxOxA(Q)', encs);
 
@@ -127,12 +152,15 @@ describe('cp.gen.encs()', function () {
   });
 
   describe('OxA(Q)xA(Q)', function () {
-    var f = fixture['OxA(Q)xA(Q)'],
-      fields = f.fields,
+    var f, fields, stats;
+    beforeEach(function() {
+      f = fixture['OxA(Q)xA(Q)'];
+      fields = f.fields;
       stats = f.stats;
+    });
 
     it('should not include charts with O on row/col except with text', function() {
-      var encs = genEncs([], fields, stats);
+      var encs = genEncs([], fields, stats, opt);
 
       expect(encs.filter(function(enc) {
         var rowIsO = enc.row && enc.row.type==='O',
@@ -142,9 +170,8 @@ describe('cp.gen.encs()', function () {
     });
 
     it('should include charts with O on row/col when omit flag is disabled', function() {
-      var encs = genEncs([], fields, stats, {
-        omitNonTextAggrWithAllDimsOnFacets: false
-      });
+      opt.omitNonTextAggrWithAllDimsOnFacets = false;
+      var encs = genEncs([], fields, stats, opt);
       expect(encs.filter(function(enc) {
         return (enc.row && enc.row.type==='O') ||
           (enc.col && enc.col.type==='O');

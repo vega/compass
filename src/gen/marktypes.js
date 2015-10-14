@@ -1,7 +1,6 @@
 "use strict";
 
 var vl = require('vega-lite'),
-  consts = require('../consts'),
   isDimension = vl.field.isDimension,
   isOrdinalScale = vl.field.isOrdinalScale;
 
@@ -17,13 +16,9 @@ var marksRule = vlmarktypes.rule = {
 };
 
 function getMarktypes(enc, stats, opt) {
-  opt = vl.schema.util.extend(opt||{}, consts.gen.encodings);
-
-  var markTypes = opt.marktypeList.filter(function(markType){
+  return opt.marktypeList.filter(function(markType){
     return vlmarktypes.satisfyRules(enc, markType, stats, opt);
   });
-
-  return markTypes;
 }
 
 vlmarktypes.satisfyRules = function (enc, markType, stats, opt) {

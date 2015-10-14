@@ -2,7 +2,6 @@
 require('../globals');
 
 var vl = require('vega-lite'),
-  consts = require('../consts'),
   genMarkTypes = require('./marktypes'),
   isDimension = vl.field.isDimension,
   isMeasure = vl.field.isMeasure;
@@ -168,7 +167,6 @@ genEncs.isAggrWithAllDimOnFacets = function (enc) {
 
 
 function genEncs(encs, fields, stats, opt) {
-  opt = vl.schema.util.extend(opt||{}, consts.gen.encodings);
   // generate a collection vega-lite's enc
   var tmpEnc = {};
 

@@ -9,6 +9,7 @@ var vl = require('vega-lite'),
 module.exports = genEncodingsFromFields;
 
 function genEncodingsFromFields(output, fields, stats, opt, nested) {
+  // opt must be augmented before being passed to genEncs or getMarktypes
   opt = vl.schema.util.extend(opt||{}, consts.gen.encodings);
   var encs = genEncs([], fields, stats, opt);
 
