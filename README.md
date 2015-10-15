@@ -3,7 +3,6 @@
 [![Build Status](https://travis-ci.org/vega/compass.svg)](https://travis-ci.org/vega/compass)
 [![npm dependencies](https://david-dm.org/vega/compass.svg)](https://www.npmjs.com/package/viscompass)
 [![npm version](https://img.shields.io/npm/v/viscompass.svg)](https://www.npmjs.com/package/viscompass)
-[![Coverage Status](https://coveralls.io/repos/vega/compass/badge.svg)](https://coveralls.io/r/vega/compass)
 
 (Vis)Compass is a module for generating and ranking visualizations. Given user
 query, Compass produces ranked group of visualization described using
