@@ -20,7 +20,10 @@
     "watch": "gulp build watch",
     "deploy": "npm run lint && npm run test && scripts/deploy.sh",
     "lint": "gulp jshint",
-    "test": "gulp t"
+    "test": "gulp t",
+    "patch": "gulp patch",
+    "feature": "gulp feature",
+    "release": "gulp release"
   },
   "browserify-shim": {
     "vega-lite": "global:vl"
