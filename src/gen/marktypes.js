@@ -1,8 +1,8 @@
 "use strict";
 
 var vl = require('vega-lite'),
-  isDimension = vl.field.isDimension,
-  isOrdinalScale = vl.field.isOrdinalScale;
+  isDimension = vl.encDef.isDimension,
+  isOrdinalScale = vl.encDef.isOrdinalScale;
 
 var vlmarktypes = module.exports = getMarktypes;
 
@@ -38,7 +38,7 @@ vlmarktypes.satisfyRules = function (enc, markType, stats, opt) {
 };
 
 function facetRule(field, stats, opt) {
-  return vl.field.cardinality(field, stats) <= opt.maxCardinalityForFacets;
+  return vl.encDef.cardinality(field, stats) <= opt.maxCardinalityForFacets;
 }
 
 function facetsRule(enc, stats, opt) {

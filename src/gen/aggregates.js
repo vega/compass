@@ -12,12 +12,12 @@ function genAggregates(output, fields, stats, opt) {
   opt = vl.schema.util.extend(opt||{}, consts.gen.aggregates);
   var tf = new Array(fields.length);
   var hasNorO = vl.any(fields, function(f) {
-    return vl.field.isTypes(f, [N, O]);
+    return vl.encDef.isTypes(f, [N, O]);
   });
 
   function emit(fieldSet) {
     fieldSet = vl.duplicate(fieldSet);
-    fieldSet.key = vl.field.shorthands(fieldSet);
+    fieldSet.key = vl.encDef.shorthands(fieldSet);
     output.push(fieldSet);
   }
 
@@ -25,7 +25,7 @@ function genAggregates(output, fields, stats, opt) {
     if (opt.omitMeasureOnly || opt.omitDimensionOnly) {
       var hasMeasure = false, hasDimension = false, hasRaw = false;
       tf.forEach(function(f) {
-        if (vl.field.isDimension(f)) {
+        if (vl.encDef.isDimension(f)) {
           hasDimension = true;
         } else {
           hasMeasure = true;
@@ -35,7 +35,7 @@ function genAggregates(output, fields, stats, opt) {
       if (!hasDimension && !hasRaw && opt.omitMeasureOnly) return;
       if (!hasMeasure) {
         if (opt.addCountForDimensionOnly) {
-          tf.push(vl.field.count());
+          tf.push(vl.encDef.count());
           emit(tf);
           tf.pop();
         }
@@ -94,7 +94,7 @@ function genAggregates(output, fields, stats, opt) {
       });
 
       if ((!opt.consistentAutoQ || vl.isin(autoMode, [AUTO, 'bin', 'cast', 'autocast'])) && !hasNorO) {
-        var highCardinality = vl.field.cardinality(f, stats) > opt.minCardinalityForBin;
+        var highCardinality = vl.encDef.cardinality(f, stats) > opt.minCardinalityForBin;
 
         var isAuto = opt.genDimQ === 'auto',
           genBin = opt.genDimQ  === 'bin' || (isAuto && highCardinality),

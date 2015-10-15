@@ -3,7 +3,7 @@
 var util = require('../util'),
   consts = require('../consts'),
   vl = require('vega-lite'),
-  isDimension = vl.field.isDimension;
+  isDimension = vl.encDef.isDimension;
 
 module.exports = projections;
 
@@ -35,10 +35,10 @@ function projections(fields, stats, opt) {
       } else {
         hasSelectedMeasure = true;
       }
-    } else if (field.selected !== false && !vl.field.isCount(field)) {
-      if (vl.field.isDimension(field) &&
+    } else if (field.selected !== false && !vl.encDef.isCount(field)) {
+      if (vl.encDef.isDimension(field) &&
           !opt.maxCardinalityForAutoAddOrdinal &&
-          vl.field.cardinality(field, stats, 15) > opt.maxCardinalityForAutoAddOrdinal
+          vl.encDef.cardinality(field, stats, 15) > opt.maxCardinalityForAutoAddOrdinal
         ) {
         return;
       }
@@ -90,7 +90,7 @@ function compareFieldsToAdd(hasSelectedDimension, hasSelectedMeasure, indices) {
 
 projections.key = function(projection) {
   return projection.map(function(field) {
-    return vl.field.isCount(field) ? 'count' : field.name;
+    return vl.encDef.isCount(field) ? 'count' : field.name;
   }).join(',');
 };
 

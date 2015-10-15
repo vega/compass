@@ -57,7 +57,7 @@ function finalTouch(encoding, stats, opt) {
   var enc = encoding.encoding;
   ['x', 'y'].forEach(function(et) {
     var field = enc[et];
-    if (field && vl.field.isMeasure(field) && !vl.field.isCount(field)) {
+    if (field && vl.encDef.isMeasure(field) && !vl.encDef.isCount(field)) {
       var stat = stats[field.name];
       if (stat && stat.stdev / stat.avg < 0.01) {
         field.scale = {zero: false};

@@ -3,8 +3,8 @@ require('../globals');
 
 var vl = require('vega-lite'),
   genMarkTypes = require('./marktypes'),
-  isDimension = vl.field.isDimension,
-  isMeasure = vl.field.isMeasure;
+  isDimension = vl.encDef.isDimension,
+  isMeasure = vl.encDef.isMeasure;
 
 module.exports = genEncs;
 
@@ -65,8 +65,8 @@ function retinalEncRules(enc, field, stats, opt) {
 function colorRules(enc, field, stats, opt) {
   if(!retinalEncRules(enc, field, stats, opt)) return false;
 
-  return vl.field.isMeasure(field) ||
-    vl.field.cardinality(field, stats) <= opt.maxCardinalityForColor;
+  return vl.encDef.isMeasure(field) ||
+    vl.encDef.cardinality(field, stats) <= opt.maxCardinalityForColor;
 }
 
 function shapeRules(enc, field, stats, opt) {
@@ -74,15 +74,15 @@ function shapeRules(enc, field, stats, opt) {
 
   if (field.bin && field.type === Q) return false;
   if (field.timeUnit && field.type === T) return false;
-  return vl.field.cardinality(field, stats) <= opt.maxCardinalityForColor;
+  return vl.encDef.cardinality(field, stats) <= opt.maxCardinalityForColor;
 }
 
 function dimMeaTransposeRule(enc) {
   // create horizontal histogram for ordinal
-  if (vl.field.isTypes(enc.y, [N, O]) && isMeasure(enc.x)) return true;
+  if (vl.encDef.isTypes(enc.y, [N, O]) && isMeasure(enc.x)) return true;
 
   // vertical histogram for Q and T
-  if (isMeasure(enc.y) && (!vl.field.isTypes(enc.x, [N, O]) && isDimension(enc.x))) return true;
+  if (isMeasure(enc.y) && (!vl.encDef.isTypes(enc.x, [N, O]) && isDimension(enc.x))) return true;
 
   return false;
 }
@@ -156,7 +156,7 @@ genEncs.isAggrWithAllDimOnFacets = function (enc) {
     if (field.aggregate) {
       hasAggr = true;
     }
-    if (vl.field.isDimension(field) && (encType !== ROW && encType !== COL)) {
+    if (vl.encDef.isDimension(field) && (encType !== ROW && encType !== COL)) {
       hasOtherO = true;
     }
     if (hasAggr && hasOtherO) break;
