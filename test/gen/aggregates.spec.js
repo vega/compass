@@ -38,12 +38,12 @@ describe('cp.gen.aggregates()', function () {
       expect(tables[0].key).to.be.ok;
     });
 
-    it('should output Q, mean(Q), bin(Q)x# if omitMeasureOnly', function () {
+    it('should output Q, avg(Q), bin(Q)x# if omitMeasureOnly', function () {
       var tables = genAggregates([], f.fields, f.stats, {
         omitMeasureOnly: false
       });
 
-      // each field can be Q, mean(Q)
+      // each field can be Q, avg(Q)
       expect(tables.length).to.equal(3);
 
       // Q
@@ -52,7 +52,7 @@ describe('cp.gen.aggregates()', function () {
         return !t.aggregate && !t.bin && t.type==='Q';
       }).length).to.equal(1);
 
-      // mean(Q)
+      // avg(Q)
       expect(tables.filter(function(table){
         var t = table[0];
         return t.aggregate && !t.bin && t.type==='Q';
@@ -95,7 +95,7 @@ describe('cp.gen.aggregates()', function () {
       expect(tables[0].key).to.be.ok;
     });
 
-    it('not generate mean with bin', function () {
+    it('not generate avg with bin', function () {
       var filtered = tables.filter(function(table) {
         return table[0].aggregate && table[1].bin;
       });

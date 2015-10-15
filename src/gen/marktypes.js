@@ -119,7 +119,7 @@ function barRule(enc, stats, opt) {
 
     if (eitherXorYisDimOrNull) {
       var aggregate = enc.x.aggregate || enc.y.aggregate;
-      return !(opt.omitStackedAverage && aggregate ==='mean' && enc.color);
+      return !(opt.omitStackedAverage && aggregate ==='avg' && enc.color);
     }
   }
 
@@ -142,7 +142,7 @@ function areaRule(enc, stats, opt) {
 
   if(!lineRule(enc, stats, opt)) return false;
 
-  return !(opt.omitStackedAverage && enc.y.aggregate ==='mean' && enc.color);
+  return !(opt.omitStackedAverage && enc.y.aggregate ==='avg' && enc.color);
 }
 
 function textRule(enc, stats, opt) {

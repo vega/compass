@@ -126,7 +126,7 @@ fixture['OxQ'] = {
 fixture['OxA(Q)'] = {
   fields: [
       {name:1, type:'O'},
-      {name:2, type:'Q', aggregate: "mean"}
+      {name:2, type:'Q', aggregate: "avg"}
   ],
   stats: stats['OxQ']
 };
@@ -182,8 +182,8 @@ fixture.OxQxQ = {
 fixture['OxA(Q)xA(Q)'] = {
   fields: [
     {name:1, type:'O'},
-    {aggregate:'mean', name:2, type:'Q'},
-    {aggregate:'mean', name:3, type:'Q'}
+    {aggregate:'avg', name:2, type:'Q'},
+    {aggregate:'avg', name:3, type:'Q'}
   ],
   stats: stats.OxQxQ
 };
@@ -264,7 +264,7 @@ fixture['QxYEAR(T)'] = {
 
 fixture['A(Q)xYEAR(T)'] = {
   fields: [
-    {name:1, type:'Q', aggregate: 'mean'},
+    {name:1, type:'Q', aggregate: 'avg'},
     {name:2, type:'T', timeUnit: 'year'}
   ],
   stats: stats['QxT']
