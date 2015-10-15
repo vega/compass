@@ -66,7 +66,7 @@ describe('cp.gen.marktypes()', function(){
       it('should not be generated', function () {
         var enc = {
           "color": {"selected": true,"name": "When__Phase_of_flight","type": "O"},
-          "x": {"name": "Cost__Total_$","type": "Q","aggregate": "avg"},
+          "x": {"name": "Cost__Total_$","type": "Q","aggregate": "mean"},
           "y": {"selected": undefined,"name": "Aircraft__Airline_Operator","type": "O"}
         };
 
@@ -94,7 +94,7 @@ describe('cp.gen.marktypes()', function(){
 
   describe('text', function() {
     it('should be generated', function () {
-      var shorthand = 'row=1,O|text=avg_2,Q',
+      var shorthand = 'row=1,O|text=mean_2,Q',
         enc = vl.enc.fromShorthand(shorthand),
         marktypes = getMarkTypes(enc, {}, opt);
       expect(marktypes.indexOf('text')).to.gt(-1);
@@ -107,10 +107,10 @@ describe('cp.gen.marktypes()', function(){
           "type": "O",
         },
         "size": {
-          "name": "Cost__Repair","type": "Q","aggregate": "avg"
+          "name": "Cost__Repair","type": "Q","aggregate": "mean"
         },
         "text": {
-          "name": "Cost__Total_$","type": "Q","aggregate": "avg"
+          "name": "Cost__Total_$","type": "Q","aggregate": "mean"
         }
       };
 
