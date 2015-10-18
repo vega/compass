@@ -38,8 +38,8 @@ function genEncodingsFromEncs(output, enc, stats, opt) {
       // Data object is the same across charts: pass by reference
       e.data = opt.data;
 
-      var encoding = finalTouch(e, stats, opt),
-      score = rank.encoding(encoding, stats, opt);
+      var encoding = finalTouch(e, stats, opt);
+      var score = rank.encoding(encoding, stats, opt);
 
       encoding._info = score;
       output.push(encoding);
