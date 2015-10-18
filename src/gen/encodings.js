@@ -32,13 +32,14 @@ function genEncodingsFromEncs(output, enc, stats, opt) {
           // Clone config & encoding to unique objects
           encoding: enc,
           config: opt.config
-        }),
-        encoding = finalTouch(e, stats, opt),
-        score = rank.encoding(encoding, stats, opt);
+        });
 
       e.marktype = markType;
       // Data object is the same across charts: pass by reference
       e.data = opt.data;
+
+      var encoding = finalTouch(e, stats, opt),
+      score = rank.encoding(encoding, stats, opt);
 
       encoding._info = score;
       output.push(encoding);
