@@ -5,3 +5,4 @@ compass.min.js.map
 compass.js
 bower_components
 coverage
+lib/vega-lite.js
