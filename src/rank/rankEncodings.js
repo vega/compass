@@ -3,7 +3,7 @@
 require('../globals');
 
 var vl = require('vega-lite'),
-  isDimension = vl.field.isDimension;
+  isDimension = vl.encDef.isDimension;
 
 module.exports = rankEncodings;
 
@@ -28,7 +28,7 @@ function rankEncodings(encoding, stats, opt, selected) {
     enc = encoding.encoding;
 
   var encodingMappingByField = vl.enc.reduce(encoding.encoding, function(o, field, encType) {
-    var key = vl.field.shorthand(field);
+    var key = vl.encDef.shorthand(field);
     var mappings = o[key] = o[key] || [];
     mappings.push({encType: encType, field: field});
     return o;
@@ -37,11 +37,11 @@ function rankEncodings(encoding, stats, opt, selected) {
   // data - encoding mapping score
   vl.forEach(encodingMappingByField, function(mappings) {
     var reasons = mappings.map(function(m) {
-        return m.encType + vl.shorthand.assign + vl.field.shorthand(m.field) +
+        return m.encType + vl.shorthand.assign + vl.encDef.shorthand(m.field) +
           ' ' + (selected && selected[m.field.name] ? '[x]' : '[ ]');
       }),
       scores = mappings.map(function(m) {
-        var role = vl.field.isDimension(m.field) ? 'dimension' : 'measure';
+        var role = vl.encDef.isDimension(m.field) ? 'dimension' : 'measure';
 
         var score = rankEncodings.score[role](m.field, m.encType, encoding.marktype, stats, opt);
 
@@ -119,14 +119,14 @@ M.bad = BAD;
 M.terrible = TERRIBLE;
 
 rankEncodings.dimensionScore = function (field, encType, marktype, stats, opt){
-  var cardinality = vl.field.cardinality(field, stats);
+  var cardinality = vl.encDef.cardinality(field, stats);
   switch (encType) {
     case X:
-      if (vl.field.isTypes(field, [N, O]))  return D.pos - D.minor;
+      if (vl.encDef.isTypes(field, [N, O]))  return D.pos - D.minor;
       return D.pos;
 
     case Y:
-      if (vl.field.isTypes(field, [N, O])) return D.pos - D.minor; //prefer ordinal on y
+      if (vl.encDef.isTypes(field, [N, O])) return D.pos - D.minor; //prefer ordinal on y
       if(field.type === T) return D.Y_T; // time should not be on Y
       return D.pos - D.minor;
 

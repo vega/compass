@@ -32,13 +32,14 @@ function genEncodingsFromEncs(output, enc, stats, opt) {
           // Clone config & encoding to unique objects
           encoding: enc,
           config: opt.config
-        }),
-        encoding = finalTouch(e, stats, opt),
-        score = rank.encoding(encoding, stats, opt);
+        });
 
       e.marktype = markType;
       // Data object is the same across charts: pass by reference
       e.data = opt.data;
+
+      var encoding = finalTouch(e, stats, opt);
+      var score = rank.encoding(encoding, stats, opt);
 
       encoding._info = score;
       output.push(encoding);
@@ -52,14 +53,14 @@ function finalTouch(encoding, stats, opt) {
     encoding.encoding.color = encoding.encoding.text;
   }
 
-  // don't include zero if stdev/avg < 0.01
+  // don't include zero if stdev/mean < 0.01
   // https://github.com/uwdata/visrec/issues/69
   var enc = encoding.encoding;
   ['x', 'y'].forEach(function(et) {
     var field = enc[et];
-    if (field && vl.field.isMeasure(field) && !vl.field.isCount(field)) {
+    if (field && vl.encDef.isMeasure(field) && !vl.encDef.isCount(field)) {
       var stat = stats[field.name];
-      if (stat && stat.stdev / stat.avg < 0.01) {
+      if (stat && stat.stdev / stat.mean < 0.01) {
         field.scale = {zero: false};
       }
     }
