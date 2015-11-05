@@ -18,7 +18,7 @@ var bundleDef = {
 var browserBundler = browserify(bundleDef);
 var watchBundler = watchify(browserify(bundleDef));
 
-// builds Vega-lite with watcher
+// builds Vega-Lite with watcher
 function bundle() {
   return build(watchBundler.bundle());
 }
