@@ -6,7 +6,7 @@
 
 (Vis)Compass is a module for generating and ranking visualizations. Given user
 query, Compass produces ranked group of visualization described using
-[vega-lite](http://github.com/vega/vega-lite).
+[Vega-Lite](http://github.com/vega/vega-lite).
 
 Compass is in active development.  More information will be included soon.
 
@@ -14,7 +14,7 @@ Compass is in active development.  More information will be included soon.
 
 ### Dependencies
 
-This project depends on [Vega-lite](https://github.com/vega/vega-lite) as a formal model for visualization.
+This project depends on [Vega-Lite](https://github.com/vega/vega-lite) as a formal model for visualization.
 
 If you plan to make changes to these dependencies and observe the changes without publishing / copying compiled libraries all the time, use [`bower link`](https://oncletom.io/2013/live-development-bower-component/) and 'npm link'.
 
