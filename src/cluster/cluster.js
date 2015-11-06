@@ -23,9 +23,9 @@ function cluster(specs, opt) {
       return util.traverse(tree, []);
     })
    .map(function(cluster) {
-    return cluster.sort(function(encoding1, encoding2) {
+    return cluster.sort(function(spec1, spec2) {
       // sort each cluster -- have the highest score as 1st item
-      return encoding2._info.score - encoding1._info.score;
+      return spec2._info.score - spec1._info.score;
     });
   }).filter(function(cluster) {  // filter empty cluster
     return cluster.length >0;
