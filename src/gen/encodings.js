@@ -1,63 +1,67 @@
 'use strict';
 
+// TODO: rename this file to specs.js
+
 var vl = require('vega-lite'),
-  genEncs = require('./encs'),
+  genEncodings = require('./encs'),
   getMarktypes = require('./marktypes'),
   rank = require('../rank/rank'),
   consts = require('../consts');
 
-module.exports = genEncodingsFromFields;
+module.exports = genSpecsFromFieldDefs;
 
-function genEncodingsFromFields(output, fields, stats, opt, nested) {
-  // opt must be augmented before being passed to genEncs or getMarktypes
+/** Design Encodings for a set of field definition */
+
+function genSpecsFromFieldDefs(output, fieldDefs, stats, opt, nested) {
+  // opt must be augmented before being passed to genEncodings or getMarktypes
   opt = vl.schema.util.extend(opt||{}, consts.gen.encodings);
-  var encs = genEncs([], fields, stats, opt);
+  var encodings = genEncodings([], fieldDefs, stats, opt);
 
   if (nested) {
-    return encs.reduce(function(dict, enc) {
-      dict[enc] = genEncodingsFromEncs([], enc, stats, opt);
+    return encodings.reduce(function(dict, encoding) {
+      dict[encoding] = genSpecsFromEncodings([], encoding, stats, opt);
       return dict;
     }, {});
   } else {
-    return encs.reduce(function(list, enc) {
-      return genEncodingsFromEncs(list, enc, stats, opt);
+    return encodings.reduce(function(list, encoding) {
+      return genSpecsFromEncodings(list, encoding, stats, opt);
     }, []);
   }
 }
 
-function genEncodingsFromEncs(output, enc, stats, opt) {
-  getMarktypes(enc, stats, opt)
+function genSpecsFromEncodings(output, encoding, stats, opt) {
+  getMarktypes(encoding, stats, opt)
     .forEach(function(markType) {
-      var e = vl.duplicate({
+      var spec = vl.duplicate({
           // Clone config & encoding to unique objects
-          encoding: enc,
+          encoding: encoding,
           config: opt.config
         });
 
-      e.marktype = markType;
+      spec.marktype = markType;
       // Data object is the same across charts: pass by reference
-      e.data = opt.data;
+      spec.data = opt.data;
 
-      var encoding = finalTouch(e, stats, opt);
-      var score = rank.encoding(encoding, stats, opt);
+      spec = finalTouch(spec, stats, opt);
+      var score = rank.encoding(spec, stats, opt);
 
-      encoding._info = score;
-      output.push(encoding);
+      spec._info = score;
+      output.push(spec);
     });
   return output;
 }
 
 //FIXME this should be refactors
-function finalTouch(encoding, stats, opt) {
-  if (encoding.marktype === 'text' && opt.alwaysGenerateTableAsHeatmap) {
-    encoding.encoding.color = encoding.encoding.text;
+function finalTouch(spec, stats, opt) {
+  if (spec.marktype === 'text' && opt.alwaysGenerateTableAsHeatmap) {
+    spec.encoding.color = spec.encoding.text;
   }
 
   // don't include zero if stdev/mean < 0.01
   // https://github.com/uwdata/visrec/issues/69
-  var enc = encoding.encoding;
-  ['x', 'y'].forEach(function(et) {
-    var field = enc[et];
+  var encoding = spec.encoding;
+  ['x', 'y'].forEach(function(encType) {
+    var field = encoding[encType];
     if (field && vl.encDef.isMeasure(field) && !vl.encDef.isCount(field)) {
       var stat = stats[field.name];
       if (stat && stat.stdev / stat.mean < 0.01) {
@@ -65,5 +69,5 @@ function finalTouch(encoding, stats, opt) {
       }
     }
   });
-  return encoding;
+  return spec;
 }

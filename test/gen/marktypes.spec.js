@@ -23,8 +23,8 @@ describe('cp.gen.marktypes()', function(){
     });
 
     it('should generate point and bar', function() {
-      var enc = {x: f.fields[0]},
-        markTypes = getMarkTypes(enc, f.stats, opt);
+      var encoding = {x: f.fields[0]},
+        markTypes = getMarkTypes(encoding, f.stats, opt);
 
       expect(markTypes.length).to.eql(2);
       expect(markTypes).to.eql(['point', 'bar']);
@@ -32,10 +32,10 @@ describe('cp.gen.marktypes()', function(){
   });
 
   describe('1Q', function () {
-    var enc, marktypes;
+    var encoding, marktypes;
     beforeEach(function() {
-      enc = {"x": {"name": "Cost__Total_$","type": "Q"}};
-      marktypes = getMarkTypes(enc, {}, opt);
+      encoding = {"x": {"name": "Cost__Total_$","type": "Q"}};
+      marktypes = getMarkTypes(encoding, {}, opt);
     });
     it('should contain tick', function () {
       expect(marktypes.indexOf('tick')).to.gt(-1);
@@ -64,25 +64,25 @@ describe('cp.gen.marktypes()', function(){
   describe('bar', function () {
     describe('with stacked average', function () {
       it('should not be generated', function () {
-        var enc = {
+        var encoding = {
           "color": {"selected": true,"name": "When__Phase_of_flight","type": "O"},
           "x": {"name": "Cost__Total_$","type": "Q","aggregate": "mean"},
           "y": {"selected": undefined,"name": "Aircraft__Airline_Operator","type": "O"}
         };
 
-        var marktypes = getMarkTypes(enc, {}, opt);
+        var marktypes = getMarkTypes(encoding, {}, opt);
         expect(marktypes.indexOf('bar')).to.equal(-1);
       });
     });
 
     describe('with stacked sum', function () {
       it('should not be generated', function () {
-        var enc = {
+        var encoding = {
           "color": {"selected": true,"name": "When__Phase_of_flight","type": "O"},
           "x": {"name": "Cost__Total_$","type": "Q","aggregate": "sum"},
           "y": {"selected": undefined,"name": "Aircraft__Airline_Operator","type": "O"}
         };
-        var marktypes = getMarkTypes(enc, {}, opt);
+        var marktypes = getMarkTypes(encoding, {}, opt);
         expect(marktypes.indexOf('bar')).to.gt(-1);
       });
     });
@@ -95,13 +95,13 @@ describe('cp.gen.marktypes()', function(){
   describe('text', function() {
     it('should be generated', function () {
       var shorthand = 'row=1,O|text=mean_2,Q',
-        enc = vl.enc.fromShorthand(shorthand),
-        marktypes = getMarkTypes(enc, {}, opt);
+        encoding = vl.enc.fromShorthand(shorthand),
+        marktypes = getMarkTypes(encoding, {}, opt);
       expect(marktypes.indexOf('text')).to.gt(-1);
     });
 
     it('should not contain size', function() {
-      var enc = {
+      var encoding = {
         "col": {
           "name": "Effect__Amount_of_damage",
           "type": "O",
@@ -114,7 +114,7 @@ describe('cp.gen.marktypes()', function(){
         }
       };
 
-      var marktypes = getMarkTypes(enc, {}, opt);
+      var marktypes = getMarkTypes(encoding, {}, opt);
 
       expect(marktypes.indexOf('text')).to.equal(-1);
     });

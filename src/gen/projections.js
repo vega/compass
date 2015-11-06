@@ -12,10 +12,10 @@ module.exports = projections;
 
 /**
  * fields
- * @param  {[type]} fields array of fields and query information
+ * @param  {[type]} fieldDefs array of fields and query information
  * @return {[type]}        [description]
  */
-function projections(fields, stats, opt) {
+function projections(fieldDefs, stats, opt) {
   opt = vl.schema.util.extend(opt||{}, consts.gen.projections);
 
   // First categorize field, selected, fieldsToAdd, and save indices
@@ -24,25 +24,25 @@ function projections(fields, stats, opt) {
     hasSelectedMeasure = false,
     indices = {};
 
-  fields.forEach(function(field, index){
+  fieldDefs.forEach(function(fieldDef, index){
     //save indices for stable sort later
-    indices[field.name] = index;
+    indices[fieldDef.name] = index;
 
-    if (field.selected) {
-      selected.push(field);
-      if (isDimension(field) || field.type ==='T') { // FIXME / HACK
+    if (fieldDef.selected) {
+      selected.push(fieldDef);
+      if (isDimension(fieldDef) || fieldDef.type ==='T') { // FIXME / HACK
         hasSelectedDimension = true;
       } else {
         hasSelectedMeasure = true;
       }
-    } else if (field.selected !== false && !vl.encDef.isCount(field)) {
-      if (vl.encDef.isDimension(field) &&
+    } else if (fieldDef.selected !== false && !vl.encDef.isCount(fieldDef)) {
+      if (vl.encDef.isDimension(fieldDef) &&
           !opt.maxCardinalityForAutoAddOrdinal &&
-          vl.encDef.cardinality(field, stats, 15) > opt.maxCardinalityForAutoAddOrdinal
+          vl.encDef.cardinality(fieldDef, stats, 15) > opt.maxCardinalityForAutoAddOrdinal
         ) {
         return;
       }
-      fieldsToAdd.push(field);
+      fieldsToAdd.push(fieldDef);
     }
   });
 

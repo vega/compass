@@ -7,10 +7,10 @@ var vl = require('vega-lite'),
 var distance = {};
 module.exports = distance;
 
-distance.table = function (encodings) {
-  var len = encodings.length,
-    colencs = encodings.map(function(e) { return distance.getEncTypeByColumnName(e); }),
-    shorthands = encodings.map(vl.Encoding.shorthand),
+distance.table = function (specs) {
+  var len = specs.length,
+    colencs = specs.map(function(e) { return distance.getEncTypeByColumnName(e); }),
+    shorthands = specs.map(vl.Encoding.shorthand),
     diff = {}, i, j;
 
   for (i = 0; i < len; i++) diff[shorthands[i]] = {};
@@ -58,20 +58,20 @@ distance.get = function (colenc1, colenc2) {
 };
 
 // get encoding type by fieldname
-distance.getEncTypeByColumnName = function(encoding) {
+distance.getEncTypeByColumnName = function(spec) {
   var _colenc = {},
-    enc = encoding.encoding;
+    encoding = spec.encoding;
 
-  vl.keys(enc).forEach(function(encType) {
-    var e = vl.duplicate(enc[encType]);
+  vl.keys(encoding).forEach(function(encType) {
+    var e = vl.duplicate(encoding[encType]);
     e.encType = encType;
     _colenc[e.name || ''] = e;
     delete e.name;
   });
 
   return {
-    marktype: encoding.marktype,
+    marktype: spec.marktype,
     col: _colenc,
-    encoding: encoding.encoding
+    encoding: spec.encoding
   };
 };

@@ -15,55 +15,55 @@ var marksRule = vlmarktypes.rule = {
   tick:   tickRule
 };
 
-function getMarktypes(enc, stats, opt) {
+function getMarktypes(encoding, stats, opt) {
   return opt.marktypeList.filter(function(markType){
-    return vlmarktypes.satisfyRules(enc, markType, stats, opt);
+    return vlmarktypes.satisfyRules(encoding, markType, stats, opt);
   });
 }
 
-vlmarktypes.satisfyRules = function (enc, markType, stats, opt) {
+vlmarktypes.satisfyRules = function (encoding, markType, stats, opt) {
   var mark = vl.compiler.marks[markType],
     reqs = mark.requiredEncoding,
     support = mark.supportedEncoding;
 
   for (var i in reqs) { // all required encodings in enc
-    if (!(reqs[i] in enc)) return false;
+    if (!(reqs[i] in encoding)) return false;
   }
 
-  for (var encType in enc) { // all encodings in enc are supported
+  for (var encType in encoding) { // all encodings in enc are supported
     if (!support[encType]) return false;
   }
 
-  return !marksRule[markType] || marksRule[markType](enc, stats, opt);
+  return !marksRule[markType] || marksRule[markType](encoding, stats, opt);
 };
 
-function facetRule(field, stats, opt) {
-  return vl.encDef.cardinality(field, stats) <= opt.maxCardinalityForFacets;
+function facetRule(fieldDef, stats, opt) {
+  return vl.encDef.cardinality(fieldDef, stats) <= opt.maxCardinalityForFacets;
 }
 
-function facetsRule(enc, stats, opt) {
-  if(enc.row && !facetRule(enc.row, stats, opt)) return false;
-  if(enc.col && !facetRule(enc.col, stats, opt)) return false;
+function facetsRule(encoding, stats, opt) {
+  if(encoding.row && !facetRule(encoding.row, stats, opt)) return false;
+  if(encoding.col && !facetRule(encoding.col, stats, opt)) return false;
   return true;
 }
 
-function pointRule(enc, stats, opt) {
-  if(!facetsRule(enc, stats, opt)) return false;
-  if (enc.x && enc.y) {
+function pointRule(encoding, stats, opt) {
+  if(!facetsRule(encoding, stats, opt)) return false;
+  if (encoding.x && encoding.y) {
     // have both x & y ==> scatter plot / bubble plot
 
-    var xIsDim = isDimension(enc.x),
-      yIsDim = isDimension(enc.y);
+    var xIsDim = isDimension(encoding.x),
+      yIsDim = isDimension(encoding.y);
 
     // For OxO
     if (xIsDim && yIsDim) {
       // shape doesn't work with both x, y as ordinal
-      if (enc.shape) {
+      if (encoding.shape) {
         return false;
       }
 
       // TODO(kanitw): check that there is quant at least ...
-      if (enc.color && isDimension(enc.color)) {
+      if (encoding.color && isDimension(encoding.color)) {
         return false;
       }
     }
@@ -72,81 +72,81 @@ function pointRule(enc, stats, opt) {
     if (opt.omitDotPlot) return false;
 
     // Dot plot should always be horizontal
-    if (opt.omitTranpose && enc.y) return false;
+    if (opt.omitTranpose && encoding.y) return false;
 
     // dot plot shouldn't have other encoding
-    if (opt.omitDotPlotWithExtraEncoding && vl.keys(enc).length > 1) return false;
+    if (opt.omitDotPlotWithExtraEncoding && vl.keys(encoding).length > 1) return false;
 
     // dot plot with shape is non-sense
-    if (enc.shape) return false;
+    if (encoding.shape) return false;
   }
   return true;
 }
 
-function tickRule(enc, stats, opt) {
+function tickRule(encoding, stats, opt) {
   // jshint unused:false
-  if (enc.x || enc.y) {
-    if(vl.enc.isAggregate(enc)) return false;
+  if (encoding.x || encoding.y) {
+    if(vl.enc.isAggregate(encoding)) return false;
 
-    var xIsDim = isDimension(enc.x),
-      yIsDim = isDimension(enc.y);
+    var xIsDim = isDimension(encoding.x),
+      yIsDim = isDimension(encoding.y);
 
-    return (!xIsDim && (!enc.y || isOrdinalScale(enc.y))) ||
-      (!yIsDim && (!enc.x || isOrdinalScale(enc.x)));
+    return (!xIsDim && (!encoding.y || isOrdinalScale(encoding.y))) ||
+      (!yIsDim && (!encoding.x || isOrdinalScale(encoding.x)));
   }
   return false;
 }
 
-function barRule(enc, stats, opt) {
-  if(!facetsRule(enc, stats, opt)) return false;
+function barRule(encoding, stats, opt) {
+  if(!facetsRule(encoding, stats, opt)) return false;
 
   // bar requires at least x or y
-  if (!enc.x && !enc.y) return false;
+  if (!encoding.x && !encoding.y) return false;
 
-  if (opt.omitSizeOnBar && enc.size !== undefined) return false;
+  if (opt.omitSizeOnBar && encoding.size !== undefined) return false;
 
   // FIXME actually check if there would be occlusion #90
   // need to aggregate on either x or y
   var aggEitherXorY =
-    (!enc.x || enc.x.aggregate === undefined) ^
-    (!enc.y || enc.y.aggregate === undefined);
+    (!encoding.x || encoding.x.aggregate === undefined) ^
+    (!encoding.y || encoding.y.aggregate === undefined);
 
 
   if (aggEitherXorY) {
     var eitherXorYisDimOrNull =
-      (!enc.x || isDimension(enc.x)) ^
-      (!enc.y || isDimension(enc.y));
+      (!encoding.x || isDimension(encoding.x)) ^
+      (!encoding.y || isDimension(encoding.y));
 
     if (eitherXorYisDimOrNull) {
-      var aggregate = enc.x.aggregate || enc.y.aggregate;
-      return !(opt.omitStackedAverage && aggregate ==='mean' && enc.color);
+      var aggregate = encoding.x.aggregate || encoding.y.aggregate;
+      return !(opt.omitStackedAverage && aggregate ==='mean' && encoding.color);
     }
   }
 
   return false;
 }
 
-function lineRule(enc, stats, opt) {
-  if(!facetsRule(enc, stats, opt)) return false;
+function lineRule(encoding, stats, opt) {
+  if(!facetsRule(encoding, stats, opt)) return false;
 
   // TODO(kanitw): add omitVerticalLine as config
 
   // FIXME truly ordinal data is fine here too.
   // Line chart should be only horizontal
   // and use only temporal data
-  return enc.x.type == 'T' && enc.x.timeUnit && enc.y.type == 'Q' && enc.y.aggregate;
+  return encoding.x.type == 'T' && encoding.x.timeUnit && encoding.y.type == 'Q' && encoding.y.aggregate;
 }
 
-function areaRule(enc, stats, opt) {
-  if(!facetsRule(enc, stats, opt)) return false;
+function areaRule(encoding, stats, opt) {
+  if(!facetsRule(encoding, stats, opt)) return false;
 
-  if(!lineRule(enc, stats, opt)) return false;
+  if(!lineRule(encoding, stats, opt)) return false;
 
-  return !(opt.omitStackedAverage && enc.y.aggregate ==='mean' && enc.color);
+  return !(opt.omitStackedAverage && encoding.y.aggregate ==='mean' && encoding.color);
 }
 
-function textRule(enc, stats, opt) {
+function textRule(encoding, stats, opt) {
   // at least must have row or col and aggregated text values
-  return (enc.row || enc.col) && enc.text && enc.text.aggregate && !enc.x && !enc.y && !enc.size &&
-    (!opt.alwaysGenerateTableAsHeatmap || !enc.color);
+  return (encoding.row || encoding.col) && encoding.text && encoding.text.aggregate && !encoding.x && !encoding.y && !encoding.size &&
+    (!opt.alwaysGenerateTableAsHeatmap || !encoding.color);
 }

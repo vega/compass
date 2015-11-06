@@ -9,11 +9,11 @@ var vl = require('vega-lite'),
 
 cluster.distance = require('./distance');
 
-function cluster(encodings, opt) {
+function cluster(specs, opt) {
   // jshint unused:false
-  var dist = cluster.distance.table(encodings);
+  var dist = cluster.distance.table(specs);
 
-  var clusterTrees = clusterfck.hcluster(encodings, function(e1, e2) {
+  var clusterTrees = clusterfck.hcluster(specs, function(e1, e2) {
     var s1 = vl.Encoding.shorthand(e1),
       s2 = vl.Encoding.shorthand(e2);
     return dist[s1][s2];

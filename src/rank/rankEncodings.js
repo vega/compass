@@ -21,16 +21,16 @@ var MARK_SCORE = {
   text: 0.8
 };
 
-function rankEncodings(encoding, stats, opt, selected) {
+function rankEncodings(spec, stats, opt, selected) {
   var features = [],
-    encTypes = vl.keys(encoding.encoding),
-    marktype = encoding.marktype,
-    enc = encoding.encoding;
+    encTypes = vl.keys(spec.encoding),
+    marktype = spec.marktype,
+    encoding = spec.encoding;
 
-  var encodingMappingByField = vl.enc.reduce(encoding.encoding, function(o, field, encType) {
-    var key = vl.encDef.shorthand(field);
+  var encodingMappingByField = vl.enc.reduce(spec.encoding, function(o, fieldDef, encType) {
+    var key = vl.encDef.shorthand(fieldDef);
     var mappings = o[key] = o[key] || [];
-    mappings.push({encType: encType, field: field});
+    mappings.push({encType: encType, field: fieldDef});
     return o;
   }, {});
 
@@ -43,7 +43,7 @@ function rankEncodings(encoding, stats, opt, selected) {
       scores = mappings.map(function(m) {
         var role = vl.encDef.isDimension(m.field) ? 'dimension' : 'measure';
 
-        var score = rankEncodings.score[role](m.field, m.encType, encoding.marktype, stats, opt);
+        var score = rankEncodings.score[role](m.field, m.encType, spec.marktype, stats, opt);
 
         return !selected || selected[m.field.name] ? score : Math.pow(score, 0.125);
       });
@@ -58,8 +58,8 @@ function rankEncodings(encoding, stats, opt, selected) {
   if (marktype === TEXT) {
     // TODO
   } else {
-    if (enc.x && enc.y) {
-      if (isDimension(enc.x) ^ isDimension(enc.y)) {
+    if (encoding.x && encoding.y) {
+      if (isDimension(encoding.x) ^ isDimension(encoding.y)) {
         features.push({
           reason: 'OxQ plot',
           score: 0.8
@@ -70,7 +70,7 @@ function rankEncodings(encoding, stats, opt, selected) {
 
   // penalize not using positional only penalize for non-text
   if (encTypes.length > 1 && marktype !== TEXT) {
-    if ((!enc.x || !enc.y) && !enc.geo && !enc.text) {
+    if ((!encoding.x || !encoding.y) && !encoding.geo && !encoding.text) {
       features.push({
         reason: 'unused position',
         score: UNUSED_POSITION
@@ -118,16 +118,16 @@ M.text = 0.4;
 M.bad = BAD;
 M.terrible = TERRIBLE;
 
-rankEncodings.dimensionScore = function (field, encType, marktype, stats, opt){
-  var cardinality = vl.encDef.cardinality(field, stats);
+rankEncodings.dimensionScore = function (fieldDef, encType, marktype, stats, opt){
+  var cardinality = vl.encDef.cardinality(fieldDef, stats);
   switch (encType) {
     case X:
-      if (vl.encDef.isTypes(field, [N, O]))  return D.pos - D.minor;
+      if (vl.encDef.isTypes(fieldDef, [N, O]))  return D.pos - D.minor;
       return D.pos;
 
     case Y:
-      if (vl.encDef.isTypes(field, [N, O])) return D.pos - D.minor; //prefer ordinal on y
-      if(field.type === T) return D.Y_T; // time should not be on Y
+      if (vl.encDef.isTypes(fieldDef, [N, O])) return D.pos - D.minor; //prefer ordinal on y
+      if (fieldDef.type === T) return D.Y_T; // time should not be on Y
       return D.pos - D.minor;
 
     case COL:
@@ -142,7 +142,7 @@ rankEncodings.dimensionScore = function (field, encType, marktype, stats, opt){
         cardinality <= opt.maxCardinalityForFacets ? D.facet_ok : D.facet_bad) - D.minor;
 
     case COLOR:
-      var hasOrder = (field.bin && field.type===Q) || (field.timeUnit && field.type===T);
+      var hasOrder = (fieldDef.bin && fieldDef.type===Q) || (fieldDef.timeUnit && fieldDef.type===T);
 
       //FIXME add stacking option once we have control ..
       var isStacked = marktype === 'bar' || marktype === 'area';
@@ -164,7 +164,7 @@ rankEncodings.dimensionScore = function (field, encType, marktype, stats, opt){
 
 rankEncodings.dimensionScore.consts = D;
 
-rankEncodings.measureScore = function (field, encType, marktype, stats, opt) {
+rankEncodings.measureScore = function (fieldDef, encType, marktype, stats, opt) {
   // jshint unused:false
   switch (encType){
     case X: return M.pos;

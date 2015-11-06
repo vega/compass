@@ -6,7 +6,7 @@ var expect = require('chai').expect,
   vl = require('vega-lite'),
   fixture = require('../fixture');
 
-var genEncs = require('../../src/gen/encs');
+var genEncodings = require('../../src/gen/encs');
 var consts = require('../../src/consts');
 
 describe('cp.gen.encs()', function () {
@@ -23,10 +23,10 @@ describe('cp.gen.encs()', function () {
       f = fixture['#'];
     });
 
-    it('should generate one encs', function() {
-      var encs = genEncs([], f.fields, f.stats, opt);
-      expect(encs.length).to.eql(1);
-      expect(encs[0].x).to.be.ok;
+    it('should generate one encodings', function() {
+      var encodings = genEncodings([], f.fields, f.stats, opt);
+      expect(encodings.length).to.eql(1);
+      expect(encodings[0].x).to.be.ok;
     });
   });
 
@@ -35,11 +35,11 @@ describe('cp.gen.encs()', function () {
   });
 
   describe('#xB(Q)', function() {
-    var f, encs, encShorthands;
+    var f, encodings, encShorthands;
     beforeEach(function() {
       f = fixture['#xB(Q)'];
-      encs = genEncs([], f.fields, f.stats, opt);
-      encShorthands = encs.map(vl.enc.shorthand);
+      encodings = genEncodings([], f.fields, f.stats, opt);
+      encShorthands = encodings.map(vl.enc.shorthand);
     });
 
     it('should show only vertical bar/plots', function() {
@@ -50,14 +50,12 @@ describe('cp.gen.encs()', function () {
   });
 
   describe('#xT', function() {
-    var f, encs, encShorthands;
+    var f, encodings, encShorthands;
     beforeEach(function() {
       f = fixture['#xT'];
-      encs = genEncs([], f.fields, f.stats, opt);
-      encShorthands = encs.map(vl.enc.shorthand);
+      encodings = genEncodings([], f.fields, f.stats, opt);
+      encShorthands = encodings.map(vl.enc.shorthand);
     });
-
-    // console.log('#xT', encs.map(vl.enc.shorthand));
 
     it('should show only vertical bar/plots', function() {
       expect(encShorthands.indexOf('x=count_*,Q|y=2,T')).to.equal(-1);
@@ -66,14 +64,12 @@ describe('cp.gen.encs()', function () {
   });
 
   describe('#xYR(T)', function() {
-    var f, encs, encShorthands;
+    var f, encodings, encShorthands;
     beforeEach(function() {
       f = fixture['#xYR(T)'];
-      encs = genEncs([], f.fields, f.stats, opt);
-      encShorthands = encs.map(vl.enc.shorthand);
+      encodings = genEncodings([], f.fields, f.stats, opt);
+      encShorthands = encodings.map(vl.enc.shorthand);
     });
-
-    // console.log('#xYR(T)', encs.map(vl.enc.shorthand));
 
     it('should show only vertical bar/plots', function() {
       expect(encShorthands.indexOf('x=count_*,Q|y=year_2,T')).to.equal(-1);
@@ -82,11 +78,11 @@ describe('cp.gen.encs()', function () {
   });
 
   describe('QxT', function () {
-    var f, encs, encShorthands;
+    var f, encodings, encShorthands;
     beforeEach(function() {
       f = fixture['QxT'];
-      encs = genEncs([], f.fields, f.stats, opt);
-      encShorthands = encs.map(vl.enc.shorthand);
+      encodings = genEncodings([], f.fields, f.stats, opt);
+      encShorthands = encodings.map(vl.enc.shorthand);
     });
     it('should show only vertical bar/plots', function() {
       expect(encShorthands.indexOf('x=1,Q|y=2,T')).to.equal(-1);
@@ -105,13 +101,13 @@ describe('cp.gen.encs()', function () {
   //     2: {cardinality: 10}
   //   };
 
-  //   var encs = genEncs([], fields, stats, opt);
+  //   var encs = genEncodings([], fields, stats, opt);
   //   console.log('QxC', encs);
   // });
 
   // describe('QxA(Q),', function() {
   //   var f = fixture['OxA(Q)'];
-  //   var encs = genEncs([], f.fields, f.stats, opt);
+  //   var encs = genEncodings([], f.fields, f.stats, opt);
   //   console.log('QxA(Q)', encs.map(vl.enc.shorthand));
   // });
 
@@ -122,9 +118,9 @@ describe('cp.gen.encs()', function () {
     });
 
     it('without stats about occlusion, it should not include charts with both O\'s on axes', function() {
-      var encs = genEncs([], f.fields, f.stats, opt);
+      var encodings = genEncodings([], f.fields, f.stats, opt);
 
-      var filtered = encs.filter(function(enc){
+      var filtered = encodings.filter(function(enc){
         return enc.x.type === 'O' && enc.y.type === 'O';
       });
 
@@ -139,12 +135,10 @@ describe('cp.gen.encs()', function () {
     });
 
     it('without stats about occlusion, it should include charts with both O\'s on axes', function() {
-      var encs = genEncs([], f.fields, f.stats, opt);
+      var encodings = genEncodings([], f.fields, f.stats, opt);
 
-      // console.log('OxOxA(Q)', encs);
-
-      var filtered = encs.filter(function(enc){
-        return enc.x && enc.x.type === 'O' && enc.y && enc.y.type === 'O';
+      var filtered = encodings.filter(function(encoding){
+        return encoding.x && encoding.x.type === 'O' && encoding.y && encoding.y.type === 'O';
       });
 
       expect(filtered.length).to.gt(0);
@@ -160,21 +154,21 @@ describe('cp.gen.encs()', function () {
     });
 
     it('should not include charts with O on row/col except with text', function() {
-      var encs = genEncs([], fields, stats, opt);
+      var encodings = genEncodings([], fields, stats, opt);
 
-      expect(encs.filter(function(enc) {
-        var rowIsO = enc.row && enc.row.type==='O',
-          colIsO = enc.col && enc.col.type==='O';
-        return !enc.text && (rowIsO || colIsO);
+      expect(encodings.filter(function(encoding) {
+        var rowIsO = encoding.row && encoding.row.type==='O',
+          colIsO = encoding.col && encoding.col.type==='O';
+        return !encoding.text && (rowIsO || colIsO);
       }).length).to.equal(0);
     });
 
     it('should include charts with O on row/col when omit flag is disabled', function() {
       opt.omitNonTextAggrWithAllDimsOnFacets = false;
-      var encs = genEncs([], fields, stats, opt);
-      expect(encs.filter(function(enc) {
-        return (enc.row && enc.row.type==='O') ||
-          (enc.col && enc.col.type==='O');
+      var encodings = genEncodings([], fields, stats, opt);
+      expect(encodings.filter(function(encoding) {
+        return (encoding.row && encoding.row.type==='O') ||
+          (encoding.col && encoding.col.type==='O');
       }).length).to.gt(0);
     });
   });
