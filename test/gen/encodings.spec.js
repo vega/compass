@@ -3,163 +3,173 @@
 /*jshint -W069 */
 
 var expect = require('chai').expect,
+  vl = require('vega-lite'),
   fixture = require('../fixture');
 
-var genSpecs = require('../../src/gen/encodings');
+var genEncodings = require('../../src/gen/encodings');
+var consts = require('../../src/consts');
 
-describe('cp.gen.encodings()', function () {
+describe('cp.gen.encs()', function () {
+  var opt;
+
+  beforeEach(function() {
+    opt = vl.schema.util.extend({}, consts.gen.encodings);
+  });
+
   describe('#', function () {
-    var f = fixture['#'];
+    var f;
 
-    it('should generate two encodings', function() {
-      var specs = genSpecs([], f.fields, f.stats);
-      expect(specs.length).to.eql(2);
-      expect(specs[0].encoding.x).to.be.ok;
+    beforeEach(function() {
+      f = fixture['#'];
+    });
+
+    it('should generate one encodings', function() {
+      var encodings = genEncodings([], f.fields, f.stats, opt);
+      expect(encodings.length).to.eql(1);
+      expect(encodings[0].x).to.be.ok;
     });
   });
 
-  describe('1Q', function() {
-    var fields = fixture['Q'].fields,
-      stats = fixture['Q'].stats;
+  describe('1Q,', function() {
+    //FIXME write tests
+  });
 
-    it('should generate no encoding if dot plots are omittted', function () {
-      var specs = genSpecs([], fields, stats, {
-        omitDotPlot: true
-      });
-      expect(specs.length).to.equal(0);
+  describe('#xB(Q)', function() {
+    var f, encodings, encShorthands;
+    beforeEach(function() {
+      f = fixture['#xB(Q)'];
+      encodings = genEncodings([], f.fields, f.stats, opt);
+      encShorthands = encodings.map(vl.enc.shorthand);
     });
 
-    it('should generate encodings if dot plots are not omitted', function () {
-      var specs = genSpecs([], fields, stats, {
-        omitDotPlot: false
-      });
-      expect(specs.length).to.equal(2); //point and tick
+    it('should show only vertical bar/plots', function() {
+      expect(encShorthands.indexOf('x=count_*,Q|y=bin_2,Q')).to.equal(-1);
+      expect(encShorthands.indexOf('x=bin_2,Q|y=count_*,Q')).to.gt(-1);
     });
 
-    it('should generate more encodings without pruning', function () {
-      var specs = genSpecs([], fields, stats, {
-        omitTranpose: false,
-        omitDotPlot: false
-      });
+  });
 
-      // x, y ,text
-      expect(specs.length).to.equal(4);
+  describe('#xT', function() {
+    var f, encodings, encShorthands;
+    beforeEach(function() {
+      f = fixture['#xT'];
+      encodings = genEncodings([], f.fields, f.stats, opt);
+      encShorthands = encodings.map(vl.enc.shorthand);
+    });
+
+    it('should show only vertical bar/plots', function() {
+      expect(encShorthands.indexOf('x=count_*,Q|y=2,T')).to.equal(-1);
+      expect(encShorthands.indexOf('x=2,T|y=count_*,Q')).to.gt(-1);
     });
   });
 
-  describe('OxQ', function() {
-    var f = fixture['OxQ'];
-    var specs = genSpecs([], f.fields, f.stats);
-
-    it('should not contain text table', function() {
-      var hasTextTable = specs.filter(function(spec) {
-        return spec.marktype === 'text';
-      }).length > 0;
-      expect(hasTextTable).to.be.false;
+  describe('#xYR(T)', function() {
+    var f, encodings, encShorthands;
+    beforeEach(function() {
+      f = fixture['#xYR(T)'];
+      encodings = genEncodings([], f.fields, f.stats, opt);
+      encShorthands = encodings.map(vl.enc.shorthand);
     });
 
-    it('should not contain bar', function() {
-      var filtered = specs.filter(function(spec) {
-        return spec.marktype === 'bar';
+    it('should show only vertical bar/plots', function() {
+      expect(encShorthands.indexOf('x=count_*,Q|y=year_2,T')).to.equal(-1);
+      expect(encShorthands.indexOf('x=year_2,T|y=count_*,Q')).to.gt(-1);
+    });
+  });
+
+  describe('QxT', function () {
+    var f, encodings, encShorthands;
+    beforeEach(function() {
+      f = fixture['QxT'];
+      encodings = genEncodings([], f.fields, f.stats, opt);
+      encShorthands = encodings.map(vl.enc.shorthand);
+    });
+    it('should show only vertical bar/plots', function() {
+      expect(encShorthands.indexOf('x=1,Q|y=2,T')).to.equal(-1);
+      expect(encShorthands.indexOf('x=2,T|y=1,Q')).to.gt(-1);
+    });
+  });
+
+  // describe('QxO,', function() {
+  //   var fields = [
+  //     {name:1, type:'O'},
+  //     {name:2, type:'Q'}
+  //   ];
+
+  //   var stats = {
+  //     1: {cardinality: 10},
+  //     2: {cardinality: 10}
+  //   };
+
+  //   var encs = genEncodings([], fields, stats, opt);
+  //   console.log('QxC', encs);
+  // });
+
+  // describe('QxA(Q),', function() {
+  //   var f = fixture['OxA(Q)'];
+  //   var encs = genEncodings([], f.fields, f.stats, opt);
+  //   console.log('QxA(Q)', encs.map(vl.enc.shorthand));
+  // });
+
+  describe('OxOxQ', function () {
+    var f;
+    beforeEach(function() {
+      f = fixture.OxOxQ;
+    });
+
+    it('without stats about occlusion, it should not include charts with both O\'s on axes', function() {
+      var encodings = genEncodings([], f.fields, f.stats, opt);
+
+      var filtered = encodings.filter(function(enc){
+        return enc.x.type === 'O' && enc.y.type === 'O';
       });
+
       expect(filtered.length).to.equal(0);
     });
   });
 
-  describe('OxA(Q)', function() {
-    var f = fixture['OxA(Q)'];
-    var specs = genSpecs([], f.fields, f.stats);
+  describe('OxOxA(Q)', function () {
+    var f;
+    beforeEach(function() {
+      f = fixture['OxOxA(Q)'];
+    });
 
-    it('should contain text table', function() {
-      var hasTextTable = specs.filter(function(spec) {
-        return spec.marktype === 'text';
-      }).length > 0;
-      expect(hasTextTable).to.be.true;
+    it('without stats about occlusion, it should include charts with both O\'s on axes', function() {
+      var encodings = genEncodings([], f.fields, f.stats, opt);
+
+      var filtered = encodings.filter(function(encoding){
+        return encoding.x && encoding.x.type === 'O' && encoding.y && encoding.y.type === 'O';
+      });
+
+      expect(filtered.length).to.gt(0);
     });
   });
 
-  describe('O_30x#', function(){
-    var f = fixture['O_30x#'];
-    var specs = genSpecs([], f.fields, f.stats);
-
-    it('should contain text table', function() {
-      var hasTextTable = specs.filter(function(spec) {
-        return spec.marktype === 'text';
-      }).length > 0;
-      expect(hasTextTable).to.be.true;
+  describe('OxA(Q)xA(Q)', function () {
+    var f, fields, stats;
+    beforeEach(function() {
+      f = fixture['OxA(Q)xA(Q)'];
+      fields = f.fields;
+      stats = f.stats;
     });
 
-    it('should contain bar', function() {
-      var hasBar = specs.filter(function(spec) {
-        return spec.marktype === 'bar';
-      }).length > 0;
-      expect(hasBar).to.be.true;
+    it('should not include charts with O on row/col except with text', function() {
+      var encodings = genEncodings([], fields, stats, opt);
+
+      expect(encodings.filter(function(encoding) {
+        var rowIsO = encoding.row && encoding.row.type==='O',
+          colIsO = encoding.col && encoding.col.type==='O';
+        return !encoding.text && (rowIsO || colIsO);
+      }).length).to.equal(0);
     });
 
-    // console.log('encodings O_30x#', encodings.map(function(spec){
-    //   return vl.Encoding.shorthandFromSpec(spec) + ":" + spec.score;
-    // }));
-  });
-
-  describe('OxQxQ', function() {
-    // var f = fixture['OxQxQ'];
-    // var encodings = genEncodings([], f.fields, f.stats);
-
-    it('should contain colored scatter plot', function() {
-      // var filtered = encodings.filter(function(encoding) {
-      //   var enc = encoding.encoding;
-      //   return encoding.marktype==='point' && enc.x && enc.y && enc.color;
-      // });
-      // FIXME(kanitw): Jul 19, 2015 - write test!
-    });
-  });
-
-  describe('QxT', function(){
-    var f = fixture['QxT'];
-    var specs = genSpecs([], f.fields, f.stats);
-
-    it('should not contain line', function() {
-      var hasLine = specs.filter(function(spec) {
-        return spec.marktype === 'line';
-      }).length > 0;
-      expect(hasLine).to.be.false;
-    });
-  });
-
-  describe('QxYEAR(T)', function(){
-    var f = fixture['QxYEAR(T)'];
-
-    var specs = genSpecs([], f.fields, f.stats);
-
-    it('should not contain line', function() {
-      var hasLine = specs.filter(function(spec) {
-        return spec.marktype === 'line';
-      }).length > 0;
-      expect(hasLine).to.be.false;
-    });
-  });
-
-  describe('A(Q)xYEAR(T)', function(){
-    var f = fixture['A(Q)xYEAR(T)'];
-    var specs = genSpecs([], f.fields, f.stats);
-
-    it('should contain line', function() {
-      var hasLine = specs.filter(function(spec) {
-        return spec.marktype === 'line';
-      }).length > 0;
-      expect(hasLine).to.be.true;
-    });
-  });
-
-  describe('#xB(Q)', function() {
-    var f = fixture['#xB(Q)'];
-    var specs = genSpecs([], f.fields, f.stats);
-
-    it('should contain text table', function() {
-      var hasTextTable = specs.filter(function(spec) {
-        return spec.marktype === 'text';
-      }).length > 0;
-      expect(hasTextTable).to.be.true;
+    it('should include charts with O on row/col when omit flag is disabled', function() {
+      opt.omitNonTextAggrWithAllDimsOnFacets = false;
+      var encodings = genEncodings([], fields, stats, opt);
+      expect(encodings.filter(function(encoding) {
+        return (encoding.row && encoding.row.type==='O') ||
+          (encoding.col && encoding.col.type==='O');
+      }).length).to.gt(0);
     });
   });
 });
