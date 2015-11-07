@@ -23,8 +23,8 @@ describe('cp.cluster.distance.get()', function () {
       }
     };
 
-    var colenc1 = distance.getEncTypeByColumnName(table1),
-      colenc2 = distance.getEncTypeByColumnName(table2);
+    var colenc1 = distance.extendSpecWithEncTypeByColumnName(table1),
+      colenc2 = distance.extendSpecWithEncTypeByColumnName(table2);
 
     expect(distance.get(colenc1, colenc2)).to.lt(1);
   });
