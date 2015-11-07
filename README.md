@@ -31,3 +31,15 @@ In the directory for compass, run
 npm link vega-lite
 bower link vega-lite
 ```
+
+### Compiling
+
+You can run `npm run build` to compile Vega-Lite.
+
+You can `npm run watch` to start a watcher task that automatically re-compiles and tests Compass when any `.js` file in `test/` or `src/` changes.
+
+Note: These commands use [Gulp](http://gulpjs.com) internally; Therefore, you need to install gulp globally with
+```sh
+npm install -g gulp
+```
+to make them work.  
