@@ -7,10 +7,10 @@ var vl = require('vega-lite'),
 var distance = {};
 module.exports = distance;
 
-distance.table = function (encodings) {
-  var len = encodings.length,
-    colencs = encodings.map(function(e) { return distance.getEncTypeByColumnName(e); }),
-    shorthands = encodings.map(vl.Encoding.shorthand),
+distance.table = function (specs) {
+  var len = specs.length,
+    extendedSpecs = specs.map(function(e) { return distance.extendSpecWithEncTypeByColumnName(e); }),
+    shorthands = specs.map(vl.Encoding.shorthand),
     diff = {}, i, j;
 
   for (i = 0; i < len; i++) diff[shorthands[i]] = {};
@@ -19,18 +19,18 @@ distance.table = function (encodings) {
     for (j = i + 1; j < len; j++) {
       var sj = shorthands[j], si = shorthands[i];
 
-      diff[sj][si] = diff[si][sj] = distance.get(colencs[i], colencs[j]);
+      diff[sj][si] = diff[si][sj] = distance.get(extendedSpecs[i], extendedSpecs[j]);
     }
   }
   return diff;
 };
 
-distance.get = function (colenc1, colenc2) {
-  var cols = util.union(vl.keys(colenc1.col), vl.keys(colenc2.col)),
+distance.get = function (extendedSpec1, extendedSpec2) {
+  var cols = util.union(vl.keys(extendedSpec1.encTypeByField), vl.keys(extendedSpec2.encTypeByField)),
     dist = 0;
 
   cols.forEach(function(col) {
-    var e1 = colenc1.col[col], e2 = colenc2.col[col];
+    var e1 = extendedSpec1.encTypeByField[col], e2 = extendedSpec2.encTypeByField[col];
 
     if (e1 && e2) {
       if (e1.encType != e2.encType) {
@@ -42,12 +42,12 @@ distance.get = function (colenc1, colenc2) {
   });
 
   // do not group stacked chart with similar non-stacked chart!
-  var isStack1 = vl.Encoding.isStack(colenc1),
-    isStack2 = vl.Encoding.isStack(colenc2);
+  var isStack1 = vl.Encoding.isStack(extendedSpec1),
+    isStack2 = vl.Encoding.isStack(extendedSpec2);
 
   if(isStack1 || isStack2) {
     if(isStack1 && isStack2) {
-      if(colenc1.encoding.color.name !== colenc2.encoding.color.name) {
+      if(extendedSpec1.encoding.color.name !== extendedSpec2.encoding.color.name) {
         dist+=1;
       }
     } else {
@@ -58,20 +58,20 @@ distance.get = function (colenc1, colenc2) {
 };
 
 // get encoding type by fieldname
-distance.getEncTypeByColumnName = function(encoding) {
-  var _colenc = {},
-    enc = encoding.encoding;
+distance.extendSpecWithEncTypeByColumnName = function(spec) {
+  var _encTypeByField = {},
+    encoding = spec.encoding;
 
-  vl.keys(enc).forEach(function(encType) {
-    var e = vl.duplicate(enc[encType]);
+  vl.keys(encoding).forEach(function(encType) {
+    var e = vl.duplicate(encoding[encType]);
     e.encType = encType;
-    _colenc[e.name || ''] = e;
+    _encTypeByField[e.name || ''] = e;
     delete e.name;
   });
 
   return {
-    marktype: encoding.marktype,
-    col: _colenc,
-    encoding: encoding.encoding
+    marktype: spec.marktype,
+    encTypeByField: _encTypeByField,
+    encoding: spec.encoding
   };
 };

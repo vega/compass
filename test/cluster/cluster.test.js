@@ -5,7 +5,7 @@ var //expect = require('chai').expect,
 
 var fixture = require('../fixture'),
   getClusters = require('../../src/cluster/cluster'),
-  genEncodings = require('../../src/gen/encodings');
+  genEncodings = require('../../src/gen/specs');
 
 // describe('cp.cluster.getClustersIndices()', function () {
 //   describe('OxQxQ', function() {

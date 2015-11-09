@@ -6,7 +6,7 @@ var mocha = require('gulp-spawn-mocha');
 
 // runs the tests
 gulp.task('test', ['jshint'], function() {
-  return gulp.src(['test/**/*.spec.js'], { read: false })
+  return gulp.src(['test/**/*.test.js'], { read: false })
     .pipe(mocha({
       reporter: 'spec',
       istanbul: true
@@ -15,7 +15,7 @@ gulp.task('test', ['jshint'], function() {
 });
 
 gulp.task('t', function() {
-  return gulp.src(['test/**/*.spec.js'], { read: false })
+  return gulp.src(['test/**/*.test.js'], { read: false })
     .pipe(mocha({
       reporter: 'spec',
       istanbul: false

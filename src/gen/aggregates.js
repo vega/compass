@@ -4,14 +4,14 @@ var vl = require('vega-lite');
 
 var consts = require('../consts');
 
-var AUTO='*';
+var AUTO = '*';
 
 module.exports = genAggregates;
 
-function genAggregates(output, fields, stats, opt) {
+function genAggregates(output, fieldDefs, stats, opt) {
   opt = vl.schema.util.extend(opt||{}, consts.gen.aggregates);
-  var tf = new Array(fields.length);
-  var hasNorO = vl.any(fields, function(f) {
+  var tf = new Array(fieldDefs.length);
+  var hasNorO = vl.any(fieldDefs, function(f) {
     return vl.encDef.isTypes(f, [N, O]);
   });
 
@@ -69,7 +69,7 @@ function genAggregates(output, fields, stats, opt) {
   }
 
   function assignQ(i, hasAggr, autoMode) {
-    var f = fields[i],
+    var f = fieldDefs[i],
       canHaveAggr = hasAggr === true || hasAggr === null;
 
     tf[i] = {name: f.name, type: f.type};
@@ -119,7 +119,7 @@ function genAggregates(output, fields, stats, opt) {
   }
 
   function assignT(i, hasAggr, autoMode) {
-    var f = fields[i];
+    var f = fieldDefs[i];
     tf[i] = {name: f.name, type: f.type};
 
     // TODO support array of f._timeUnits
@@ -141,12 +141,12 @@ function genAggregates(output, fields, stats, opt) {
   }
 
   function assignField(i, hasAggr, autoMode) {
-    if (i === fields.length) { // If all fields are assigned
+    if (i === fieldDefs.length) { // If all fields are assigned
       checkAndPush();
       return;
     }
 
-    var f = fields[i];
+    var f = fieldDefs[i];
     // Otherwise, assign i-th field
     switch (f.type) {
       //TODO "D", "G"

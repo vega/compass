@@ -9,11 +9,11 @@ var vl = require('vega-lite'),
 
 cluster.distance = require('./distance');
 
-function cluster(encodings, opt) {
+function cluster(specs, opt) {
   // jshint unused:false
-  var dist = cluster.distance.table(encodings);
+  var dist = cluster.distance.table(specs);
 
-  var clusterTrees = clusterfck.hcluster(encodings, function(e1, e2) {
+  var clusterTrees = clusterfck.hcluster(specs, function(e1, e2) {
     var s1 = vl.Encoding.shorthand(e1),
       s2 = vl.Encoding.shorthand(e2);
     return dist[s1][s2];
@@ -23,9 +23,9 @@ function cluster(encodings, opt) {
       return util.traverse(tree, []);
     })
    .map(function(cluster) {
-    return cluster.sort(function(encoding1, encoding2) {
+    return cluster.sort(function(spec1, spec2) {
       // sort each cluster -- have the highest score as 1st item
-      return encoding2._info.score - encoding1._info.score;
+      return spec2._info.score - spec1._info.score;
     });
   }).filter(function(cluster) {  // filter empty cluster
     return cluster.length >0;
