@@ -179,6 +179,3 @@ consts.gen.encodings = {
     }
   }
 };
-
-
-

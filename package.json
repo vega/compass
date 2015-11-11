@@ -1,6 +1,6 @@
 {
   "name": "viscompass",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "VisCompass: Visualization Recommender",
   "author": {
     "name": "UW Interactive Data Lab",
@@ -20,10 +20,7 @@
     "watch": "gulp build watch",
     "deploy": "npm run lint && npm run test && scripts/deploy.sh",
     "lint": "gulp jshint",
-    "test": "gulp t",
-    "patch": "gulp patch",
-    "feature": "gulp feature",
-    "release": "gulp release"
+    "test": "gulp t"
   },
   "browserify-shim": {
     "vega-lite": "global:vl"
@@ -42,7 +39,6 @@
     "browserify-shim": "^3.8.9",
     "chai": "^3.0.0",
     "gulp": "^3.9.0",
-    "gulp-bump": "^0.3.1",
     "gulp-jshint": "^1.11.2",
     "gulp-load-plugins": "^1.0.0-rc",
     "gulp-mocha": "^2.1.2",
