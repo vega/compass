@@ -6,8 +6,14 @@ var util = module.exports = {
   gen: {}
 };
 
+// FIXME: remove redundant methods
+
 util.isArray = Array.isArray || function (obj) {
   return {}.toString.call(obj) == '[object Array]';
+};
+
+util.isin = function (item, array) {
+    return array.indexOf(item) !== -1;
 };
 
 util.json = function(s, sp) {
@@ -18,6 +24,30 @@ util.keys = function(obj) {
   var k = [], x;
   for (x in obj) k.push(x);
   return k;
+};
+
+util.duplicate = function(obj) {
+  return JSON.parse(JSON.stringify(obj));
+};
+
+util.forEach = function(obj, f, thisArg) {
+  if (obj.forEach) {
+    obj.forEach.call(thisArg, f);
+  }
+  else {
+    for (var k in obj) {
+      f.call(thisArg, obj[k], k, obj);
+    }
+  }
+};
+
+util.any = function (arr, f) {
+    var i = 0, k;
+    for (k in arr) {
+        if (f(arr[k], k, i++))
+            return true;
+    }
+    return false;
 };
 
 util.nestedMap = function (col, f, level, filter) {

@@ -1,9 +1,11 @@
 'use strict';
 
+var vlEncDef = require('vega-lite/src/encdef');
+var vlSchema = require('vega-lite/src/schema/schema');
+
 var util = require('../util'),
   consts = require('../consts'),
-  vl = require('vega-lite'),
-  isDimension = vl.encDef.isDimension;
+  isDimension = vlEncDef.isDimension;
 
 module.exports = projections;
 
@@ -16,7 +18,7 @@ module.exports = projections;
  * @return {[type]}        [description]
  */
 function projections(fieldDefs, stats, opt) {
-  opt = vl.schema.util.extend(opt||{}, consts.gen.projections);
+  opt = vlSchema.util.extend(opt||{}, consts.gen.projections);
 
   // First categorize field, selected, fieldsToAdd, and save indices
   var selected = [], fieldsToAdd = [], fieldSets = [],
@@ -35,10 +37,10 @@ function projections(fieldDefs, stats, opt) {
       } else {
         hasSelectedMeasure = true;
       }
-    } else if (fieldDef.selected !== false && !vl.encDef.isCount(fieldDef)) {
-      if (vl.encDef.isDimension(fieldDef) &&
+    } else if (fieldDef.selected !== false && !vlEncDef.isCount(fieldDef)) {
+      if (vlEncDef.isDimension(fieldDef) &&
           !opt.maxCardinalityForAutoAddOrdinal &&
-          vl.encDef.cardinality(fieldDef, stats, 15) > opt.maxCardinalityForAutoAddOrdinal
+          vlEncDef.cardinality(fieldDef, stats, 15) > opt.maxCardinalityForAutoAddOrdinal
         ) {
         return;
       }
@@ -90,7 +92,7 @@ function compareFieldsToAdd(hasSelectedDimension, hasSelectedMeasure, indices) {
 
 projections.key = function(projection) {
   return projection.map(function(field) {
-    return vl.encDef.isCount(field) ? 'count' : field.name;
+    return vlEncDef.isCount(field) ? 'count' : field.name;
   }).join(',');
 };
 

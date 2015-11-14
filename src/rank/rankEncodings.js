@@ -2,8 +2,11 @@
 
 require('../globals');
 
-var vl = require('vega-lite'),
-  isDimension = vl.encDef.isDimension;
+var vlEnc = require('vega-lite/src/enc'),
+  vlEncDef = require('vega-lite/src/encdef'),
+  vlConsts = require('vega-lite/src/consts'),
+  isDimension = vlEncDef.isDimension,
+  util = require('../util');
 
 module.exports = rankEncodings;
 
@@ -23,25 +26,25 @@ var MARK_SCORE = {
 
 function rankEncodings(spec, stats, opt, selected) {
   var features = [],
-    encTypes = vl.keys(spec.encoding),
+    encTypes = util.keys(spec.encoding),
     marktype = spec.marktype,
     encoding = spec.encoding;
 
-  var encodingMappingByField = vl.enc.reduce(spec.encoding, function(o, fieldDef, encType) {
-    var key = vl.encDef.shorthand(fieldDef);
+  var encodingMappingByField = vlEnc.reduce(spec.encoding, function(o, fieldDef, encType) {
+    var key = vlEncDef.shorthand(fieldDef);
     var mappings = o[key] = o[key] || [];
     mappings.push({encType: encType, field: fieldDef});
     return o;
   }, {});
 
   // data - encoding mapping score
-  vl.forEach(encodingMappingByField, function(mappings) {
+  util.forEach(encodingMappingByField, function(mappings) {
     var reasons = mappings.map(function(m) {
-        return m.encType + vl.shorthand.assign + vl.encDef.shorthand(m.field) +
+        return m.encType + vlConsts.shorthand.assign + vlEncDef.shorthand(m.field) +
           ' ' + (selected && selected[m.field.name] ? '[x]' : '[ ]');
       }),
       scores = mappings.map(function(m) {
-        var role = vl.encDef.isDimension(m.field) ? 'dimension' : 'measure';
+        var role = vlEncDef.isDimension(m.field) ? 'dimension' : 'measure';
 
         var score = rankEncodings.score[role](m.field, m.encType, spec.marktype, stats, opt);
 
@@ -119,14 +122,14 @@ M.bad = BAD;
 M.terrible = TERRIBLE;
 
 rankEncodings.dimensionScore = function (fieldDef, encType, marktype, stats, opt){
-  var cardinality = vl.encDef.cardinality(fieldDef, stats);
+  var cardinality = vlEncDef.cardinality(fieldDef, stats);
   switch (encType) {
     case X:
-      if (vl.encDef.isTypes(fieldDef, [N, O]))  return D.pos - D.minor;
+      if (vlEncDef.isTypes(fieldDef, [N, O]))  return D.pos - D.minor;
       return D.pos;
 
     case Y:
-      if (vl.encDef.isTypes(fieldDef, [N, O])) return D.pos - D.minor; //prefer ordinal on y
+      if (vlEncDef.isTypes(fieldDef, [N, O])) return D.pos - D.minor; //prefer ordinal on y
       if (fieldDef.type === T) return D.Y_T; // time should not be on Y
       return D.pos - D.minor;
 
