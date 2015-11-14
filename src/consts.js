@@ -108,6 +108,7 @@ consts.gen.encodings = {
       default: ['x', 'y', 'row', 'col', 'size', 'color', 'text', 'detail'],
       description: 'allowed encoding types'
     },
+    // TODO: is this used in generation?
     maxGoodCardinalityForFacets: {
       type: 'integer',
       default: 5,
@@ -138,6 +139,7 @@ consts.gen.encodings = {
       default: true,
       description: 'Eliminate all transpose by (1) keeping horizontal dot plot only (2) for OxQ charts, always put O on Y (3) show only one DxD, MxM (currently sorted by name)'
     },
+    // TODO: create chart type name
     omitDotPlot: {
       type: 'boolean',
       default: false,
@@ -165,11 +167,13 @@ consts.gen.encodings = {
       default: false,
       description: 'omit one dimension count'
     },
+    // TODO remove this and merge with supportedEncodings
     omitSizeOnBar: {
       type: 'boolean',
       default: false,
       description: 'do not use bar\'s size'
     },
+    // TODO: change to omit non-summative stack
     omitStackedAverage: {
       type: 'boolean',
       default: true,
