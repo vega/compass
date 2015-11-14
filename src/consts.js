@@ -153,11 +153,13 @@ consts.gen.encodings = {
       default: true,
       description: 'omit using multiple retinal variables (size, color, shape)'
     },
+    // TODO: revise
     omitNonTextAggrWithAllDimsOnFacets: {
       type: 'boolean',
       default: true,
       description: 'remove all aggregated charts (except text tables) with all dims on facets (row, col)'
     },
+    // TODO: revise
     omitOneDimensionCount: {
       type: 'boolean',
       default: false,
