@@ -20,7 +20,7 @@ function genAggregates(output, fieldDefs, stats, opt) {
   opt = vlSchemaUtil.extend(opt||{}, consts.gen.aggregates);
   var tf = new Array(fieldDefs.length);
   var hasNorO = util.any(fieldDefs, function(f) {
-    return vlEncDef.isTypes(f, [N, O]);
+    return f.type === N || f.type == O;
   });
 
   function emit(fieldSet) {

@@ -131,12 +131,18 @@ rankEncodings.dimensionScore = function (fieldDef, encType, marktype, stats, opt
   var cardinality = vlEncDef.cardinality(fieldDef, stats);
   switch (encType) {
     case vlConsts.Enctype.X:
-      if (vlEncDef.isTypes(fieldDef, [N, O]))  return D.pos - D.minor;
+      if (fieldDef.type === N || fieldDef.type === O)  {
+        return D.pos - D.minor;
+      }
       return D.pos;
 
     case vlConsts.Enctype.Y:
-      if (vlEncDef.isTypes(fieldDef, [N, O])) return D.pos - D.minor; //prefer ordinal on y
-      if (fieldDef.type === T) return D.Y_T; // time should not be on Y
+      if (fieldDef.type === N || fieldDef.type === O) {
+        return D.pos - D.minor; //prefer ordinal on y
+      }
+      if (fieldDef.type === T) {
+        return D.Y_T; // time should not be on Y
+      }
       return D.pos - D.minor;
 
     case vlConsts.Enctype.COL:

@@ -87,10 +87,17 @@ function shapeRules(encoding, fieldDef, stats, opt) {
 
 function dimMeaTransposeRule(encoding) {
   // create horizontal histogram for ordinal
-  if (vlEncDef.isTypes(encoding.y, [N, O]) && isMeasure(encoding.x)) return true;
+  if ((encoding.y.type === N || encoding.y.type === O) && isMeasure(encoding.x)) {
+    return true;
+  }
 
   // vertical histogram for Q and T
-  if (isMeasure(encoding.y) && (!vlEncDef.isTypes(encoding.x, [N, O]) && isDimension(encoding.x))) return true;
+  if (isMeasure(encoding.y) &&
+      !(encoding.x.type === N || encoding.x.type === O) &&
+      isDimension(encoding.x)
+      ) {
+    return true;
+  }
 
   return false;
 }
@@ -126,7 +133,9 @@ function generalRules(encoding, stats, opt) {
 
       if (opt.omitTranpose) {
         if (isDimX ^ isDimY) { // dim x mea
-          if (!dimMeaTransposeRule(encoding)) return false;
+          if (!dimMeaTransposeRule(encoding)) {
+            return false;
+          }
         } else if (encoding.y.type===T || encoding.x.type === T) {
           if (encoding.y.type===T && encoding.x.type !== T) return false;
         } else { // show only one OxO, QxQ
