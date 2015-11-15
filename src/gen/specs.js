@@ -1,7 +1,7 @@
 'use strict';
 
 var vlEncDef = require('vega-lite/src/encdef');
-var vlSchema = require('vega-lite/src/schema/schema');
+var vlSchemaUtil = require('vega-lite/src/schema/schemautil');
 var util = require('../util');
 
 var genEncodings = require('./encodings'),
@@ -15,7 +15,7 @@ module.exports = genSpecsFromFieldDefs;
 
 function genSpecsFromFieldDefs(output, fieldDefs, stats, opt, nested) {
   // opt must be augmented before being passed to genEncodings or getMarktypes
-  opt = vlSchema.util.extend(opt||{}, consts.gen.encodings);
+  opt = vlSchemaUtil.extend(opt||{}, consts.gen.encodings);
   var encodings = genEncodings([], fieldDefs, stats, opt);
 
   if (nested) {

@@ -7,7 +7,6 @@ var g = global || window;
 g.AGGREGATE = 'aggregate';
 g.RAW = 'raw';
 g.STACKED = 'stacked';
-g.INDEX = 'index';
 
 g.X = 'x';
 g.Y = 'y';

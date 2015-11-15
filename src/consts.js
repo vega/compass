@@ -6,6 +6,22 @@ var consts = module.exports = {
   rank: {}
 };
 
+consts.X = 'x';
+consts.Y = 'y';
+consts.ROW = 'row';
+consts.COL = 'col';
+consts.SIZE = 'size';
+consts.SHAPE = 'shape';
+consts.COLOR = 'color';
+consts.TEXT = 'text';
+consts.DETAIL = 'detail';
+
+consts.N = 'N';
+consts.O = 'O';
+consts.Q = 'Q';
+consts.T = 'T';
+
+
 consts.gen.projections = {
   type: 'object',
   properties: {
@@ -107,6 +123,16 @@ consts.gen.encodings = {
       items: {type: 'string'},
       default: ['x', 'y', 'row', 'col', 'size', 'color', 'text', 'detail'],
       description: 'allowed encoding types'
+    },
+    requiredEncodings: {
+      type: 'object',
+      default: undefined,
+      description: 'required encodings for each mark type'
+    },
+    supportedEncodings: {
+      type: 'object',
+      default: undefined,
+      description: 'supported encoding for each mark type'
     },
     // TODO: is this used in generation?
     maxGoodCardinalityForFacets: {

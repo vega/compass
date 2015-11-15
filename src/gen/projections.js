@@ -1,7 +1,7 @@
 'use strict';
 
 var vlEncDef = require('vega-lite/src/encdef');
-var vlSchema = require('vega-lite/src/schema/schema');
+var vlSchemaUtil = require('vega-lite/src/schema/schemautil');
 
 var util = require('../util'),
   consts = require('../consts'),
@@ -18,7 +18,7 @@ module.exports = projections;
  * @return {[type]}        [description]
  */
 function projections(fieldDefs, stats, opt) {
-  opt = vlSchema.util.extend(opt||{}, consts.gen.projections);
+  opt = vlSchemaUtil.extend(opt||{}, consts.gen.projections);
 
   // First categorize field, selected, fieldsToAdd, and save indices
   var selected = [], fieldsToAdd = [], fieldSets = [],

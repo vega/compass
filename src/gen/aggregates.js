@@ -1,7 +1,7 @@
 'use strict';
 
 var vlEncDef = require('vega-lite/src/encdef');
-var vlSchema = require('vega-lite/src/schema/schema');
+var vlSchemaUtil = require('vega-lite/src/schema/schemautil');
 
 var consts = require('../consts');
 var util = require('../util');
@@ -10,8 +10,14 @@ var AUTO = '*';
 
 module.exports = genAggregates;
 
+// FIXME
+var N = consts.N;
+var O = consts.O;
+var Q = consts.Q;
+var T = consts.T;
+
 function genAggregates(output, fieldDefs, stats, opt) {
-  opt = vlSchema.util.extend(opt||{}, consts.gen.aggregates);
+  opt = vlSchemaUtil.extend(opt||{}, consts.gen.aggregates);
   var tf = new Array(fieldDefs.length);
   var hasNorO = util.any(fieldDefs, function(f) {
     return vlEncDef.isTypes(f, [N, O]);

@@ -9,6 +9,12 @@ var genMarkTypes = require('./marktypes'),
   isDimension = vlEncDef.isDimension,
   isMeasure = vlEncDef.isMeasure;
 
+var consts = require('../consts');
+var N = consts.N;
+var O = consts.O;
+var Q = consts.Q;
+var T = consts.T;
+
 module.exports = genEncodings;
 
 // FIXME remove dimension, measure and use information in vega-lite instead!
@@ -93,7 +99,7 @@ function dimMeaTransposeRule(encoding) {
 function generalRules(encoding, stats, opt) {
   // enc.text is only used for TEXT TABLE
   if (encoding.text) {
-    return genMarkTypes.satisfyRules(encoding, TEXT, stats, opt);
+    return genMarkTypes.satisfyRules(encoding, 'text', stats, opt);
   }
 
   // CARTESIAN PLOT OR MAP
@@ -159,7 +165,7 @@ genEncodings.isAggrWithAllDimOnFacets = function (encoding) {
     if (field.aggregate) {
       hasAggr = true;
     }
-    if (vlEncDef.isDimension(field) && (encType !== ROW && encType !== COL)) {
+    if (vlEncDef.isDimension(field) && (encType !== consts.ROW && encType !== consts.COL)) {
       hasOtherO = true;
     }
     if (hasAggr && hasOtherO) break;
