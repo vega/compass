@@ -2,7 +2,7 @@
 
 module.exports = cluster;
 
-var Encoding = require('vega-lite/src/Encoding'),
+var Encoding = require('vega-lite/src/Encoding').default,
   clusterfck = require('clusterfck'),
   consts = require('./clusterconsts'),
   util = require('../util');

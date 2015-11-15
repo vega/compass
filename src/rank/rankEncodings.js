@@ -1,7 +1,5 @@
 'use strict';
 
-require('../globals');
-
 var vlEnc = require('vega-lite/src/enc'),
   vlEncDef = require('vega-lite/src/encdef'),
   vlConsts = require('vega-lite/src/consts'),
