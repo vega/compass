@@ -1,6 +1,6 @@
 'use strict';
 
-var Encoding = require('vega-lite/src/Encoding'),
+var Encoding = require('vega-lite/src/Encoding').default,
   consts = require('./clusterconsts'),
   util = require('../util');
 
