@@ -91,8 +91,8 @@ function compareFieldsToAdd(hasSelectedDimension, hasSelectedMeasure, indices) {
 }
 
 projections.key = function(projection) {
-  return projection.map(function(field) {
-    return vlEncDef.isCount(field) ? 'count' : field.name;
+  return projection.map(function(fieldDef) {
+    return vlEncDef.isCount(fieldDef) ? 'count' : fieldDef.name;
   }).join(',');
 };
 
