@@ -112,9 +112,9 @@ function genAggregates(output, fieldDefs, stats, opt) {
           assignBinQ(i, hasAggr, isAuto ? 'autocast' : 'bin');
         }
         if (genCast && util.isin(autoMode, [AUTO, 'cast', 'autocast'])) {
-          tf[i].type = 'O';
+          tf[i].type = O;
           assignField(i + 1, hasAggr, isAuto ? 'autocast' : 'cast');
-          tf[i].type = 'Q';
+          tf[i].type = Q;
         }
       }
     }

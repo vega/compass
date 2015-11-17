@@ -32,7 +32,7 @@ function projections(fieldDefs, stats, opt) {
 
     if (fieldDef.selected) {
       selected.push(fieldDef);
-      if (isDimension(fieldDef) || fieldDef.type ==='T') { // FIXME / HACK
+      if (isDimension(fieldDef) || fieldDef.type ==='temporal') { // FIXME / HACK
         hasSelectedDimension = true;
       } else {
         hasSelectedMeasure = true;
@@ -69,10 +69,10 @@ function projections(fieldDefs, stats, opt) {
 }
 
 var typeIsMeasureScore = {
-  N: 0,
-  O: 0,
-  T: 2,
-  Q: 3
+  nominal: 0,
+  ordinal: 0,
+  temporal: 2,
+  quantitative: 3
 };
 
 function compareFieldsToAdd(hasSelectedDimension, hasSelectedMeasure, indices) {

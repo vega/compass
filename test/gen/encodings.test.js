@@ -91,18 +91,7 @@ describe('cp.gen.encs()', function () {
   });
 
   // describe('QxO,', function() {
-  //   var fields = [
-  //     {name:1, type:'O'},
-  //     {name:2, type:'Q'}
-  //   ];
-
-  //   var stats = {
-  //     1: {cardinality: 10},
-  //     2: {cardinality: 10}
-  //   };
-
-  //   var encs = genEncodings([], fields, stats, opt);
-  //   console.log('QxC', encs);
+  //
   // });
 
   // describe('QxA(Q),', function() {
@@ -121,7 +110,7 @@ describe('cp.gen.encs()', function () {
       var encodings = genEncodings([], f.fields, f.stats, opt);
 
       var filtered = encodings.filter(function(enc){
-        return enc.x.type === 'O' && enc.y.type === 'O';
+        return enc.x.type === 'ordinal' && enc.y.type === 'ordinal';
       });
 
       expect(filtered.length).to.equal(0);
@@ -138,7 +127,7 @@ describe('cp.gen.encs()', function () {
       var encodings = genEncodings([], f.fields, f.stats, opt);
 
       var filtered = encodings.filter(function(encoding){
-        return encoding.x && encoding.x.type === 'O' && encoding.y && encoding.y.type === 'O';
+        return encoding.x && encoding.x.type === 'ordinal' && encoding.y && encoding.y.type === 'ordinal';
       });
 
       expect(filtered.length).to.gt(0);
@@ -157,8 +146,8 @@ describe('cp.gen.encs()', function () {
       var encodings = genEncodings([], fields, stats, opt);
 
       expect(encodings.filter(function(encoding) {
-        var rowIsO = encoding.row && encoding.row.type==='O',
-          colIsO = encoding.col && encoding.col.type==='O';
+        var rowIsO = encoding.row && encoding.row.type==='ordinal',
+          colIsO = encoding.col && encoding.col.type==='ordinal';
         return !encoding.text && (rowIsO || colIsO);
       }).length).to.equal(0);
     });
@@ -167,8 +156,8 @@ describe('cp.gen.encs()', function () {
       opt.omitNonTextAggrWithAllDimsOnFacets = false;
       var encodings = genEncodings([], fields, stats, opt);
       expect(encodings.filter(function(encoding) {
-        return (encoding.row && encoding.row.type==='O') ||
-          (encoding.col && encoding.col.type==='O');
+        return (encoding.row && encoding.row.type==='ordinal') ||
+          (encoding.col && encoding.col.type==='ordinal');
       }).length).to.gt(0);
     });
   });
