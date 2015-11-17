@@ -1,6 +1,6 @@
 'use strict';
 
-var vlEncDef = require('vega-lite/src/encdef');
+var vlFieldDef = require('vega-lite/src/encdef');
 var vlSchemaUtil = require('vega-lite/src/schema/schemautil');
 var util = require('../util');
 
@@ -63,7 +63,7 @@ function finalTouch(spec, stats, opt) {
   var encoding = spec.encoding;
   ['x', 'y'].forEach(function(encType) {
     var fieldDef = encoding[encType];
-    if (fieldDef && vlEncDef.isMeasure(fieldDef) && !vlEncDef.isCount(fieldDef)) {
+    if (fieldDef && vlFieldDef.isMeasure(fieldDef) && !vlFieldDef.isCount(fieldDef)) {
       var stat = stats[fieldDef.name];
       if (stat && stat.stdev / stat.mean < 0.01) {
         fieldDef.scale = {zero: false};

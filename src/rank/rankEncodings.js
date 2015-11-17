@@ -1,9 +1,9 @@
 'use strict';
 
 var vlEnc = require('vega-lite/src/enc'),
-  vlEncDef = require('vega-lite/src/encdef'),
+  vlFieldDef = require('vega-lite/src/encdef'),
   vlConsts = require('vega-lite/src/consts'),
-  isDimension = vlEncDef.isDimension,
+  isDimension = vlFieldDef.isDimension,
   util = require('../util');
 
 var consts = require('../consts');
@@ -32,7 +32,7 @@ function rankEncodings(spec, stats, opt, selected) {
     encoding = spec.encoding;
 
   var encodingMappingByField = vlEnc.reduce(spec.encoding, function(o, fieldDef, encType) {
-    var key = vlEncDef.shorthand(fieldDef);
+    var key = vlFieldDef.shorthand(fieldDef);
     var mappings = o[key] = o[key] || [];
     mappings.push({encType: encType, fieldDef: fieldDef});
     return o;
@@ -41,11 +41,11 @@ function rankEncodings(spec, stats, opt, selected) {
   // data - encoding mapping score
   util.forEach(encodingMappingByField, function(mappings) {
     var reasons = mappings.map(function(m) {
-        return m.encType + vlConsts.Shorthand.Assign + vlEncDef.shorthand(m.fieldDef) +
+        return m.encType + vlConsts.Shorthand.Assign + vlFieldDef.shorthand(m.fieldDef) +
           ' ' + (selected && selected[m.fieldDef.name] ? '[x]' : '[ ]');
       }),
       scores = mappings.map(function(m) {
-        var role = vlEncDef.isDimension(m.fieldDef) ? 'dimension' : 'measure';
+        var role = vlFieldDef.isDimension(m.fieldDef) ? 'dimension' : 'measure';
 
         var score = rankEncodings.score[role](m.fieldDef, m.encType, spec.marktype, stats, opt);
 
@@ -123,7 +123,7 @@ M.bad = BAD;
 M.terrible = TERRIBLE;
 
 rankEncodings.dimensionScore = function (fieldDef, encType, marktype, stats, opt){
-  var cardinality = vlEncDef.cardinality(fieldDef, stats);
+  var cardinality = vlFieldDef.cardinality(fieldDef, stats);
   switch (encType) {
     case vlConsts.Enctype.X:
       if (fieldDef.type === Type.Nominal || fieldDef.type === Type.Ordinal)  {
