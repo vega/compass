@@ -1,31 +1,27 @@
 'use strict';
 
-var vlEncDef = require('vega-lite/src/encdef');
+var vlFieldDef = require('vega-lite/src/fielddef');
 var vlSchemaUtil = require('vega-lite/src/schema/schemautil');
 
 var consts = require('../consts');
+var Type = consts.Type;
 var util = require('../util');
 
 var AUTO = '*';
 
 module.exports = genAggregates;
 
-// FIXME
-var N = consts.N;
-var O = consts.O;
-var Q = consts.Q;
-var T = consts.T;
 
 function genAggregates(output, fieldDefs, stats, opt) {
   opt = vlSchemaUtil.extend(opt||{}, consts.gen.aggregates);
   var tf = new Array(fieldDefs.length);
   var hasNorO = util.any(fieldDefs, function(f) {
-    return f.type === N || f.type == O;
+    return f.type === Type.Nominal || f.type == Type.Ordinal;
   });
 
   function emit(fieldSet) {
     fieldSet = util.duplicate(fieldSet);
-    fieldSet.key = vlEncDef.shorthands(fieldSet);
+    fieldSet.key = vlFieldDef.shorthands(fieldSet);
     output.push(fieldSet);
   }
 
@@ -33,7 +29,7 @@ function genAggregates(output, fieldDefs, stats, opt) {
     if (opt.omitMeasureOnly || opt.omitDimensionOnly) {
       var hasMeasure = false, hasDimension = false, hasRaw = false;
       tf.forEach(function(f) {
-        if (vlEncDef.isDimension(f)) {
+        if (vlFieldDef.isDimension(f)) {
           hasDimension = true;
         } else {
           hasMeasure = true;
@@ -43,7 +39,7 @@ function genAggregates(output, fieldDefs, stats, opt) {
       if (!hasDimension && !hasRaw && opt.omitMeasureOnly) return;
       if (!hasMeasure) {
         if (opt.addCountForDimensionOnly) {
-          tf.push(vlEncDef.count());
+          tf.push(vlFieldDef.count());
           emit(tf);
           tf.pop();
         }
@@ -102,7 +98,7 @@ function genAggregates(output, fieldDefs, stats, opt) {
       });
 
       if ((!opt.consistentAutoQ || util.isin(autoMode, [AUTO, 'bin', 'cast', 'autocast'])) && !hasNorO) {
-        var highCardinality = vlEncDef.cardinality(f, stats) > opt.minCardinalityForBin;
+        var highCardinality = vlFieldDef.cardinality(f, stats) > opt.minCardinalityForBin;
 
         var isAuto = opt.genDimQ === 'auto',
           genBin = opt.genDimQ  === 'bin' || (isAuto && highCardinality),
@@ -112,9 +108,9 @@ function genAggregates(output, fieldDefs, stats, opt) {
           assignBinQ(i, hasAggr, isAuto ? 'autocast' : 'bin');
         }
         if (genCast && util.isin(autoMode, [AUTO, 'cast', 'autocast'])) {
-          tf[i].type = 'O';
+          tf[i].type = Type.Ordinal;
           assignField(i + 1, hasAggr, isAuto ? 'autocast' : 'cast');
-          tf[i].type = 'Q';
+          tf[i].type = Type.Quantitative;
         }
       }
     }
@@ -158,16 +154,16 @@ function genAggregates(output, fieldDefs, stats, opt) {
     // Otherwise, assign i-th field
     switch (f.type) {
       //TODO "D", "G"
-      case Q:
+      case Type.Quantitative:
         assignQ(i, hasAggr, autoMode);
         break;
 
-      case T:
+      case Type.Temporal:
         assignT(i, hasAggr, autoMode);
         break;
-      case O:
+      case Type.Ordinal:
         /* falls through */
-      case N:
+      case Type.Nominal:
         /* falls through */
       default:
         tf[i] = f;

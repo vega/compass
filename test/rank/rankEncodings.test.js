@@ -160,9 +160,9 @@ describe('cp.rank.encoding', function () {
         var encoding = {
           "marktype": "text",
           "encoding": {
-            "col": {"name": "Aircraft__Airline_Operator","type": "O"},
-            "text": {"name": "*","aggregate": "count","type": "Q"},
-            "color": {"name": "*","aggregate": "count","type": "Q"}
+            "col": {"name": "Aircraft__Airline_Operator","type": "ordinal"},
+            "text": {"name": "*","aggregate": "count","type": "quantitative"},
+            "color": {"name": "*","aggregate": "count","type": "quantitative"}
           }
         };
         var score = rankEncodings(encoding, {

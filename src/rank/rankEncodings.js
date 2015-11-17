@@ -1,20 +1,15 @@
 'use strict';
 
 var vlEnc = require('vega-lite/src/enc'),
-  vlEncDef = require('vega-lite/src/encdef'),
+  vlFieldDef = require('vega-lite/src/fielddef'),
   vlConsts = require('vega-lite/src/consts'),
-  isDimension = vlEncDef.isDimension,
+  isDimension = vlFieldDef.isDimension,
   util = require('../util');
 
-module.exports = rankEncodings;
-
-
-// FIXME
 var consts = require('../consts');
-var N = consts.N;
-var O = consts.O;
-var Q = consts.Q;
-var T = consts.T;
+var Type = consts.Type;
+
+module.exports = rankEncodings;
 
 // bad score not specified in the table above
 var UNUSED_POSITION = 0.5;
@@ -37,24 +32,24 @@ function rankEncodings(spec, stats, opt, selected) {
     encoding = spec.encoding;
 
   var encodingMappingByField = vlEnc.reduce(spec.encoding, function(o, fieldDef, encType) {
-    var key = vlEncDef.shorthand(fieldDef);
+    var key = vlFieldDef.shorthand(fieldDef);
     var mappings = o[key] = o[key] || [];
-    mappings.push({encType: encType, field: fieldDef});
+    mappings.push({encType: encType, fieldDef: fieldDef});
     return o;
   }, {});
 
   // data - encoding mapping score
   util.forEach(encodingMappingByField, function(mappings) {
     var reasons = mappings.map(function(m) {
-        return m.encType + vlConsts.Shorthand.Assign + vlEncDef.shorthand(m.field) +
-          ' ' + (selected && selected[m.field.name] ? '[x]' : '[ ]');
+        return m.encType + vlConsts.Shorthand.Assign + vlFieldDef.shorthand(m.fieldDef) +
+          ' ' + (selected && selected[m.fieldDef.name] ? '[x]' : '[ ]');
       }),
       scores = mappings.map(function(m) {
-        var role = vlEncDef.isDimension(m.field) ? 'dimension' : 'measure';
+        var role = vlFieldDef.isDimension(m.fieldDef) ? 'dimension' : 'measure';
 
-        var score = rankEncodings.score[role](m.field, m.encType, spec.marktype, stats, opt);
+        var score = rankEncodings.score[role](m.fieldDef, m.encType, spec.marktype, stats, opt);
 
-        return !selected || selected[m.field.name] ? score : Math.pow(score, 0.125);
+        return !selected || selected[m.fieldDef.name] ? score : Math.pow(score, 0.125);
       });
 
     features.push({
@@ -128,19 +123,19 @@ M.bad = BAD;
 M.terrible = TERRIBLE;
 
 rankEncodings.dimensionScore = function (fieldDef, encType, marktype, stats, opt){
-  var cardinality = vlEncDef.cardinality(fieldDef, stats);
+  var cardinality = vlFieldDef.cardinality(fieldDef, stats);
   switch (encType) {
     case vlConsts.Enctype.X:
-      if (fieldDef.type === N || fieldDef.type === O)  {
+      if (fieldDef.type === Type.Nominal || fieldDef.type === Type.Ordinal)  {
         return D.pos - D.minor;
       }
       return D.pos;
 
     case vlConsts.Enctype.Y:
-      if (fieldDef.type === N || fieldDef.type === O) {
+      if (fieldDef.type === Type.Nominal || fieldDef.type === Type.Ordinal) {
         return D.pos - D.minor; //prefer ordinal on y
       }
-      if (fieldDef.type === T) {
+      if (fieldDef.type === Type.Temporal) {
         return D.Y_T; // time should not be on Y
       }
       return D.pos - D.minor;
@@ -157,7 +152,7 @@ rankEncodings.dimensionScore = function (fieldDef, encType, marktype, stats, opt
         cardinality <= opt.maxCardinalityForFacets ? D.facet_ok : D.facet_bad) - D.minor;
 
     case vlConsts.Enctype.COLOR:
-      var hasOrder = (fieldDef.bin && fieldDef.type===Q) || (fieldDef.timeUnit && fieldDef.type===T);
+      var hasOrder = (fieldDef.bin && fieldDef.type=== Type.Quantitative) || (fieldDef.timeUnit && fieldDef.type=== Type.Temporal);
 
       //FIXME add stacking option once we have control ..
       var isStacked = marktype === 'bar' || marktype === 'area';

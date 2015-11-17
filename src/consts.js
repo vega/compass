@@ -16,10 +16,13 @@ consts.COLOR = 'color';
 consts.TEXT = 'text';
 consts.DETAIL = 'detail';
 
-consts.N = 'N';
-consts.O = 'O';
-consts.Q = 'Q';
-consts.T = 'T';
+
+// rename these
+consts.Type = {};
+consts.Type.Nominal = 'nominal';
+consts.Type.Ordinal = 'ordinal';
+consts.Type.Quantitative = 'quantitative';
+consts.Type.Temporal = 'temporal';
 
 
 consts.gen.projections = {
@@ -33,7 +36,7 @@ consts.gen.projections = {
     maxCardinalityForAutoAddOrdinal: {
       type: 'integer',
       default: 50,
-      description: 'max cardinality for ordinal field to be considered for auto adding'
+      description: 'max cardinality for an ordinal variable to be considered for auto adding'
     },
     alwaysAddHistogram: {
       type: 'boolean',
@@ -65,7 +68,7 @@ consts.gen.aggregates = {
     minCardinalityForBin: {
       type: 'integer',
       default: 20,
-      description: 'minimum cardinality of a field if we were to bin'
+      description: 'minimum cardinality of an ordinal variable if we were to bin'
     },
     omitDotPlot: {
       type: 'boolean',
@@ -138,27 +141,27 @@ consts.gen.encodings = {
     maxGoodCardinalityForFacets: {
       type: 'integer',
       default: 5,
-      description: 'maximum cardinality of a field to be put on facet (row/col) effectively'
+      description: 'maximum cardinality of an ordinal variable to be put on facet (row/col) effectively'
     },
     maxCardinalityForFacets: {
       type: 'integer',
       default: 20,
-      description: 'maximum cardinality of a field to be put on facet (row/col)'
+      description: 'maximum cardinality of an ordinal variable to be put on facet (row/col)'
     },
     maxGoodCardinalityForColor: {
       type: 'integer',
       default: 7,
-      description: 'maximum cardinality of an ordinal field to be put on color effectively'
+      description: 'maximum cardinality of an ordinal variable to be put on color effectively'
     },
     maxCardinalityForColor: {
       type: 'integer',
       default: 20,
-      description: 'maximum cardinality of an ordinal field to be put on color'
+      description: 'maximum cardinality of an ordinal variable to be put on color'
     },
     maxCardinalityForShape: {
       type: 'integer',
       default: 6,
-      description: 'maximum cardinality of an ordinal field to be put on shape'
+      description: 'maximum cardinality of an ordinal variable to be put on shape'
     },
     omitTranpose:  {
       type: 'boolean',

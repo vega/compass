@@ -1,6 +1,6 @@
 'use strict';
 
-var vlEncDef = require('vega-lite/src/encdef');
+var vlFieldDef = require('vega-lite/src/fielddef');
 var vlSchemaUtil = require('vega-lite/src/schema/schemautil');
 var util = require('../util');
 
@@ -62,11 +62,11 @@ function finalTouch(spec, stats, opt) {
   // https://github.com/uwdata/visrec/issues/69
   var encoding = spec.encoding;
   ['x', 'y'].forEach(function(encType) {
-    var field = encoding[encType];
-    if (field && vlEncDef.isMeasure(field) && !vlEncDef.isCount(field)) {
-      var stat = stats[field.name];
+    var fieldDef = encoding[encType];
+    if (fieldDef && vlFieldDef.isMeasure(fieldDef) && !vlFieldDef.isCount(fieldDef)) {
+      var stat = stats[fieldDef.name];
       if (stat && stat.stdev / stat.mean < 0.01) {
-        field.scale = {zero: false};
+        fieldDef.scale = {zero: false};
       }
     }
   });

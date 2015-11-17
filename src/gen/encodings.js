@@ -1,18 +1,15 @@
 "use strict";
 
-var vlEncDef = require('vega-lite/src/encdef');
+var vlFieldDef = require('vega-lite/src/fielddef');
 var vlEnc = require('vega-lite/src/enc');
 var util = require('../util');
 
 var genMarkTypes = require('./marktypes'),
-  isDimension = vlEncDef.isDimension,
-  isMeasure = vlEncDef.isMeasure;
+  isDimension = vlFieldDef.isDimension,
+  isMeasure = vlFieldDef.isMeasure;
 
 var consts = require('../consts');
-var N = consts.N;
-var O = consts.O;
-var Q = consts.Q;
-var T = consts.T;
+var Type = consts.Type;
 
 module.exports = genEncodings;
 
@@ -73,27 +70,27 @@ function retinalEncRules(encoding, fieldDef, stats, opt) {
 function colorRules(encoding, fieldDef, stats, opt) {
   if(!retinalEncRules(encoding, fieldDef, stats, opt)) return false;
 
-  return vlEncDef.isMeasure(fieldDef) ||
-    vlEncDef.cardinality(fieldDef, stats) <= opt.maxCardinalityForColor;
+  return vlFieldDef.isMeasure(fieldDef) ||
+    vlFieldDef.cardinality(fieldDef, stats) <= opt.maxCardinalityForColor;
 }
 
 function shapeRules(encoding, fieldDef, stats, opt) {
   if(!retinalEncRules(encoding, fieldDef, stats, opt)) return false;
 
-  if (fieldDef.bin && fieldDef.type === Q) return false;
-  if (fieldDef.timeUnit && fieldDef.type === T) return false;
-  return vlEncDef.cardinality(fieldDef, stats) <= opt.maxCardinalityForColor;
+  if (fieldDef.bin && fieldDef.type === Type.Quantitative) return false;
+  if (fieldDef.timeUnit && fieldDef.type === Type.Temporal) return false;
+  return vlFieldDef.cardinality(fieldDef, stats) <= opt.maxCardinalityForColor;
 }
 
 function dimMeaTransposeRule(encoding) {
   // create horizontal histogram for ordinal
-  if ((encoding.y.type === N || encoding.y.type === O) && isMeasure(encoding.x)) {
+  if ((encoding.y.type === Type.Nominal || encoding.y.type === Type.Ordinal) && isMeasure(encoding.x)) {
     return true;
   }
 
   // vertical histogram for Q and T
   if (isMeasure(encoding.y) &&
-      !(encoding.x.type === N || encoding.x.type === O) &&
+      !(encoding.x.type === Type.Nominal || encoding.x.type === Type.Ordinal) &&
       isDimension(encoding.x)
       ) {
     return true;
@@ -136,8 +133,8 @@ function generalRules(encoding, stats, opt) {
           if (!dimMeaTransposeRule(encoding)) {
             return false;
           }
-        } else if (encoding.y.type===T || encoding.x.type === T) {
-          if (encoding.y.type===T && encoding.x.type !== T) return false;
+        } else if (encoding.y.type=== Type.Temporal|| encoding.x.type === Type.Temporal) {
+          if (encoding.y.type=== Type.Temporal && encoding.x.type !== Type.Temporal) return false;
         } else { // show only one OxO, QxQ
           if (encoding.x.name > encoding.y.name) return false;
         }
@@ -169,11 +166,11 @@ function generalRules(encoding, stats, opt) {
 genEncodings.isAggrWithAllDimOnFacets = function (encoding) {
   var hasAggr = false, hasOtherO = false;
   for (var encType in encoding) {
-    var field = encoding[encType];
-    if (field.aggregate) {
+    var fieldDef = encoding[encType];
+    if (fieldDef.aggregate) {
       hasAggr = true;
     }
-    if (vlEncDef.isDimension(field) && (encType !== consts.ROW && encType !== consts.COL)) {
+    if (vlFieldDef.isDimension(fieldDef) && (encType !== consts.ROW && encType !== consts.COL)) {
       hasOtherO = true;
     }
     if (hasAggr && hasOtherO) break;
