@@ -18,10 +18,11 @@ consts.DETAIL = 'detail';
 
 
 // rename these
-consts.N = 'nominal';
-consts.O = 'ordinal';
-consts.Q = 'quantitative';
-consts.T = 'temporal';
+consts.Type = {};
+consts.Type.Nominal = 'nominal';
+consts.Type.Ordinal = 'ordinal';
+consts.Type.Quantitative = 'quantitative';
+consts.Type.Temporal = 'temporal';
 
 
 consts.gen.projections = {

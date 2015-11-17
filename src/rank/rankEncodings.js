@@ -8,14 +8,6 @@ var vlEnc = require('vega-lite/src/enc'),
 
 module.exports = rankEncodings;
 
-
-// FIXME
-var consts = require('../consts');
-var N = consts.N;
-var O = consts.O;
-var Q = consts.Q;
-var T = consts.T;
-
 // bad score not specified in the table above
 var UNUSED_POSITION = 0.5;
 
