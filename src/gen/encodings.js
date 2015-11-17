@@ -166,11 +166,11 @@ function generalRules(encoding, stats, opt) {
 genEncodings.isAggrWithAllDimOnFacets = function (encoding) {
   var hasAggr = false, hasOtherO = false;
   for (var encType in encoding) {
-    var field = encoding[encType];
-    if (field.aggregate) {
+    var fieldDef = encoding[encType];
+    if (fieldDef.aggregate) {
       hasAggr = true;
     }
-    if (vlEncDef.isDimension(field) && (encType !== consts.ROW && encType !== consts.COL)) {
+    if (vlEncDef.isDimension(fieldDef) && (encType !== consts.ROW && encType !== consts.COL)) {
       hasOtherO = true;
     }
     if (hasAggr && hasOtherO) break;
