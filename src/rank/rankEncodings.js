@@ -1,7 +1,7 @@
 'use strict';
 
 var vlEnc = require('vega-lite/src/enc'),
-  vlFieldDef = require('vega-lite/src/encdef'),
+  vlFieldDef = require('vega-lite/src/fielddef'),
   vlConsts = require('vega-lite/src/consts'),
   isDimension = vlFieldDef.isDimension,
   util = require('../util');

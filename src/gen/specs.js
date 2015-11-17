@@ -1,6 +1,6 @@
 'use strict';
 
-var vlFieldDef = require('vega-lite/src/encdef');
+var vlFieldDef = require('vega-lite/src/fielddef');
 var vlSchemaUtil = require('vega-lite/src/schema/schemautil');
 var util = require('../util');
 
