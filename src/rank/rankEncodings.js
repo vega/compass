@@ -6,6 +6,9 @@ var vlEnc = require('vega-lite/src/enc'),
   isDimension = vlEncDef.isDimension,
   util = require('../util');
 
+var consts = require('../consts');
+var Type = consts.Type;
+
 module.exports = rankEncodings;
 
 // bad score not specified in the table above
@@ -123,16 +126,16 @@ rankEncodings.dimensionScore = function (fieldDef, encType, marktype, stats, opt
   var cardinality = vlEncDef.cardinality(fieldDef, stats);
   switch (encType) {
     case vlConsts.Enctype.X:
-      if (fieldDef.type === N || fieldDef.type === O)  {
+      if (fieldDef.type === Type.Nominal || fieldDef.type === Type.Ordinal)  {
         return D.pos - D.minor;
       }
       return D.pos;
 
     case vlConsts.Enctype.Y:
-      if (fieldDef.type === N || fieldDef.type === O) {
+      if (fieldDef.type === Type.Nominal || fieldDef.type === Type.Ordinal) {
         return D.pos - D.minor; //prefer ordinal on y
       }
-      if (fieldDef.type === T) {
+      if (fieldDef.type === Type.Temporal) {
         return D.Y_T; // time should not be on Y
       }
       return D.pos - D.minor;
@@ -149,7 +152,7 @@ rankEncodings.dimensionScore = function (fieldDef, encType, marktype, stats, opt
         cardinality <= opt.maxCardinalityForFacets ? D.facet_ok : D.facet_bad) - D.minor;
 
     case vlConsts.Enctype.COLOR:
-      var hasOrder = (fieldDef.bin && fieldDef.type===Q) || (fieldDef.timeUnit && fieldDef.type===T);
+      var hasOrder = (fieldDef.bin && fieldDef.type=== Type.Quantitative) || (fieldDef.timeUnit && fieldDef.type=== Type.Temporal);
 
       //FIXME add stacking option once we have control ..
       var isStacked = marktype === 'bar' || marktype === 'area';
