@@ -17,22 +17,22 @@ var consts = require('../../src/consts'),
 
 describe('cp.rank.encoding', function () {
   var marktypes = consts.gen.encodings.properties.marktypeList.default;
-  var encTypes = ['x', 'y', 'row', 'col', 'size', 'color', 'shape', 'text', 'detail'];
+  var channels = ['x', 'y', 'row', 'col', 'size', 'color', 'shape', 'text', 'detail'];
   var dFixtures = ['O', 'O_15', 'O_30', 'BIN(Q)'],
     mFixtures = ['Q'];
 
 
   var score = {};
   marktypes.forEach(function(marktype) {
-    encTypes.forEach(function(encType) {
+    channels.forEach(function(channel) {
       mFixtures.forEach(function(q) {
         var Qf = fixture[q];
-        setter(score, [q, marktype, encType], measureScore(Qf.fields[0], encType, marktype, Qf.stats, opt));
+        setter(score, [q, marktype, channel], measureScore(Qf.fields[0], channel, marktype, Qf.stats, opt));
       });
 
       dFixtures.forEach(function(o) {
         var Of = fixture[o];
-        setter(score, [o, marktype, encType], dimensionScore(Of.fields[0], encType, marktype, Of.stats, opt));
+        setter(score, [o, marktype, channel], dimensionScore(Of.fields[0], channel, marktype, Of.stats, opt));
       });
     });
   });

@@ -61,8 +61,8 @@ function finalTouch(spec, stats, opt) {
   // don't include zero if stdev/mean < 0.01
   // https://github.com/uwdata/visrec/issues/69
   var encoding = spec.encoding;
-  ['x', 'y'].forEach(function(encType) {
-    var fieldDef = encoding[encType];
+  ['x', 'y'].forEach(function(channel) {
+    var fieldDef = encoding[channel];
     if (fieldDef && vlFieldDef.isMeasure(fieldDef) && !vlFieldDef.isCount(fieldDef)) {
       var stat = stats[fieldDef.name];
       if (stat && stat.stdev / stat.mean < 0.01) {
