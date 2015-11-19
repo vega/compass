@@ -1,11 +1,11 @@
 "use strict";
 
 var vlEnc = require('vega-lite/src/enc');
-var vlEncDef = require('vega-lite/src/encdef');
+var vlFieldDef = require('vega-lite/src/fielddef');
 var vlValidate = require('vega-lite/src/validate');
 
-var isDimension = vlEncDef.isDimension;
-var isOrdinalScale = vlEncDef.isOrdinalScale;
+var isDimension = vlFieldDef.isDimension;
+var isOrdinalScale = vlFieldDef.isOrdinalScale;
 var util = require('../util');
 
 var consts = require('../consts');
@@ -37,7 +37,7 @@ vlmarktypes.satisfyRules = function (encoding, markType, stats, opt) {
 };
 
 function facetRule(fieldDef, stats, opt) {
-  return vlEncDef.cardinality(fieldDef, stats) <= opt.maxCardinalityForFacets;
+  return vlFieldDef.cardinality(fieldDef, stats) <= opt.maxCardinalityForFacets;
 }
 
 function facetsRule(encoding, stats, opt) {

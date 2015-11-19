@@ -1,9 +1,9 @@
 'use strict';
 
 var vlEnc = require('vega-lite/src/enc'),
-  vlEncDef = require('vega-lite/src/encdef'),
+  vlFieldDef = require('vega-lite/src/fielddef'),
   vlConsts = require('vega-lite/src/consts'),
-  isDimension = vlEncDef.isDimension,
+  isDimension = vlFieldDef.isDimension,
   util = require('../util');
 
 var consts = require('../consts');
@@ -32,24 +32,24 @@ function rankEncodings(spec, stats, opt, selected) {
     encoding = spec.encoding;
 
   var encodingMappingByField = vlEnc.reduce(spec.encoding, function(o, fieldDef, encType) {
-    var key = vlEncDef.shorthand(fieldDef);
+    var key = vlFieldDef.shorthand(fieldDef);
     var mappings = o[key] = o[key] || [];
-    mappings.push({encType: encType, field: fieldDef});
+    mappings.push({encType: encType, fieldDef: fieldDef});
     return o;
   }, {});
 
   // data - encoding mapping score
   util.forEach(encodingMappingByField, function(mappings) {
     var reasons = mappings.map(function(m) {
-        return m.encType + vlConsts.Shorthand.Assign + vlEncDef.shorthand(m.field) +
-          ' ' + (selected && selected[m.field.name] ? '[x]' : '[ ]');
+        return m.encType + vlConsts.Shorthand.Assign + vlFieldDef.shorthand(m.fieldDef) +
+          ' ' + (selected && selected[m.fieldDef.name] ? '[x]' : '[ ]');
       }),
       scores = mappings.map(function(m) {
-        var role = vlEncDef.isDimension(m.field) ? 'dimension' : 'measure';
+        var role = vlFieldDef.isDimension(m.fieldDef) ? 'dimension' : 'measure';
 
-        var score = rankEncodings.score[role](m.field, m.encType, spec.marktype, stats, opt);
+        var score = rankEncodings.score[role](m.fieldDef, m.encType, spec.marktype, stats, opt);
 
-        return !selected || selected[m.field.name] ? score : Math.pow(score, 0.125);
+        return !selected || selected[m.fieldDef.name] ? score : Math.pow(score, 0.125);
       });
 
     features.push({
@@ -123,7 +123,7 @@ M.bad = BAD;
 M.terrible = TERRIBLE;
 
 rankEncodings.dimensionScore = function (fieldDef, encType, marktype, stats, opt){
-  var cardinality = vlEncDef.cardinality(fieldDef, stats);
+  var cardinality = vlFieldDef.cardinality(fieldDef, stats);
   switch (encType) {
     case vlConsts.Enctype.X:
       if (fieldDef.type === Type.Nominal || fieldDef.type === Type.Ordinal)  {

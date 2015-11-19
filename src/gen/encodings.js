@@ -1,12 +1,12 @@
 "use strict";
 
-var vlEncDef = require('vega-lite/src/encdef');
+var vlFieldDef = require('vega-lite/src/fielddef');
 var vlEnc = require('vega-lite/src/enc');
 var util = require('../util');
 
 var genMarkTypes = require('./marktypes'),
-  isDimension = vlEncDef.isDimension,
-  isMeasure = vlEncDef.isMeasure;
+  isDimension = vlFieldDef.isDimension,
+  isMeasure = vlFieldDef.isMeasure;
 
 var consts = require('../consts');
 var Type = consts.Type;
@@ -70,8 +70,8 @@ function retinalEncRules(encoding, fieldDef, stats, opt) {
 function colorRules(encoding, fieldDef, stats, opt) {
   if(!retinalEncRules(encoding, fieldDef, stats, opt)) return false;
 
-  return vlEncDef.isMeasure(fieldDef) ||
-    vlEncDef.cardinality(fieldDef, stats) <= opt.maxCardinalityForColor;
+  return vlFieldDef.isMeasure(fieldDef) ||
+    vlFieldDef.cardinality(fieldDef, stats) <= opt.maxCardinalityForColor;
 }
 
 function shapeRules(encoding, fieldDef, stats, opt) {
@@ -79,7 +79,7 @@ function shapeRules(encoding, fieldDef, stats, opt) {
 
   if (fieldDef.bin && fieldDef.type === Type.Quantitative) return false;
   if (fieldDef.timeUnit && fieldDef.type === Type.Temporal) return false;
-  return vlEncDef.cardinality(fieldDef, stats) <= opt.maxCardinalityForColor;
+  return vlFieldDef.cardinality(fieldDef, stats) <= opt.maxCardinalityForColor;
 }
 
 function dimMeaTransposeRule(encoding) {
@@ -166,11 +166,11 @@ function generalRules(encoding, stats, opt) {
 genEncodings.isAggrWithAllDimOnFacets = function (encoding) {
   var hasAggr = false, hasOtherO = false;
   for (var encType in encoding) {
-    var field = encoding[encType];
-    if (field.aggregate) {
+    var fieldDef = encoding[encType];
+    if (fieldDef.aggregate) {
       hasAggr = true;
     }
-    if (vlEncDef.isDimension(field) && (encType !== consts.ROW && encType !== consts.COL)) {
+    if (vlFieldDef.isDimension(fieldDef) && (encType !== consts.ROW && encType !== consts.COL)) {
       hasOtherO = true;
     }
     if (hasAggr && hasOtherO) break;

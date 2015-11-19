@@ -1,6 +1,6 @@
 'use strict';
 
-var vlEncDef = require('vega-lite/src/encdef');
+var vlFieldDef = require('vega-lite/src/fielddef');
 var vlSchemaUtil = require('vega-lite/src/schema/schemautil');
 
 var consts = require('../consts');
@@ -21,7 +21,7 @@ function genAggregates(output, fieldDefs, stats, opt) {
 
   function emit(fieldSet) {
     fieldSet = util.duplicate(fieldSet);
-    fieldSet.key = vlEncDef.shorthands(fieldSet);
+    fieldSet.key = vlFieldDef.shorthands(fieldSet);
     output.push(fieldSet);
   }
 
@@ -29,7 +29,7 @@ function genAggregates(output, fieldDefs, stats, opt) {
     if (opt.omitMeasureOnly || opt.omitDimensionOnly) {
       var hasMeasure = false, hasDimension = false, hasRaw = false;
       tf.forEach(function(f) {
-        if (vlEncDef.isDimension(f)) {
+        if (vlFieldDef.isDimension(f)) {
           hasDimension = true;
         } else {
           hasMeasure = true;
@@ -39,7 +39,7 @@ function genAggregates(output, fieldDefs, stats, opt) {
       if (!hasDimension && !hasRaw && opt.omitMeasureOnly) return;
       if (!hasMeasure) {
         if (opt.addCountForDimensionOnly) {
-          tf.push(vlEncDef.count());
+          tf.push(vlFieldDef.count());
           emit(tf);
           tf.pop();
         }
@@ -98,7 +98,7 @@ function genAggregates(output, fieldDefs, stats, opt) {
       });
 
       if ((!opt.consistentAutoQ || util.isin(autoMode, [AUTO, 'bin', 'cast', 'autocast'])) && !hasNorO) {
-        var highCardinality = vlEncDef.cardinality(f, stats) > opt.minCardinalityForBin;
+        var highCardinality = vlFieldDef.cardinality(f, stats) > opt.minCardinalityForBin;
 
         var isAuto = opt.genDimQ === 'auto',
           genBin = opt.genDimQ  === 'bin' || (isAuto && highCardinality),
