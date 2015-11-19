@@ -95,10 +95,6 @@ describe('cp.gen.encodings()', function () {
       }).length > 0;
       expect(hasBar).to.be.true;
     });
-
-    // console.log('encodings O_30x#', encodings.map(function(spec){
-    //   return vl.Encoding.shorthandFromSpec(spec) + ":" + spec.score;
-    // }));
   });
 
   describe('OxQxQ', function() {

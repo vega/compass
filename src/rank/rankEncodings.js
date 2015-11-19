@@ -28,27 +28,27 @@ var MARK_SCORE = {
 
 function rankEncodings(spec, stats, opt, selected) {
   var features = [],
-    encTypes = util.keys(spec.encoding),
+    channels = util.keys(spec.encoding),
     marktype = spec.marktype,
     encoding = spec.encoding;
 
-  var encodingMappingByField = vlEnc.reduce(spec.encoding, function(o, fieldDef, encType) {
+  var encodingMappingByField = vlEnc.reduce(spec.encoding, function(o, fieldDef, channel) {
     var key = vlFieldDef.shorthand(fieldDef);
     var mappings = o[key] = o[key] || [];
-    mappings.push({encType: encType, fieldDef: fieldDef});
+    mappings.push({channel: channel, fieldDef: fieldDef});
     return o;
   }, {});
 
   // data - encoding mapping score
   util.forEach(encodingMappingByField, function(mappings) {
     var reasons = mappings.map(function(m) {
-        return m.encType + vlConsts.Shorthand.Assign + vlFieldDef.shorthand(m.fieldDef) +
+        return m.channel + vlConsts.Shorthand.Assign + vlFieldDef.shorthand(m.fieldDef) +
           ' ' + (selected && selected[m.fieldDef.name] ? '[x]' : '[ ]');
       }),
       scores = mappings.map(function(m) {
         var role = vlFieldDef.isDimension(m.fieldDef) ? 'dimension' : 'measure';
 
-        var score = rankEncodings.score[role](m.fieldDef, m.encType, spec.marktype, stats, opt);
+        var score = rankEncodings.score[role](m.fieldDef, m.channel, spec.marktype, stats, opt);
 
         return !selected || selected[m.fieldDef.name] ? score : Math.pow(score, 0.125);
       });
@@ -74,7 +74,7 @@ function rankEncodings(spec, stats, opt, selected) {
   }
 
   // penalize not using positional only penalize for non-text
-  if (encTypes.length > 1 && marktype !== 'text') {
+  if (channels.length > 1 && marktype !== 'text') {
     if ((!encoding.x || !encoding.y) && !encoding.geo && !encoding.text) {
       features.push({
         reason: 'unused position',
@@ -123,9 +123,9 @@ M.text = 0.4;
 M.bad = BAD;
 M.terrible = TERRIBLE;
 
-rankEncodings.dimensionScore = function (fieldDef, encType, marktype, stats, opt){
+rankEncodings.dimensionScore = function (fieldDef, channel, marktype, stats, opt){
   var cardinality = vlFieldDef.cardinality(fieldDef, stats);
-  switch (encType) {
+  switch (channel) {
     case vlChannel.X:
       if (fieldDef.type === Type.Nominal || fieldDef.type === Type.Ordinal)  {
         return D.pos - D.minor;
@@ -175,9 +175,9 @@ rankEncodings.dimensionScore = function (fieldDef, encType, marktype, stats, opt
 
 rankEncodings.dimensionScore.consts = D;
 
-rankEncodings.measureScore = function (fieldDef, encType, marktype, stats, opt) {
+rankEncodings.measureScore = function (fieldDef, channel, marktype, stats, opt) {
   // jshint unused:false
-  switch (encType){
+  switch (channel){
     case vlChannel.X: return M.pos;
     case vlChannel.Y: return M.pos;
     case vlChannel.SIZE:

@@ -165,12 +165,12 @@ function generalRules(encoding, stats, opt) {
 
 genEncodings.isAggrWithAllDimOnFacets = function (encoding) {
   var hasAggr = false, hasOtherO = false;
-  for (var encType in encoding) {
-    var fieldDef = encoding[encType];
+  for (var channel in encoding) {
+    var fieldDef = encoding[channel];
     if (fieldDef.aggregate) {
       hasAggr = true;
     }
-    if (vlFieldDef.isDimension(fieldDef) && (encType !== consts.ROW && encType !== consts.COL)) {
+    if (vlFieldDef.isDimension(fieldDef) && (channel !== consts.ROW && channel !== consts.COL)) {
       hasOtherO = true;
     }
     if (hasAggr && hasOtherO) break;
@@ -197,17 +197,17 @@ function genEncodings(encodings, fieldDefs, stats, opt) {
     // Otherwise, assign i-th field
     var fieldDef = fieldDefs[i];
     for (var j in opt.encodingTypeList) {
-      var encType = opt.encodingTypeList[j],
+      var channel = opt.encodingTypeList[j],
         isDim = isDimension(fieldDef);
 
       //TODO: support "multiple" assignment
-      if (!(encType in tmpEncoding) && // encoding not used
-        ((isDim && rules[encType].dimension) || (!isDim && rules[encType].measure)) &&
-        (!rules[encType].rules || rules[encType].rules(tmpEncoding, fieldDef, stats, opt))
+      if (!(channel in tmpEncoding) && // encoding not used
+        ((isDim && rules[channel].dimension) || (!isDim && rules[channel].measure)) &&
+        (!rules[channel].rules || rules[channel].rules(tmpEncoding, fieldDef, stats, opt))
       ) {
-        tmpEncoding[encType] = fieldDef;
+        tmpEncoding[channel] = fieldDef;
         assignField(i + 1);
-        delete tmpEncoding[encType];
+        delete tmpEncoding[channel];
       }
     }
   }
