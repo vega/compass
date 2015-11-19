@@ -16,10 +16,13 @@ consts.COLOR = 'color';
 consts.TEXT = 'text';
 consts.DETAIL = 'detail';
 
-consts.N = 'N';
-consts.O = 'O';
-consts.Q = 'Q';
-consts.T = 'T';
+
+// rename these
+consts.Type = {};
+consts.Type.Nominal = 'nominal';
+consts.Type.Ordinal = 'ordinal';
+consts.Type.Quantitative = 'quantitative';
+consts.Type.Temporal = 'temporal';
 
 
 consts.gen.projections = {

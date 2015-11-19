@@ -8,6 +8,9 @@ var isDimension = vlEncDef.isDimension;
 var isOrdinalScale = vlEncDef.isOrdinalScale;
 var util = require('../util');
 
+var consts = require('../consts');
+var Type = consts.Type;
+
 var vlmarktypes = module.exports = getMarktypes;
 
 var marksRule = vlmarktypes.rule = {
@@ -130,7 +133,7 @@ function lineRule(encoding, stats, opt) {
   // FIXME truly ordinal data is fine here too.
   // Line chart should be only horizontal
   // and use only temporal data
-  return encoding.x.type == 'T' && encoding.x.timeUnit && encoding.y.type == 'Q' && encoding.y.aggregate;
+  return encoding.x.type == Type.Temporal && encoding.x.timeUnit && encoding.y.type == Type.Quantitative && encoding.y.aggregate;
 }
 
 function areaRule(encoding, stats, opt) {
