@@ -6,6 +6,22 @@ var consts = module.exports = {
   rank: {}
 };
 
+consts.X = 'x';
+consts.Y = 'y';
+consts.ROW = 'row';
+consts.COL = 'col';
+consts.SIZE = 'size';
+consts.SHAPE = 'shape';
+consts.COLOR = 'color';
+consts.TEXT = 'text';
+consts.DETAIL = 'detail';
+
+consts.N = 'N';
+consts.O = 'O';
+consts.Q = 'Q';
+consts.T = 'T';
+
+
 consts.gen.projections = {
   type: 'object',
   properties: {
@@ -108,6 +124,17 @@ consts.gen.encodings = {
       default: ['x', 'y', 'row', 'col', 'size', 'color', 'text', 'detail'],
       description: 'allowed encoding types'
     },
+    requiredEncodings: {
+      type: 'object',
+      default: undefined,
+      description: 'required encodings for each mark type'
+    },
+    supportedEncodings: {
+      type: 'object',
+      default: undefined,
+      description: 'supported encoding for each mark type'
+    },
+    // TODO: is this used in generation?
     maxGoodCardinalityForFacets: {
       type: 'integer',
       default: 5,
@@ -138,6 +165,7 @@ consts.gen.encodings = {
       default: true,
       description: 'Eliminate all transpose by (1) keeping horizontal dot plot only (2) for OxQ charts, always put O on Y (3) show only one DxD, MxM (currently sorted by name)'
     },
+    // TODO: create chart type name
     omitDotPlot: {
       type: 'boolean',
       default: false,
@@ -153,21 +181,25 @@ consts.gen.encodings = {
       default: true,
       description: 'omit using multiple retinal variables (size, color, shape)'
     },
+    // TODO: revise
     omitNonTextAggrWithAllDimsOnFacets: {
       type: 'boolean',
       default: true,
       description: 'remove all aggregated charts (except text tables) with all dims on facets (row, col)'
     },
+    // TODO: revise
     omitOneDimensionCount: {
       type: 'boolean',
       default: false,
       description: 'omit one dimension count'
     },
+    // TODO remove this and merge with supportedEncodings
     omitSizeOnBar: {
       type: 'boolean',
       default: false,
       description: 'do not use bar\'s size'
     },
+    // TODO: change to omit non-summative stack
     omitStackedAverage: {
       type: 'boolean',
       default: true,

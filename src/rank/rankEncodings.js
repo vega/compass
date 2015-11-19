@@ -1,11 +1,20 @@
 'use strict';
 
-require('../globals');
-
-var vl = require('vega-lite'),
-  isDimension = vl.encDef.isDimension;
+var vlEnc = require('vega-lite/src/enc'),
+  vlEncDef = require('vega-lite/src/encdef'),
+  vlConsts = require('vega-lite/src/consts'),
+  isDimension = vlEncDef.isDimension,
+  util = require('../util');
 
 module.exports = rankEncodings;
+
+
+// FIXME
+var consts = require('../consts');
+var N = consts.N;
+var O = consts.O;
+var Q = consts.Q;
+var T = consts.T;
 
 // bad score not specified in the table above
 var UNUSED_POSITION = 0.5;
@@ -23,25 +32,25 @@ var MARK_SCORE = {
 
 function rankEncodings(spec, stats, opt, selected) {
   var features = [],
-    encTypes = vl.keys(spec.encoding),
+    encTypes = util.keys(spec.encoding),
     marktype = spec.marktype,
     encoding = spec.encoding;
 
-  var encodingMappingByField = vl.enc.reduce(spec.encoding, function(o, fieldDef, encType) {
-    var key = vl.encDef.shorthand(fieldDef);
+  var encodingMappingByField = vlEnc.reduce(spec.encoding, function(o, fieldDef, encType) {
+    var key = vlEncDef.shorthand(fieldDef);
     var mappings = o[key] = o[key] || [];
     mappings.push({encType: encType, field: fieldDef});
     return o;
   }, {});
 
   // data - encoding mapping score
-  vl.forEach(encodingMappingByField, function(mappings) {
+  util.forEach(encodingMappingByField, function(mappings) {
     var reasons = mappings.map(function(m) {
-        return m.encType + vl.shorthand.assign + vl.encDef.shorthand(m.field) +
+        return m.encType + vlConsts.Shorthand.Assign + vlEncDef.shorthand(m.field) +
           ' ' + (selected && selected[m.field.name] ? '[x]' : '[ ]');
       }),
       scores = mappings.map(function(m) {
-        var role = vl.encDef.isDimension(m.field) ? 'dimension' : 'measure';
+        var role = vlEncDef.isDimension(m.field) ? 'dimension' : 'measure';
 
         var score = rankEncodings.score[role](m.field, m.encType, spec.marktype, stats, opt);
 
@@ -55,7 +64,7 @@ function rankEncodings(spec, stats, opt, selected) {
   });
 
   // plot type
-  if (marktype === TEXT) {
+  if (marktype === 'text') {
     // TODO
   } else {
     if (encoding.x && encoding.y) {
@@ -69,7 +78,7 @@ function rankEncodings(spec, stats, opt, selected) {
   }
 
   // penalize not using positional only penalize for non-text
-  if (encTypes.length > 1 && marktype !== TEXT) {
+  if (encTypes.length > 1 && marktype !== 'text') {
     if ((!encoding.x || !encoding.y) && !encoding.geo && !encoding.text) {
       features.push({
         reason: 'unused position',
@@ -119,29 +128,35 @@ M.bad = BAD;
 M.terrible = TERRIBLE;
 
 rankEncodings.dimensionScore = function (fieldDef, encType, marktype, stats, opt){
-  var cardinality = vl.encDef.cardinality(fieldDef, stats);
+  var cardinality = vlEncDef.cardinality(fieldDef, stats);
   switch (encType) {
-    case X:
-      if (vl.encDef.isTypes(fieldDef, [N, O]))  return D.pos - D.minor;
+    case vlConsts.Enctype.X:
+      if (fieldDef.type === N || fieldDef.type === O)  {
+        return D.pos - D.minor;
+      }
       return D.pos;
 
-    case Y:
-      if (vl.encDef.isTypes(fieldDef, [N, O])) return D.pos - D.minor; //prefer ordinal on y
-      if (fieldDef.type === T) return D.Y_T; // time should not be on Y
+    case vlConsts.Enctype.Y:
+      if (fieldDef.type === N || fieldDef.type === O) {
+        return D.pos - D.minor; //prefer ordinal on y
+      }
+      if (fieldDef.type === T) {
+        return D.Y_T; // time should not be on Y
+      }
       return D.pos - D.minor;
 
-    case COL:
-      if (marktype === TEXT) return D.facet_text;
+    case vlConsts.Enctype.COL:
+      if (marktype === 'text') return D.facet_text;
       //prefer column over row due to scrolling issues
       return cardinality <= opt.maxGoodCardinalityForFacets ? D.facet_good :
         cardinality <= opt.maxCardinalityForFacets ? D.facet_ok : D.facet_bad;
 
-    case ROW:
-      if (marktype === TEXT) return D.facet_text;
+    case vlConsts.Enctype.ROW:
+      if (marktype === 'text') return D.facet_text;
       return (cardinality <= opt.maxGoodCardinalityForFacets ? D.facet_good :
         cardinality <= opt.maxCardinalityForFacets ? D.facet_ok : D.facet_bad) - D.minor;
 
-    case COLOR:
+    case vlConsts.Enctype.COLOR:
       var hasOrder = (fieldDef.bin && fieldDef.type===Q) || (fieldDef.timeUnit && fieldDef.type===T);
 
       //FIXME add stacking option once we have control ..
@@ -154,9 +169,9 @@ rankEncodings.dimensionScore = function (fieldDef, encType, marktype, stats, opt
       if (isStacked) return D.color_stack;
 
       return cardinality <= opt.maxGoodCardinalityForColor ? D.color_good: cardinality <= opt.maxCardinalityForColor ? D.color_ok : D.color_bad;
-    case SHAPE:
+    case vlConsts.Enctype.SHAPE:
       return cardinality <= opt.maxCardinalityForShape ? D.shape : TERRIBLE;
-    case DETAIL:
+    case vlConsts.Enctype.DETAIL:
       return D.detail;
   }
   return TERRIBLE;
@@ -167,15 +182,15 @@ rankEncodings.dimensionScore.consts = D;
 rankEncodings.measureScore = function (fieldDef, encType, marktype, stats, opt) {
   // jshint unused:false
   switch (encType){
-    case X: return M.pos;
-    case Y: return M.pos;
-    case SIZE:
+    case vlConsts.Enctype.X: return M.pos;
+    case vlConsts.Enctype.Y: return M.pos;
+    case vlConsts.Enctype.SIZE:
       if (marktype === 'bar') return BAD; //size of bar is very bad
-      if (marktype === TEXT) return BAD;
+      if (marktype === 'text') return BAD;
       if (marktype === 'line') return BAD;
       return M.size;
-    case COLOR: return M.color;
-    case TEXT: return M.text;
+    case vlConsts.Enctype.COLOR: return M.color;
+    case vlConsts.Enctype.TEXT: return M.text;
   }
   return BAD;
 };

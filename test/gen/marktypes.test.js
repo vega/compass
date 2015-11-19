@@ -65,7 +65,7 @@ describe('cp.gen.marktypes()', function(){
     describe('with stacked average', function () {
       it('should not be generated', function () {
         var encoding = {
-          "color": {"selected": true,"name": "When__Phase_of_flight","type": "O"},
+          "color": {"name": "When__Phase_of_flight","type": "O"},
           "x": {"name": "Cost__Total_$","type": "Q","aggregate": "mean"},
           "y": {"selected": undefined,"name": "Aircraft__Airline_Operator","type": "O"}
         };
@@ -76,11 +76,11 @@ describe('cp.gen.marktypes()', function(){
     });
 
     describe('with stacked sum', function () {
-      it('should not be generated', function () {
+      it('should be generated', function () {
         var encoding = {
-          "color": {"selected": true,"name": "When__Phase_of_flight","type": "O"},
+          "color": {"name": "When__Phase_of_flight","type": "O"},
           "x": {"name": "Cost__Total_$","type": "Q","aggregate": "sum"},
-          "y": {"selected": undefined,"name": "Aircraft__Airline_Operator","type": "O"}
+          "y": {"name": "Aircraft__Airline_Operator","type": "O"}
         };
         var marktypes = getMarkTypes(encoding, {}, opt);
         expect(marktypes.indexOf('bar')).to.gt(-1);

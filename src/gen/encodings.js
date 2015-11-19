@@ -1,10 +1,18 @@
 "use strict";
-require('../globals');
 
-var vl = require('vega-lite'),
-  genMarkTypes = require('./marktypes'),
-  isDimension = vl.encDef.isDimension,
-  isMeasure = vl.encDef.isMeasure;
+var vlEncDef = require('vega-lite/src/encdef');
+var vlEnc = require('vega-lite/src/enc');
+var util = require('../util');
+
+var genMarkTypes = require('./marktypes'),
+  isDimension = vlEncDef.isDimension,
+  isMeasure = vlEncDef.isMeasure;
+
+var consts = require('../consts');
+var N = consts.N;
+var O = consts.O;
+var Q = consts.Q;
+var T = consts.T;
 
 module.exports = genEncodings;
 
@@ -65,8 +73,8 @@ function retinalEncRules(encoding, fieldDef, stats, opt) {
 function colorRules(encoding, fieldDef, stats, opt) {
   if(!retinalEncRules(encoding, fieldDef, stats, opt)) return false;
 
-  return vl.encDef.isMeasure(fieldDef) ||
-    vl.encDef.cardinality(fieldDef, stats) <= opt.maxCardinalityForColor;
+  return vlEncDef.isMeasure(fieldDef) ||
+    vlEncDef.cardinality(fieldDef, stats) <= opt.maxCardinalityForColor;
 }
 
 function shapeRules(encoding, fieldDef, stats, opt) {
@@ -74,15 +82,22 @@ function shapeRules(encoding, fieldDef, stats, opt) {
 
   if (fieldDef.bin && fieldDef.type === Q) return false;
   if (fieldDef.timeUnit && fieldDef.type === T) return false;
-  return vl.encDef.cardinality(fieldDef, stats) <= opt.maxCardinalityForColor;
+  return vlEncDef.cardinality(fieldDef, stats) <= opt.maxCardinalityForColor;
 }
 
 function dimMeaTransposeRule(encoding) {
   // create horizontal histogram for ordinal
-  if (vl.encDef.isTypes(encoding.y, [N, O]) && isMeasure(encoding.x)) return true;
+  if ((encoding.y.type === N || encoding.y.type === O) && isMeasure(encoding.x)) {
+    return true;
+  }
 
   // vertical histogram for Q and T
-  if (isMeasure(encoding.y) && (!vl.encDef.isTypes(encoding.x, [N, O]) && isDimension(encoding.x))) return true;
+  if (isMeasure(encoding.y) &&
+      !(encoding.x.type === N || encoding.x.type === O) &&
+      isDimension(encoding.x)
+      ) {
+    return true;
+  }
 
   return false;
 }
@@ -90,7 +105,7 @@ function dimMeaTransposeRule(encoding) {
 function generalRules(encoding, stats, opt) {
   // enc.text is only used for TEXT TABLE
   if (encoding.text) {
-    return genMarkTypes.satisfyRules(encoding, TEXT, stats, opt);
+    return genMarkTypes.satisfyRules(encoding, 'text', stats, opt);
   }
 
   // CARTESIAN PLOT OR MAP
@@ -111,14 +126,16 @@ function generalRules(encoding, stats, opt) {
       var isDimX = !!isDimension(encoding.x),
         isDimY = !!isDimension(encoding.y);
 
-      if (isDimX && isDimY && !vl.enc.isAggregate(encoding)) {
+      if (isDimX && isDimY && !vlEnc.isAggregate(encoding)) {
         // FIXME actually check if there would be occlusion #90
         return false;
       }
 
       if (opt.omitTranpose) {
         if (isDimX ^ isDimY) { // dim x mea
-          if (!dimMeaTransposeRule(encoding)) return false;
+          if (!dimMeaTransposeRule(encoding)) {
+            return false;
+          }
         } else if (encoding.y.type===T || encoding.x.type === T) {
           if (encoding.y.type===T && encoding.x.type !== T) return false;
         } else { // show only one OxO, QxQ
@@ -136,7 +153,7 @@ function generalRules(encoding, stats, opt) {
     if (opt.omitTranpose && encoding.y) return false;
 
     // dot plot shouldn't have other encoding
-    if (opt.omitDotPlotWithExtraEncoding && vl.keys(encoding).length > 1) return false;
+    if (opt.omitDotPlotWithExtraEncoding && util.keys(encoding).length > 1) return false;
 
     if (opt.omitOneDimensionCount) {
       // one dimension "count"
@@ -156,7 +173,7 @@ genEncodings.isAggrWithAllDimOnFacets = function (encoding) {
     if (field.aggregate) {
       hasAggr = true;
     }
-    if (vl.encDef.isDimension(field) && (encType !== ROW && encType !== COL)) {
+    if (vlEncDef.isDimension(field) && (encType !== consts.ROW && encType !== consts.COL)) {
       hasOtherO = true;
     }
     if (hasAggr && hasOtherO) break;
@@ -175,7 +192,7 @@ function genEncodings(encodings, fieldDefs, stats, opt) {
     if (i === fieldDefs.length) {
       // at the minimal all chart should have x, y, geo, text or arc
       if (generalRules(tmpEncoding, stats, opt)) {
-        encodings.push(vl.duplicate(tmpEncoding));
+        encodings.push(util.duplicate(tmpEncoding));
       }
       return;
     }

@@ -1,6 +1,6 @@
 'use strict';
 
-var vl = require('vega-lite'),
+var Encoding = require('vega-lite/src/Encoding').default,
   consts = require('./clusterconsts'),
   util = require('../util');
 
@@ -10,7 +10,7 @@ module.exports = distance;
 distance.table = function (specs) {
   var len = specs.length,
     extendedSpecs = specs.map(function(e) { return distance.extendSpecWithEncTypeByColumnName(e); }),
-    shorthands = specs.map(vl.Encoding.shorthand),
+    shorthands = specs.map(Encoding.shorthand),
     diff = {}, i, j;
 
   for (i = 0; i < len; i++) diff[shorthands[i]] = {};
@@ -26,7 +26,7 @@ distance.table = function (specs) {
 };
 
 distance.get = function (extendedSpec1, extendedSpec2) {
-  var cols = util.union(vl.keys(extendedSpec1.encTypeByField), vl.keys(extendedSpec2.encTypeByField)),
+  var cols = util.union(util.keys(extendedSpec1.encTypeByField), util.keys(extendedSpec2.encTypeByField)),
     dist = 0;
 
   cols.forEach(function(col) {
@@ -42,8 +42,8 @@ distance.get = function (extendedSpec1, extendedSpec2) {
   });
 
   // do not group stacked chart with similar non-stacked chart!
-  var isStack1 = vl.Encoding.isStack(extendedSpec1),
-    isStack2 = vl.Encoding.isStack(extendedSpec2);
+  var isStack1 = Encoding.isStack(extendedSpec1),
+    isStack2 = Encoding.isStack(extendedSpec2);
 
   if(isStack1 || isStack2) {
     if(isStack1 && isStack2) {
@@ -62,8 +62,8 @@ distance.extendSpecWithEncTypeByColumnName = function(spec) {
   var _encTypeByField = {},
     encoding = spec.encoding;
 
-  vl.keys(encoding).forEach(function(encType) {
-    var e = vl.duplicate(encoding[encType]);
+  util.keys(encoding).forEach(function(encType) {
+    var e = util.duplicate(encoding[encType]);
     e.encType = encType;
     _encTypeByField[e.name || ''] = e;
     delete e.name;

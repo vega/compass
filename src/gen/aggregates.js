@@ -1,23 +1,31 @@
 'use strict';
 
-var vl = require('vega-lite');
+var vlEncDef = require('vega-lite/src/encdef');
+var vlSchemaUtil = require('vega-lite/src/schema/schemautil');
 
 var consts = require('../consts');
+var util = require('../util');
 
 var AUTO = '*';
 
 module.exports = genAggregates;
 
+// FIXME
+var N = consts.N;
+var O = consts.O;
+var Q = consts.Q;
+var T = consts.T;
+
 function genAggregates(output, fieldDefs, stats, opt) {
-  opt = vl.schema.util.extend(opt||{}, consts.gen.aggregates);
+  opt = vlSchemaUtil.extend(opt||{}, consts.gen.aggregates);
   var tf = new Array(fieldDefs.length);
-  var hasNorO = vl.any(fieldDefs, function(f) {
-    return vl.encDef.isTypes(f, [N, O]);
+  var hasNorO = util.any(fieldDefs, function(f) {
+    return f.type === N || f.type == O;
   });
 
   function emit(fieldSet) {
-    fieldSet = vl.duplicate(fieldSet);
-    fieldSet.key = vl.encDef.shorthands(fieldSet);
+    fieldSet = util.duplicate(fieldSet);
+    fieldSet.key = vlEncDef.shorthands(fieldSet);
     output.push(fieldSet);
   }
 
@@ -25,7 +33,7 @@ function genAggregates(output, fieldDefs, stats, opt) {
     if (opt.omitMeasureOnly || opt.omitDimensionOnly) {
       var hasMeasure = false, hasDimension = false, hasRaw = false;
       tf.forEach(function(f) {
-        if (vl.encDef.isDimension(f)) {
+        if (vlEncDef.isDimension(f)) {
           hasDimension = true;
         } else {
           hasMeasure = true;
@@ -35,7 +43,7 @@ function genAggregates(output, fieldDefs, stats, opt) {
       if (!hasDimension && !hasRaw && opt.omitMeasureOnly) return;
       if (!hasMeasure) {
         if (opt.addCountForDimensionOnly) {
-          tf.push(vl.encDef.count());
+          tf.push(vlEncDef.count());
           emit(tf);
           tf.pop();
         }
@@ -93,17 +101,17 @@ function genAggregates(output, fieldDefs, stats, opt) {
         }
       });
 
-      if ((!opt.consistentAutoQ || vl.isin(autoMode, [AUTO, 'bin', 'cast', 'autocast'])) && !hasNorO) {
-        var highCardinality = vl.encDef.cardinality(f, stats) > opt.minCardinalityForBin;
+      if ((!opt.consistentAutoQ || util.isin(autoMode, [AUTO, 'bin', 'cast', 'autocast'])) && !hasNorO) {
+        var highCardinality = vlEncDef.cardinality(f, stats) > opt.minCardinalityForBin;
 
         var isAuto = opt.genDimQ === 'auto',
           genBin = opt.genDimQ  === 'bin' || (isAuto && highCardinality),
           genCast = opt.genDimQ === 'cast' || (isAuto && !highCardinality);
 
-        if (genBin && vl.isin(autoMode, [AUTO, 'bin', 'autocast'])) {
+        if (genBin && util.isin(autoMode, [AUTO, 'bin', 'autocast'])) {
           assignBinQ(i, hasAggr, isAuto ? 'autocast' : 'bin');
         }
-        if (genCast && vl.isin(autoMode, [AUTO, 'cast', 'autocast'])) {
+        if (genCast && util.isin(autoMode, [AUTO, 'cast', 'autocast'])) {
           tf[i].type = 'O';
           assignField(i + 1, hasAggr, isAuto ? 'autocast' : 'cast');
           tf[i].type = 'Q';

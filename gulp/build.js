@@ -11,8 +11,7 @@ var watchify = require('watchify');
 var bundleDef = {
   entries: ['./src/cp'],
   standalone: 'cp',
-  debug: true,
-  transform: ['browserify-shim']
+  debug: true
 };
 
 var browserBundler = browserify(bundleDef);
