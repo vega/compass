@@ -1,7 +1,10 @@
 'use strict';
 
-var vl = require('vega-lite'),
-  genEncodings = require('./encodings'),
+var vlFieldDef = require('vega-lite/src/fielddef');
+var vlSchemaUtil = require('vega-lite/src/schema/schemautil');
+var util = require('../util');
+
+var genEncodings = require('./encodings'),
   getMarktypes = require('./marktypes'),
   rank = require('../rank/rank'),
   consts = require('../consts');
@@ -12,7 +15,7 @@ module.exports = genSpecsFromFieldDefs;
 
 function genSpecsFromFieldDefs(output, fieldDefs, stats, opt, nested) {
   // opt must be augmented before being passed to genEncodings or getMarktypes
-  opt = vl.schema.util.extend(opt||{}, consts.gen.encodings);
+  opt = vlSchemaUtil.extend(opt||{}, consts.gen.encodings);
   var encodings = genEncodings([], fieldDefs, stats, opt);
 
   if (nested) {
@@ -30,7 +33,7 @@ function genSpecsFromFieldDefs(output, fieldDefs, stats, opt, nested) {
 function genSpecsFromEncodings(output, encoding, stats, opt) {
   getMarktypes(encoding, stats, opt)
     .forEach(function(markType) {
-      var spec = vl.duplicate({
+      var spec = util.duplicate({
           // Clone config & encoding to unique objects
           encoding: encoding,
           config: opt.config
@@ -58,12 +61,12 @@ function finalTouch(spec, stats, opt) {
   // don't include zero if stdev/mean < 0.01
   // https://github.com/uwdata/visrec/issues/69
   var encoding = spec.encoding;
-  ['x', 'y'].forEach(function(encType) {
-    var field = encoding[encType];
-    if (field && vl.encDef.isMeasure(field) && !vl.encDef.isCount(field)) {
-      var stat = stats[field.name];
+  ['x', 'y'].forEach(function(channel) {
+    var fieldDef = encoding[channel];
+    if (fieldDef && vlFieldDef.isMeasure(fieldDef) && !vlFieldDef.isCount(fieldDef)) {
+      var stat = stats[fieldDef.name];
       if (stat && stat.stdev / stat.mean < 0.01) {
-        field.scale = {zero: false};
+        fieldDef.scale = {zero: false};
       }
     }
   });

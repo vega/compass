@@ -1,6 +1,6 @@
 'use strict';
 
-var vl = require('vega-lite'),
+var Encoding = require('vega-lite/src/Encoding').default,
   consts = require('./clusterconsts'),
   util = require('../util');
 
@@ -9,8 +9,8 @@ module.exports = distance;
 
 distance.table = function (specs) {
   var len = specs.length,
-    extendedSpecs = specs.map(function(e) { return distance.extendSpecWithEncTypeByColumnName(e); }),
-    shorthands = specs.map(vl.Encoding.shorthand),
+    extendedSpecs = specs.map(function(e) { return distance.extendSpecWithChannelByColumnName(e); }),
+    shorthands = specs.map(Encoding.shorthand),
     diff = {}, i, j;
 
   for (i = 0; i < len; i++) diff[shorthands[i]] = {};
@@ -26,15 +26,15 @@ distance.table = function (specs) {
 };
 
 distance.get = function (extendedSpec1, extendedSpec2) {
-  var cols = util.union(vl.keys(extendedSpec1.encTypeByField), vl.keys(extendedSpec2.encTypeByField)),
+  var cols = util.union(util.keys(extendedSpec1.channelByField), util.keys(extendedSpec2.channelByField)),
     dist = 0;
 
   cols.forEach(function(col) {
-    var e1 = extendedSpec1.encTypeByField[col], e2 = extendedSpec2.encTypeByField[col];
+    var e1 = extendedSpec1.channelByField[col], e2 = extendedSpec2.channelByField[col];
 
     if (e1 && e2) {
-      if (e1.encType != e2.encType) {
-        dist += (consts.DIST_BY_ENCTYPE[e1.encType] || {})[e2.encType] || 1;
+      if (e1.channel != e2.channel) {
+        dist += (consts.DIST_BY_CHANNEL[e1.channel] || {})[e2.channel] || 1;
       }
     } else {
       dist += consts.DIST_MISSING;
@@ -42,8 +42,8 @@ distance.get = function (extendedSpec1, extendedSpec2) {
   });
 
   // do not group stacked chart with similar non-stacked chart!
-  var isStack1 = vl.Encoding.isStack(extendedSpec1),
-    isStack2 = vl.Encoding.isStack(extendedSpec2);
+  var isStack1 = Encoding.isStack(extendedSpec1),
+    isStack2 = Encoding.isStack(extendedSpec2);
 
   if(isStack1 || isStack2) {
     if(isStack1 && isStack2) {
@@ -58,20 +58,20 @@ distance.get = function (extendedSpec1, extendedSpec2) {
 };
 
 // get encoding type by fieldname
-distance.extendSpecWithEncTypeByColumnName = function(spec) {
-  var _encTypeByField = {},
+distance.extendSpecWithChannelByColumnName = function(spec) {
+  var _channelByField = {},
     encoding = spec.encoding;
 
-  vl.keys(encoding).forEach(function(encType) {
-    var e = vl.duplicate(encoding[encType]);
-    e.encType = encType;
-    _encTypeByField[e.name || ''] = e;
+  util.keys(encoding).forEach(function(channel) {
+    var e = util.duplicate(encoding[channel]);
+    e.channel = channel;
+    _channelByField[e.name || ''] = e;
     delete e.name;
   });
 
   return {
     marktype: spec.marktype,
-    encTypeByField: _encTypeByField,
+    channelByField: _channelByField,
     encoding: spec.encoding
   };
 };

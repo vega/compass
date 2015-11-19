@@ -1,8 +1,15 @@
 "use strict";
 
-var vl = require('vega-lite'),
-  isDimension = vl.encDef.isDimension,
-  isOrdinalScale = vl.encDef.isOrdinalScale;
+var vlEnc = require('vega-lite/src/enc');
+var vlFieldDef = require('vega-lite/src/fielddef');
+var vlValidate = require('vega-lite/src/validate');
+
+var isDimension = vlFieldDef.isDimension;
+var isOrdinalScale = vlFieldDef.isOrdinalScale;
+var util = require('../util');
+
+var consts = require('../consts');
+var Type = consts.Type;
 
 var vlmarktypes = module.exports = getMarktypes;
 
@@ -22,23 +29,15 @@ function getMarktypes(encoding, stats, opt) {
 }
 
 vlmarktypes.satisfyRules = function (encoding, markType, stats, opt) {
-  var mark = vl.compiler.marks[markType],
-    reqs = mark.requiredEncoding,
-    support = mark.supportedEncoding;
-
-  for (var i in reqs) { // all required encodings in enc
-    if (!(reqs[i] in encoding)) return false;
-  }
-
-  for (var encType in encoding) { // all encodings in enc are supported
-    if (!support[encType]) return false;
-  }
-
-  return !marksRule[markType] || marksRule[markType](encoding, stats, opt);
+  return vlValidate.getEncodingMappingError({
+      marktype: markType,
+      encoding: encoding
+    }) === null &&
+    (!marksRule[markType] || marksRule[markType](encoding, stats, opt));
 };
 
 function facetRule(fieldDef, stats, opt) {
-  return vl.encDef.cardinality(fieldDef, stats) <= opt.maxCardinalityForFacets;
+  return vlFieldDef.cardinality(fieldDef, stats) <= opt.maxCardinalityForFacets;
 }
 
 function facetsRule(encoding, stats, opt) {
@@ -75,7 +74,7 @@ function pointRule(encoding, stats, opt) {
     if (opt.omitTranpose && encoding.y) return false;
 
     // dot plot shouldn't have other encoding
-    if (opt.omitDotPlotWithExtraEncoding && vl.keys(encoding).length > 1) return false;
+    if (opt.omitDotPlotWithExtraEncoding && util.keys(encoding).length > 1) return false;
 
     // dot plot with shape is non-sense
     if (encoding.shape) return false;
@@ -86,7 +85,7 @@ function pointRule(encoding, stats, opt) {
 function tickRule(encoding, stats, opt) {
   // jshint unused:false
   if (encoding.x || encoding.y) {
-    if(vl.enc.isAggregate(encoding)) return false;
+    if(vlEnc.isAggregate(encoding)) return false;
 
     var xIsDim = isDimension(encoding.x),
       yIsDim = isDimension(encoding.y);
@@ -134,7 +133,7 @@ function lineRule(encoding, stats, opt) {
   // FIXME truly ordinal data is fine here too.
   // Line chart should be only horizontal
   // and use only temporal data
-  return encoding.x.type == 'T' && encoding.x.timeUnit && encoding.y.type == 'Q' && encoding.y.aggregate;
+  return encoding.x.type == Type.Temporal && encoding.x.timeUnit && encoding.y.type == Type.Quantitative && encoding.y.aggregate;
 }
 
 function areaRule(encoding, stats, opt) {

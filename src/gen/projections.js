@@ -1,9 +1,11 @@
 'use strict';
 
+var vlFieldDef = require('vega-lite/src/fielddef');
+var vlSchemaUtil = require('vega-lite/src/schema/schemautil');
+
 var util = require('../util'),
   consts = require('../consts'),
-  vl = require('vega-lite'),
-  isDimension = vl.encDef.isDimension;
+  isDimension = vlFieldDef.isDimension;
 
 module.exports = projections;
 
@@ -16,7 +18,7 @@ module.exports = projections;
  * @return {[type]}        [description]
  */
 function projections(fieldDefs, stats, opt) {
-  opt = vl.schema.util.extend(opt||{}, consts.gen.projections);
+  opt = vlSchemaUtil.extend(opt||{}, consts.gen.projections);
 
   // First categorize field, selected, fieldsToAdd, and save indices
   var selected = [], fieldsToAdd = [], fieldSets = [],
@@ -30,15 +32,15 @@ function projections(fieldDefs, stats, opt) {
 
     if (fieldDef.selected) {
       selected.push(fieldDef);
-      if (isDimension(fieldDef) || fieldDef.type ==='T') { // FIXME / HACK
+      if (isDimension(fieldDef) || fieldDef.type ==='temporal') { // FIXME / HACK
         hasSelectedDimension = true;
       } else {
         hasSelectedMeasure = true;
       }
-    } else if (fieldDef.selected !== false && !vl.encDef.isCount(fieldDef)) {
-      if (vl.encDef.isDimension(fieldDef) &&
+    } else if (fieldDef.selected !== false && !vlFieldDef.isCount(fieldDef)) {
+      if (vlFieldDef.isDimension(fieldDef) &&
           !opt.maxCardinalityForAutoAddOrdinal &&
-          vl.encDef.cardinality(fieldDef, stats, 15) > opt.maxCardinalityForAutoAddOrdinal
+          vlFieldDef.cardinality(fieldDef, stats, 15) > opt.maxCardinalityForAutoAddOrdinal
         ) {
         return;
       }
@@ -67,10 +69,10 @@ function projections(fieldDefs, stats, opt) {
 }
 
 var typeIsMeasureScore = {
-  N: 0,
-  O: 0,
-  T: 2,
-  Q: 3
+  nominal: 0,
+  ordinal: 0,
+  temporal: 2,
+  quantitative: 3
 };
 
 function compareFieldsToAdd(hasSelectedDimension, hasSelectedMeasure, indices) {
@@ -89,8 +91,8 @@ function compareFieldsToAdd(hasSelectedDimension, hasSelectedMeasure, indices) {
 }
 
 projections.key = function(projection) {
-  return projection.map(function(field) {
-    return vl.encDef.isCount(field) ? 'count' : field.name;
+  return projection.map(function(fieldDef) {
+    return vlFieldDef.isCount(fieldDef) ? 'count' : fieldDef.name;
   }).join(',');
 };
 

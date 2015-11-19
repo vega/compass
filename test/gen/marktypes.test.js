@@ -34,7 +34,7 @@ describe('cp.gen.marktypes()', function(){
   describe('1Q', function () {
     var encoding, marktypes;
     beforeEach(function() {
-      encoding = {"x": {"name": "Cost__Total_$","type": "Q"}};
+      encoding = {"x": {"name": "Cost__Total_$","type": "quantitative"}};
       marktypes = getMarkTypes(encoding, {}, opt);
     });
     it('should contain tick', function () {
@@ -65,9 +65,9 @@ describe('cp.gen.marktypes()', function(){
     describe('with stacked average', function () {
       it('should not be generated', function () {
         var encoding = {
-          "color": {"selected": true,"name": "When__Phase_of_flight","type": "O"},
-          "x": {"name": "Cost__Total_$","type": "Q","aggregate": "mean"},
-          "y": {"selected": undefined,"name": "Aircraft__Airline_Operator","type": "O"}
+          "color": {"name": "When__Phase_of_flight","type": "ordinal"},
+          "x": {"name": "Cost__Total_$","type": "quantitative","aggregate": "mean"},
+          "y": {"selected": undefined,"name": "Aircraft__Airline_Operator","type": "ordinal"}
         };
 
         var marktypes = getMarkTypes(encoding, {}, opt);
@@ -76,11 +76,11 @@ describe('cp.gen.marktypes()', function(){
     });
 
     describe('with stacked sum', function () {
-      it('should not be generated', function () {
+      it('should be generated', function () {
         var encoding = {
-          "color": {"selected": true,"name": "When__Phase_of_flight","type": "O"},
-          "x": {"name": "Cost__Total_$","type": "Q","aggregate": "sum"},
-          "y": {"selected": undefined,"name": "Aircraft__Airline_Operator","type": "O"}
+          "color": {"name": "When__Phase_of_flight","type": "ordinal"},
+          "x": {"name": "Cost__Total_$","type": "quantitative","aggregate": "sum"},
+          "y": {"name": "Aircraft__Airline_Operator","type": "ordinal"}
         };
         var marktypes = getMarkTypes(encoding, {}, opt);
         expect(marktypes.indexOf('bar')).to.gt(-1);
@@ -104,13 +104,13 @@ describe('cp.gen.marktypes()', function(){
       var encoding = {
         "col": {
           "name": "Effect__Amount_of_damage",
-          "type": "O",
+          "type": "ordinal",
         },
         "size": {
-          "name": "Cost__Repair","type": "Q","aggregate": "mean"
+          "name": "Cost__Repair","type": "quantitative","aggregate": "mean"
         },
         "text": {
-          "name": "Cost__Total_$","type": "Q","aggregate": "mean"
+          "name": "Cost__Total_$","type": "quantitative","aggregate": "mean"
         }
       };
 
