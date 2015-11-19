@@ -1,3 +1,5 @@
+// FIXME: rename to rankSpecs
+
 'use strict';
 
 var vlEnc = require('vega-lite/src/enc'),
@@ -6,6 +8,8 @@ var vlEnc = require('vega-lite/src/enc'),
   vlChannel = require('vega-lite/src/channel'),
   isDimension = vlFieldDef.isDimension,
   util = require('../util');
+
+var vlShorthand = require('vega-lite/src/shorthand');
 
 var consts = require('../consts');
 var Type = consts.Type;
@@ -33,7 +37,7 @@ function rankEncodings(spec, stats, opt, selected) {
     encoding = spec.encoding;
 
   var encodingMappingByField = vlEnc.reduce(spec.encoding, function(o, fieldDef, channel) {
-    var key = vlFieldDef.shorthand(fieldDef);
+    var key = vlShorthand.parseFieldDef(fieldDef);
     var mappings = o[key] = o[key] || [];
     mappings.push({channel: channel, fieldDef: fieldDef});
     return o;

@@ -1,6 +1,7 @@
 'use strict';
 
-var Encoding = require('vega-lite/src/Encoding').default,
+var vlSpec = require('vega-lite/src/spec'),
+  vlShorthand = require('vega-lite/src/shorthand'),
   consts = require('./clusterconsts'),
   util = require('../util');
 
@@ -10,7 +11,7 @@ module.exports = distance;
 distance.table = function (specs) {
   var len = specs.length,
     extendedSpecs = specs.map(function(e) { return distance.extendSpecWithChannelByColumnName(e); }),
-    shorthands = specs.map(Encoding.shorthand),
+    shorthands = specs.map(vlShorthand.shorten),
     diff = {}, i, j;
 
   for (i = 0; i < len; i++) diff[shorthands[i]] = {};
@@ -42,8 +43,8 @@ distance.get = function (extendedSpec1, extendedSpec2) {
   });
 
   // do not group stacked chart with similar non-stacked chart!
-  var isStack1 = Encoding.isStack(extendedSpec1),
-    isStack2 = Encoding.isStack(extendedSpec2);
+  var isStack1 = vlSpec.isStack(extendedSpec1),
+    isStack2 = vlSpec.isStack(extendedSpec2);
 
   if(isStack1 || isStack2) {
     if(isStack1 && isStack2) {

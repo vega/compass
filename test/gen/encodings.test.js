@@ -39,7 +39,7 @@ describe('cp.gen.encs()', function () {
     beforeEach(function() {
       f = fixture['#xB(Q)'];
       encodings = genEncodings([], f.fields, f.stats, opt);
-      encShorthands = encodings.map(vl.enc.shorthand);
+      encShorthands = encodings.map(vl.shorthand.shortenEncoding);
     });
 
     it('should show only vertical bar/plots', function() {
@@ -54,7 +54,7 @@ describe('cp.gen.encs()', function () {
     beforeEach(function() {
       f = fixture['#xT'];
       encodings = genEncodings([], f.fields, f.stats, opt);
-      encShorthands = encodings.map(vl.enc.shorthand);
+      encShorthands = encodings.map(vl.shorthand.shortenEncoding);
     });
 
     it('should show only vertical bar/plots', function() {
@@ -68,7 +68,7 @@ describe('cp.gen.encs()', function () {
     beforeEach(function() {
       f = fixture['#xYR(T)'];
       encodings = genEncodings([], f.fields, f.stats, opt);
-      encShorthands = encodings.map(vl.enc.shorthand);
+      encShorthands = encodings.map(vl.shorthand.shortenEncoding);
     });
 
     it('should show only vertical bar/plots', function() {
@@ -82,7 +82,7 @@ describe('cp.gen.encs()', function () {
     beforeEach(function() {
       f = fixture['QxT'];
       encodings = genEncodings([], f.fields, f.stats, opt);
-      encShorthands = encodings.map(vl.enc.shorthand);
+      encShorthands = encodings.map(vl.shorthand.shortenEncoding);
     });
     it('should show only vertical bar/plots', function() {
       expect(encShorthands.indexOf('x=1,Q|y=2,T')).to.equal(-1);
@@ -95,9 +95,7 @@ describe('cp.gen.encs()', function () {
   // });
 
   // describe('QxA(Q),', function() {
-  //   var f = fixture['OxA(Q)'];
-  //   var encs = genEncodings([], f.fields, f.stats, opt);
-  //   console.log('QxA(Q)', encs.map(vl.enc.shorthand));
+  //
   // });
 
   describe('OxOxQ', function () {

@@ -2,6 +2,7 @@
 
 var vlFieldDef = require('vega-lite/src/fielddef');
 var vlSchemaUtil = require('vega-lite/src/schema/schemautil');
+var vlShorthand = require('vega-lite/src/shorthand');
 
 var consts = require('../consts');
 var Type = consts.Type;
@@ -21,7 +22,7 @@ function genAggregates(output, fieldDefs, stats, opt) {
 
   function emit(fieldSet) {
     fieldSet = util.duplicate(fieldSet);
-    fieldSet.key = vlFieldDef.shorthands(fieldSet);
+    fieldSet.key = vlShorthand.parseFieldDefs(fieldSet);
     output.push(fieldSet);
   }
 
