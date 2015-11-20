@@ -1,6 +1,6 @@
 "use strict";
 
-var vlEnc = require('vega-lite/src/enc');
+var vlEncoding = require('vega-lite/src/encoding');
 var vlFieldDef = require('vega-lite/src/fielddef');
 var vlValidate = require('vega-lite/src/validate');
 
@@ -85,7 +85,7 @@ function pointRule(encoding, stats, opt) {
 function tickRule(encoding, stats, opt) {
   // jshint unused:false
   if (encoding.x || encoding.y) {
-    if(vlEnc.isAggregate(encoding)) return false;
+    if(vlEncoding.isAggregate(encoding)) return false;
 
     var xIsDim = isDimension(encoding.x),
       yIsDim = isDimension(encoding.y);

@@ -1,7 +1,7 @@
 "use strict";
 
 var vlFieldDef = require('vega-lite/src/fielddef');
-var vlEnc = require('vega-lite/src/enc');
+var vlEncoding = require('vega-lite/src/encoding');
 var util = require('../util');
 
 var genMarkTypes = require('./marktypes'),
@@ -100,7 +100,7 @@ function dimMeaTransposeRule(encoding) {
 }
 
 function generalRules(encoding, stats, opt) {
-  // enc.text is only used for TEXT TABLE
+  // encoding.text is only used for TEXT TABLE
   if (encoding.text) {
     return genMarkTypes.satisfyRules(encoding, 'text', stats, opt);
   }
@@ -123,7 +123,7 @@ function generalRules(encoding, stats, opt) {
       var isDimX = !!isDimension(encoding.x),
         isDimY = !!isDimension(encoding.y);
 
-      if (isDimX && isDimY && !vlEnc.isAggregate(encoding)) {
+      if (isDimX && isDimY && !vlEncoding.isAggregate(encoding)) {
         // FIXME actually check if there would be occlusion #90
         return false;
       }
@@ -181,7 +181,7 @@ genEncodings.isAggrWithAllDimOnFacets = function (encoding) {
 
 
 function genEncodings(encodings, fieldDefs, stats, opt) {
-  // generate a collection vega-lite's enc
+  // generate a collection vega-lite's encoding
   var tmpEncoding = {};
 
   function assignField(i) {

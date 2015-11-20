@@ -103,8 +103,8 @@ describe('cp.gen.encodings()', function () {
 
     it('should contain colored scatter plot', function() {
       // var filtered = encodings.filter(function(encoding) {
-      //   var enc = encoding.encoding;
-      //   return encoding.marktype==='point' && enc.x && enc.y && enc.color;
+      //   var encoding = encoding.encoding;
+      //   return encoding.marktype==='point' && encoding.x && encoding.y && encoding.color;
       // });
       // FIXME(kanitw): Jul 19, 2015 - write test!
     });

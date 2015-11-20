@@ -2,7 +2,7 @@
 
 'use strict';
 
-var vlEnc = require('vega-lite/src/enc'),
+var vlEncoding = require('vega-lite/src/encoding'),
   vlFieldDef = require('vega-lite/src/fielddef'),
   vlConsts = require('vega-lite/src/consts'),
   vlChannel = require('vega-lite/src/channel'),
@@ -36,7 +36,7 @@ function rankEncodings(spec, stats, opt, selected) {
     marktype = spec.marktype,
     encoding = spec.encoding;
 
-  var encodingMappingByField = vlEnc.reduce(spec.encoding, function(o, fieldDef, channel) {
+  var encodingMappingByField = vlEncoding.reduce(spec.encoding, function(o, fieldDef, channel) {
     var key = vlShorthand.parseFieldDef(fieldDef);
     var mappings = o[key] = o[key] || [];
     mappings.push({channel: channel, fieldDef: fieldDef});

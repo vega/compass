@@ -107,8 +107,8 @@ describe('cp.gen.encs()', function () {
     it('without stats about occlusion, it should not include charts with both O\'s on axes', function() {
       var encodings = genEncodings([], f.fields, f.stats, opt);
 
-      var filtered = encodings.filter(function(enc){
-        return enc.x.type === 'ordinal' && enc.y.type === 'ordinal';
+      var filtered = encodings.filter(function(encoding){
+        return encoding.x.type === 'ordinal' && encoding.y.type === 'ordinal';
       });
 
       expect(filtered.length).to.equal(0);
