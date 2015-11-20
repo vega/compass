@@ -22,7 +22,9 @@ function genAggregates(output, fieldDefs, stats, opt) {
 
   function emit(fieldSet) {
     fieldSet = util.duplicate(fieldSet);
-    fieldSet.key = vlShorthand.parseFieldDefs(fieldSet);
+    fieldSet.key = fieldSet.map(function(fieldDef) {
+      return vlShorthand.shortenFieldDef(fieldDef);
+    }).join(vlShorthand.DELIM);
     output.push(fieldSet);
   }
 
