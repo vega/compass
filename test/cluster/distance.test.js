@@ -8,18 +8,18 @@ describe('cp.cluster.distance.get()', function () {
     var table1 = {
       "marktype": "text",
       "encoding": {
-        "row": {"name": "Effect__Amount_of_damage","type": "ordinal"},
-        "column": {"name": "Aircraft__Airline_Operator","type": "ordinal"},
-        "text": {"name": "*","aggregate": "count","type": "quantitative","displayName": "Number of Records"}
+        "row": {"field": "Effect__Amount_of_damage","type": "ordinal"},
+        "column": {"field": "Aircraft__Airline_Operator","type": "ordinal"},
+        "text": {"field": "*","aggregate": "count","type": "quantitative","displayName": "Number of Records"}
       }
     };
 
     var table2 = {
       "marktype": "text",
       "encoding": {
-        "column": {"name": "Effect__Amount_of_damage","type": "ordinal"},
-        "row": {"name": "Aircraft__Airline_Operator","type": "ordinal"},
-        "text": {"name": "*","aggregate": "count","type": "quantitative","displayName": "Number of Records"}
+        "column": {"field": "Effect__Amount_of_damage","type": "ordinal"},
+        "row": {"field": "Aircraft__Airline_Operator","type": "ordinal"},
+        "text": {"field": "*","aggregate": "count","type": "quantitative","displayName": "Number of Records"}
       }
     };
 

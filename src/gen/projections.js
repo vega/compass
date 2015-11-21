@@ -28,7 +28,7 @@ function projections(fieldDefs, stats, opt) {
 
   fieldDefs.forEach(function(fieldDef, index){
     //save indices for stable sort later
-    indices[fieldDef.name] = index;
+    indices[fieldDef.field] = index;
 
     if (fieldDef.selected) {
       selected.push(fieldDef);
@@ -86,13 +86,13 @@ function compareFieldsToAdd(hasSelectedDimension, hasSelectedMeasure, indices) {
       }
     }
     //make the sort stable
-    return indices[a.name] - indices[b.name];
+    return indices[a.field] - indices[b.field];
   };
 }
 
 projections.key = function(projection) {
   return projection.map(function(fieldDef) {
-    return vlFieldDef.isCount(fieldDef) ? 'count' : fieldDef.name;
+    return vlFieldDef.isCount(fieldDef) ? 'count' : fieldDef.field;
   }).join(',');
 };
 

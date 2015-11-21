@@ -24,7 +24,7 @@ describe('cp.gen.projections()', function () {
       for (var i=0; i<projections.length-1 ; i++) {
         var a = projections[i][0], b=projections[i+1][0];
         if (a.type === b.type) {
-          expect(a.name).to.lt(b.name);
+          expect(a.field).to.lt(b.field);
         }
       }
     });
@@ -32,10 +32,10 @@ describe('cp.gen.projections()', function () {
 
   describe('with a set of fields', function () {
     var fields = [
-      {name:1, selected: true},
-      {name:2, selected: true},
-      {name:3, selected: undefined},
-      {name:4, selected: undefined}
+      {field:1, selected: true},
+      {field:2, selected: true},
+      {field:3, selected: undefined},
+      {field:4, selected: undefined}
     ];
 
     var projections = genProjections(fields);
@@ -45,8 +45,8 @@ describe('cp.gen.projections()', function () {
     });
 
     it('should keep selected field as first items', function () {
-      expect(projections[2][0].name).to.equal(1);
-      expect(projections[2][1].name).to.equal(2);
+      expect(projections[2][0].field).to.equal(1);
+      expect(projections[2][1].field).to.equal(2);
     });
 
     it('should add projection key', function () {

@@ -64,7 +64,7 @@ function finalTouch(spec, stats, opt) {
   ['x', 'y'].forEach(function(channel) {
     var fieldDef = encoding[channel];
     if (fieldDef && vlFieldDef.isMeasure(fieldDef) && !vlFieldDef.isCount(fieldDef)) {
-      var stat = stats[fieldDef.name];
+      var stat = stats[fieldDef.field];
       if (stat && stat.stdev / stat.mean < 0.01) {
         fieldDef.scale = {zero: false};
       }

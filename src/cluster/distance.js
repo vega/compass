@@ -48,7 +48,7 @@ distance.get = function (extendedSpec1, extendedSpec2) {
 
   if(isStack1 || isStack2) {
     if(isStack1 && isStack2) {
-      if(extendedSpec1.encoding.color.name !== extendedSpec2.encoding.color.name) {
+      if(extendedSpec1.encoding.color.field !== extendedSpec2.encoding.color.field) {
         dist+=1;
       }
     } else {
@@ -66,8 +66,8 @@ distance.extendSpecWithChannelByColumnName = function(spec) {
   util.keys(encoding).forEach(function(channel) {
     var e = util.duplicate(encoding[channel]);
     e.channel = channel;
-    _channelByField[e.name || ''] = e;
-    delete e.name;
+    _channelByField[e.field || ''] = e;
+    delete e.field;
   });
 
   return {

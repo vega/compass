@@ -34,7 +34,7 @@ describe('cp.gen.marktypes()', function(){
   describe('1Q', function () {
     var encoding, marktypes;
     beforeEach(function() {
-      encoding = {"x": {"name": "Cost__Total_$","type": "quantitative"}};
+      encoding = {"x": {"field": "Cost__Total_$","type": "quantitative"}};
       marktypes = getMarkTypes(encoding, {}, opt);
     });
     it('should contain tick', function () {
@@ -65,9 +65,9 @@ describe('cp.gen.marktypes()', function(){
     describe('with stacked average', function () {
       it('should not be generated', function () {
         var encoding = {
-          "color": {"name": "When__Phase_of_flight","type": "ordinal"},
-          "x": {"name": "Cost__Total_$","type": "quantitative","aggregate": "mean"},
-          "y": {"selected": undefined,"name": "Aircraft__Airline_Operator","type": "ordinal"}
+          "color": {"field": "When__Phase_of_flight","type": "ordinal"},
+          "x": {"field": "Cost__Total_$","type": "quantitative","aggregate": "mean"},
+          "y": {"selected": undefined,"field": "Aircraft__Airline_Operator","type": "ordinal"}
         };
 
         var marktypes = getMarkTypes(encoding, {}, opt);
@@ -78,9 +78,9 @@ describe('cp.gen.marktypes()', function(){
     describe('with stacked sum', function () {
       it('should be generated', function () {
         var encoding = {
-          "color": {"name": "When__Phase_of_flight","type": "ordinal"},
-          "x": {"name": "Cost__Total_$","type": "quantitative","aggregate": "sum"},
-          "y": {"name": "Aircraft__Airline_Operator","type": "ordinal"}
+          "color": {"field": "When__Phase_of_flight","type": "ordinal"},
+          "x": {"field": "Cost__Total_$","type": "quantitative","aggregate": "sum"},
+          "y": {"field": "Aircraft__Airline_Operator","type": "ordinal"}
         };
         var marktypes = getMarkTypes(encoding, {}, opt);
         expect(marktypes.indexOf('bar')).to.gt(-1);
@@ -103,14 +103,14 @@ describe('cp.gen.marktypes()', function(){
     it('should not contain size', function() {
       var encoding = {
         "column": {
-          "name": "Effect__Amount_of_damage",
+          "field": "Effect__Amount_of_damage",
           "type": "ordinal",
         },
         "size": {
-          "name": "Cost__Repair","type": "quantitative","aggregate": "mean"
+          "field": "Cost__Repair","type": "quantitative","aggregate": "mean"
         },
         "text": {
-          "name": "Cost__Total_$","type": "quantitative","aggregate": "mean"
+          "field": "Cost__Total_$","type": "quantitative","aggregate": "mean"
         }
       };
 

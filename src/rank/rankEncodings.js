@@ -46,14 +46,14 @@ function rankEncodings(spec, stats, opt, selected) {
   util.forEach(encodingMappingByField, function(mappings) {
     var reasons = mappings.map(function(m) {
         return m.channel + vlShorthand.Assign + vlShorthand.shortenFieldDef(m.fieldDef) +
-          ' ' + (selected && selected[m.fieldDef.name] ? '[x]' : '[ ]');
+          ' ' + (selected && selected[m.fieldDef.field] ? '[x]' : '[ ]');
       }),
       scores = mappings.map(function(m) {
         var role = vlFieldDef.isDimension(m.fieldDef) ? 'dimension' : 'measure';
 
         var score = rankEncodings.score[role](m.fieldDef, m.channel, spec.marktype, stats, opt);
 
-        return !selected || selected[m.fieldDef.name] ? score : Math.pow(score, 0.125);
+        return !selected || selected[m.fieldDef.field] ? score : Math.pow(score, 0.125);
       });
 
     features.push({

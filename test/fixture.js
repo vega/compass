@@ -8,15 +8,15 @@ var fixture = module.exports = {};
 
 var stats = fixture.stats = {};
 
-var count = {name:'*', type:'quantitative', aggregate:'count'},
+var count = {field:'*', type:'quantitative', aggregate:'count'},
   count_stat = {min:0, max:100};
 
-var O_15 = {name: 'O_15', type: 'ordinal'},
+var O_15 = {field: 'O_15', type: 'ordinal'},
   O_15_stat = {distinct: 15},
-  O_30 = {name:'O_30', type:'ordinal'},
+  O_30 = {field:'O_30', type:'ordinal'},
   O_30_stat = {distinct: 30};
 
-var q10 = {name: 'Q_10', type: 'quantitative'},
+var q10 = {field: 'Q_10', type: 'quantitative'},
   q10_stat = {distinct: 10, min:0, max:150};
 
 var o_stat = {distinct: 5},
@@ -101,7 +101,7 @@ stats['#xT'] = {
 
 
 fixture['O'] = {
-  fields: [{name:1, type:'ordinal'}],
+  fields: [{field:1, type:'ordinal'}],
   stats: {1: o_stat}
 };
 
@@ -117,23 +117,23 @@ fixture['O_30'] = {
 
 fixture['OxQ'] = {
   fields: [
-      {name:1, type:'ordinal'},
-      {name:2, type:'quantitative'}
+      {field:1, type:'ordinal'},
+      {field:2, type:'quantitative'}
   ],
   stats: stats['OxQ']
 };
 
 fixture['OxA(Q)'] = {
   fields: [
-      {name:1, type:'ordinal'},
-      {name:2, type:'quantitative', aggregate: "mean"}
+      {field:1, type:'ordinal'},
+      {field:2, type:'quantitative', aggregate: "mean"}
   ],
   stats: stats['OxQ']
 };
 
 
 fixture['Ox#'] = {
-  fields: [{name:1, type:'ordinal'}, count],
+  fields: [{field:1, type:'ordinal'}, count],
   stats: stats['Ox#']
 };
 
@@ -144,8 +144,8 @@ fixture['O_30x#'] = {
 
 fixture['OxOx#'] = {
   fields: [
-    {name:1, type:'ordinal'},
-    {name:2, type:'ordinal'},
+    {field:1, type:'ordinal'},
+    {field:2, type:'ordinal'},
     count
   ],
   stats: stats.OxO
@@ -153,9 +153,9 @@ fixture['OxOx#'] = {
 
 fixture.OxOxQ = {
   fields: [
-    {name:1, type:'ordinal'},
-    {name:2, type:'ordinal'},
-    {name:3, type:'quantitative'}
+    {field:1, type:'ordinal'},
+    {field:2, type:'ordinal'},
+    {field:3, type:'quantitative'}
   ],
   stats: stats.OxOxQ
 };
@@ -163,37 +163,37 @@ fixture.OxOxQ = {
 
 fixture['OxOxA(Q)'] = {
   fields: [
-    {name:1, type:'ordinal'},
-    {name:2, type:'ordinal'},
-    {name:3, type:'quantitative', aggregate:'sum'}
+    {field:1, type:'ordinal'},
+    {field:2, type:'ordinal'},
+    {field:3, type:'quantitative', aggregate:'sum'}
   ],
   stats: stats.OxOxQ
 };
 
 fixture.OxQxQ = {
   fields: [
-    {name:1, type:'ordinal'},
-    {name:2, type:'quantitative'},
-    {name:3, type:'quantitative'}
+    {field:1, type:'ordinal'},
+    {field:2, type:'quantitative'},
+    {field:3, type:'quantitative'}
   ],
   stats: stats.OxQxQ
 };
 
 fixture['OxA(Q)xA(Q)'] = {
   fields: [
-    {name:1, type:'ordinal'},
-    {aggregate:'mean', name:2, type:'quantitative'},
-    {aggregate:'mean', name:3, type:'quantitative'}
+    {field:1, type:'ordinal'},
+    {aggregate:'mean', field:2, type:'quantitative'},
+    {aggregate:'mean', field:3, type:'quantitative'}
   ],
   stats: stats.OxQxQ
 };
 
 fixture['OxQxQxQ'] = {
   fields: [
-    {name:1, type: 'ordinal'},
-    {name:2, type: 'quantitative'},
-    {name:3, type: 'quantitative'},
-    {name:4, type: 'quantitative'}
+    {field:1, type: 'ordinal'},
+    {field:2, type: 'quantitative'},
+    {field:3, type: 'quantitative'},
+    {field:4, type: 'quantitative'}
   ],
   stats: {
     1: o_stat,
@@ -205,11 +205,11 @@ fixture['OxQxQxQ'] = {
 
 fixture['OxOxQxQx#'] = {
   fields: [
-    {name:1, type:'quantitative', selected: undefined},
-    {name:2, type:'quantitative', selected: undefined},
-    {name:3, type:'ordinal', selected: undefined},
-    {name:4, type:'ordinal', selected: undefined},
-    {name:'*', aggregate:'count', selected: undefined}
+    {field:1, type:'quantitative', selected: undefined},
+    {field:2, type:'quantitative', selected: undefined},
+    {field:3, type:'ordinal', selected: undefined},
+    {field:4, type:'ordinal', selected: undefined},
+    {field:'*', aggregate:'count', selected: undefined}
   ],
   stats: {
     1: q_stat,
@@ -222,7 +222,7 @@ fixture['OxOxQxQx#'] = {
 
 
 fixture['Q'] = {
-  fields: [{name:1, type:'quantitative'}],
+  fields: [{field:1, type:'quantitative'}],
   stats: {1: q_stat}
 };
 
@@ -232,40 +232,40 @@ fixture['Q_10'] = {
 };
 
 fixture['BIN(Q)'] = {
-  fields: [{name:1, type:'quantitative', bin: {maxbins: 15}}],
+  fields: [{field:1, type:'quantitative', bin: {maxbins: 15}}],
   stats: {1: q_stat}
 };
 
 fixture['QxQ'] = {
-  fields: [{name:1, type:'quantitative'}, {name:2, type:'quantitative'}],
+  fields: [{field:1, type:'quantitative'}, {field:2, type:'quantitative'}],
   stats: stats['QxQ']
 };
 
 fixture['Qx#'] = {
-  fields: [{name:1, type:'quantitative'}, count],
+  fields: [{field:1, type:'quantitative'}, count],
   stats: stats.Q
 };
 
 fixture['QxT'] = {
   fields: [
-    {name:1, type:'quantitative'},
-    {name:2, type:'temporal'}
+    {field:1, type:'quantitative'},
+    {field:2, type:'temporal'}
   ],
   stats: stats['QxT']
 };
 
 fixture['QxYEAR(T)'] = {
   fields: [
-    {name:1, type:'quantitative'},
-    {name:2, type:'temporal', timeUnit: 'year'}
+    {field:1, type:'quantitative'},
+    {field:2, type:'temporal', timeUnit: 'year'}
   ],
   stats: stats['QxT']
 };
 
 fixture['A(Q)xYEAR(T)'] = {
   fields: [
-    {name:1, type:'quantitative', aggregate: 'mean'},
-    {name:2, type:'temporal', timeUnit: 'year'}
+    {field:1, type:'quantitative', aggregate: 'mean'},
+    {field:2, type:'temporal', timeUnit: 'year'}
   ],
   stats: stats['QxT']
 };
@@ -273,8 +273,8 @@ fixture['A(Q)xYEAR(T)'] = {
 
 fixture['B(Q)xB(Q)x#'] = {
   fields: [
-    {name:1, type:'quantitative', bin: {maxbins: 15}},
-    {name:2, type:'quantitative', bin: {maxbins: 15}},
+    {field:1, type:'quantitative', bin: {maxbins: 15}},
+    {field:2, type:'quantitative', bin: {maxbins: 15}},
     count
   ],
   stats: stats.QxQ
@@ -291,100 +291,100 @@ fixture['#'] = {
 fixture['#xB(Q)'] = {
   fields: [
       count,
-      {name:2, type:'quantitative', bin: {maxbins: 15}}
+      {field:2, type:'quantitative', bin: {maxbins: 15}}
   ],
   stats: stats['#xQ']
 };
 
 fixture['#xYR(T)'] = {
   fields: [
-      {name:'*', type:'quantitative', aggregate:'count'},
-      {name:2, type:'temporal', timeUnit:'year'}
+      {field:'*', type:'quantitative', aggregate:'count'},
+      {field:2, type:'temporal', timeUnit:'year'}
   ],
   stats: stats['#xT']
 };
 
 fixture['#xT'] = {
   fields: [
-      {name:'*', type:'quantitative', aggregate:'count'},
-      {name:2, type:'temporal'}
+      {field:'*', type:'quantitative', aggregate:'count'},
+      {field:2, type:'temporal'}
   ],
   stats: stats['#xT']
 };
 
 fixture.birdstrikes = {};
 fixture.birdstrikes.fields = [{
-  "name": "Aircraft__Airline_Operator",
+  "field": "Aircraft__Airline_Operator",
   "type": "ordinal",
   "$$hashKey": "object:12",
   "_any": true
 }, {
-  "name": "Aircraft__Make_Model",
+  "field": "Aircraft__Make_Model",
   "type": "ordinal",
   "$$hashKey": "object:13",
   "_any": true
 }, {
-  "name": "Airport__Name",
+  "field": "Airport__Name",
   "type": "ordinal",
   "$$hashKey": "object:14",
   "_any": true
 }, {
-  "name": "Effect__Amount_of_damage",
+  "field": "Effect__Amount_of_damage",
   "type": "ordinal",
   "$$hashKey": "object:15",
   "_any": true
 }, {
-  "name": "Origin_State",
+  "field": "Origin_State",
   "type": "ordinal",
   "$$hashKey": "object:16",
   "_any": true
 }, {
-  "name": "When__Phase_of_flight",
+  "field": "When__Phase_of_flight",
   "type": "ordinal",
   "$$hashKey": "object:17",
   "_any": true
 }, {
-  "name": "When__Time_of_day",
+  "field": "When__Time_of_day",
   "type": "ordinal",
   "$$hashKey": "object:18",
   "_any": true
 }, {
-  "name": "Wildlife__Size",
+  "field": "Wildlife__Size",
   "type": "ordinal",
   "$$hashKey": "object:19",
   "_any": true
 }, {
-  "name": "Wildlife__Species",
+  "field": "Wildlife__Species",
   "type": "ordinal",
   "$$hashKey": "object:20",
   "_any": true
 }, {
-  "name": "Flight_Date",
+  "field": "Flight_Date",
   "type": "temporal",
   "$$hashKey": "object:21",
   "_any": true
 }, {
-  "name": "Cost__Other",
+  "field": "Cost__Other",
   "type": "quantitative",
   "$$hashKey": "object:22",
   "_any": true
 }, {
-  "name": "Cost__Repair",
+  "field": "Cost__Repair",
   "type": "quantitative",
   "$$hashKey": "object:23",
   "_any": true
 }, {
-  "name": "Cost__Total_$",
+  "field": "Cost__Total_$",
   "type": "quantitative",
   "$$hashKey": "object:24",
   "_any": true
 }, {
-  "name": "Speed_IAS_in_knots",
+  "field": "Speed_IAS_in_knots",
   "type": "quantitative",
   "$$hashKey": "object:25",
   "_any": true
 }, {
-  "name": "*",
+  "field": "*",
   "aggregate": "count",
   "type": "quantitative",
   "displayName": "Number of Records",
