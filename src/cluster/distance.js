@@ -30,8 +30,8 @@ distance.get = function (extendedSpec1, extendedSpec2) {
   var cols = util.union(util.keys(extendedSpec1.channelByField), util.keys(extendedSpec2.channelByField)),
     dist = 0;
 
-  cols.forEach(function(col) {
-    var e1 = extendedSpec1.channelByField[col], e2 = extendedSpec2.channelByField[col];
+  cols.forEach(function(column) {
+    var e1 = extendedSpec1.channelByField[column], e2 = extendedSpec2.channelByField[column];
 
     if (e1 && e2) {
       if (e1.channel != e2.channel) {

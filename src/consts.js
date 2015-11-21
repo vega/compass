@@ -9,7 +9,7 @@ var consts = module.exports = {
 consts.X = 'x';
 consts.Y = 'y';
 consts.ROW = 'row';
-consts.COL = 'col';
+consts.COL = 'column';
 consts.SIZE = 'size';
 consts.SHAPE = 'shape';
 consts.COLOR = 'color';
@@ -124,7 +124,7 @@ consts.gen.encodings = {
     encodingTypeList: {
       type: 'array',
       items: {type: 'string'},
-      default: ['x', 'y', 'row', 'col', 'size', 'color', 'text', 'detail'],
+      default: ['x', 'y', 'row', 'column', 'size', 'color', 'text', 'detail'],
       description: 'allowed encoding types'
     },
     requiredEncodings: {
@@ -141,12 +141,12 @@ consts.gen.encodings = {
     maxGoodCardinalityForFacets: {
       type: 'integer',
       default: 5,
-      description: 'maximum cardinality of an ordinal variable to be put on facet (row/col) effectively'
+      description: 'maximum cardinality of an ordinal variable to be put on facet (row/column) effectively'
     },
     maxCardinalityForFacets: {
       type: 'integer',
       default: 20,
-      description: 'maximum cardinality of an ordinal variable to be put on facet (row/col)'
+      description: 'maximum cardinality of an ordinal variable to be put on facet (row/column)'
     },
     maxGoodCardinalityForColor: {
       type: 'integer',
@@ -188,7 +188,7 @@ consts.gen.encodings = {
     omitNonTextAggrWithAllDimsOnFacets: {
       type: 'boolean',
       default: true,
-      description: 'remove all aggregated charts (except text tables) with all dims on facets (row, col)'
+      description: 'remove all aggregated charts (except text tables) with all dims on facets (row, column)'
     },
     // TODO: revise
     omitOneDimensionCount: {

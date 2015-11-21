@@ -102,7 +102,7 @@ describe('cp.gen.marktypes()', function(){
 
     it('should not contain size', function() {
       var encoding = {
-        "col": {
+        "column": {
           "name": "Effect__Amount_of_damage",
           "type": "ordinal",
         },

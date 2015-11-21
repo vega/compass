@@ -29,7 +29,7 @@ var rules = {
     dimension: true,
     multiple: true
   },
-  col: {
+  column: {
     dimension: true,
     multiple: true
   },
@@ -108,13 +108,13 @@ function generalRules(encoding, stats, opt) {
   // CARTESIAN PLOT OR MAP
   if (encoding.x || encoding.y || encoding.geo || encoding.arc) {
 
-    if (encoding.row || encoding.col) { //have facet(s)
+    if (encoding.row || encoding.column) { //have facet(s)
 
       // don't use facets before filling up x,y
       if (!encoding.x || !encoding.y) return false;
 
       if (opt.omitNonTextAggrWithAllDimsOnFacets) {
-        // remove all aggregated charts with all dims on facets (row, col)
+        // remove all aggregated charts with all dims on facets (row, column)
         if (genEncodings.isAggrWithAllDimOnFacets(encoding)) return false;
       }
     }

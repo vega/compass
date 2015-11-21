@@ -17,7 +17,7 @@ function reduceTupleToTable(r, x) {
 c.DIST_BY_CHANNEL = [
   // positional
   ['x', 'y', c.SWAPPABLE],
-  ['row', 'col', c.SWAPPABLE],
+  ['row', 'column', c.SWAPPABLE],
 
   // ordinal mark properties
   ['color', 'shape', c.SWAPPABLE],
