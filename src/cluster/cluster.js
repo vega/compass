@@ -2,7 +2,7 @@
 
 module.exports = cluster;
 
-var Encoding = require('vega-lite/src/Encoding').default,
+var vlShorthand = require('vega-lite/src/shorthand'),
   clusterfck = require('clusterfck'),
   consts = require('./clusterconsts'),
   util = require('../util');
@@ -14,8 +14,8 @@ function cluster(specs, opt) {
   var dist = cluster.distance.table(specs);
 
   var clusterTrees = clusterfck.hcluster(specs, function(e1, e2) {
-    var s1 = Encoding.shorthand(e1),
-      s2 = Encoding.shorthand(e2);
+    var s1 = vlShorthand.shorten(e1),
+      s2 = vlShorthand.shorten(e2);
     return dist[s1][s2];
   }, 'average', consts.CLUSTER_THRESHOLD);
 

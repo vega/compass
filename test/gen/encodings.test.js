@@ -3,7 +3,8 @@
 /*jshint -W069 */
 
 var expect = require('chai').expect,
-  vl = require('vega-lite'),
+  vlSchema = require('vega-lite/src/schema/schema'),
+  vlShorthand = require('vega-lite/src/shorthand'),
   fixture = require('../fixture');
 
 var genEncodings = require('../../src/gen/encodings');
@@ -13,7 +14,7 @@ describe('cp.gen.encs()', function () {
   var opt;
 
   beforeEach(function() {
-    opt = vl.schema.util.extend({}, consts.gen.encodings);
+    opt = vlSchema.util.extend({}, consts.gen.encodings);
   });
 
   describe('#', function () {
@@ -39,7 +40,7 @@ describe('cp.gen.encs()', function () {
     beforeEach(function() {
       f = fixture['#xB(Q)'];
       encodings = genEncodings([], f.fields, f.stats, opt);
-      encShorthands = encodings.map(vl.enc.shorthand);
+      encShorthands = encodings.map(vlShorthand.shortenEncoding);
     });
 
     it('should show only vertical bar/plots', function() {
@@ -54,7 +55,7 @@ describe('cp.gen.encs()', function () {
     beforeEach(function() {
       f = fixture['#xT'];
       encodings = genEncodings([], f.fields, f.stats, opt);
-      encShorthands = encodings.map(vl.enc.shorthand);
+      encShorthands = encodings.map(vlShorthand.shortenEncoding);
     });
 
     it('should show only vertical bar/plots', function() {
@@ -68,7 +69,7 @@ describe('cp.gen.encs()', function () {
     beforeEach(function() {
       f = fixture['#xYR(T)'];
       encodings = genEncodings([], f.fields, f.stats, opt);
-      encShorthands = encodings.map(vl.enc.shorthand);
+      encShorthands = encodings.map(vlShorthand.shortenEncoding);
     });
 
     it('should show only vertical bar/plots', function() {
@@ -82,7 +83,7 @@ describe('cp.gen.encs()', function () {
     beforeEach(function() {
       f = fixture['QxT'];
       encodings = genEncodings([], f.fields, f.stats, opt);
-      encShorthands = encodings.map(vl.enc.shorthand);
+      encShorthands = encodings.map(vlShorthand.shortenEncoding);
     });
     it('should show only vertical bar/plots', function() {
       expect(encShorthands.indexOf('x=1,Q|y=2,T')).to.equal(-1);
@@ -95,9 +96,7 @@ describe('cp.gen.encs()', function () {
   // });
 
   // describe('QxA(Q),', function() {
-  //   var f = fixture['OxA(Q)'];
-  //   var encs = genEncodings([], f.fields, f.stats, opt);
-  //   console.log('QxA(Q)', encs.map(vl.enc.shorthand));
+  //
   // });
 
   describe('OxOxQ', function () {
@@ -109,8 +108,8 @@ describe('cp.gen.encs()', function () {
     it('without stats about occlusion, it should not include charts with both O\'s on axes', function() {
       var encodings = genEncodings([], f.fields, f.stats, opt);
 
-      var filtered = encodings.filter(function(enc){
-        return enc.x.type === 'ordinal' && enc.y.type === 'ordinal';
+      var filtered = encodings.filter(function(encoding){
+        return encoding.x.type === 'ordinal' && encoding.y.type === 'ordinal';
       });
 
       expect(filtered.length).to.equal(0);

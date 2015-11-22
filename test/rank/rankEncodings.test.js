@@ -157,7 +157,7 @@ describe('cp.rank.encoding', function () {
 
     describe('text tables', function() {
       it('\'s text and color score should be merged', function () {
-        var encoding = {
+        var spec = {
           "marktype": "text",
           "encoding": {
             "col": {"name": "Aircraft__Airline_Operator","type": "ordinal"},
@@ -165,7 +165,7 @@ describe('cp.rank.encoding', function () {
             "color": {"name": "*","aggregate": "count","type": "quantitative"}
           }
         };
-        var score = rankEncodings(encoding, {
+        var score = rankEncodings(spec, {
           Aircraft__Airline_Operator: {cardinality: 10},
           count: 15
         });

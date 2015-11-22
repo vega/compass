@@ -1,11 +1,14 @@
+// FIXME: rename to rankSpecs
+
 'use strict';
 
-var vlEnc = require('vega-lite/src/enc'),
+var vlEncoding = require('vega-lite/src/encoding'),
   vlFieldDef = require('vega-lite/src/fielddef'),
-  vlConsts = require('vega-lite/src/consts'),
   vlChannel = require('vega-lite/src/channel'),
   isDimension = vlFieldDef.isDimension,
   util = require('../util');
+
+var vlShorthand = require('vega-lite/src/shorthand');
 
 var consts = require('../consts');
 var Type = consts.Type;
@@ -32,8 +35,8 @@ function rankEncodings(spec, stats, opt, selected) {
     marktype = spec.marktype,
     encoding = spec.encoding;
 
-  var encodingMappingByField = vlEnc.reduce(spec.encoding, function(o, fieldDef, channel) {
-    var key = vlFieldDef.shorthand(fieldDef);
+  var encodingMappingByField = vlEncoding.reduce(spec.encoding, function(o, fieldDef, channel) {
+    var key = vlShorthand.shortenFieldDef(fieldDef);
     var mappings = o[key] = o[key] || [];
     mappings.push({channel: channel, fieldDef: fieldDef});
     return o;
@@ -42,7 +45,7 @@ function rankEncodings(spec, stats, opt, selected) {
   // data - encoding mapping score
   util.forEach(encodingMappingByField, function(mappings) {
     var reasons = mappings.map(function(m) {
-        return m.channel + vlConsts.Shorthand.Assign + vlFieldDef.shorthand(m.fieldDef) +
+        return m.channel + vlShorthand.Assign + vlShorthand.shortenFieldDef(m.fieldDef) +
           ' ' + (selected && selected[m.fieldDef.name] ? '[x]' : '[ ]');
       }),
       scores = mappings.map(function(m) {

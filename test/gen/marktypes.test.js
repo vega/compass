@@ -95,7 +95,7 @@ describe('cp.gen.marktypes()', function(){
   describe('text', function() {
     it('should be generated', function () {
       var shorthand = 'row=1,O|text=mean_2,Q',
-        encoding = vl.enc.fromShorthand(shorthand),
+        encoding = vl.shorthand.parseEncoding(shorthand),
         marktypes = getMarkTypes(encoding, {}, opt);
       expect(marktypes.indexOf('text')).to.gt(-1);
     });
