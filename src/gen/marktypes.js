@@ -42,7 +42,7 @@ function facetRule(fieldDef, stats, opt) {
 
 function facetsRule(encoding, stats, opt) {
   if(encoding.row && !facetRule(encoding.row, stats, opt)) return false;
-  if(encoding.col && !facetRule(encoding.col, stats, opt)) return false;
+  if(encoding.column && !facetRule(encoding.column, stats, opt)) return false;
   return true;
 }
 
@@ -145,7 +145,7 @@ function areaRule(encoding, stats, opt) {
 }
 
 function textRule(encoding, stats, opt) {
-  // at least must have row or col and aggregated text values
-  return (encoding.row || encoding.col) && encoding.text && encoding.text.aggregate && !encoding.x && !encoding.y && !encoding.size &&
+  // at least must have row or column and aggregated text values
+  return (encoding.row || encoding.column) && encoding.text && encoding.text.aggregate && !encoding.x && !encoding.y && !encoding.size &&
     (!opt.alwaysGenerateTableAsHeatmap || !encoding.color);
 }

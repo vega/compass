@@ -141,22 +141,22 @@ describe('cp.gen.encs()', function () {
       stats = f.stats;
     });
 
-    it('should not include charts with O on row/col except with text', function() {
+    it('should not include charts with O on row/column except with text', function() {
       var encodings = genEncodings([], fields, stats, opt);
 
       expect(encodings.filter(function(encoding) {
         var rowIsO = encoding.row && encoding.row.type==='ordinal',
-          colIsO = encoding.col && encoding.col.type==='ordinal';
+          colIsO = encoding.column && encoding.column.type==='ordinal';
         return !encoding.text && (rowIsO || colIsO);
       }).length).to.equal(0);
     });
 
-    it('should include charts with O on row/col when omit flag is disabled', function() {
+    it('should include charts with O on row/column when omit flag is disabled', function() {
       opt.omitNonTextAggrWithAllDimsOnFacets = false;
       var encodings = genEncodings([], fields, stats, opt);
       expect(encodings.filter(function(encoding) {
         return (encoding.row && encoding.row.type==='ordinal') ||
-          (encoding.col && encoding.col.type==='ordinal');
+          (encoding.column && encoding.column.type==='ordinal');
       }).length).to.gt(0);
     });
   });

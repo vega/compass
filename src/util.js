@@ -50,19 +50,19 @@ util.any = function (arr, f) {
     return false;
 };
 
-util.nestedMap = function (col, f, level, filter) {
+util.nestedMap = function (collection, f, level, filter) {
   return level === 0 ?
-    col.map(f) :
-    col.map(function(v) {
+    collection.map(f) :
+    collection.map(function(v) {
       var r = util.nestedMap(v, f, level - 1);
       return filter ? r.filter(util.nonEmpty) : r;
     });
 };
 
-util.nestedReduce = function (col, f, level, filter) {
+util.nestedReduce = function (collection, f, level, filter) {
   return level === 0 ?
-    col.reduce(f, []) :
-    col.map(function(v) {
+    collection.reduce(f, []) :
+    collection.map(function(v) {
       var r = util.nestedReduce(v, f, level - 1);
       return filter ? r.filter(util.nonEmpty) : r;
     });

@@ -29,7 +29,7 @@ var rules = {
     dimension: true,
     multiple: true
   },
-  col: {
+  column: {
     dimension: true,
     multiple: true
   },
@@ -108,13 +108,13 @@ function generalRules(encoding, stats, opt) {
   // CARTESIAN PLOT OR MAP
   if (encoding.x || encoding.y || encoding.geo || encoding.arc) {
 
-    if (encoding.row || encoding.col) { //have facet(s)
+    if (encoding.row || encoding.column) { //have facet(s)
 
       // don't use facets before filling up x,y
       if (!encoding.x || !encoding.y) return false;
 
       if (opt.omitNonTextAggrWithAllDimsOnFacets) {
-        // remove all aggregated charts with all dims on facets (row, col)
+        // remove all aggregated charts with all dims on facets (row, column)
         if (genEncodings.isAggrWithAllDimOnFacets(encoding)) return false;
       }
     }
@@ -134,9 +134,13 @@ function generalRules(encoding, stats, opt) {
             return false;
           }
         } else if (encoding.y.type=== Type.Temporal|| encoding.x.type === Type.Temporal) {
-          if (encoding.y.type=== Type.Temporal && encoding.x.type !== Type.Temporal) return false;
+          if (encoding.y.type=== Type.Temporal && encoding.x.type !== Type.Temporal) {
+            return false;
+          }
         } else { // show only one OxO, QxQ
-          if (encoding.x.name > encoding.y.name) return false;
+          if (encoding.x.field > encoding.y.field) {
+            return false;
+          }
         }
       }
       return true;
@@ -144,18 +148,28 @@ function generalRules(encoding, stats, opt) {
 
     // DOT PLOTS
     // // plot with one axis = dot plot
-    if (opt.omitDotPlot) return false;
+    if (opt.omitDotPlot) {
+      return false;
+    }
 
     // Dot plot should always be horizontal
-    if (opt.omitTranpose && encoding.y) return false;
+    if (opt.omitTranpose && encoding.y) {
+      return false;
+    }
 
     // dot plot shouldn't have other encoding
-    if (opt.omitDotPlotWithExtraEncoding && util.keys(encoding).length > 1) return false;
+    if (opt.omitDotPlotWithExtraEncoding && util.keys(encoding).length > 1) {
+      return false;
+    }
 
     if (opt.omitOneDimensionCount) {
       // one dimension "count"
-      if (encoding.x && encoding.x.aggregate == 'count' && !encoding.y) return false;
-      if (encoding.y && encoding.y.aggregate == 'count' && !encoding.x) return false;
+      if (encoding.x && encoding.x.aggregate == 'count' && !encoding.y) {
+        return false;
+      }
+      if (encoding.y && encoding.y.aggregate == 'count' && !encoding.x) {
+        return false;
+      }
     }
 
     return true;

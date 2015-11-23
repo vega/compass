@@ -17,7 +17,7 @@ var consts = require('../../src/consts'),
 
 describe('cp.rank.encoding', function () {
   var marktypes = consts.gen.encodings.properties.marktypeList.default;
-  var channels = ['x', 'y', 'row', 'col', 'size', 'color', 'shape', 'text', 'detail'];
+  var channels = ['x', 'y', 'row', 'column', 'size', 'color', 'shape', 'text', 'detail'];
   var dFixtures = ['O', 'O_15', 'O_30', 'BIN(Q)'],
     mFixtures = ['Q'];
 
@@ -160,9 +160,9 @@ describe('cp.rank.encoding', function () {
         var spec = {
           "marktype": "text",
           "encoding": {
-            "col": {"name": "Aircraft__Airline_Operator","type": "ordinal"},
-            "text": {"name": "*","aggregate": "count","type": "quantitative"},
-            "color": {"name": "*","aggregate": "count","type": "quantitative"}
+            "column": {"field": "Aircraft__Airline_Operator","type": "ordinal"},
+            "text": {"field": "*","aggregate": "count","type": "quantitative"},
+            "color": {"field": "*","aggregate": "count","type": "quantitative"}
           }
         };
         var score = rankEncodings(spec, {

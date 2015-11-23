@@ -79,7 +79,7 @@ function genAggregates(output, fieldDefs, stats, opt) {
     var f = fieldDefs[i],
       canHaveAggr = hasAggr === true || hasAggr === null;
 
-    tf[i] = {name: f.name, type: f.type};
+    tf[i] = {field: f.field, type: f.type};
 
     if (f.aggregate === 'count') { // if count is included in the selected fields
       if (canHaveAggr) {
@@ -127,7 +127,7 @@ function genAggregates(output, fieldDefs, stats, opt) {
 
   function assignT(i, hasAggr, autoMode) {
     var f = fieldDefs[i];
-    tf[i] = {name: f.name, type: f.type};
+    tf[i] = {field: f.field, type: f.type};
 
     // TODO support array of f._timeUnits
     if (f._timeUnit) {
