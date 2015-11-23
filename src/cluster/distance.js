@@ -46,9 +46,13 @@ distance.get = function (extendedSpec1, extendedSpec2) {
   var isStack1 = vlSpec.isStack(extendedSpec1),
     isStack2 = vlSpec.isStack(extendedSpec2);
 
-  if(isStack1 || isStack2) {
-    if(isStack1 && isStack2) {
-      if(extendedSpec1.encoding.color.field !== extendedSpec2.encoding.color.field) {
+  if (isStack1 || isStack2) {
+    if (isStack1 && isStack2) {
+      if ((extendedSpec1.encoding.color && extendedSpec2.encoding.color &&
+          extendedSpec1.encoding.color.field !== extendedSpec2.encoding.color.field) ||
+          (extendedSpec1.encoding.detail && extendedSpec2.encoding.detail &&
+          extendedSpec1.encoding.detail.field !== extendedSpec2.encoding.detail.field)
+         ) {
         dist+=1;
       }
     } else {
