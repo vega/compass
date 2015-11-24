@@ -4,7 +4,7 @@
 var expect = require('chai').expect,
   vl = require('vega-lite'),
   fixture = require('../fixture'),
-  setter = vl.setter;
+  setter = vl.util.setter;
 
 
 var consts = require('../../src/consts'),
