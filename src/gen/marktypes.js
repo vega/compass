@@ -5,7 +5,6 @@ var vlFieldDef = require('vega-lite/src/fielddef');
 var vlValidate = require('vega-lite/src/validate');
 
 var isDimension = vlFieldDef.isDimension;
-var isOrdinalScale = vlFieldDef.isOrdinalScale;
 var util = require('../util');
 
 var consts = require('../consts');
@@ -90,8 +89,8 @@ function tickRule(encoding, stats, opt) {
     var xIsDim = isDimension(encoding.x),
       yIsDim = isDimension(encoding.y);
 
-    return (!xIsDim && (!encoding.y || isOrdinalScale(encoding.y))) ||
-      (!yIsDim && (!encoding.x || isOrdinalScale(encoding.x)));
+    return (!xIsDim && (!encoding.y || yIsDim)) ||
+      (!yIsDim && (!encoding.x || xIsDim));
   }
   return false;
 }
