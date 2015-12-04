@@ -6,7 +6,7 @@ var expect = require('chai').expect,
 describe('cp.cluster.distance.get()', function () {
   it('should return correct distance', function() {
     var table1 = {
-      "marktype": "text",
+      "mark": "text",
       "encoding": {
         "row": {"field": "Effect__Amount_of_damage","type": "ordinal"},
         "column": {"field": "Aircraft__Airline_Operator","type": "ordinal"},
@@ -15,7 +15,7 @@ describe('cp.cluster.distance.get()', function () {
     };
 
     var table2 = {
-      "marktype": "text",
+      "mark": "text",
       "encoding": {
         "column": {"field": "Effect__Amount_of_damage","type": "ordinal"},
         "row": {"field": "Aircraft__Airline_Operator","type": "ordinal"},

@@ -13,7 +13,7 @@ var gen = module.exports = {
   // encodings / visual variations
   specs: require('./specs'),
   encodings: require('./encodings'),
-  marktypes: require('./marktypes')
+  marks: require('./marks')
 };
 
 
@@ -41,11 +41,11 @@ gen.charts = function(fieldDefs, opt, config, flat) {
 
   if (flat === true || (flat && flat.encodings)) {
     charts = util.nestedReduce(encodings, function(output, encoding) {
-      return gen.marktypes(output, encoding, opt, config);
+      return gen.marks(output, encoding, opt, config);
     }, level, true);
   } else {
     charts = util.nestedMap(encodings, function(encoding) {
-      return gen.marktypes([], encoding, opt, config);
+      return gen.marks([], encoding, opt, config);
     }, level, true);
     level += 1;
   }

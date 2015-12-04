@@ -53,14 +53,14 @@ describe('cp.gen.encodings()', function () {
 
     it('should not contain text table', function() {
       var hasTextTable = specs.filter(function(spec) {
-        return spec.marktype === 'text';
+        return spec.mark === 'text';
       }).length > 0;
       expect(hasTextTable).to.be.false;
     });
 
     it('should not contain bar', function() {
       var filtered = specs.filter(function(spec) {
-        return spec.marktype === 'bar';
+        return spec.mark === 'bar';
       });
       expect(filtered.length).to.equal(0);
     });
@@ -72,7 +72,7 @@ describe('cp.gen.encodings()', function () {
 
     it('should contain text table', function() {
       var hasTextTable = specs.filter(function(spec) {
-        return spec.marktype === 'text';
+        return spec.mark === 'text';
       }).length > 0;
       expect(hasTextTable).to.be.true;
     });
@@ -84,14 +84,14 @@ describe('cp.gen.encodings()', function () {
 
     it('should contain text table', function() {
       var hasTextTable = specs.filter(function(spec) {
-        return spec.marktype === 'text';
+        return spec.mark === 'text';
       }).length > 0;
       expect(hasTextTable).to.be.true;
     });
 
     it('should contain bar', function() {
       var hasBar = specs.filter(function(spec) {
-        return spec.marktype === 'bar';
+        return spec.mark === 'bar';
       }).length > 0;
       expect(hasBar).to.be.true;
     });
@@ -104,7 +104,7 @@ describe('cp.gen.encodings()', function () {
     it('should contain colored scatter plot', function() {
       // var filtered = encodings.filter(function(encoding) {
       //   var encoding = encoding.encoding;
-      //   return encoding.marktype==='point' && encoding.x && encoding.y && encoding.color;
+      //   return encoding.mark==='point' && encoding.x && encoding.y && encoding.color;
       // });
       // FIXME(kanitw): Jul 19, 2015 - write test!
     });
@@ -116,7 +116,7 @@ describe('cp.gen.encodings()', function () {
 
     it('should not contain line', function() {
       var hasLine = specs.filter(function(spec) {
-        return spec.marktype === 'line';
+        return spec.mark === 'line';
       }).length > 0;
       expect(hasLine).to.be.false;
     });
@@ -129,7 +129,7 @@ describe('cp.gen.encodings()', function () {
 
     it('should not contain line', function() {
       var hasLine = specs.filter(function(spec) {
-        return spec.marktype === 'line';
+        return spec.mark === 'line';
       }).length > 0;
       expect(hasLine).to.be.false;
     });
@@ -141,7 +141,7 @@ describe('cp.gen.encodings()', function () {
 
     it('should contain line', function() {
       var hasLine = specs.filter(function(spec) {
-        return spec.marktype === 'line';
+        return spec.mark === 'line';
       }).length > 0;
       expect(hasLine).to.be.true;
     });
@@ -153,7 +153,7 @@ describe('cp.gen.encodings()', function () {
 
     it('should contain text table', function() {
       var hasTextTable = specs.filter(function(spec) {
-        return spec.marktype === 'text';
+        return spec.mark === 'text';
       }).length > 0;
       expect(hasTextTable).to.be.true;
     });

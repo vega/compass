@@ -10,9 +10,9 @@ var util = require('../util');
 var consts = require('../consts');
 var Type = consts.Type;
 
-var vlmarktypes = module.exports = getMarktypes;
+var genMarks = module.exports = getMarks;
 
-var marksRule = vlmarktypes.rule = {
+var marksRule = genMarks.rule = {
   point:  pointRule,
   bar:    barRule,
   line:   lineRule,
@@ -21,18 +21,18 @@ var marksRule = vlmarktypes.rule = {
   tick:   tickRule
 };
 
-function getMarktypes(encoding, stats, opt) {
-  return opt.marktypeList.filter(function(markType){
-    return vlmarktypes.satisfyRules(encoding, markType, stats, opt);
+function getMarks(encoding, stats, opt) {
+  return opt.markList.filter(function(mark){
+    return genMarks.satisfyRules(encoding, mark, stats, opt);
   });
 }
 
-vlmarktypes.satisfyRules = function (encoding, markType, stats, opt) {
+genMarks.satisfyRules = function (encoding, mark, stats, opt) {
   return vlValidate.getEncodingMappingError({
-      marktype: markType,
+      mark: mark,
       encoding: encoding
     }) === null &&
-    (!marksRule[markType] || marksRule[markType](encoding, stats, opt));
+    (!marksRule[mark] || marksRule[mark](encoding, stats, opt));
 };
 
 function facetRule(fieldDef, stats, opt) {

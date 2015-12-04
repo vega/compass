@@ -75,7 +75,7 @@ distance.extendSpecWithChannelByColumnName = function(spec) {
   });
 
   return {
-    marktype: spec.marktype,
+    mark: spec.mark,
     channelByField: _channelByField,
     encoding: spec.encoding
   };

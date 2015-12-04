@@ -3,8 +3,18 @@
 
 var expect = require('chai').expect,
   vl = require('vega-lite'),
-  fixture = require('../fixture'),
-  setter = vl.util.setter;
+  fixture = require('../fixture');
+
+var setter = function(x, p, val, noaugment) {
+  for (var i=0; i<p.length-1; ++i) {
+    if (!noaugment && !(p[i] in x)){
+      x = x[p[i]] = {};
+    } else {
+      x = x[p[i]];
+    }
+  }
+  x[p[i]] = val;
+};
 
 
 var consts = require('../../src/consts'),
@@ -16,23 +26,23 @@ var consts = require('../../src/consts'),
   opt = vl.schema.util.extend(opt||{}, consts.gen.encodings);
 
 describe('cp.rank.encoding', function () {
-  var marktypes = consts.gen.encodings.properties.marktypeList.default;
+  var marks = consts.gen.encodings.properties.markList.default;
   var channels = ['x', 'y', 'row', 'column', 'size', 'color', 'shape', 'text', 'detail'];
   var dFixtures = ['O', 'O_15', 'O_30', 'BIN(Q)'],
     mFixtures = ['Q'];
 
 
   var score = {};
-  marktypes.forEach(function(marktype) {
+  marks.forEach(function(mark) {
     channels.forEach(function(channel) {
       mFixtures.forEach(function(q) {
         var Qf = fixture[q];
-        setter(score, [q, marktype, channel], measureScore(Qf.fields[0], channel, marktype, Qf.stats, opt));
+        setter(score, [q, mark, channel], measureScore(Qf.fields[0], channel, mark, Qf.stats, opt));
       });
 
       dFixtures.forEach(function(o) {
         var Of = fixture[o];
-        setter(score, [o, marktype, channel], dimensionScore(Of.fields[0], channel, marktype, Of.stats, opt));
+        setter(score, [o, mark, channel], dimensionScore(Of.fields[0], channel, mark, Of.stats, opt));
       });
     });
   });
@@ -130,7 +140,7 @@ describe('cp.rank.encoding', function () {
     describe('B(Q)xB(Q)x#', function () {
       var f = fixture['B(Q)xB(Q)x#'];
       var bp = {
-        marktype: 'point',
+        mark: 'point',
         encoding: {
           x: f.fields[0],
           y: f.fields[1],
@@ -139,7 +149,7 @@ describe('cp.rank.encoding', function () {
       };
 
       var sb = {
-        marktype: 'bar',
+        mark: 'bar',
         encoding: {
           x: f.fields[0],
           y: f.fields[2], // count
@@ -158,7 +168,7 @@ describe('cp.rank.encoding', function () {
     describe('text tables', function() {
       it('\'s text and color score should be merged', function () {
         var spec = {
-          "marktype": "text",
+          "mark": "text",
           "encoding": {
             "column": {"field": "Aircraft__Airline_Operator","type": "ordinal"},
             "text": {"field": "*","aggregate": "count","type": "quantitative"},
