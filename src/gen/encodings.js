@@ -4,7 +4,7 @@ var vlFieldDef = require('vega-lite/src/fielddef');
 var vlEncoding = require('vega-lite/src/encoding');
 var util = require('../util');
 
-var genMarkTypes = require('./marktypes'),
+var genMarks = require('./marks'),
   isDimension = vlFieldDef.isDimension,
   isMeasure = vlFieldDef.isMeasure;
 
@@ -102,7 +102,7 @@ function dimMeaTransposeRule(encoding) {
 function generalRules(encoding, stats, opt) {
   // encoding.text is only used for TEXT TABLE
   if (encoding.text) {
-    return genMarkTypes.satisfyRules(encoding, 'text', stats, opt);
+    return genMarks.satisfyRules(encoding, 'text', stats, opt);
   }
 
   // CARTESIAN PLOT OR MAP

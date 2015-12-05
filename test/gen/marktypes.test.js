@@ -6,9 +6,9 @@ var expect = require('chai').expect,
 
 // var dataB = require("../data/birdstrikes.json");
 var consts = require('../../src/consts');
-var getMarkTypes = require('../../src/gen/marktypes');
+var getMarks = require('../../src/gen/marks');
 
-describe('cp.gen.marktypes()', function(){
+describe('cp.gen.marks()', function(){
   var opt;
 
   beforeEach(function() {
@@ -24,24 +24,24 @@ describe('cp.gen.marktypes()', function(){
 
     it('should generate point and bar', function() {
       var encoding = {x: f.fields[0]},
-        markTypes = getMarkTypes(encoding, f.stats, opt);
+        marks = getMarks(encoding, f.stats, opt);
 
-      expect(markTypes.length).to.eql(2);
-      expect(markTypes).to.eql(['point', 'bar']);
+      expect(marks.length).to.eql(2);
+      expect(marks).to.eql(['point', 'bar']);
     });
   });
 
   describe('1Q', function () {
-    var encoding, marktypes;
+    var encoding, marks;
     beforeEach(function() {
       encoding = {"x": {"field": "Cost__Total_$","type": "quantitative"}};
-      marktypes = getMarkTypes(encoding, {}, opt);
+      marks = getMarks(encoding, {}, opt);
     });
     it('should contain tick', function () {
-      expect(marktypes.indexOf('tick')).to.gt(-1);
+      expect(marks.indexOf('tick')).to.gt(-1);
     });
     it('should contain point', function () {
-      expect(marktypes.indexOf('point')).to.gt(-1);
+      expect(marks.indexOf('point')).to.gt(-1);
     });
   });
 
@@ -70,8 +70,8 @@ describe('cp.gen.marktypes()', function(){
           "y": {"selected": undefined,"field": "Aircraft__Airline_Operator","type": "ordinal"}
         };
 
-        var marktypes = getMarkTypes(encoding, {}, opt);
-        expect(marktypes.indexOf('bar')).to.equal(-1);
+        var marks = getMarks(encoding, {}, opt);
+        expect(marks.indexOf('bar')).to.equal(-1);
       });
     });
 
@@ -82,8 +82,8 @@ describe('cp.gen.marktypes()', function(){
           "x": {"field": "Cost__Total_$","type": "quantitative","aggregate": "sum"},
           "y": {"field": "Aircraft__Airline_Operator","type": "ordinal"}
         };
-        var marktypes = getMarkTypes(encoding, {}, opt);
-        expect(marktypes.indexOf('bar')).to.gt(-1);
+        var marks = getMarks(encoding, {}, opt);
+        expect(marks.indexOf('bar')).to.gt(-1);
       });
     });
   });
@@ -96,8 +96,8 @@ describe('cp.gen.marktypes()', function(){
     it('should be generated', function () {
       var shorthand = 'row=1,O|text=mean_2,Q',
         encoding = vl.shorthand.parseEncoding(shorthand),
-        marktypes = getMarkTypes(encoding, {}, opt);
-      expect(marktypes.indexOf('text')).to.gt(-1);
+        marks = getMarks(encoding, {}, opt);
+      expect(marks.indexOf('text')).to.gt(-1);
     });
 
     it('should not contain size', function() {
@@ -114,9 +114,9 @@ describe('cp.gen.marktypes()', function(){
         }
       };
 
-      var marktypes = getMarkTypes(encoding, {}, opt);
+      var marks = getMarks(encoding, {}, opt);
 
-      expect(marktypes.indexOf('text')).to.equal(-1);
+      expect(marks.indexOf('text')).to.equal(-1);
     });
   });
 });

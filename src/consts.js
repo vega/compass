@@ -115,11 +115,11 @@ consts.gen.aggregates = {
 consts.gen.encodings = {
   type: 'object',
   properties: {
-    marktypeList: {
+    markList: {
       type: 'array',
       items: {type: 'string'},
       default: ['point', 'bar', 'line', 'area', 'text', 'tick'], //filled_map
-      description: 'allowed marktypes'
+      description: 'allowed marks'
     },
     encodingTypeList: {
       type: 'array',

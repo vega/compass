@@ -5,7 +5,7 @@ var vlSchemaUtil = require('vega-lite/src/schema/schemautil');
 var util = require('../util');
 
 var genEncodings = require('./encodings'),
-  getMarktypes = require('./marktypes'),
+  getMarks = require('./marks'),
   rank = require('../rank/rank'),
   consts = require('../consts');
 
@@ -14,7 +14,7 @@ module.exports = genSpecsFromFieldDefs;
 /** Design Encodings for a set of field definition */
 
 function genSpecsFromFieldDefs(output, fieldDefs, stats, opt, nested) {
-  // opt must be augmented before being passed to genEncodings or getMarktypes
+  // opt must be augmented before being passed to genEncodings or getMarks
   opt = vlSchemaUtil.extend(opt||{}, consts.gen.encodings);
   var encodings = genEncodings([], fieldDefs, stats, opt);
 
@@ -31,15 +31,15 @@ function genSpecsFromFieldDefs(output, fieldDefs, stats, opt, nested) {
 }
 
 function genSpecsFromEncodings(output, encoding, stats, opt) {
-  getMarktypes(encoding, stats, opt)
-    .forEach(function(markType) {
+  getMarks(encoding, stats, opt)
+    .forEach(function(mark) {
       var spec = util.duplicate({
           // Clone config & encoding to unique objects
           encoding: encoding,
           config: opt.config
         });
 
-      spec.marktype = markType;
+      spec.mark = mark;
       // Data object is the same across charts: pass by reference
       spec.data = opt.data;
 
@@ -54,7 +54,7 @@ function genSpecsFromEncodings(output, encoding, stats, opt) {
 
 //FIXME this should be refactors
 function finalTouch(spec, stats, opt) {
-  if (spec.marktype === 'text' && opt.alwaysGenerateTableAsHeatmap) {
+  if (spec.mark === 'text' && opt.alwaysGenerateTableAsHeatmap) {
     spec.encoding.color = spec.encoding.text;
   }
 
