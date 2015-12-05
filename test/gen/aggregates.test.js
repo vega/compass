@@ -49,13 +49,13 @@ describe('cp.gen.aggregates()', function () {
       // Q
       expect(tables.filter(function(table){
         var t = table[0];
-        return !t.aggregate && !t.bin && t.type==='Q';
+        return !t.aggregate && !t.bin && t.type==='quantitative';
       }).length).to.equal(1);
 
       // mean(Q)
       expect(tables.filter(function(table){
         var t = table[0];
-        return t.aggregate && !t.bin && t.type==='Q';
+        return t.aggregate && !t.bin && t.type==='quantitative';
       }).length).to.equal(1);
 
       // bin(Q) x #

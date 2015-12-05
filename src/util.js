@@ -6,8 +6,14 @@ var util = module.exports = {
   gen: {}
 };
 
+// FIXME: remove redundant methods
+
 util.isArray = Array.isArray || function (obj) {
   return {}.toString.call(obj) == '[object Array]';
+};
+
+util.isin = function (item, array) {
+    return array.indexOf(item) !== -1;
 };
 
 util.json = function(s, sp) {
@@ -20,19 +26,43 @@ util.keys = function(obj) {
   return k;
 };
 
-util.nestedMap = function (col, f, level, filter) {
+util.duplicate = function(obj) {
+  return JSON.parse(JSON.stringify(obj));
+};
+
+util.forEach = function(obj, f, thisArg) {
+  if (obj.forEach) {
+    obj.forEach.call(thisArg, f);
+  }
+  else {
+    for (var k in obj) {
+      f.call(thisArg, obj[k], k, obj);
+    }
+  }
+};
+
+util.any = function (arr, f) {
+    var i = 0, k;
+    for (k in arr) {
+        if (f(arr[k], k, i++))
+            return true;
+    }
+    return false;
+};
+
+util.nestedMap = function (collection, f, level, filter) {
   return level === 0 ?
-    col.map(f) :
-    col.map(function(v) {
+    collection.map(f) :
+    collection.map(function(v) {
       var r = util.nestedMap(v, f, level - 1);
       return filter ? r.filter(util.nonEmpty) : r;
     });
 };
 
-util.nestedReduce = function (col, f, level, filter) {
+util.nestedReduce = function (collection, f, level, filter) {
   return level === 0 ?
-    col.reduce(f, []) :
-    col.map(function(v) {
+    collection.reduce(f, []) :
+    collection.map(function(v) {
       var r = util.nestedReduce(v, f, level - 1);
       return filter ? r.filter(util.nonEmpty) : r;
     });

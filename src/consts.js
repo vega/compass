@@ -6,6 +6,25 @@ var consts = module.exports = {
   rank: {}
 };
 
+consts.X = 'x';
+consts.Y = 'y';
+consts.ROW = 'row';
+consts.COL = 'column';
+consts.SIZE = 'size';
+consts.SHAPE = 'shape';
+consts.COLOR = 'color';
+consts.TEXT = 'text';
+consts.DETAIL = 'detail';
+
+
+// rename these
+consts.Type = {};
+consts.Type.Nominal = 'nominal';
+consts.Type.Ordinal = 'ordinal';
+consts.Type.Quantitative = 'quantitative';
+consts.Type.Temporal = 'temporal';
+
+
 consts.gen.projections = {
   type: 'object',
   properties: {
@@ -17,7 +36,7 @@ consts.gen.projections = {
     maxCardinalityForAutoAddOrdinal: {
       type: 'integer',
       default: 50,
-      description: 'max cardinality for ordinal field to be considered for auto adding'
+      description: 'max cardinality for an ordinal variable to be considered for auto adding'
     },
     alwaysAddHistogram: {
       type: 'boolean',
@@ -49,7 +68,7 @@ consts.gen.aggregates = {
     minCardinalityForBin: {
       type: 'integer',
       default: 20,
-      description: 'minimum cardinality of a field if we were to bin'
+      description: 'minimum cardinality of an ordinal variable if we were to bin'
     },
     omitDotPlot: {
       type: 'boolean',
@@ -96,48 +115,60 @@ consts.gen.aggregates = {
 consts.gen.encodings = {
   type: 'object',
   properties: {
-    marktypeList: {
+    markList: {
       type: 'array',
       items: {type: 'string'},
       default: ['point', 'bar', 'line', 'area', 'text', 'tick'], //filled_map
-      description: 'allowed marktypes'
+      description: 'allowed marks'
     },
     encodingTypeList: {
       type: 'array',
       items: {type: 'string'},
-      default: ['x', 'y', 'row', 'col', 'size', 'color', 'text', 'detail'],
+      default: ['x', 'y', 'row', 'column', 'size', 'color', 'text', 'detail'],
       description: 'allowed encoding types'
     },
+    requiredEncodings: {
+      type: 'object',
+      default: undefined,
+      description: 'required encodings for each mark type'
+    },
+    supportedEncodings: {
+      type: 'object',
+      default: undefined,
+      description: 'supported encoding for each mark type'
+    },
+    // TODO: is this used in generation?
     maxGoodCardinalityForFacets: {
       type: 'integer',
       default: 5,
-      description: 'maximum cardinality of a field to be put on facet (row/col) effectively'
+      description: 'maximum cardinality of an ordinal variable to be put on facet (row/column) effectively'
     },
     maxCardinalityForFacets: {
       type: 'integer',
       default: 20,
-      description: 'maximum cardinality of a field to be put on facet (row/col)'
+      description: 'maximum cardinality of an ordinal variable to be put on facet (row/column)'
     },
     maxGoodCardinalityForColor: {
       type: 'integer',
       default: 7,
-      description: 'maximum cardinality of an ordinal field to be put on color effectively'
+      description: 'maximum cardinality of an ordinal variable to be put on color effectively'
     },
     maxCardinalityForColor: {
       type: 'integer',
       default: 20,
-      description: 'maximum cardinality of an ordinal field to be put on color'
+      description: 'maximum cardinality of an ordinal variable to be put on color'
     },
     maxCardinalityForShape: {
       type: 'integer',
       default: 6,
-      description: 'maximum cardinality of an ordinal field to be put on shape'
+      description: 'maximum cardinality of an ordinal variable to be put on shape'
     },
     omitTranpose:  {
       type: 'boolean',
       default: true,
       description: 'Eliminate all transpose by (1) keeping horizontal dot plot only (2) for OxQ charts, always put O on Y (3) show only one DxD, MxM (currently sorted by name)'
     },
+    // TODO: create chart type name
     omitDotPlot: {
       type: 'boolean',
       default: false,
@@ -153,21 +184,25 @@ consts.gen.encodings = {
       default: true,
       description: 'omit using multiple retinal variables (size, color, shape)'
     },
+    // TODO: revise
     omitNonTextAggrWithAllDimsOnFacets: {
       type: 'boolean',
       default: true,
-      description: 'remove all aggregated charts (except text tables) with all dims on facets (row, col)'
+      description: 'remove all aggregated charts (except text tables) with all dims on facets (row, column)'
     },
+    // TODO: revise
     omitOneDimensionCount: {
       type: 'boolean',
       default: false,
       description: 'omit one dimension count'
     },
+    // TODO remove this and merge with supportedEncodings
     omitSizeOnBar: {
       type: 'boolean',
       default: false,
       description: 'do not use bar\'s size'
     },
+    // TODO: change to omit non-summative stack
     omitStackedAverage: {
       type: 'boolean',
       default: true,

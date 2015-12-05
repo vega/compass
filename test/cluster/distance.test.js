@@ -6,25 +6,25 @@ var expect = require('chai').expect,
 describe('cp.cluster.distance.get()', function () {
   it('should return correct distance', function() {
     var table1 = {
-      "marktype": "text",
+      "mark": "text",
       "encoding": {
-        "row": {"name": "Effect__Amount_of_damage","type": "O"},
-        "col": {"name": "Aircraft__Airline_Operator","type": "O"},
-        "text": {"name": "*","aggregate": "count","type": "Q","displayName": "Number of Records"}
+        "row": {"field": "Effect__Amount_of_damage","type": "ordinal"},
+        "column": {"field": "Aircraft__Airline_Operator","type": "ordinal"},
+        "text": {"field": "*","aggregate": "count","type": "quantitative","displayName": "Number of Records"}
       }
     };
 
     var table2 = {
-      "marktype": "text",
+      "mark": "text",
       "encoding": {
-        "col": {"name": "Effect__Amount_of_damage","type": "O"},
-        "row": {"name": "Aircraft__Airline_Operator","type": "O"},
-        "text": {"name": "*","aggregate": "count","type": "Q","displayName": "Number of Records"}
+        "column": {"field": "Effect__Amount_of_damage","type": "ordinal"},
+        "row": {"field": "Aircraft__Airline_Operator","type": "ordinal"},
+        "text": {"field": "*","aggregate": "count","type": "quantitative","displayName": "Number of Records"}
       }
     };
 
-    var colenc1 = distance.extendSpecWithEncTypeByColumnName(table1),
-      colenc2 = distance.extendSpecWithEncTypeByColumnName(table2);
+    var colenc1 = distance.extendSpecWithChannelByColumnName(table1),
+      colenc2 = distance.extendSpecWithChannelByColumnName(table2);
 
     expect(distance.get(colenc1, colenc2)).to.lt(1);
   });

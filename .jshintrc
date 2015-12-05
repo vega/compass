@@ -7,9 +7,5 @@
   "node":    true,
   "browser": true,
   "mocha": true,
-  "predef": [
-    "TABLE", "RAW", "STACKED", "INDEX",
-    "X", "Y", "ROW", "COL", "SIZE", "SHAPE", "COLOR", "ALPHA", "TEXT", "DETAIL",
-    "O", "Q", "T", "N"],
   "globalstrict": true
 }

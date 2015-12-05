@@ -1,12 +1,18 @@
 "use strict";
 
-var vl = require('vega-lite'),
-  isDimension = vl.encDef.isDimension,
-  isOrdinalScale = vl.encDef.isOrdinalScale;
+var vlEncoding = require('vega-lite/src/encoding');
+var vlFieldDef = require('vega-lite/src/fielddef');
+var vlValidate = require('vega-lite/src/validate');
 
-var vlmarktypes = module.exports = getMarktypes;
+var isDimension = vlFieldDef.isDimension;
+var util = require('../util');
 
-var marksRule = vlmarktypes.rule = {
+var consts = require('../consts');
+var Type = consts.Type;
+
+var genMarks = module.exports = getMarks;
+
+var marksRule = genMarks.rule = {
   point:  pointRule,
   bar:    barRule,
   line:   lineRule,
@@ -15,35 +21,27 @@ var marksRule = vlmarktypes.rule = {
   tick:   tickRule
 };
 
-function getMarktypes(encoding, stats, opt) {
-  return opt.marktypeList.filter(function(markType){
-    return vlmarktypes.satisfyRules(encoding, markType, stats, opt);
+function getMarks(encoding, stats, opt) {
+  return opt.markList.filter(function(mark){
+    return genMarks.satisfyRules(encoding, mark, stats, opt);
   });
 }
 
-vlmarktypes.satisfyRules = function (encoding, markType, stats, opt) {
-  var mark = vl.compiler.marks[markType],
-    reqs = mark.requiredEncoding,
-    support = mark.supportedEncoding;
-
-  for (var i in reqs) { // all required encodings in enc
-    if (!(reqs[i] in encoding)) return false;
-  }
-
-  for (var encType in encoding) { // all encodings in enc are supported
-    if (!support[encType]) return false;
-  }
-
-  return !marksRule[markType] || marksRule[markType](encoding, stats, opt);
+genMarks.satisfyRules = function (encoding, mark, stats, opt) {
+  return vlValidate.getEncodingMappingError({
+      mark: mark,
+      encoding: encoding
+    }) === null &&
+    (!marksRule[mark] || marksRule[mark](encoding, stats, opt));
 };
 
 function facetRule(fieldDef, stats, opt) {
-  return vl.encDef.cardinality(fieldDef, stats) <= opt.maxCardinalityForFacets;
+  return vlFieldDef.cardinality(fieldDef, stats) <= opt.maxCardinalityForFacets;
 }
 
 function facetsRule(encoding, stats, opt) {
   if(encoding.row && !facetRule(encoding.row, stats, opt)) return false;
-  if(encoding.col && !facetRule(encoding.col, stats, opt)) return false;
+  if(encoding.column && !facetRule(encoding.column, stats, opt)) return false;
   return true;
 }
 
@@ -75,7 +73,7 @@ function pointRule(encoding, stats, opt) {
     if (opt.omitTranpose && encoding.y) return false;
 
     // dot plot shouldn't have other encoding
-    if (opt.omitDotPlotWithExtraEncoding && vl.keys(encoding).length > 1) return false;
+    if (opt.omitDotPlotWithExtraEncoding && util.keys(encoding).length > 1) return false;
 
     // dot plot with shape is non-sense
     if (encoding.shape) return false;
@@ -86,13 +84,13 @@ function pointRule(encoding, stats, opt) {
 function tickRule(encoding, stats, opt) {
   // jshint unused:false
   if (encoding.x || encoding.y) {
-    if(vl.enc.isAggregate(encoding)) return false;
+    if(vlEncoding.isAggregate(encoding)) return false;
 
     var xIsDim = isDimension(encoding.x),
       yIsDim = isDimension(encoding.y);
 
-    return (!xIsDim && (!encoding.y || isOrdinalScale(encoding.y))) ||
-      (!yIsDim && (!encoding.x || isOrdinalScale(encoding.x)));
+    return (!xIsDim && (!encoding.y || yIsDim)) ||
+      (!yIsDim && (!encoding.x || xIsDim));
   }
   return false;
 }
@@ -134,7 +132,7 @@ function lineRule(encoding, stats, opt) {
   // FIXME truly ordinal data is fine here too.
   // Line chart should be only horizontal
   // and use only temporal data
-  return encoding.x.type == 'T' && encoding.x.timeUnit && encoding.y.type == 'Q' && encoding.y.aggregate;
+  return encoding.x.type == Type.Temporal && encoding.x.timeUnit && encoding.y.type == Type.Quantitative && encoding.y.aggregate;
 }
 
 function areaRule(encoding, stats, opt) {
@@ -146,7 +144,7 @@ function areaRule(encoding, stats, opt) {
 }
 
 function textRule(encoding, stats, opt) {
-  // at least must have row or col and aggregated text values
-  return (encoding.row || encoding.col) && encoding.text && encoding.text.aggregate && !encoding.x && !encoding.y && !encoding.size &&
+  // at least must have row or column and aggregated text values
+  return (encoding.row || encoding.column) && encoding.text && encoding.text.aggregate && !encoding.x && !encoding.y && !encoding.size &&
     (!opt.alwaysGenerateTableAsHeatmap || !encoding.color);
 }

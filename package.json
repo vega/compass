@@ -22,9 +22,7 @@
     "lint": "gulp jshint",
     "test": "gulp t"
   },
-  "browserify-shim": {
-    "vega-lite": "global:vl"
-  },
+  "browserify-shim": {},
   "repository": {
     "type": "git",
     "url": "https://github.com/vega/visrec.git"
@@ -62,10 +60,10 @@
     "sinon": "~1.15.4",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0",
-    "watchify": "^3.2.3"
+    "watchify": "^3.2.3",
+    "vega-lite": "^0.9.0"
   },
   "dependencies": {
-    "clusterfck": "^0.6.0",
-    "vega-lite": "^0.8.0"
+    "clusterfck": "^0.6.0"
   }
 }
