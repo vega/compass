@@ -1,13 +1,9 @@
-'use strict';
+import * as vlFieldDef from 'vega-lite/src/fielddef';
+import * as vlSchemaUtil from 'vega-lite/src/schema/schemautil';
 
-var vlFieldDef = require('vega-lite/src/fielddef');
-var vlSchemaUtil = require('vega-lite/src/schema/schemautil');
-
-var util = require('../util'),
-  consts = require('../consts'),
-  isDimension = vlFieldDef.isDimension;
-
-module.exports = projections;
+import * as util from '../util';
+import * as consts from '../consts';
+const isDimension = vlFieldDef.isDimension;
 
 // TODO support other mode of projections generation
 // powerset, chooseK, chooseKorLess are already included in the util
@@ -17,7 +13,7 @@ module.exports = projections;
  * @param  {[type]} fieldDefs array of fields and query information
  * @return {[type]}        [description]
  */
-function projections(fieldDefs, stats, opt) {
+export default function projections(fieldDefs, stats, opt) {
   opt = vlSchemaUtil.extend(opt||{}, consts.gen.projections);
 
   // First categorize field, selected, fieldsToAdd, and save indices
@@ -27,7 +23,7 @@ function projections(fieldDefs, stats, opt) {
     indices = {};
 
   fieldDefs.forEach(function(fieldDef, index){
-    //save indices for stable sort later
+    // save indices for stable sort later
     indices[fieldDef.field] = index;
 
     if (fieldDef.selected) {
@@ -62,7 +58,7 @@ function projections(fieldDefs, stats, opt) {
 
   fieldSets.forEach(function(fieldSet) {
       // always append projection's key to each projection returned, d3 style.
-    fieldSet.key = projections.key(fieldSet);
+    fieldSet.key = key(fieldSet);
   });
 
   return fieldSets;
@@ -81,18 +77,17 @@ function compareFieldsToAdd(hasSelectedDimension, hasSelectedMeasure, indices) {
     if (a.type !== b.type) {
       if (!hasSelectedDimension) {
         return typeIsMeasureScore[a.type] - typeIsMeasureScore[b.type];
-      } else { //if (!hasSelectedMeasure) {
+      } else { // if (!hasSelectedMeasure) {
         return typeIsMeasureScore[b.type] - typeIsMeasureScore[a.type];
       }
     }
-    //make the sort stable
+    // make the sort stable
     return indices[a.field] - indices[b.field];
   };
 }
 
-projections.key = function(projection) {
+export function key(projection) {
   return projection.map(function(fieldDef) {
     return vlFieldDef.isCount(fieldDef) ? 'count' : fieldDef.field;
   }).join(',');
 };
-

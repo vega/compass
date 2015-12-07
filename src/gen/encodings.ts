@@ -1,29 +1,25 @@
-"use strict";
+import * as vlFieldDef from 'vega-lite/src/fielddef';
+import * as vlEncoding from 'vega-lite/src/encoding';
+import * as util from '../util';
+import * as genMarks from './marks';
+import * as consts from '../consts';
 
-var vlFieldDef = require('vega-lite/src/fielddef');
-var vlEncoding = require('vega-lite/src/encoding');
-var util = require('../util');
-
-var genMarks = require('./marks'),
-  isDimension = vlFieldDef.isDimension,
+var isDimension = vlFieldDef.isDimension,
   isMeasure = vlFieldDef.isMeasure;
 
-var consts = require('../consts');
 var Type = consts.Type;
 
-module.exports = genEncodings;
-
 // FIXME remove dimension, measure and use information in vega-lite instead!
-var rules = {
+const rules = {
   x: {
     dimension: true,
     measure: true,
-    multiple: true //FIXME should allow multiple only for Q, T
+    multiple: true // FIXME should allow multiple only for Q, T
   },
   y: {
     dimension: true,
     measure: true,
-    multiple: true //FIXME should allow multiple only for Q, T
+    multiple: true // FIXME should allow multiple only for Q, T
   },
   row: {
     dimension: true,
@@ -52,12 +48,6 @@ var rules = {
   detail: {
     dimension: true
   }
-  //geo: {
-  //  geo: true
-  //},
-  //arc: { // pie
-  //
-  //}
 };
 
 function retinalEncRules(encoding, fieldDef, stats, opt) {
@@ -108,14 +98,14 @@ function generalRules(encoding, stats, opt) {
   // CARTESIAN PLOT OR MAP
   if (encoding.x || encoding.y || encoding.geo || encoding.arc) {
 
-    if (encoding.row || encoding.column) { //have facet(s)
+    if (encoding.row || encoding.column) { // have facet(s)
 
       // don't use facets before filling up x,y
-      if (!encoding.x || !encoding.y) return false;
+      if (!encoding.x || !encoding.y) { return false; }
 
       if (opt.omitNonTextAggrWithAllDimsOnFacets) {
         // remove all aggregated charts with all dims on facets (row, column)
-        if (genEncodings.isAggrWithAllDimOnFacets(encoding)) return false;
+        if (isAggrWithAllDimOnFacets(encoding)) { return false; }
       }
     }
 
@@ -129,7 +119,7 @@ function generalRules(encoding, stats, opt) {
       }
 
       if (opt.omitTranpose) {
-        if (isDimX ^ isDimY) { // dim x mea
+        if ((isDimX && !isDimY) || (!isDimX && isDimY)) { // dim x mea
           if (!dimMeaTransposeRule(encoding)) {
             return false;
           }
@@ -164,10 +154,10 @@ function generalRules(encoding, stats, opt) {
 
     if (opt.omitOneDimensionCount) {
       // one dimension "count"
-      if (encoding.x && encoding.x.aggregate == 'count' && !encoding.y) {
+      if (encoding.x && encoding.x.aggregate === 'count' && !encoding.y) {
         return false;
       }
-      if (encoding.y && encoding.y.aggregate == 'count' && !encoding.x) {
+      if (encoding.y && encoding.y.aggregate === 'count' && !encoding.x) {
         return false;
       }
     }
@@ -177,7 +167,7 @@ function generalRules(encoding, stats, opt) {
   return false;
 }
 
-genEncodings.isAggrWithAllDimOnFacets = function (encoding) {
+export function isAggrWithAllDimOnFacets(encoding) {
   var hasAggr = false, hasOtherO = false;
   for (var channel in encoding) {
     var fieldDef = encoding[channel];
@@ -187,14 +177,14 @@ genEncodings.isAggrWithAllDimOnFacets = function (encoding) {
     if (vlFieldDef.isDimension(fieldDef) && (channel !== consts.ROW && channel !== consts.COL)) {
       hasOtherO = true;
     }
-    if (hasAggr && hasOtherO) break;
+    if (hasAggr && hasOtherO) { break; }
   }
 
   return hasAggr && !hasOtherO;
 };
 
 
-function genEncodings(encodings, fieldDefs, stats, opt) {
+export default function genEncodings(encodings, fieldDefs, stats, opt) {
   // generate a collection vega-lite's encoding
   var tmpEncoding = {};
 
@@ -214,7 +204,7 @@ function genEncodings(encodings, fieldDefs, stats, opt) {
       var channel = opt.encodingTypeList[j],
         isDim = isDimension(fieldDef);
 
-      //TODO: support "multiple" assignment
+      // TODO: support "multiple" assignment
       if (!(channel in tmpEncoding) && // encoding not used
         ((isDim && rules[channel].dimension) || (!isDim && rules[channel].measure)) &&
         (!rules[channel].rules || rules[channel].rules(tmpEncoding, fieldDef, stats, opt))

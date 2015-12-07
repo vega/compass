@@ -40,7 +40,8 @@
         "src/gen/specs.ts",
         "src/rank/rank.ts",
         "src/rank/rankEncodings.ts",
-        "src/util.ts"
+        "src/util.ts",
+        "typings/clusterfck.d.ts"
     ],
     "atom": {
         "rewriteTsconfig": true

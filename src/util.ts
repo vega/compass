@@ -1,103 +1,101 @@
-"use strict";
-
-var consts = require('./consts');
-
-var util = module.exports = {
-  gen: {}
+export let isArray = Array.isArray || function (obj) {
+  return {}.toString.call(obj) === '[object Array]';
 };
 
-// FIXME: remove redundant methods
-
-util.isArray = Array.isArray || function (obj) {
-  return {}.toString.call(obj) == '[object Array]';
-};
-
-util.isin = function (item, array) {
+export function isin(item, array) {
     return array.indexOf(item) !== -1;
 };
 
-util.json = function(s, sp) {
+export function json(s, sp) {
   return JSON.stringify(s, null, sp);
 };
 
-util.keys = function(obj) {
+export function keys(obj) {
   var k = [], x;
-  for (x in obj) k.push(x);
+  for (x in obj) {
+    k.push(x);
+  }
   return k;
 };
 
-util.duplicate = function(obj) {
+export function duplicate(obj) {
   return JSON.parse(JSON.stringify(obj));
 };
 
-util.forEach = function(obj, f, thisArg) {
+export function forEach(obj, f, thisArg?) {
   if (obj.forEach) {
     obj.forEach.call(thisArg, f);
-  }
-  else {
+  } else {
     for (var k in obj) {
       f.call(thisArg, obj[k], k, obj);
     }
   }
 };
 
-util.any = function (arr, f) {
+export function any(arr, f) {
     var i = 0, k;
     for (k in arr) {
-        if (f(arr[k], k, i++))
-            return true;
+      if (f(arr[k], k, i++)) {
+        return true;
+      }
     }
     return false;
 };
 
-util.nestedMap = function (collection, f, level, filter) {
+export function nestedMap(collection, f, level, filter?) {
   return level === 0 ?
     collection.map(f) :
     collection.map(function(v) {
-      var r = util.nestedMap(v, f, level - 1);
-      return filter ? r.filter(util.nonEmpty) : r;
+      var r = nestedMap(v, f, level - 1);
+      return filter ? r.filter(nonEmpty) : r;
     });
 };
 
-util.nestedReduce = function (collection, f, level, filter) {
+export function nestedReduce(collection, f, level, filter?) {
   return level === 0 ?
     collection.reduce(f, []) :
     collection.map(function(v) {
-      var r = util.nestedReduce(v, f, level - 1);
-      return filter ? r.filter(util.nonEmpty) : r;
+      var r = nestedReduce(v, f, level - 1);
+      return filter ? r.filter(nonEmpty) : r;
     });
 };
 
-util.nonEmpty = function(grp) {
-  return !util.isArray(grp) || grp.length > 0;
+export function nonEmpty(grp) {
+  return !isArray(grp) || grp.length > 0;
 };
 
 
-util.traverse = function (node, arr) {
+export function traverse(node, arr) {
   if (node.value !== undefined) {
     arr.push(node.value);
   } else {
-    if (node.left) util.traverse(node.left, arr);
-    if (node.right) util.traverse(node.right, arr);
+    if (node.left) {
+      traverse(node.left, arr);
+    }
+    if (node.right) {
+      traverse(node.right, arr);
+    }
+
   }
   return arr;
 };
 
-util.union = function (a, b) {
+export function union(a, b) {
   var o = {};
   a.forEach(function(x) { o[x] = true;});
   b.forEach(function(x) { o[x] = true;});
-  return util.keys(o);
+  return keys(o);
 };
 
-
-util.gen.getOpt = function (opt) {
-  //merge with default
-  return (opt ? util.keys(opt) : []).reduce(function(c, k) {
-    c[k] = opt[k];
-    return c;
-  }, Object.create(consts.gen.DEFAULT_OPT));
-};
+export namespace gen {
+  export function getOpt(opt) {
+    // merge with default
+    return (opt ? keys(opt) : []).reduce(function(c, k) {
+      c[k] = opt[k];
+      return c;
+    }, Object.create({})); // FIXME check if {} is correct
+  };
+}
 
 /**
  * powerset code from http://rosettacode.org/wiki/Power_Set#JavaScript
@@ -108,10 +106,9 @@ util.gen.getOpt = function (opt) {
  *
  * [[],[1],[2],[1,2],[3],[1,3],[2,3],[1,2,3],[4],[1,4],
  * [2,4],[1,2,4],[3,4],[1,3,4],[2,3,4],[1,2,3,4]]
-[edit]
-*/
+ */
 
-util.powerset = function(list) {
+export function powerset(list) {
   var ps = [
     []
   ];
@@ -123,12 +120,12 @@ util.powerset = function(list) {
   return ps;
 };
 
-util.chooseKorLess = function(list, k) {
+export function chooseKorLess(list, k) {
   var subset = [[]];
   for (var i = 0; i < list.length; i++) {
     for (var j = 0, len = subset.length; j < len; j++) {
       var sub = subset[j].concat(list[i]);
-      if(sub.length <= k){
+      if(sub.length <= k) {
         subset.push(sub);
       }
     }
@@ -136,15 +133,15 @@ util.chooseKorLess = function(list, k) {
   return subset;
 };
 
-util.chooseK = function(list, k) {
+export function chooseK(list, k) {
   var subset = [[]];
   var kArray =[];
   for (var i = 0; i < list.length; i++) {
     for (var j = 0, len = subset.length; j < len; j++) {
       var sub = subset[j].concat(list[i]);
-      if(sub.length < k){
+      if (sub.length < k) {
         subset.push(sub);
-      }else if (sub.length === k){
+      } else if (sub.length === k) {
         kArray.push(sub);
       }
     }
@@ -152,13 +149,12 @@ util.chooseK = function(list, k) {
   return kArray;
 };
 
-util.cross = function(a,b){
+export function cross(a,b) {
   var x = [];
-  for(var i=0; i< a.length; i++){
-    for(var j=0;j< b.length; j++){
+  for(var i=0; i< a.length; i++) {
+    for(var j=0;j< b.length; j++) {
       x.push(a[i].concat(b[j]));
     }
   }
   return x;
 };
-

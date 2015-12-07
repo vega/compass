@@ -1,18 +1,14 @@
-"use strict";
-
-var vlEncoding = require('vega-lite/src/encoding');
-var vlFieldDef = require('vega-lite/src/fielddef');
-var vlValidate = require('vega-lite/src/validate');
+import * as vlEncoding from 'vega-lite/src/encoding';
+import * as vlFieldDef from 'vega-lite/src/fielddef';
+import * as vlValidate from 'vega-lite/src/validate';
 
 var isDimension = vlFieldDef.isDimension;
-var util = require('../util');
+import * as util from '../util';
 
-var consts = require('../consts');
+import * as consts from '../consts';
 var Type = consts.Type;
 
-var genMarks = module.exports = getMarks;
-
-var marksRule = genMarks.rule = {
+export const rule = {
   point:  pointRule,
   bar:    barRule,
   line:   lineRule,
@@ -21,18 +17,18 @@ var marksRule = genMarks.rule = {
   tick:   tickRule
 };
 
-function getMarks(encoding, stats, opt) {
+export default function genMarks(encoding, stats, opt) {
   return opt.markList.filter(function(mark){
-    return genMarks.satisfyRules(encoding, mark, stats, opt);
+    return satisfyRules(encoding, mark, stats, opt);
   });
 }
 
-genMarks.satisfyRules = function (encoding, mark, stats, opt) {
+export function satisfyRules(encoding, mark, stats, opt) {
   return vlValidate.getEncodingMappingError({
       mark: mark,
       encoding: encoding
     }) === null &&
-    (!marksRule[mark] || marksRule[mark](encoding, stats, opt));
+    (!rule[mark] || rule[mark](encoding, stats, opt));
 };
 
 function facetRule(fieldDef, stats, opt) {
@@ -105,14 +101,15 @@ function barRule(encoding, stats, opt) {
 
   // FIXME actually check if there would be occlusion #90
   // need to aggregate on either x or y
+
   var aggEitherXorY =
-    (!encoding.x || encoding.x.aggregate === undefined) ^
+    (!encoding.x || encoding.x.aggregate === undefined) !== // xor
     (!encoding.y || encoding.y.aggregate === undefined);
 
 
   if (aggEitherXorY) {
     var eitherXorYisDimOrNull =
-      (!encoding.x || isDimension(encoding.x)) ^
+      (!encoding.x || isDimension(encoding.x)) !== // xor
       (!encoding.y || isDimension(encoding.y));
 
     if (eitherXorYisDimOrNull) {
@@ -132,7 +129,8 @@ function lineRule(encoding, stats, opt) {
   // FIXME truly ordinal data is fine here too.
   // Line chart should be only horizontal
   // and use only temporal data
-  return encoding.x.type == Type.Temporal && encoding.x.timeUnit && encoding.y.type == Type.Quantitative && encoding.y.aggregate;
+  return encoding.x.type === Type.Temporal && encoding.x.timeUnit &&
+         encoding.y.type === Type.Quantitative && encoding.y.aggregate;
 }
 
 function areaRule(encoding, stats, opt) {

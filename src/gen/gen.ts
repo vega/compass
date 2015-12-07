@@ -1,53 +1,56 @@
 'use strict';
 
-var util = require('../util');
+import * as util from '../util';
+import genAggregates from './aggregates';
+import genProjections from './projections';
+import genSpecs from './specs';
+import genEncodings from './encodings';
+import genMarks from './marks';
 
 /**
  * Module for generating visualizations
  */
 
-var gen = module.exports = {
-  // data variations
-  aggregates: require('./aggregates'),
-  projections: require('./projections'),
-  // encodings / visual variations
-  specs: require('./specs'),
-  encodings: require('./encodings'),
-  marks: require('./marks')
-};
+// data variations
+export const aggregates = genAggregates;
+export const projections = genProjections;
 
+// encodings / visual variations
+export const specs = genSpecs;
+export const encodings = genEncodings;
+export const marks = genMarks;
 
-// TODO(kanitw): revise if this is still working
-gen.charts = function(fieldDefs, opt, config, flat) {
-  opt = util.gen.getOpt(opt);
-  flat = flat === undefined ? {encodings: 1} : flat;
-
-  // TODO generate
-
-  // generate permutation of encoding mappings
-  var fieldSets = opt.genAggr ? gen.aggregates([], fieldDefs, opt) : [fieldDefs],
-    encodings, charts, level = 0;
-
-  if (flat === true || (flat && flat.aggregate)) {
-    encodings = fieldSets.reduce(function(output, fieldDefs) {
-      return gen.encs(output, fieldDefs, opt);
-    }, []);
-  } else {
-    encodings = fieldSets.map(function(fieldDefs) {
-      return gen.encs([], fieldDefs, opt);
-    }, true);
-    level += 1;
-  }
-
-  if (flat === true || (flat && flat.encodings)) {
-    charts = util.nestedReduce(encodings, function(output, encoding) {
-      return gen.marks(output, encoding, opt, config);
-    }, level, true);
-  } else {
-    charts = util.nestedMap(encodings, function(encoding) {
-      return gen.marks([], encoding, opt, config);
-    }, level, true);
-    level += 1;
-  }
-  return charts;
-};
+// // TODO(kanitw): revise if this is still working
+// export function charts(fieldDefs, opt, config, flat) {
+//   opt = util.gen.getOpt(opt);
+//   flat = flat === undefined ? {encodings: 1} : flat;
+//
+//   // TODO generate
+//
+//   // generate permutation of encoding mappings
+//   var fieldSets = opt.genAggr ? genAggregates([], fieldDefs, opt) : [fieldDefs],
+//     encodings, charts, level = 0;
+//
+//   if (flat === true || (flat && flat.aggregate)) {
+//     encodings = fieldSets.reduce(function(output, fieldDefs) {
+//       return genEncodings(output, fieldDefs, opt);
+//     }, []);
+//   } else {
+//     encodings = fieldSets.map(function(fieldDefs) {
+//       return genEncodings([], fieldDefs, opt);
+//     }, true);
+//     level += 1;
+//   }
+//
+//   if (flat === true || (flat && flat.encodings)) {
+//     charts = util.nestedReduce(encodings, function(output, encoding) {
+//       return gen.marks(output, encoding, opt, config);
+//     }, level, true);
+//   } else {
+//     charts = util.nestedMap(encodings, function(encoding) {
+//       return gen.marks([], encoding, opt, config);
+//     }, level, true);
+//     level += 1;
+//   }
+//   return charts;
+// };

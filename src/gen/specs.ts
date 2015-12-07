@@ -1,19 +1,17 @@
 'use strict';
 
-var vlFieldDef = require('vega-lite/src/fielddef');
-var vlSchemaUtil = require('vega-lite/src/schema/schemautil');
-var util = require('../util');
+import * as vlFieldDef from 'vega-lite/src/fielddef';
+import * as vlSchemaUtil from 'vega-lite/src/schema/schemautil';
+import * as util from '../util';
 
-var genEncodings = require('./encodings'),
-  getMarks = require('./marks'),
-  rank = require('../rank/rank'),
-  consts = require('../consts');
-
-module.exports = genSpecsFromFieldDefs;
+import genEncodings from './encodings';
+import getMarks from './marks';
+import * as rank from '../rank/rank';
+import * as consts from '../consts';
 
 /** Design Encodings for a set of field definition */
 
-function genSpecsFromFieldDefs(output, fieldDefs, stats, opt, nested) {
+export default function genSpecsFromFieldDefs(output, fieldDefs, stats, opt, nested) {
   // opt must be augmented before being passed to genEncodings or getMarks
   opt = vlSchemaUtil.extend(opt||{}, consts.gen.encodings);
   var encodings = genEncodings([], fieldDefs, stats, opt);
@@ -52,7 +50,7 @@ function genSpecsFromEncodings(output, encoding, stats, opt) {
   return output;
 }
 
-//FIXME this should be refactors
+// FIXME this should be refactors
 function finalTouch(spec, stats, opt) {
   if (spec.mark === 'text' && opt.alwaysGenerateTableAsHeatmap) {
     spec.encoding.color = spec.encoding.text;

@@ -1,5 +1,3 @@
-module.exports = {
-  encoding: require('./rankEncodings')
-};
+import rankEncodings from './rankEncodings';
 
-
+export const encoding = rankEncodings;

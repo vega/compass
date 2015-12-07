@@ -1,23 +1,20 @@
 'use strict';
 
-var vlFieldDef = require('vega-lite/src/fielddef');
-var vlSchemaUtil = require('vega-lite/src/schema/schemautil');
-var vlShorthand = require('vega-lite/src/shorthand');
+import * as vlFieldDef from 'vega-lite/src/fielddef';
+import * as vlSchemaUtil from 'vega-lite/src/schema/schemautil';
+import * as vlShorthand from 'vega-lite/src/shorthand';
 
-var consts = require('../consts');
+import * as consts from '../consts';
 var Type = consts.Type;
-var util = require('../util');
+import * as util from '../util';
 
 var AUTO = '*';
 
-module.exports = genAggregates;
-
-
-function genAggregates(output, fieldDefs, stats, opt) {
+export default function genAggregates(output, fieldDefs, stats, opt) {
   opt = vlSchemaUtil.extend(opt||{}, consts.gen.aggregates);
   var tf = new Array(fieldDefs.length);
   var hasNorO = util.any(fieldDefs, function(f) {
-    return f.type === Type.Nominal || f.type == Type.Ordinal;
+    return f.type === Type.Nominal || f.type === Type.Ordinal;
   });
 
   function emit(fieldSet) {
@@ -36,20 +33,20 @@ function genAggregates(output, fieldDefs, stats, opt) {
           hasDimension = true;
         } else {
           hasMeasure = true;
-          if (!f.aggregate) hasRaw = true;
+          if (!f.aggregate) { hasRaw = true; }
         }
       });
-      if (!hasDimension && !hasRaw && opt.omitMeasureOnly) return;
+      if (!hasDimension && !hasRaw && opt.omitMeasureOnly) { return; }
       if (!hasMeasure) {
         if (opt.addCountForDimensionOnly) {
           tf.push(vlFieldDef.count());
           emit(tf);
           tf.pop();
         }
-        if (opt.omitDimensionOnly) return;
+        if (opt.omitDimensionOnly) { return; }
       }
     }
-    if (opt.omitDotPlot && tf.length === 1) return;
+    if (opt.omitDotPlot && tf.length === 1) { return; }
     emit(tf);
   }
 
@@ -156,7 +153,7 @@ function genAggregates(output, fieldDefs, stats, opt) {
     var f = fieldDefs[i];
     // Otherwise, assign i-th field
     switch (f.type) {
-      //TODO "D", "G"
+      // TODO: "D", "G"
       case Type.Quantitative:
         assignQ(i, hasAggr, autoMode);
         break;
