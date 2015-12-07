@@ -27,78 +27,6 @@ var MARK_SCORE = {
   text: 0.8
 };
 
-export default function rankEncodings(spec, stats, opt?, selected?) {
-  var features = [],
-    channels = util.keys(spec.encoding),
-    mark = spec.mark,
-    encoding = spec.encoding;
-
-  var encodingMappingByField = vlEncoding.reduce(spec.encoding, function(o, fieldDef, channel) {
-    var key = vlShorthand.shortenFieldDef(fieldDef);
-    var mappings = o[key] = o[key] || [];
-    mappings.push({channel: channel, fieldDef: fieldDef});
-    return o;
-  }, {});
-
-  // data - encoding mapping score
-  util.forEach(encodingMappingByField, function(mappings) {
-    var reasons = mappings.map(function(m) {
-        return m.channel + vlShorthand.ASSIGN + vlShorthand.shortenFieldDef(m.fieldDef) +
-          ' ' + (selected && selected[m.fieldDef.field] ? '[x]' : '[ ]');
-      }),
-      scores = mappings.map(function(m) {
-        var role = vlFieldDef.isDimension(m.fieldDef) ? 'dimension' : 'measure';
-
-        var score = score[role](m.fieldDef, m.channel, spec.mark, stats, opt);
-
-        return !selected || selected[m.fieldDef.field] ? score : Math.pow(score, 0.125);
-      });
-
-    features.push({
-      reason: reasons.join(" | "),
-      score: Math.max.apply(null, scores)
-    });
-  });
-
-  // plot type
-  if (mark === 'text') {
-    // TODO
-  } else {
-    if (encoding.x && encoding.y) {
-      if (isDimension(encoding.x) !== isDimension(encoding.y)) {
-        features.push({
-          reason: 'OxQ plot',
-          score: 0.8
-        });
-      }
-    }
-  }
-
-  // penalize not using positional only penalize for non-text
-  if (channels.length > 1 && mark !== 'text') {
-    if ((!encoding.x || !encoding.y) && !encoding.geo && !encoding.text) {
-      features.push({
-        reason: 'unused position',
-        score: UNUSED_POSITION
-      });
-    }
-  }
-
-  // mark type score
-  features.push({
-    reason: 'mark='+mark,
-    score: MARK_SCORE[mark]
-  });
-
-  return {
-    score: features.reduce(function(p, f) {
-      return p * f.score;
-    }, 1),
-    features: features
-  };
-}
-
-
 var D:any = {}, M:any = {}, BAD = 0.1, TERRIBLE = 0.01;
 
 D.minor = 0.01;
@@ -201,3 +129,76 @@ export const score = {
   dimension: dimensionScore,
   measure: measureScore,
 };
+
+
+export default function rankEncodings(spec, stats, opt?, selected?) {
+  var features = [],
+    channels = util.keys(spec.encoding),
+    mark = spec.mark,
+    encoding = spec.encoding;
+
+  var encodingMappingByField = vlEncoding.reduce(spec.encoding, function(o, fieldDef, channel) {
+    var key = vlShorthand.shortenFieldDef(fieldDef);
+    var mappings = o[key] = o[key] || [];
+    mappings.push({channel: channel, fieldDef: fieldDef});
+    return o;
+  }, {});
+
+  // data - encoding mapping score
+  util.forEach(encodingMappingByField, function(mappings) {
+    var reasons = mappings.map(function(m) {
+        return m.channel + vlShorthand.ASSIGN + vlShorthand.shortenFieldDef(m.fieldDef) +
+          ' ' + (selected && selected[m.fieldDef.field] ? '[x]' : '[ ]');
+      }),
+      scores = mappings.map(function(m) {
+        var roleScore = vlFieldDef.isDimension(m.fieldDef) ?
+                          dimensionScore : measureScore;
+
+        var score = roleScore(m.fieldDef, m.channel, spec.mark, stats, opt);
+
+        return !selected || selected[m.fieldDef.field] ? score : Math.pow(score, 0.125);
+      });
+
+    features.push({
+      reason: reasons.join(" | "),
+      score: Math.max.apply(null, scores)
+    });
+  });
+
+  // plot type
+  if (mark === 'text') {
+    // TODO
+  } else {
+    if (encoding.x && encoding.y) {
+      if (isDimension(encoding.x) !== isDimension(encoding.y)) {
+        features.push({
+          reason: 'OxQ plot',
+          score: 0.8
+        });
+      }
+    }
+  }
+
+  // penalize not using positional only penalize for non-text
+  if (channels.length > 1 && mark !== 'text') {
+    if ((!encoding.x || !encoding.y) && !encoding.geo && !encoding.text) {
+      features.push({
+        reason: 'unused position',
+        score: UNUSED_POSITION
+      });
+    }
+  }
+
+  // mark type score
+  features.push({
+    reason: 'mark='+mark,
+    score: MARK_SCORE[mark]
+  });
+
+  return {
+    score: features.reduce(function(p, f) {
+      return p * f.score;
+    }, 1),
+    features: features
+  };
+}
