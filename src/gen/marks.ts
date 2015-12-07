@@ -2,11 +2,12 @@ import * as vlEncoding from 'vega-lite/src/encoding';
 import * as vlFieldDef from 'vega-lite/src/fielddef';
 import * as vlValidate from 'vega-lite/src/validate';
 
+import {Type} from '../consts';
+
 var isDimension = vlFieldDef.isDimension;
 import * as util from '../util';
 
 import * as consts from '../consts';
-var TYPE = consts.Type;
 
 export const rule = {
   point:  pointRule,
@@ -129,8 +130,8 @@ function lineRule(encoding, stats, opt) {
   // FIXME truly ordinal data is fine here too.
   // Line chart should be only horizontal
   // and use only temporal data
-  return encoding.x.type === TYPE.Temporal && encoding.x.timeUnit &&
-         encoding.y.type === TYPE.Quantitative && encoding.y.aggregate;
+  return encoding.x.type === Type.Temporal && encoding.x.timeUnit &&
+         encoding.y.type === Type.Quantitative && encoding.y.aggregate;
 }
 
 function areaRule(encoding, stats, opt) {

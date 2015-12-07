@@ -3,11 +3,10 @@ import * as vlEncoding from 'vega-lite/src/encoding';
 import * as util from '../util';
 import * as genMarks from './marks';
 import * as consts from '../consts';
+import {Type} from '../consts';
 
 var isDimension = vlFieldDef.isDimension,
   isMeasure = vlFieldDef.isMeasure;
-
-var TYPE = consts.Type;
 
 // FIXME remove dimension, measure and use information in vega-lite instead!
 const rules = {
@@ -67,20 +66,20 @@ function colorRules(encoding, fieldDef, stats, opt) {
 function shapeRules(encoding, fieldDef, stats, opt) {
   if(!retinalEncRules(encoding, fieldDef, stats, opt)) return false;
 
-  if (fieldDef.bin && fieldDef.type === TYPE.Quantitative) return false;
-  if (fieldDef.timeUnit && fieldDef.type === TYPE.Temporal) return false;
+  if (fieldDef.bin && fieldDef.type === Type.Quantitative) return false;
+  if (fieldDef.timeUnit && fieldDef.type === Type.Temporal) return false;
   return vlFieldDef.cardinality(fieldDef, stats) <= opt.maxCardinalityForColor;
 }
 
 function dimMeaTransposeRule(encoding) {
   // create horizontal histogram for ordinal
-  if ((encoding.y.type === TYPE.Nominal || encoding.y.type === TYPE.Ordinal) && isMeasure(encoding.x)) {
+  if ((encoding.y.type === Type.Nominal || encoding.y.type === Type.Ordinal) && isMeasure(encoding.x)) {
     return true;
   }
 
   // vertical histogram for Q and T
   if (isMeasure(encoding.y) &&
-      !(encoding.x.type === TYPE.Nominal || encoding.x.type === TYPE.Ordinal) &&
+      !(encoding.x.type === Type.Nominal || encoding.x.type === Type.Ordinal) &&
       isDimension(encoding.x)
       ) {
     return true;
@@ -123,8 +122,8 @@ function generalRules(encoding, stats, opt) {
           if (!dimMeaTransposeRule(encoding)) {
             return false;
           }
-        } else if (encoding.y.type=== TYPE.Temporal|| encoding.x.type === TYPE.Temporal) {
-          if (encoding.y.type=== TYPE.Temporal && encoding.x.type !== TYPE.Temporal) {
+        } else if (encoding.y.type=== Type.Temporal|| encoding.x.type === Type.Temporal) {
+          if (encoding.y.type=== Type.Temporal && encoding.x.type !== Type.Temporal) {
             return false;
           }
         } else { // show only one OxO, QxQ
