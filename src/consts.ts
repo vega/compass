@@ -1,3 +1,5 @@
+/* tslint:disable:variable-name */
+
 export const X = 'x';
 export const Y = 'y';
 export const ROW = 'row';
@@ -20,7 +22,7 @@ export namespace gen {
   export const projections = {
     type: 'object',
     properties: {
-      omitDotPlot: { //FIXME remove this!
+      omitDotPlot: { // FIXME remove this!
         type: 'boolean',
         default: false,
         description: 'remove all dot plots'
@@ -99,7 +101,7 @@ export namespace gen {
       consistentAutoQ: {
         type: 'boolean',
         default: true,
-        description: "generate similar auto transform for quant"
+        description: 'generate similar auto transform for quant'
       }
     }
   };
@@ -110,7 +112,7 @@ export namespace gen {
       markList: {
         type: 'array',
         items: {type: 'string'},
-        default: ['point', 'bar', 'line', 'area', 'text', 'tick'], //filled_map
+        default: ['point', 'bar', 'line', 'area', 'text', 'tick'], // filled_map
         description: 'allowed marks'
       },
       encodingTypeList: {

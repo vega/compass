@@ -11,7 +11,7 @@ import * as util from '../util';
 import * as vlShorthand from 'vega-lite/src/shorthand';
 
 import * as consts from '../consts';
-var Type = consts.Type;
+var TYPE = consts.Type;
 
 // bad score not specified in the table above
 var UNUSED_POSITION = 0.5;
@@ -57,16 +57,16 @@ export let dimensionScore:any = function(fieldDef, channel, mark, stats, opt){
   var cardinality = vlFieldDef.cardinality(fieldDef, stats);
   switch (channel) {
     case vlChannel.X:
-      if (fieldDef.type === Type.Nominal || fieldDef.type === Type.Ordinal)  {
+      if (fieldDef.type === TYPE.Nominal || fieldDef.type === TYPE.Ordinal)  {
         return D.pos - D.minor;
       }
       return D.pos;
 
     case vlChannel.Y:
-      if (fieldDef.type === Type.Nominal || fieldDef.type === Type.Ordinal) {
+      if (fieldDef.type === TYPE.Nominal || fieldDef.type === TYPE.Ordinal) {
         return D.pos - D.minor; // prefer ordinal on y
       }
-      if (fieldDef.type === Type.Temporal) {
+      if (fieldDef.type === TYPE.Temporal) {
         return D.Y_T; // time should not be on Y
       }
       return D.pos - D.minor;
@@ -83,7 +83,7 @@ export let dimensionScore:any = function(fieldDef, channel, mark, stats, opt){
         cardinality <= opt.maxCardinalityForFacets ? D.facet_ok : D.facet_bad) - D.minor;
 
     case vlChannel.COLOR:
-      var hasOrder = (fieldDef.bin && fieldDef.type=== Type.Quantitative) || (fieldDef.timeUnit && fieldDef.type=== Type.Temporal);
+      var hasOrder = (fieldDef.bin && fieldDef.type=== TYPE.Quantitative) || (fieldDef.timeUnit && fieldDef.type=== TYPE.Temporal);
 
       // FIXME add stacking option once we have control ..
       var isStacked = mark === 'bar' || mark === 'area';
@@ -124,13 +124,6 @@ export let measureScore:any = function(fieldDef, channel, mark, stats, opt) {
 
 measureScore.consts = M;
 
-
-export const score = {
-  dimension: dimensionScore,
-  measure: measureScore,
-};
-
-
 export default function rankEncodings(spec, stats, opt?, selected?) {
   var features = [],
     channels = util.keys(spec.encoding),
@@ -160,7 +153,7 @@ export default function rankEncodings(spec, stats, opt?, selected?) {
       });
 
     features.push({
-      reason: reasons.join(" | "),
+      reason: reasons.join(' | '),
       score: Math.max.apply(null, scores)
     });
   });

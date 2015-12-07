@@ -5,7 +5,9 @@ import * as vlSchemaUtil from 'vega-lite/src/schema/schemautil';
 import * as vlShorthand from 'vega-lite/src/shorthand';
 
 import * as consts from '../consts';
-var Type = consts.Type;
+
+var TYPE = consts.Type;
+
 import * as util from '../util';
 
 var AUTO = '*';
@@ -14,7 +16,7 @@ export default function genAggregates(output, fieldDefs, stats, opt?) {
   opt = vlSchemaUtil.extend(opt||{}, consts.gen.aggregates);
   var tf = new Array(fieldDefs.length);
   var hasNorO = util.any(fieldDefs, function(f) {
-    return f.type === Type.Nominal || f.type === Type.Ordinal;
+    return f.type === TYPE.Nominal || f.type === TYPE.Ordinal;
   });
 
   function emit(fieldSet) {
@@ -108,9 +110,9 @@ export default function genAggregates(output, fieldDefs, stats, opt?) {
           assignBinQ(i, hasAggr, isAuto ? 'autocast' : 'bin');
         }
         if (genCast && util.isin(autoMode, [AUTO, 'cast', 'autocast'])) {
-          tf[i].type = Type.Ordinal;
+          tf[i].type = TYPE.Ordinal;
           assignField(i + 1, hasAggr, isAuto ? 'autocast' : 'cast');
-          tf[i].type = Type.Quantitative;
+          tf[i].type = TYPE.Quantitative;
         }
       }
     }
@@ -154,16 +156,16 @@ export default function genAggregates(output, fieldDefs, stats, opt?) {
     // Otherwise, assign i-th field
     switch (f.type) {
       // TODO: "D", "G"
-      case Type.Quantitative:
+      case TYPE.Quantitative:
         assignQ(i, hasAggr, autoMode);
         break;
 
-      case Type.Temporal:
+      case TYPE.Temporal:
         assignT(i, hasAggr, autoMode);
         break;
-      case Type.Ordinal:
+      case TYPE.Ordinal:
         /* falls through */
-      case Type.Nominal:
+      case TYPE.Nominal:
         /* falls through */
       default:
         tf[i] = f;

@@ -9,7 +9,7 @@ import {dimensionScore, measureScore} from '../../src/rank/rankEncodings';
 
 var setter = function(x, p, val, noaugment?) {
   for (var i=0; i<p.length-1; ++i) {
-    if (!noaugment && !(p[i] in x)){
+    if (!noaugment && !(p[i] in x)) {
       x = x[p[i]] = {};
     } else {
       x = x[p[i]];
@@ -34,13 +34,13 @@ describe('cp.rank.encoding', function () {
   marks.forEach(function(mark) {
     channels.forEach(function(channel) {
       mFixtures.forEach(function(q) {
-        var Qf = fixture[q];
-        setter(score, [q, mark, channel], measureScore(Qf.fields[0], channel, mark, Qf.stats, opt));
+        var fQ = fixture[q];
+        setter(score, [q, mark, channel], measureScore(fQ.fields[0], channel, mark, fQ.stats, opt));
       });
 
       dFixtures.forEach(function(o) {
-        var Of = fixture[o];
-        setter(score, [o, mark, channel], dimensionScore(Of.fields[0], channel, mark, Of.stats, opt));
+        var fO = fixture[o];
+        setter(score, [o, mark, channel], dimensionScore(fO.fields[0], channel, mark, fO.stats, opt));
       });
     });
   });
@@ -142,7 +142,7 @@ describe('cp.rank.encoding', function () {
         encoding: {
           x: f.fields[0],
           y: f.fields[1],
-          color: f.fields[2] //count
+          color: f.fields[2] // count
         }
       };
 
@@ -166,18 +166,18 @@ describe('cp.rank.encoding', function () {
     describe('text tables', function() {
       it('\'s text and color score should be merged', function () {
         var spec = {
-          "mark": "text",
-          "encoding": {
-            "column": {"field": "Aircraft__Airline_Operator","type": "ordinal"},
-            "text": {"field": "*","aggregate": "count","type": "quantitative"},
-            "color": {"field": "*","aggregate": "count","type": "quantitative"}
+          'mark': 'text',
+          'encoding': {
+            'column': {'field': 'Aircraft__Airline_Operator','type': 'ordinal'},
+            'text': {'field': '*','aggregate': 'count','type': 'quantitative'},
+            'color': {'field': '*','aggregate': 'count','type': 'quantitative'}
           }
         };
-        var score = rankEncodings(spec, {
+        var textScore = rankEncodings(spec, {
           Aircraft__Airline_Operator: {cardinality: 10},
           count: 15
         });
-        expect(score.features.length).to.equal(3);
+        expect(textScore.features.length).to.equal(3);
       });
     });
   });

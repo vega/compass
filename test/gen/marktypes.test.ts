@@ -31,7 +31,7 @@ describe('cp.gen.marks()', function(){
   describe('1Q', function () {
     var encoding, marks;
     beforeEach(function() {
-      encoding = {"x": {"field": "Cost__Total_$","type": "quantitative"}};
+      encoding = {'x': {'field': 'Cost__Total_$','type': 'quantitative'}};
       marks = getMarks(encoding, {}, opt);
     });
     it('should contain tick', function () {
@@ -50,11 +50,11 @@ describe('cp.gen.marks()', function(){
 
   describe('point', function(){
     describe('scatter and bubble plots', function(){
-      //TODO
+      // TODO
     });
 
     describe('dot plot', function(){
-      //TODO
+      // TODO
     });
   });
 
@@ -62,9 +62,9 @@ describe('cp.gen.marks()', function(){
     describe('with stacked average', function () {
       it('should not be generated', function () {
         var encoding = {
-          "color": {"field": "When__Phase_of_flight","type": "ordinal"},
-          "x": {"field": "Cost__Total_$","type": "quantitative","aggregate": "mean"},
-          "y": {"selected": undefined,"field": "Aircraft__Airline_Operator","type": "ordinal"}
+          'color': {'field': 'When__Phase_of_flight','type': 'ordinal'},
+          'x': {'field': 'Cost__Total_$','type': 'quantitative','aggregate': 'mean'},
+          'y': {'selected': undefined,'field': 'Aircraft__Airline_Operator','type': 'ordinal'}
         };
 
         var marks = getMarks(encoding, {}, opt);
@@ -75,9 +75,9 @@ describe('cp.gen.marks()', function(){
     describe('with stacked sum', function () {
       it('should be generated', function () {
         var encoding = {
-          "color": {"field": "When__Phase_of_flight","type": "ordinal"},
-          "x": {"field": "Cost__Total_$","type": "quantitative","aggregate": "sum"},
-          "y": {"field": "Aircraft__Airline_Operator","type": "ordinal"}
+          'color': {'field': 'When__Phase_of_flight','type': 'ordinal'},
+          'x': {'field': 'Cost__Total_$','type': 'quantitative','aggregate': 'sum'},
+          'y': {'field': 'Aircraft__Airline_Operator','type': 'ordinal'}
         };
         var marks = getMarks(encoding, {}, opt);
         expect(marks.indexOf('bar')).to.gt(-1);
@@ -99,15 +99,15 @@ describe('cp.gen.marks()', function(){
 
     it('should not contain size', function() {
       var encoding = {
-        "column": {
-          "field": "Effect__Amount_of_damage",
-          "type": "ordinal",
+        'column': {
+          'field': 'Effect__Amount_of_damage',
+          'type': 'ordinal',
         },
-        "size": {
-          "field": "Cost__Repair","type": "quantitative","aggregate": "mean"
+        'size': {
+          'field': 'Cost__Repair','type': 'quantitative','aggregate': 'mean'
         },
-        "text": {
-          "field": "Cost__Total_$","type": "quantitative","aggregate": "mean"
+        'text': {
+          'field': 'Cost__Total_$','type': 'quantitative','aggregate': 'mean'
         }
       };
 

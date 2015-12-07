@@ -27,7 +27,7 @@ describe('cp.gen.encs()', function () {
   });
 
   describe('1Q,', function() {
-    //FIXME write tests
+    // FIXME write tests
   });
 
   describe('#xB(Q)', function() {

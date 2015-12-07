@@ -28,7 +28,7 @@ describe('cp.gen.encodings()', function () {
       var specs = genSpecs([], fields, stats, {
         omitDotPlot: false
       });
-      expect(specs.length).to.equal(2); //point and tick
+      expect(specs.length).to.equal(2); // point and tick
     });
 
     it('should generate more encodings without pruning', function () {

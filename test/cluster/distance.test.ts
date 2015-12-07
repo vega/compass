@@ -5,20 +5,20 @@ import * as distance from '../../src/cluster/distance';
 describe('cp.cluster.distance.get()', function () {
   it('should return correct distance', function() {
     var table1 = {
-      "mark": "text",
-      "encoding": {
-        "row": {"field": "Effect__Amount_of_damage","type": "ordinal"},
-        "column": {"field": "Aircraft__Airline_Operator","type": "ordinal"},
-        "text": {"field": "*","aggregate": "count","type": "quantitative","displayName": "Number of Records"}
+      'mark': 'text',
+      'encoding': {
+        'row': {'field': 'Effect__Amount_of_damage','type': 'ordinal'},
+        'column': {'field': 'Aircraft__Airline_Operator','type': 'ordinal'},
+        'text': {'field': '*','aggregate': 'count','type': 'quantitative','displayName': 'Number of Records'}
       }
     };
 
     var table2 = {
-      "mark": "text",
-      "encoding": {
-        "column": {"field": "Effect__Amount_of_damage","type": "ordinal"},
-        "row": {"field": "Aircraft__Airline_Operator","type": "ordinal"},
-        "text": {"field": "*","aggregate": "count","type": "quantitative","displayName": "Number of Records"}
+      'mark': 'text',
+      'encoding': {
+        'column': {'field': 'Effect__Amount_of_damage','type': 'ordinal'},
+        'row': {'field': 'Aircraft__Airline_Operator','type': 'ordinal'},
+        'text': {'field': '*','aggregate': 'count','type': 'quantitative','displayName': 'Number of Records'}
       }
     };
 
