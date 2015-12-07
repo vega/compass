@@ -1,5 +1,5 @@
 import * as cpConsts from './consts';
-import * as cpCluster from './cluster/cluster';
+import cpCluster from './cluster/cluster'; // FIXME
 import * as cpGen from './gen/gen';
 import * as cpRank from './rank/rank';
 import * as cpUtil from './util';
@@ -10,5 +10,7 @@ export const gen = cpGen;
 export const rank = cpRank;
 export const util = cpUtil;
 
-// FIXME move 
+// FIXME move
 export const auto = '-, sum';
+
+export const version = '__VERSION__';

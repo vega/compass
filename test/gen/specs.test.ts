@@ -1,8 +1,6 @@
 import {expect} from 'chai';
 import {fixture} from '../fixture';
 import genSpecs from '../../src/gen/specs';
-import * as consts from '../../src/consts';
-import * as vl from 'vega-lite/src/vl';
 
 describe('cp.gen.encodings()', function () {
   describe('#', function () {

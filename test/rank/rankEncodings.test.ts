@@ -1,7 +1,7 @@
 import {expect} from 'chai';
 import {fixture} from '../fixture';
 import * as consts from '../../src/consts';
-import * as vl from 'vega-lite/src/vl';
+import * as vlSchema from 'vega-lite/src/schema/schema';
 
 // FIXME
 import rankEncodings from '../../src/rank/rankEncodings';
@@ -21,7 +21,7 @@ var setter = function(x, p, val, noaugment?) {
 
 var D = dimensionScore.consts,
   M = measureScore.consts,
-  opt = vl.schema.util.extend(opt||{}, consts.gen.encodings);
+  opt = vlSchema.util.extend(opt||{}, consts.gen.encodings);
 
 describe('cp.rank.encoding', function () {
   var marks = consts.gen.encodings.properties.markList.default;

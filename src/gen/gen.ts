@@ -1,8 +1,8 @@
 'use strict';
 
-import * as util from '../util';
 import genAggregates from './aggregates';
 import genProjections from './projections';
+import {key} from './projections';
 import genSpecs from './specs';
 import genEncodings from './encodings';
 import genMarks from './marks';
@@ -13,7 +13,9 @@ import genMarks from './marks';
 
 // data variations
 export const aggregates = genAggregates;
-export const projections = genProjections;
+export let projections: any = genProjections;
+// FIXME
+projections.key = key;
 
 // encodings / visual variations
 export const specs = genSpecs;
