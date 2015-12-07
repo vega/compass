@@ -41,6 +41,15 @@
         "src/rank/rank.ts",
         "src/rank/rankEncodings.ts",
         "src/util.ts",
+        "test/cluster/cluster.test.ts",
+        "test/cluster/distance.test.ts",
+        "test/fixture.ts",
+        "test/gen/aggregates.test.ts",
+        "test/gen/encodings.test.ts",
+        "test/gen/marktypes.test.ts",
+        "test/gen/projections.test.ts",
+        "test/gen/specs.test.ts",
+        "test/rank/rankEncodings.test.ts",
         "typings/clusterfck.d.ts"
     ],
     "atom": {
