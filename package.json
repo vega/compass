@@ -16,15 +16,15 @@
     "test": "test"
   },
   "scripts": {
-    "build": "browserify src/cp.ts -p tsify -d -s cp | exorcist compass.js.map > compass.js",
+    "build": "tsc && browserify src/cp.js -d -s cp | exorcist compass.js.map > compass.js",
     "postbuild": "uglifyjs compass.js -cm --source-map compass.min.js.map > compass.min.js",
     "clean": "rm -f compass.* & find src -name '*.js*' -type f -delete & find test -name '*.js*' -type f -delete",
     "cover": "tsc && istanbul cover node_modules/.bin/_mocha -- --recursive",
     "deploy": "npm run clean && npm run lint && npm run test && scripts/deploy.sh",
     "lint": "tslint -c tslint.json src/*.ts test/*.ts src/**/*.ts test/**/*.ts",
-    "watch": "nodemon -x 'npm run build && npm test && npm run lint'",
-    "tsc": "tsc",
-    "test": "tsc && mocha --recursive --require source-map-support/register"
+    "watch": "nodemon -x 'npm run build && npm run test:only && npm run lint'",
+    "test": "tsc && npm run test:only",
+    "test:only": "mocha --recursive --require source-map-support/register"
   },
   "browserify-shim": {},
   "repository": {
