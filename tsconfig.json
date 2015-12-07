@@ -1,0 +1,48 @@
+{
+    "compilerOptions": {
+        "target": "es5",
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "isolatedModules": false,
+        "jsx": "react",
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        "declaration": false,
+        "noImplicitAny": false,
+        "removeComments": true,
+        "noLib": false,
+        "preserveConstEnums": true,
+        "suppressImplicitAnyIndexErrors": true,
+        "sourceMap": true
+    },
+    "filesGlob": [
+        "**/*.ts",
+        "**/*.tsx"
+    ],
+    "exclude": [
+        "node_modules",
+        "bower_components",
+        "data",
+        "_site",
+        "lib"
+    ],
+    "files": [
+        "src/cluster/cluster.ts",
+        "src/cluster/clusterconsts.ts",
+        "src/cluster/distance.ts",
+        "src/consts.ts",
+        "src/cp.ts",
+        "src/gen/aggregates.ts",
+        "src/gen/encodings.ts",
+        "src/gen/gen.ts",
+        "src/gen/marks.ts",
+        "src/gen/projections.ts",
+        "src/gen/specs.ts",
+        "src/rank/rank.ts",
+        "src/rank/rankEncodings.ts",
+        "src/util.ts"
+    ],
+    "atom": {
+        "rewriteTsconfig": true
+    }
+}

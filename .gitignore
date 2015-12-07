@@ -6,3 +6,5 @@ compass.js
 bower_components
 coverage
 lib/vega-lite.js
+src/**/*.js
+**/*.js.map
