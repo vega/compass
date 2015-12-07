@@ -1,20 +1,15 @@
-'use strict';
-
-/*jshint -W069 */
-
-var expect = require('chai').expect,
-  vlSchema = require('vega-lite/src/schema/schema'),
-  vlShorthand = require('vega-lite/src/shorthand'),
-  fixture = require('../fixture');
-
-var genEncodings = require('../../src/gen/encodings');
-var consts = require('../../src/consts');
+import {expect} from 'chai';
+import {fixture} from '../fixture';
+import {util as vlSchemaUtil} from 'vega-lite/src/schema/schema';
+import * as vlShorthand from 'vega-lite/src/shorthand';
+import genEncodings from '../../src/gen/encodings';
+import * as consts from '../../src/consts';
 
 describe('cp.gen.encs()', function () {
   var opt;
 
   beforeEach(function() {
-    opt = vlSchema.util.extend({}, consts.gen.encodings);
+    opt = vlSchemaUtil.extend({}, consts.gen.encodings);
   });
 
   describe('#', function () {

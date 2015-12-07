@@ -1,9 +1,8 @@
 'use strict';
 
-var expect = require('chai').expect,
-  fixture = require('../fixture');
-
-var genProjections = require('../../src/gen/projections');
+import {expect} from 'chai';
+import {fixture} from '../fixture';
+import genProjections from '../../src/gen/projections';
 
 describe('cp.gen.projections()', function () {
   describe('with empty set of fields', function () {

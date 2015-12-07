@@ -1,11 +1,13 @@
-'use strict';
-/*jshint -W069 */
+import {expect} from 'chai';
+import {fixture} from '../fixture';
+import * as consts from '../../src/consts';
+import * as vl from 'vega-lite/src/vl';
 
-var expect = require('chai').expect,
-  vl = require('vega-lite'),
-  fixture = require('../fixture');
+// FIXME
+import rankEncodings from '../../src/rank/rankEncodings';
+import {dimensionScore, measureScore} from '../../src/rank/rankEncodings';
 
-var setter = function(x, p, val, noaugment) {
+var setter = function(x, p, val, noaugment?) {
   for (var i=0; i<p.length-1; ++i) {
     if (!noaugment && !(p[i] in x)){
       x = x[p[i]] = {};
@@ -17,11 +19,7 @@ var setter = function(x, p, val, noaugment) {
 };
 
 
-var consts = require('../../src/consts'),
-  rankEncodings = require('../../src/rank/rank').encoding,
-  dimensionScore = rankEncodings.dimensionScore,
-  measureScore = rankEncodings.measureScore,
-  D = dimensionScore.consts,
+var D = dimensionScore.consts,
   M = measureScore.consts,
   opt = vl.schema.util.extend(opt||{}, consts.gen.encodings);
 
@@ -32,7 +30,7 @@ describe('cp.rank.encoding', function () {
     mFixtures = ['Q'];
 
 
-  var score = {};
+  var score:any = {};
   marks.forEach(function(mark) {
     channels.forEach(function(channel) {
       mFixtures.forEach(function(q) {

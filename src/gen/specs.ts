@@ -11,7 +11,7 @@ import * as consts from '../consts';
 
 /** Design Encodings for a set of field definition */
 
-export default function genSpecsFromFieldDefs(output, fieldDefs, stats, opt, nested) {
+export default function genSpecsFromFieldDefs(output, fieldDefs, stats, opt?, nested?) {
   // opt must be augmented before being passed to genEncodings or getMarks
   opt = vlSchemaUtil.extend(opt||{}, consts.gen.encodings);
   var encodings = genEncodings([], fieldDefs, stats, opt);

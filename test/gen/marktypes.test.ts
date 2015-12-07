@@ -1,18 +1,15 @@
-'use strict';
-
-var expect = require('chai').expect,
-  vl = require('vega-lite'),
-  fixture = require('../fixture');
-
-// var dataB = require("../data/birdstrikes.json");
-var consts = require('../../src/consts');
-var getMarks = require('../../src/gen/marks');
+import {expect} from 'chai';
+import {fixture} from '../fixture';
+import getMarks from '../../src/gen/marks';
+import * as consts from '../../src/consts';
+import * as vlSchema from 'vega-lite/src/schema/schema';
+import * as vlShorthand from 'vega-lite/src/shorthand';
 
 describe('cp.gen.marks()', function(){
   var opt;
 
   beforeEach(function() {
-    opt = vl.schema.util.extend({}, consts.gen.encodings);
+    opt = vlSchema.util.extend({}, consts.gen.encodings);
   });
 
   describe('#', function () {
@@ -95,7 +92,7 @@ describe('cp.gen.marks()', function(){
   describe('text', function() {
     it('should be generated', function () {
       var shorthand = 'row=1,O|text=mean_2,Q',
-        encoding = vl.shorthand.parseEncoding(shorthand),
+        encoding = vlShorthand.parseEncoding(shorthand),
         marks = getMarks(encoding, {}, opt);
       expect(marks.indexOf('text')).to.gt(-1);
     });
@@ -120,5 +117,3 @@ describe('cp.gen.marks()', function(){
     });
   });
 });
-
-

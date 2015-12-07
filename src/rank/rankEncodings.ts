@@ -27,7 +27,7 @@ var MARK_SCORE = {
   text: 0.8
 };
 
-export default function rankEncodings(spec, stats, opt, selected?) {
+export default function rankEncodings(spec, stats, opt?, selected?) {
   var features = [],
     channels = util.keys(spec.encoding),
     mark = spec.mark,

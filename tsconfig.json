@@ -50,7 +50,9 @@
         "test/gen/projections.test.ts",
         "test/gen/specs.test.ts",
         "test/rank/rankEncodings.test.ts",
-        "typings/clusterfck.d.ts"
+        "typings/chai.d.ts",
+        "typings/clusterfck.d.ts",
+        "typings/mocha.d.ts"
     ],
     "atom": {
         "rewriteTsconfig": true

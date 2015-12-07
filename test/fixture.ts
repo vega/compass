@@ -3,10 +3,9 @@
 /*jshint -W069 */
 
 // commonly used data set
+export let fixture: any = {}
 
-var fixture = module.exports = {};
-
-var stats = fixture.stats = {};
+var stats:any = fixture.stats = {};
 
 var count = {field:'*', type:'quantitative', aggregate:'count'},
   count_stat = {min:0, max:100};
@@ -23,7 +22,7 @@ var o_stat = {distinct: 5},
   q_stat = {distinct: 100, min:0, max:150},
   t_stat = o_stat;
 
-fixture.stat = {
+export var stat = {
   o_stat: o_stat,
   q_stat: q_stat,
   t_stat: t_stat,
@@ -98,6 +97,7 @@ stats['#xT'] = {
 };
 
 // fixtures
+
 
 
 fixture['O'] = {

@@ -13,7 +13,8 @@ const isDimension = vlFieldDef.isDimension;
  * @param  {[type]} fieldDefs array of fields and query information
  * @return {[type]}        [description]
  */
-export default function projections(fieldDefs, stats, opt) {
+// FIXME stats shouldn't be optional 
+export default function projections(fieldDefs, stats?, opt?) {
   opt = vlSchemaUtil.extend(opt||{}, consts.gen.projections);
 
   // First categorize field, selected, fieldsToAdd, and save indices

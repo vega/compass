@@ -1,13 +1,6 @@
-'use strict';
-
-/*jshint -W069 */
-
-var expect = require('chai').expect;
-
-var //genProjections = require('../../src/gen/projections'),
-  genAggregates = require('../../src/gen/aggregates'),
-  fixture = require('../fixture');
-
+import {expect} from 'chai';
+import genAggregates from '../../src/gen/aggregates';
+import {fixture} from '../fixture';
 
 describe('cp.gen.aggregates()', function () {
 
@@ -127,4 +120,3 @@ describe('cp.gen.aggregates()', function () {
     });
   });
 });
-

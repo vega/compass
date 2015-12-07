@@ -1,7 +1,6 @@
 'use strict';
-
-var expect = require('chai').expect,
-  distance = require('../../src/cluster/distance');
+import {expect} from 'chai';
+import * as distance from '../../src/cluster/distance';
 
 describe('cp.cluster.distance.get()', function () {
   it('should return correct distance', function() {

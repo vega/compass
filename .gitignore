@@ -7,4 +7,5 @@ bower_components
 coverage
 lib/vega-lite.js
 src/**/*.js
+test/**/*.js
 **/*.js.map
