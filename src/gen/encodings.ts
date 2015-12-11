@@ -2,8 +2,8 @@ import * as vlFieldDef from 'vega-lite/src/fielddef';
 import * as vlEncoding from 'vega-lite/src/encoding';
 import * as util from '../util';
 import * as genMarks from './marks';
-import * as consts from '../consts';
 import {Type} from 'vega-lite/src/type';
+import {ROW, COLUMN} from 'vega-lite/src/channel';
 
 var isDimension = vlFieldDef.isDimension,
   isMeasure = vlFieldDef.isMeasure;
@@ -176,7 +176,7 @@ export function isAggrWithAllDimOnFacets(encoding) {
     if (fieldDef.aggregate) {
       hasAggr = true;
     }
-    if (vlFieldDef.isDimension(fieldDef) && (channel !== consts.ROW && channel !== consts.COL)) {
+    if (vlFieldDef.isDimension(fieldDef) && (channel !== ROW && channel !== COLUMN)) {
       hasOtherO = true;
     }
     if (hasAggr && hasOtherO) { break; }

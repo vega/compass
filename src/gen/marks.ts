@@ -7,8 +7,6 @@ import {Type} from 'vega-lite/src/type';
 var isDimension = vlFieldDef.isDimension;
 import * as util from '../util';
 
-import * as consts from '../consts';
-
 export const rule = {
   point:  pointRule,
   bar:    barRule,

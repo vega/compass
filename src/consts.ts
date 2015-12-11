@@ -1,15 +1,5 @@
 /* tslint:disable:variable-name */
 
-export const X = 'x';
-export const Y = 'y';
-export const ROW = 'row';
-export const COL = 'column';
-export const SIZE = 'size';
-export const SHAPE = 'shape';
-export const COLOR = 'color';
-export const TEXT = 'text';
-export const DETAIL = 'detail';
-
 export namespace gen {
   export const projections = {
     type: 'object',
