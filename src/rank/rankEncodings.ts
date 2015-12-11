@@ -10,6 +10,7 @@ import * as util from '../util';
 import * as vlShorthand from 'vega-lite/src/shorthand';
 
 import {Type} from 'vega-lite/src/type';
+import {Mark} from 'vega-lite/src/mark';
 
 // bad score not specified in the table above
 var UNUSED_POSITION = 0.5;
@@ -84,7 +85,7 @@ export let dimensionScore:any = function(fieldDef, channel, mark, stats, opt){
       var hasOrder = (fieldDef.bin && fieldDef.type=== Type.QUANTITATIVE) || (fieldDef.timeUnit && fieldDef.type=== Type.TEMPORAL);
 
       // FIXME add stacking option once we have control ..
-      var isStacked = mark === 'bar' || mark === 'area';
+      var isStacked = mark === Mark.BAR || mark === Mark.AREA;
 
       // true ordinal on color is currently BAD (until we have good ordinal color scale support)
       if (hasOrder) return D.color_bad;
@@ -110,7 +111,7 @@ export let measureScore:any = function(fieldDef, channel, mark, stats, opt) {
     case vlChannel.X: return M.pos;
     case vlChannel.Y: return M.pos;
     case vlChannel.SIZE:
-      if (mark === 'bar' || mark === 'text' || mark === 'line') {
+      if (mark === Mark.BAR || mark === Mark.TEXT || mark === Mark.LINE) {
         return BAD; // size of bar is very bad
       }
       return M.size;
@@ -171,7 +172,7 @@ export default function rankEncodings(spec, stats, opt?, selected?) {
   }
 
   // penalize not using positional only penalize for non-text
-  if (channels.length > 1 && mark !== 'text') {
+  if (channels.length > 1 && mark !== Mark.TEXT) {
     if ((!encoding.x || !encoding.y) && !encoding.geo && !encoding.text) {
       features.push({
         reason: 'unused position',
