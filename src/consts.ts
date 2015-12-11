@@ -10,14 +10,6 @@ export const COLOR = 'color';
 export const TEXT = 'text';
 export const DETAIL = 'detail';
 
-// rename these
-export namespace Type {
-  export const Nominal = 'nominal';
-  export const Ordinal = 'ordinal';
-  export const Quantitative = 'quantitative';
-  export const Temporal = 'temporal';
-}
-
 export namespace gen {
   export const projections = {
     type: 'object',

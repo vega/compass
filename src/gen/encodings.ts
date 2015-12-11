@@ -3,7 +3,7 @@ import * as vlEncoding from 'vega-lite/src/encoding';
 import * as util from '../util';
 import * as genMarks from './marks';
 import * as consts from '../consts';
-import {Type} from '../consts';
+import {Type} from 'vega-lite/src/type';
 
 var isDimension = vlFieldDef.isDimension,
   isMeasure = vlFieldDef.isMeasure;
@@ -57,29 +57,32 @@ function retinalEncRules(encoding, fieldDef, stats, opt) {
 }
 
 function colorRules(encoding, fieldDef, stats, opt) {
-  if(!retinalEncRules(encoding, fieldDef, stats, opt)) return false;
+  // Don't use color if omitMultipleRetinalEncodings is true and we already have other retinal encoding
+  if (!retinalEncRules(encoding, fieldDef, stats, opt)) return false;
 
   return vlFieldDef.isMeasure(fieldDef) ||
     vlFieldDef.cardinality(fieldDef, stats) <= opt.maxCardinalityForColor;
 }
 
 function shapeRules(encoding, fieldDef, stats, opt) {
-  if(!retinalEncRules(encoding, fieldDef, stats, opt)) return false;
+  if (!retinalEncRules(encoding, fieldDef, stats, opt)) return false;
 
-  if (fieldDef.bin && fieldDef.type === Type.Quantitative) return false;
-  if (fieldDef.timeUnit && fieldDef.type === Type.Temporal) return false;
+  // FIXME simplify as not having order?
+  if (fieldDef.bin && fieldDef.type === Type.QUANTITATIVE) return false;
+  if (fieldDef.timeUnit && fieldDef.type === Type.TEMPORAL) return false;
+
   return vlFieldDef.cardinality(fieldDef, stats) <= opt.maxCardinalityForColor;
 }
 
 function dimMeaTransposeRule(encoding) {
   // create horizontal histogram for ordinal
-  if ((encoding.y.type === Type.Nominal || encoding.y.type === Type.Ordinal) && isMeasure(encoding.x)) {
+  if ((encoding.y.type === Type.NOMINAL || encoding.y.type === Type.ORDINAL) && isMeasure(encoding.x)) {
     return true;
   }
 
   // vertical histogram for Q and T
   if (isMeasure(encoding.y) &&
-      !(encoding.x.type === Type.Nominal || encoding.x.type === Type.Ordinal) &&
+      !(encoding.x.type === Type.NOMINAL || encoding.x.type === Type.ORDINAL) &&
       isDimension(encoding.x)
       ) {
     return true;
@@ -122,8 +125,8 @@ function generalRules(encoding, stats, opt) {
           if (!dimMeaTransposeRule(encoding)) {
             return false;
           }
-        } else if (encoding.y.type=== Type.Temporal|| encoding.x.type === Type.Temporal) {
-          if (encoding.y.type=== Type.Temporal && encoding.x.type !== Type.Temporal) {
+        } else if (encoding.y.type=== Type.TEMPORAL|| encoding.x.type === Type.TEMPORAL) {
+          if (encoding.y.type=== Type.TEMPORAL && encoding.x.type !== Type.TEMPORAL) {
             return false;
           }
         } else { // show only one OxO, QxQ

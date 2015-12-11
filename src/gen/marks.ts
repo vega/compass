@@ -2,7 +2,7 @@ import * as vlEncoding from 'vega-lite/src/encoding';
 import * as vlFieldDef from 'vega-lite/src/fielddef';
 import * as vlValidate from 'vega-lite/src/validate';
 
-import {Type} from '../consts';
+import {Type} from 'vega-lite/src/type';
 
 var isDimension = vlFieldDef.isDimension;
 import * as util from '../util';
@@ -130,8 +130,8 @@ function lineRule(encoding, stats, opt) {
   // FIXME truly ordinal data is fine here too.
   // Line chart should be only horizontal
   // and use only temporal data
-  return encoding.x.type === Type.Temporal && encoding.x.timeUnit &&
-         encoding.y.type === Type.Quantitative && encoding.y.aggregate;
+  return encoding.x.type === Type.TEMPORAL && encoding.x.timeUnit &&
+         encoding.y.type === Type.QUANTITATIVE && encoding.y.aggregate;
 }
 
 function areaRule(encoding, stats, opt) {

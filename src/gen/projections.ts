@@ -3,6 +3,7 @@ import * as vlSchemaUtil from 'vega-lite/src/schema/schemautil';
 
 import * as util from '../util';
 import * as consts from '../consts';
+import {TEMPORAL} from 'vega-lite/src/type';
 const isDimension = vlFieldDef.isDimension;
 
 // TODO support other mode of projections generation
@@ -29,7 +30,8 @@ export default function projections(fieldDefs, stats?, opt?) {
 
     if (fieldDef.selected) {
       selected.push(fieldDef);
-      if (isDimension(fieldDef) || fieldDef.type ==='temporal') { // FIXME / HACK
+
+      if (isDimension(fieldDef) || fieldDef.type === TEMPORAL) {
         hasSelectedDimension = true;
       } else {
         hasSelectedMeasure = true;
