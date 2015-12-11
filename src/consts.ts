@@ -1,26 +1,6 @@
 /* tslint:disable:variable-name */
 
 export namespace gen {
-  export const projections = {
-    type: 'object',
-    properties: {
-      omitDotPlot: { // FIXME remove this!
-        type: 'boolean',
-        default: false,
-        description: 'remove all dot plots'
-      },
-      maxCardinalityForAutoAddOrdinal: {
-        type: 'integer',
-        default: 50,
-        description: 'max cardinality for an ordinal variable to be considered for auto adding'
-      },
-      alwaysAddHistogram: {
-        type: 'boolean',
-        default: true
-      }
-    }
-  };
-
   export const aggregates = {
     type: 'object',
     properties: {

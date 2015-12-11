@@ -31,21 +31,21 @@ describe('cp.gen.projections()', function () {
 
   describe('with a set of fields', function () {
     var fields = [
-      {field:1, selected: true},
-      {field:2, selected: true},
-      {field:3, selected: undefined},
-      {field:4, selected: undefined}
+      {field:'1', selected: true},
+      {field:'2', selected: true},
+      {field:'3', selected: undefined},
+      {field:'4', selected: undefined}
     ];
 
     var projections = genProjections(fields);
 
     it('should generate correct # of projections', function () {
-      expect(projections.length).to.equal(3);
+      expect(projections.length).to.equal('3');
     });
 
     it('should keep selected field as first items', function () {
-      expect(projections[2][0].field).to.equal(1);
-      expect(projections[2][1].field).to.equal(2);
+      expect(projections[2][0].field).to.equal('1');
+      expect(projections[2][1].field).to.equal('2');
     });
 
     it('should add projection key', function () {

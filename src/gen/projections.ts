@@ -1,37 +1,59 @@
 import * as vlFieldDef from 'vega-lite/src/fielddef';
-import * as vlSchemaUtil from 'vega-lite/src/schema/schemautil';
-
 import * as util from '../util';
-import * as consts from '../consts';
+import {SchemaField} from '../schema';
 import {TEMPORAL} from 'vega-lite/src/type';
 const isDimension = vlFieldDef.isDimension;
+
+
+export interface ProjectionOption {
+  /** If true, excluce all dot plots. */
+  omitDotPlot?: boolean;
+  /** Max cardinality for an ordinal variable to be considered for auto adding */
+  maxCardinalityForAutoAddOrdinal?: number;
+  // TODO: explain
+  alwaysAddHistogram?: boolean;
+}
+
+const DEFAULT_PROJECTION_OPT:ProjectionOption = {
+  omitDotPlot: true,
+  maxCardinalityForAutoAddOrdinal: 50,
+  alwaysAddHistogram: true
+};
+
 
 // TODO support other mode of projections generation
 // powerset, chooseK, chooseKorLess are already included in the util
 
 /**
  * fields
- * @param  {[type]} fieldDefs array of fields and query information
- * @return {[type]}        [description]
+ * @param  fieldDefs array of fields and query information
+ * @return [description]
  */
-// FIXME stats shouldn't be optional 
-export default function projections(fieldDefs, stats?, opt?) {
-  opt = vlSchemaUtil.extend(opt||{}, consts.gen.projections);
+// FIXME stats shouldn't be optional
+export default function projections(fieldDefs: SchemaField[], stats?, opt: ProjectionOption = {}) {
+  opt = util.extend({}, DEFAULT_PROJECTION_OPT, opt);
 
   // First categorize field, selected, fieldsToAdd, and save indices
-  var selected = [], fieldsToAdd = [], fieldSets = [],
-    hasSelectedDimension = false,
-    hasSelectedMeasure = false,
-    indices = {};
+  var selected = [], fieldsToAdd = [], fieldSets = [];
+
+  // Whether the given fieldDefs contains selected dimension(s) / measure(s)
+  // This will affect how we order suggested variables
+  var hasSelectedDimension = false,
+    hasSelectedMeasure = false;
+  var indices = {};
 
   fieldDefs.forEach(function(fieldDef, index){
     // save indices for stable sort later
     indices[fieldDef.field] = index;
 
-    if (fieldDef.selected) {
+    if (fieldDef.selected) { // selected fields are included in selected
       selected.push(fieldDef);
 
       if (isDimension(fieldDef) || fieldDef.type === TEMPORAL) {
+        // If the field can serve as dimension
+
+        // FIXME vega-lite's isDimension is designed to work with FieldDef, not SchemaField
+        // Therefore, we should augment vega-lite's isDimension
         hasSelectedDimension = true;
       } else {
         hasSelectedMeasure = true;
@@ -49,6 +71,7 @@ export default function projections(fieldDefs, stats?, opt?) {
 
   fieldsToAdd.sort(compareFieldsToAdd(hasSelectedDimension, hasSelectedMeasure, indices));
 
+  // FIXME make 1 a parameter -- for yhoonkim's case, set it to # of variables
   var setsToAdd = util.chooseKorLess(fieldsToAdd, 1);
 
   setsToAdd.forEach(function(setToAdd) {

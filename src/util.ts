@@ -80,6 +80,14 @@ export function traverse(node, arr) {
   return arr;
 };
 
+export function extend(obj, b, ...rest) {
+  for (var x, name, i=1, len=arguments.length; i<len; ++i) {
+    x = arguments[i];
+    for (name in x) { obj[name] = x[name]; }
+  }
+  return obj;
+};
+
 export function union(a, b) {
   var o = {};
   a.forEach(function(x) { o[x] = true;});

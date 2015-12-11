@@ -5,12 +5,13 @@ import * as vlSchemaUtil from 'vega-lite/src/schema/schemautil';
 import * as vlShorthand from 'vega-lite/src/shorthand';
 import * as consts from '../consts';
 import {Type} from 'vega-lite/src/type';
+import {SchemaField} from '../schema';
 
 import * as util from '../util';
 
 var AUTO = '*';
 
-export default function genAggregates(output, fieldDefs, stats, opt?) {
+export default function genAggregates(output, fieldDefs: SchemaField[], stats, opt?) {
   opt = vlSchemaUtil.extend(opt||{}, consts.gen.aggregates);
   var tf = new Array(fieldDefs.length);
   var hasNorO = util.any(fieldDefs, function(f) {

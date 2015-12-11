@@ -40,6 +40,7 @@
         "src/gen/specs.ts",
         "src/rank/rank.ts",
         "src/rank/rankEncodings.ts",
+        "src/schema.ts",
         "src/util.ts",
         "test/cluster/cluster.test.ts",
         "test/cluster/distance.test.ts",
