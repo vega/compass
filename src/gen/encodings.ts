@@ -6,8 +6,9 @@ import {EncodingOption, DEFAULT_ENCODING_OPTION} from '../consts';
 import {ROW, COLUMN, getSupportedRole} from 'vega-lite/src/channel';
 import {Type} from 'vega-lite/src/type';
 import {Encoding} from 'vega-lite/src/schema/encoding.schema';
+import {FieldDef} from 'vega-lite/src/schema/fielddef.schema';
 
-export default function genEncodings(encodings: Encoding[], fieldDefs, stats, opt: EncodingOption = DEFAULT_ENCODING_OPTION) {
+export default function genEncodings(encodings: Encoding[], fieldDefs: FieldDef[], stats, opt: EncodingOption = DEFAULT_ENCODING_OPTION) {
   // generate a collection vega-lite's encoding
   var tmpEncoding: Encoding = {};
 
@@ -63,7 +64,7 @@ namespace rule {
     export const row = noRule;
     export const column = noRule;
 
-    export function color(encoding: Encoding, fieldDef, stats, opt: EncodingOption) {
+    export function color(encoding: Encoding, fieldDef: FieldDef, stats, opt: EncodingOption) {
       // Don't use color if omitMultipleRetinalEncodings is true and we already have other retinal encoding
       if (!retinalEncRules(encoding, fieldDef, stats, opt)) {
         return false;
@@ -74,7 +75,7 @@ namespace rule {
         cardinality(fieldDef, stats) <= opt.maxCardinalityForColor;
     }
 
-    export function shape(encoding: Encoding, fieldDef, stats, opt: EncodingOption) {
+    export function shape(encoding: Encoding, fieldDef: FieldDef, stats, opt: EncodingOption) {
       if (!retinalEncRules(encoding, fieldDef, stats, opt)) {
         return false;
       }
@@ -91,7 +92,7 @@ namespace rule {
     }
 
     function noRule() { return true; }
-    function retinalEncRules(encoding: Encoding, fieldDef, stats, opt: EncodingOption) {
+    function retinalEncRules(encoding: Encoding, fieldDef: FieldDef, stats, opt: EncodingOption) {
       if (opt.omitMultipleRetinalEncodings) {
         if (encoding.color || encoding.size || encoding.shape) {
           return false;
@@ -101,80 +102,96 @@ namespace rule {
     }
   }
 
-function dotPlotRules(encoding: Encoding, stats, opt: EncodingOption) {
-  if (opt.omitDotPlot) { return false;}
+  function dotPlotRules(encoding: Encoding, stats, opt: EncodingOption) {
+    if (opt.omitDotPlot) { return false;}
 
-  // Dot plot should always be horizontal
-  if (opt.omitTranspose && encoding.y) { return false;}
+    // Dot plot should always be horizontal
+    if (opt.omitTranspose && encoding.y) { return false;}
 
-  // Omit Dot plot with facet
-  if (opt.omitDotPlotWithFacet && (encoding.row || encoding.column)) {
-    return false;
-  }
-
-  // dot plot shouldn't have other encoding
-  if (opt.omitDotPlotWithExtraEncoding && keys(encoding).length > 1) {
-    return false;
-  }
-
-  if (opt.omitDotPlotWithOnlyCount) {
-    // one dimension "count"
-    if (encoding.x && encoding.x.aggregate === 'count' && !encoding.y) {
+    // Omit Dot plot with facet
+    if (opt.omitDotPlotWithFacet && (encoding.row || encoding.column)) {
       return false;
     }
-    if (encoding.y && encoding.y.aggregate === 'count' && !encoding.x) {
+
+    // dot plot shouldn't have other encoding
+    if (opt.omitDotPlotWithExtraEncoding && keys(encoding).length > 1) {
       return false;
     }
-  }
-  return true;
-}
 
-function xyPlotRules(encoding: Encoding, stats, opt: EncodingOption) {
-  if (encoding.row || encoding.column) { // have facet(s)
-    if (opt.omitNonTextAggrWithAllDimsOnFacets) {
-      // remove all aggregated charts with all dims on facets (row, column)
-      if (isAggrWithAllDimOnFacets(encoding)) { return false; }
-    }
-  }
-
-  var isDimX = isDimension(encoding.x),
-    isDimY = isDimension(encoding.y);
-
-  // If both x and y are dimension, and the plot is not aggregated,
-  // there might be occlusion.
-  if (opt.omitRawWithXYBothDimension && isDimX && isDimY && !isAggregate(encoding)) {
-    // FIXME actually check if there would be occlusion #90
-    return false;
-  }
-
-  if (opt.omitTranspose) {
-    if (isDimX !== isDimY) { // dim x mea
-      // create horizontal histogram for ordinal
-      if ((encoding.y.type === Type.NOMINAL || encoding.y.type === Type.ORDINAL) && isMeasure(encoding.x)) {
-        return true;
-      }
-
-      // vertical histogram for binned Q and T
-      if (!isDimY && isDimX && !(encoding.x.type === Type.NOMINAL || encoding.x.type === Type.ORDINAL)) {
-        return true;
-      }
-
-      return false;
-    } else if (encoding.y.type=== Type.TEMPORAL || encoding.x.type === Type.TEMPORAL) {
-      // FIXME revise this
-      if (encoding.y.type=== Type.TEMPORAL && encoding.x.type !== Type.TEMPORAL) {
+    if (opt.omitDotPlotWithOnlyCount) {
+      // one dimension "count"
+      if (encoding.x && encoding.x.aggregate === 'count' && !encoding.y) {
         return false;
       }
-    } else {
-      // FIXME: test if we can remove this rule
-      // show only one OxO, QxQ
-      if (encoding.x.field > encoding.y.field) {
+      if (encoding.y && encoding.y.aggregate === 'count' && !encoding.x) {
         return false;
       }
     }
+    return true;
   }
-  return true;
-}
+
+  function isAggrWithAllDimOnFacets(encoding) {
+    var hasAggr = false, hasOtherO = false;
+    for (var channel in encoding) {
+      var fieldDef = encoding[channel];
+      if (fieldDef.aggregate) {
+        hasAggr = true;
+      }
+      if (isDimension(fieldDef) && (channel !== ROW && channel !== COLUMN)) {
+        hasOtherO = true;
+      }
+      if (hasAggr && hasOtherO) { break; }
+    }
+
+    return hasAggr && !hasOtherO;
+  };
+
+  function xyPlotRules(encoding: Encoding, stats, opt: EncodingOption) {
+    if (encoding.row || encoding.column) { // have facet(s)
+      if (opt.omitNonTextAggrWithAllDimsOnFacets) {
+        // remove all aggregated charts with all dims on facets (row, column)
+        if (isAggrWithAllDimOnFacets(encoding)) { return false; }
+      }
+    }
+
+    var isDimX = isDimension(encoding.x),
+      isDimY = isDimension(encoding.y);
+
+    // If both x and y are dimension, and the plot is not aggregated,
+    // there might be occlusion.
+    if (opt.omitRawWithXYBothDimension && isDimX && isDimY && !isAggregate(encoding)) {
+      // FIXME actually check if there would be occlusion #90
+      return false;
+    }
+
+    if (opt.omitTranspose) {
+      if (isDimX !== isDimY) { // dim x mea
+        // create horizontal histogram for ordinal
+        if ((encoding.y.type === Type.NOMINAL || encoding.y.type === Type.ORDINAL) && isMeasure(encoding.x)) {
+          return true;
+        }
+
+        // vertical histogram for binned Q and T
+        if (!isDimY && isDimX && !(encoding.x.type === Type.NOMINAL || encoding.x.type === Type.ORDINAL)) {
+          return true;
+        }
+
+        return false;
+      } else if (encoding.y.type=== Type.TEMPORAL || encoding.x.type === Type.TEMPORAL) {
+        // FIXME revise this
+        if (encoding.y.type=== Type.TEMPORAL && encoding.x.type !== Type.TEMPORAL) {
+          return false;
+        }
+      } else {
+        // FIXME: test if we can remove this rule
+        // show only one OxO, QxQ
+        if (encoding.x.field > encoding.y.field) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
 
   /** List of rules that are only considered at the end of the generation process */
   export function encoding(encoding: Encoding, stats, opt: EncodingOption) {
@@ -194,20 +211,4 @@ function xyPlotRules(encoding: Encoding, stats, opt: EncodingOption) {
     // TODO: consider other type of visualization (e.g., geo, arc) when we have them.
     return false;
   }
-
-  export function isAggrWithAllDimOnFacets(encoding) {
-    var hasAggr = false, hasOtherO = false;
-    for (var channel in encoding) {
-      var fieldDef = encoding[channel];
-      if (fieldDef.aggregate) {
-        hasAggr = true;
-      }
-      if (isDimension(fieldDef) && (channel !== ROW && channel !== COLUMN)) {
-        hasOtherO = true;
-      }
-      if (hasAggr && hasOtherO) { break; }
-    }
-
-    return hasAggr && !hasOtherO;
-  };
 }
