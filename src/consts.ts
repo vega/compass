@@ -88,27 +88,39 @@ export interface EncodingOption {
   maxCardinalityForColor?: number;
   /** Maximum cardinality of an ordinal variable to be put on shape */
   maxCardinalityForShape?: number;
+
   /** Remove all dot plots */
   omitDotPlot?: boolean;
   /** Remove all dot plots with >1 encoding */
   omitDotPlotWithExtraEncoding?: boolean;
+  /** Omit trellis plots that do not use X or Y */
+  omitDotPlotWithFacet?: boolean;
+  /** Omit one dimension count */
+  omitDotPlotWithOnlyCount?: boolean; // FIXME remove
   /** Omit using multiple retinal variables (size, color, shape) */
   omitMultipleRetinalEncodings?: boolean;  // FIXME NonPositional
-  /** Remove all aggregated charts (except text tables) with all dims on facets (row, column) */
+  /**
+   * Remove all aggregated charts (except text tables) with all dims on facets (row, column)
+   * because this would lead to only one mark per facet.
+   */
   omitNonTextAggrWithAllDimsOnFacets?: boolean; // FIXME revise
-  /** Omit one dimension count */
-  omitOneDimensionCount?: boolean; // FIXME remove
+  /** Omit plot with both x and y as dimension, which most of the time have occlusion. */
+  omitRawWithXYBothDimension?: boolean;
+  /** Omit binned fields on shape */
+  omitShapeWithBin?: boolean;
+  /** Omit temporal dimension (time with time unit) on shape */
+  omitShapeWithTimeDimension?: boolean;
+  /** Do not use bar\'s size. */
+  omitSizeOnBar?: boolean; // FIXME: remove
+  /** Do not stack bar chart with average. */
+  omitStackedAverage?: boolean; // FIXME: remove
   /**
    * Eliminate all transpose by
    * (1) keeping horizontal dot plot only
    * (2) for OxQ charts, always put O on Y
    * (3) show only one DxD, MxM (currently sorted by name)
    */
-  omitTranspose?: boolean;
-  /** Do not use bar\'s size. */
-  omitSizeOnBar?: boolean; // FIXME: remove
-  /** Do not stack bar chart with average. */
-  omitStackedAverage?: boolean; // FIXME: remove
+  omitTranspose?: boolean; // FIXME revise
 };
 
 export const DEFAULT_ENCODING_OPTION: EncodingOption = {
@@ -125,10 +137,14 @@ export const DEFAULT_ENCODING_OPTION: EncodingOption = {
   maxCardinalityForShape: 6,
   omitDotPlot: false,
   omitDotPlotWithExtraEncoding: true,
+  omitDotPlotWithFacet: true,
+  omitDotPlotWithOnlyCount: false, // TODO: revise if this should be true
   omitMultipleRetinalEncodings: true,
   omitNonTextAggrWithAllDimsOnFacets: true,
-  omitOneDimensionCount: false,
-  omitTranspose: true,
+  omitRawWithXYBothDimension: true,
+  omitShapeWithBin: true,
+  omitShapeWithTimeDimension: true,
   omitSizeOnBar: true,
   omitStackedAverage: true,
+  omitTranspose: true,
 };
