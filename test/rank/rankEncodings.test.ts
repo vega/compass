@@ -1,7 +1,6 @@
 import {expect} from 'chai';
 import {fixture} from '../fixture';
 import * as consts from '../../src/consts';
-import * as vlSchema from 'vega-lite/src/schema/schema';
 
 // FIXME
 import rankEncodings from '../../src/rank/rankEncodings';

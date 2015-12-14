@@ -2,7 +2,6 @@ import {expect} from 'chai';
 import {fixture} from '../fixture';
 import getMarks from '../../src/gen/marks';
 import * as consts from '../../src/consts';
-import * as vlSchema from 'vega-lite/src/schema/schema';
 import * as vlShorthand from 'vega-lite/src/shorthand';
 
 describe('cp.gen.marks()', function(){
