@@ -5,7 +5,7 @@ import {rule as marksRule} from './marks';
 import {EncodingOption, DEFAULT_ENCODING_OPTION} from '../consts';
 import {ROW, COLUMN, getSupportedRole} from 'vega-lite/src/channel';
 import {Type} from 'vega-lite/src/type';
-import {Encoding} from 'vega-lite/src/schema/Encoding.schema';
+import {Encoding} from 'vega-lite/src/schema/encoding.schema';
 
 export default function genEncodings(encodings: Encoding[], fieldDefs, stats, opt: EncodingOption = DEFAULT_ENCODING_OPTION) {
   // generate a collection vega-lite's encoding
