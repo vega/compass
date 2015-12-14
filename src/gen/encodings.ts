@@ -5,11 +5,11 @@ import {rule as marksRule} from './marks';
 import {EncodingOption, DEFAULT_ENCODING_OPTION} from '../consts';
 import {ROW, COLUMN, getSupportedRole} from 'vega-lite/src/channel';
 import {Type} from 'vega-lite/src/type';
+import {Encoding} from 'vega-lite/src/schema/Encoding.schema';
 
-
-export default function genEncodings(encodings, fieldDefs, stats, opt: EncodingOption = DEFAULT_ENCODING_OPTION) {
+export default function genEncodings(encodings: Encoding[], fieldDefs, stats, opt: EncodingOption = DEFAULT_ENCODING_OPTION) {
   // generate a collection vega-lite's encoding
-  var tmpEncoding = {};
+  var tmpEncoding: Encoding = {};
 
   function assignField(i) {
     // If all fields are assigned, save
@@ -63,7 +63,7 @@ namespace rule {
     export const row = noRule;
     export const column = noRule;
 
-    export function color(encoding, fieldDef, stats, opt: EncodingOption) {
+    export function color(encoding: Encoding, fieldDef, stats, opt: EncodingOption) {
       // Don't use color if omitMultipleRetinalEncodings is true and we already have other retinal encoding
       if (!retinalEncRules(encoding, fieldDef, stats, opt)) {
         return false;
@@ -74,7 +74,7 @@ namespace rule {
         cardinality(fieldDef, stats) <= opt.maxCardinalityForColor;
     }
 
-    export function shape(encoding, fieldDef, stats, opt: EncodingOption) {
+    export function shape(encoding: Encoding, fieldDef, stats, opt: EncodingOption) {
       if (!retinalEncRules(encoding, fieldDef, stats, opt)) {
         return false;
       }
@@ -91,7 +91,7 @@ namespace rule {
     }
 
     function noRule() { return true; }
-    function retinalEncRules(encoding, fieldDef, stats, opt: EncodingOption) {
+    function retinalEncRules(encoding: Encoding, fieldDef, stats, opt: EncodingOption) {
       if (opt.omitMultipleRetinalEncodings) {
         if (encoding.color || encoding.size || encoding.shape) {
           return false;
@@ -101,7 +101,7 @@ namespace rule {
     }
   }
 
-function dotPlotRules(encoding, stats, opt: EncodingOption) {
+function dotPlotRules(encoding: Encoding, stats, opt: EncodingOption) {
   if (opt.omitDotPlot) { return false;}
 
   // Dot plot should always be horizontal
@@ -129,7 +129,7 @@ function dotPlotRules(encoding, stats, opt: EncodingOption) {
   return true;
 }
 
-function xyPlotRules(encoding, stats, opt: EncodingOption) {
+function xyPlotRules(encoding: Encoding, stats, opt: EncodingOption) {
   if (encoding.row || encoding.column) { // have facet(s)
     if (opt.omitNonTextAggrWithAllDimsOnFacets) {
       // remove all aggregated charts with all dims on facets (row, column)
@@ -177,7 +177,7 @@ function xyPlotRules(encoding, stats, opt: EncodingOption) {
 }
 
   /** List of rules that are only considered at the end of the generation process */
-  export function encoding(encoding, stats, opt: EncodingOption) {
+  export function encoding(encoding: Encoding, stats, opt: EncodingOption) {
     // TODO call Vega-Lite validate instead once it is implemented
     // encoding.text is only used for TEXT TABLE
     if (encoding.text) {

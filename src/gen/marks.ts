@@ -1,12 +1,14 @@
 import {isAggregate} from 'vega-lite/src/encoding';
 import {isDimension, cardinality} from 'vega-lite/src/fielddef';
 import {getEncodingMappingError} from 'vega-lite/src/validate';
+import {EncodingOption} from '../consts';
 
 import {Type} from 'vega-lite/src/type';
+import {Encoding} from 'vega-lite/src/schema/Encoding.schema';
 
 import * as util from '../util';
 
-export default function genMarks(encoding, stats, opt) {
+export default function genMarks(encoding: Encoding, stats, opt: EncodingOption) {
   return opt.markList.filter(function(mark){
     const noVlError = getEncodingMappingError({
                         mark: mark,
@@ -17,17 +19,17 @@ export default function genMarks(encoding, stats, opt) {
 }
 
 export namespace rule {
-  function facetRule(fieldDef, stats, opt) {
+  function facetRule(fieldDef, stats, opt: EncodingOption) {
     return cardinality(fieldDef, stats) <= opt.maxCardinalityForFacets;
   }
 
-  function facetsRule(encoding, stats, opt) {
+  function facetsRule(encoding: Encoding, stats, opt: EncodingOption) {
     if(encoding.row && !facetRule(encoding.row, stats, opt)) return false;
     if(encoding.column && !facetRule(encoding.column, stats, opt)) return false;
     return true;
   }
 
-  export function point(encoding, stats, opt) {
+  export function point(encoding: Encoding, stats, opt: EncodingOption) {
     if(!facetsRule(encoding, stats, opt)) return false;
     if (encoding.x && encoding.y) {
       // have both x & y ==> scatter plot / bubble plot
@@ -52,7 +54,7 @@ export namespace rule {
       if (opt.omitDotPlot) return false;
 
       // Dot plot should always be horizontal
-      if (opt.omitTranpose && encoding.y) return false;
+      if (opt.omitTranspose && encoding.y) return false;
 
       // dot plot shouldn't have other encoding
       if (opt.omitDotPlotWithExtraEncoding && util.keys(encoding).length > 1) return false;
@@ -63,7 +65,7 @@ export namespace rule {
     return true;
   }
 
-  export function tick(encoding, stats, opt) {
+  export function tick(encoding: Encoding, stats, opt: EncodingOption) {
     // jshint unused:false
     if (encoding.x || encoding.y) {
       if(isAggregate(encoding)) return false;
@@ -77,7 +79,7 @@ export namespace rule {
     return false;
   }
 
-  export function bar(encoding, stats, opt) {
+  export function bar(encoding: Encoding, stats, opt: EncodingOption) {
     if(!facetsRule(encoding, stats, opt)) return false;
 
     // bar requires at least x or y
@@ -107,7 +109,7 @@ export namespace rule {
     return false;
   }
 
-  export function line(encoding, stats, opt) {
+  export function line(encoding: Encoding, stats, opt: EncodingOption) {
     if (!facetsRule(encoding, stats, opt)) return false;
 
     // TODO(kanitw): add omitVerticalLine as config
@@ -115,11 +117,11 @@ export namespace rule {
     // FIXME truly ordinal data is fine here too.
     // Line chart should be only horizontal
     // and use only temporal data
-    return encoding.x.type === Type.TEMPORAL && encoding.x.timeUnit &&
-           encoding.y.type === Type.QUANTITATIVE && encoding.y.aggregate;
+    return encoding.x.type === Type.TEMPORAL && !!encoding.x.timeUnit &&
+           encoding.y.type === Type.QUANTITATIVE && !!encoding.y.aggregate;
   }
 
-  export function area(encoding, stats, opt) {
+  export function area(encoding: Encoding, stats, opt: EncodingOption) {
     if (!facetsRule(encoding, stats, opt)) return false;
 
     if (!line(encoding, stats, opt)) return false;
@@ -127,7 +129,7 @@ export namespace rule {
     return !(opt.omitStackedAverage && encoding.y.aggregate ==='mean' && encoding.color);
   }
 
-  export function text(encoding, stats, opt) {
+  export function text(encoding: Encoding, stats, opt: EncodingOption) {
     // at least must have row or column and aggregated text values
     return (encoding.row || encoding.column) && encoding.text && encoding.text.aggregate && !encoding.x && !encoding.y && !encoding.size &&
       (!opt.alwaysGenerateTableAsHeatmap || !encoding.color);

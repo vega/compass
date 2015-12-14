@@ -1,6 +1,7 @@
 import {expect} from 'chai';
 import {fixture} from '../fixture';
 import * as vlShorthand from 'vega-lite/src/shorthand';
+import {ORDINAL} from 'vega-lite/src/type';
 import genEncodings from '../../src/gen/encodings';
 import {DEFAULT_ENCODING_OPTION} from '../../src/consts';
 import {extend} from '../../src/util';
@@ -98,7 +99,7 @@ describe('cp.gen.encodings()', function () {
       var encodings = genEncodings([], f.fields, f.stats);
 
       var filtered = encodings.filter(function(encoding){
-        return encoding.x.type === 'ordinal' && encoding.y.type === 'ordinal';
+        return encoding.x.type === ORDINAL && encoding.y.type === ORDINAL;
       });
 
       expect(filtered.length).to.equal(0);
@@ -115,7 +116,7 @@ describe('cp.gen.encodings()', function () {
       var encodings = genEncodings([], f.fields, f.stats);
 
       var filtered = encodings.filter(function(encoding){
-        return encoding.x && encoding.x.type === 'ordinal' && encoding.y && encoding.y.type === 'ordinal';
+        return encoding.x && encoding.x.type === ORDINAL && encoding.y && encoding.y.type === ORDINAL;
       });
 
       expect(filtered.length).to.gt(0);
@@ -134,8 +135,8 @@ describe('cp.gen.encodings()', function () {
       var encodings = genEncodings([], fields, stats);
 
       expect(encodings.filter(function(encoding) {
-        var rowIsO = encoding.row && encoding.row.type==='ordinal',
-          colIsO = encoding.column && encoding.column.type==='ordinal';
+        var rowIsO = encoding.row && encoding.row.type === ORDINAL,
+          colIsO = encoding.column && encoding.column.type === ORDINAL;
         return !encoding.text && (rowIsO || colIsO);
       }).length).to.equal(0);
     });
@@ -144,8 +145,8 @@ describe('cp.gen.encodings()', function () {
       const opt = extend({}, DEFAULT_ENCODING_OPTION, {omitNonTextAggrWithAllDimsOnFacets: false});
       var encodings = genEncodings([], fields, stats, opt);
       expect(encodings.filter(function(encoding) {
-        return (encoding.row && encoding.row.type==='ordinal') ||
-          (encoding.column && encoding.column.type==='ordinal');
+        return (encoding.row && encoding.row.type === ORDINAL) ||
+          (encoding.column && encoding.column.type === ORDINAL);
       }).length).to.gt(0);
     });
   });

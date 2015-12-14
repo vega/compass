@@ -6,17 +6,19 @@ import {EncodingOption, DEFAULT_ENCODING_OPTION} from '../consts';
 import genEncodings from './encodings';
 import getMarks from './marks';
 import * as rank from '../rank/rank';
+import {shortenEncoding} from 'vega-lite/src/shorthand';
 
 /** Design Encodings for a set of field definition */
 
-export default function genSpecsFromFieldDefs(output, fieldDefs, stats, opt: EncodingOption = {}, nested?) {
+export default function genSpecsFromFieldDefs(output, fieldDefs, stats, opt: EncodingOption = {}, nested?): any {
   // opt must be augmented before being passed to genEncodings or getMarks
   opt = util.extend({}, DEFAULT_ENCODING_OPTION, opt);
   var encodings = genEncodings([], fieldDefs, stats, opt);
 
   if (nested) {
     return encodings.reduce(function(dict, encoding) {
-      dict[encoding] = genSpecsFromEncodings([], encoding, stats, opt);
+      var encodingShorthand = shortenEncoding(encoding);
+      dict[encodingShorthand] = genSpecsFromEncodings([], encoding, stats, opt);
       return dict;
     }, {});
   } else {
