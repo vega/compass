@@ -9,81 +9,54 @@ import {Type} from 'vega-lite/src/type';
 var isDimension = vlFieldDef.isDimension,
   isMeasure = vlFieldDef.isMeasure;
 
-// FIXME remove dimension, measure and use information in vega-lite instead!
-const rules = {
-  x: {
-    dimension: true,
-    measure: true,
-    multiple: true // FIXME should allow multiple only for Q, T
-  },
-  y: {
-    dimension: true,
-    measure: true,
-    multiple: true // FIXME should allow multiple only for Q, T
-  },
-  row: {
-    dimension: true,
-    multiple: true
-  },
-  column: {
-    dimension: true,
-    multiple: true
-  },
-  shape: {
-    dimension: true,
-    rules: shapeRules
-  },
-  size: {
-    measure: true,
-    rules: retinalEncRules
-  },
-  color: {
-    dimension: true,
-    measure: true,
-    rules: colorRules
-  },
-  text: {
-    measure: true
-  },
-  detail: {
-    dimension: true
-  }
-};
+namespace channelRules {
+  export const x = noRule;
+  export const y = noRule;
+  export const text = noRule;
+  export const detail = noRule;
+  export const size = retinalEncRules;
 
-function retinalEncRules(encoding, fieldDef, stats, opt: EncodingOption) {
-  if (opt.omitMultipleRetinalEncodings) {
-    if (encoding.color || encoding.size || encoding.shape) {
+  // facet rules has interaction with mark -- so they are in marks.ts
+  // TODO: revise this after we revise text encoding in Vega-lite
+  export const row = noRule;
+  export const column = noRule;
+
+  export function color(encoding, fieldDef, stats, opt: EncodingOption) {
+    // Don't use color if omitMultipleRetinalEncodings is true and we already have other retinal encoding
+    if (!retinalEncRules(encoding, fieldDef, stats, opt)) {
       return false;
     }
-  }
-  return true;
-}
 
-function colorRules(encoding, fieldDef, stats, opt: EncodingOption) {
-  // Don't use color if omitMultipleRetinalEncodings is true and we already have other retinal encoding
-  if (!retinalEncRules(encoding, fieldDef, stats, opt)) {
-    return false;
+    // Color must be either measure or dimension with cardinality lower than the max cardinality
+    return vlFieldDef.isMeasure(fieldDef) ||
+      vlFieldDef.cardinality(fieldDef, stats) <= opt.maxCardinalityForColor;
   }
 
-  // Color must be either measure or dimension with cardinality lower than the max cardinality
-  return vlFieldDef.isMeasure(fieldDef) ||
-    vlFieldDef.cardinality(fieldDef, stats) <= opt.maxCardinalityForColor;
-}
+  export function shape(encoding, fieldDef, stats, opt: EncodingOption) {
+    if (!retinalEncRules(encoding, fieldDef, stats, opt)) {
+      return false;
+    }
 
-function shapeRules(encoding, fieldDef, stats, opt: EncodingOption) {
-  if (!retinalEncRules(encoding, fieldDef, stats, opt)) {
-    return false;
+    // TODO: revise if this should mainly be on ranking
+    if (opt.omitShapeWithBin && fieldDef.bin && fieldDef.type === Type.QUANTITATIVE) {
+      return false;
+    }
+    if (opt.omitShapeWithTimeDimension && fieldDef.timeUnit && fieldDef.type === Type.TEMPORAL) {
+      return false;
+    }
+
+    return vlFieldDef.cardinality(fieldDef, stats) <= opt.maxCardinalityForShape;
   }
 
-  // TODO: revise if this should mainly be on ranking
-  if (opt.omitShapeWithBin && fieldDef.bin && fieldDef.type === Type.QUANTITATIVE) {
-    return false;
+  function noRule() { return true; }
+  function retinalEncRules(encoding, fieldDef, stats, opt: EncodingOption) {
+    if (opt.omitMultipleRetinalEncodings) {
+      if (encoding.color || encoding.size || encoding.shape) {
+        return false;
+      }
+    }
+    return true;
   }
-  if (opt.omitShapeWithTimeDimension && fieldDef.timeUnit && fieldDef.type === Type.TEMPORAL) {
-    return false;
-  }
-
-  return vlFieldDef.cardinality(fieldDef, stats) <= opt.maxCardinalityForShape;
 }
 
 function dotPlotRules(encoding, stats, opt: EncodingOption) {
@@ -216,10 +189,16 @@ export default function genEncodings(encodings, fieldDefs, stats, opt: EncodingO
       var channel = opt.encodingTypeList[j],
         isDim = isDimension(fieldDef);
 
+      const supportedRole = getSupportedRole(channel);
+
       // TODO: support "multiple" assignment
-      if (!(channel in tmpEncoding) && // encoding not used
-        ((isDim && rules[channel].dimension) || (!isDim && rules[channel].measure)) &&
-        (!rules[channel].rules || rules[channel].rules(tmpEncoding, fieldDef, stats, opt))
+      if (
+        // encoding not used
+        !(channel in tmpEncoding) &&
+        // channel support the assigned role
+        ((isDim && supportedRole.dimension) || (!isDim && supportedRole.measure)) &&
+        // the field satisties the channel's rule
+        channelRules[channel](tmpEncoding, fieldDef, stats, opt)
       ) {
         tmpEncoding[channel] = fieldDef;
         assignField(i + 1);
