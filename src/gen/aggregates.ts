@@ -3,6 +3,7 @@
 import * as vlFieldDef from 'vega-lite/src/fielddef';
 import * as vlShorthand from 'vega-lite/src/shorthand';
 import {Type} from 'vega-lite/src/type';
+import {FieldDef} from 'vega-lite/src/schema/fielddef.schema';
 import {SchemaField} from '../schema';
 
 import * as util from '../util';
@@ -13,7 +14,7 @@ var AUTO = '*';
 export default function genAggregates(output, fieldDefs: SchemaField[], stats, opt: AggregationOption = {}) {
   opt = util.extend({}, DEFAULT_AGGREGATION_OPTIONS, opt);
 
-  var tf = new Array(fieldDefs.length);
+  var tf: FieldDef[] = new Array(fieldDefs.length);
   var hasNorO = util.any(fieldDefs, function(f) {
     return f.type === Type.NOMINAL || f.type === Type.ORDINAL;
   });
@@ -37,7 +38,9 @@ export default function genAggregates(output, fieldDefs: SchemaField[], stats, o
           if (!f.aggregate) { hasRaw = true; }
         }
       });
-      if (!hasDimension && !hasRaw && opt.omitMeasureOnly) { return; }
+      if (!hasDimension && !hasRaw && opt.omitMeasureOnly) {
+        return;
+      }
       if (!hasMeasure) {
         if (opt.addCountForDimensionOnly) {
           tf.push(vlFieldDef.count());

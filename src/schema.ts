@@ -6,5 +6,4 @@ export interface SchemaField extends FieldDef {
   _raw?: boolean;
   _bin?: boolean;
   _timeUnit?: boolean;
-  // TODO _aggr, _
 }
