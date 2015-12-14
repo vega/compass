@@ -3,7 +3,7 @@ import {fixture} from '../fixture';
 import * as vlShorthand from 'vega-lite/src/shorthand';
 import {ORDINAL} from 'vega-lite/src/type';
 import genEncodings from '../../src/gen/encodings';
-import {DEFAULT_ENCODING_OPTION} from '../../src/consts';
+import {DEFAULT_SPEC_OPTION} from '../../src/consts';
 import {extend} from '../../src/util';
 
 describe('cp.gen.encodings()', function () {
@@ -142,7 +142,7 @@ describe('cp.gen.encodings()', function () {
     });
 
     it('should include charts with O on row/column when omit flag is disabled', function() {
-      const opt = extend({}, DEFAULT_ENCODING_OPTION, {omitNonTextAggrWithAllDimsOnFacets: false});
+      const opt = extend({}, DEFAULT_SPEC_OPTION, {omitNonTextAggrWithAllDimsOnFacets: false});
       var encodings = genEncodings([], fields, stats, opt);
       expect(encodings.filter(function(encoding) {
         return (encoding.row && encoding.row.type === ORDINAL) ||

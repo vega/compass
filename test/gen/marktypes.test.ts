@@ -1,7 +1,7 @@
 import {expect} from 'chai';
 import {fixture} from '../fixture';
 import getMarks from '../../src/gen/marks';
-import {DEFAULT_ENCODING_OPTION} from '../../src/consts';
+import {DEFAULT_SPEC_OPTION} from '../../src/consts';
 import * as vlShorthand from 'vega-lite/src/shorthand';
 import {BAR, POINT, TEXT} from 'vega-lite/src/mark';
 import {QUANTITATIVE, ORDINAL} from 'vega-lite/src/type';
@@ -10,7 +10,7 @@ describe('cp.gen.marks()', function(){
   var opt;
 
   beforeEach(function() {
-    opt = DEFAULT_ENCODING_OPTION;
+    opt = DEFAULT_SPEC_OPTION;
   });
 
   describe('#', function () {

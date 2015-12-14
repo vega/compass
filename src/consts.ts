@@ -2,7 +2,7 @@ import {Channel, X, Y, ROW, COLUMN, SIZE, COLOR, TEXT, DETAIL} from 'vega-lite/s
 import {Mark} from 'vega-lite/src/mark';
 
 export interface ProjectionOption {
-  /** If true, excluce all dot plots. */
+  /** If true, exclude all dot plots. */
   omitDotPlot?: boolean;
   /** Max cardinality for an ordinal variable to be considered for auto adding */
   maxCardinalityForAutoAddOrdinal?: number;
@@ -66,7 +66,7 @@ export const DEFAULT_AGGREGATION_OPTIONS: AggregationOption = {
 
 
 
-export interface EncodingOption {
+export interface SpecOption {
   /** Allowed marks. */
   markList?: Mark[];
 
@@ -123,7 +123,7 @@ export interface EncodingOption {
   omitTranspose?: boolean; // FIXME revise
 };
 
-export const DEFAULT_ENCODING_OPTION: EncodingOption = {
+export const DEFAULT_SPEC_OPTION: SpecOption = {
   markList: [Mark.POINT, Mark.BAR, Mark.LINE, Mark.AREA, Mark.TEXT, Mark.TICK],
   encodingTypeList: [X, Y, ROW, COLUMN, SIZE, COLOR, TEXT, DETAIL],
   requiredEncodings: undefined, // FIXME

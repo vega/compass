@@ -2,13 +2,13 @@ import {isDimension, isMeasure, cardinality} from 'vega-lite/src/fielddef';
 import {isAggregate} from 'vega-lite/src/encoding';
 import {keys, duplicate} from '../util';
 import {rule as marksRule} from './marks';
-import {EncodingOption, DEFAULT_ENCODING_OPTION} from '../consts';
+import {SpecOption, DEFAULT_SPEC_OPTION} from '../consts';
 import {ROW, COLUMN, getSupportedRole} from 'vega-lite/src/channel';
 import {Type} from 'vega-lite/src/type';
 import {Encoding} from 'vega-lite/src/schema/encoding.schema';
 import {FieldDef} from 'vega-lite/src/schema/fielddef.schema';
 
-export default function genEncodings(encodings: Encoding[], fieldDefs: FieldDef[], stats, opt: EncodingOption = DEFAULT_ENCODING_OPTION) {
+export default function genEncodings(encodings: Encoding[], fieldDefs: FieldDef[], stats, opt: SpecOption = DEFAULT_SPEC_OPTION) {
   // generate a collection vega-lite's encoding
   var tmpEncoding: Encoding = {};
 
@@ -64,7 +64,7 @@ namespace rule {
     export const row = noRule;
     export const column = noRule;
 
-    export function color(encoding: Encoding, fieldDef: FieldDef, stats, opt: EncodingOption) {
+    export function color(encoding: Encoding, fieldDef: FieldDef, stats, opt: SpecOption) {
       // Don't use color if omitMultipleRetinalEncodings is true and we already have other retinal encoding
       if (!retinalEncRules(encoding, fieldDef, stats, opt)) {
         return false;
@@ -75,7 +75,7 @@ namespace rule {
         cardinality(fieldDef, stats) <= opt.maxCardinalityForColor;
     }
 
-    export function shape(encoding: Encoding, fieldDef: FieldDef, stats, opt: EncodingOption) {
+    export function shape(encoding: Encoding, fieldDef: FieldDef, stats, opt: SpecOption) {
       if (!retinalEncRules(encoding, fieldDef, stats, opt)) {
         return false;
       }
@@ -92,7 +92,7 @@ namespace rule {
     }
 
     function noRule() { return true; }
-    function retinalEncRules(encoding: Encoding, fieldDef: FieldDef, stats, opt: EncodingOption) {
+    function retinalEncRules(encoding: Encoding, fieldDef: FieldDef, stats, opt: SpecOption) {
       if (opt.omitMultipleRetinalEncodings) {
         if (encoding.color || encoding.size || encoding.shape) {
           return false;
@@ -102,7 +102,7 @@ namespace rule {
     }
   }
 
-  function dotPlotRules(encoding: Encoding, stats, opt: EncodingOption) {
+  function dotPlotRules(encoding: Encoding, stats, opt: SpecOption) {
     if (opt.omitDotPlot) { return false;}
 
     // Dot plot should always be horizontal
@@ -146,7 +146,7 @@ namespace rule {
     return hasAggr && !hasOtherO;
   };
 
-  function xyPlotRules(encoding: Encoding, stats, opt: EncodingOption) {
+  function xyPlotRules(encoding: Encoding, stats, opt: SpecOption) {
     if (encoding.row || encoding.column) { // have facet(s)
       if (opt.omitNonTextAggrWithAllDimsOnFacets) {
         // remove all aggregated charts with all dims on facets (row, column)
@@ -194,7 +194,7 @@ namespace rule {
   }
 
   /** List of rules that are only considered at the end of the generation process */
-  export function encoding(encoding: Encoding, stats, opt: EncodingOption) {
+  export function encoding(encoding: Encoding, stats, opt: SpecOption) {
     // TODO call Vega-Lite validate instead once it is implemented
     // encoding.text is only used for TEXT TABLE
     if (encoding.text) {
