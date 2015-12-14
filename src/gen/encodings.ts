@@ -139,7 +139,7 @@ function generalRules(encoding, stats, opt: EncodingOption) {
   // TODO call Vega-Lite validate instead once it is implemented
   // encoding.text is only used for TEXT TABLE
   if (encoding.text) {
-    return genMarks.satisfyRules(encoding, 'text', stats, opt);
+      return marksRule.text(encoding, stats, opt);
   }
 
   const hasX = !!encoding.x, hasY = !!encoding.y;
