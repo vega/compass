@@ -63,11 +63,14 @@ export default function projections(fieldDefs: SchemaField[], stats?, opt: Proje
   setsToAdd.forEach(function(setToAdd) {
     var fieldSet = selected.concat(setToAdd);
     if (fieldSet.length > 0) {
-      if (opt.omitDotPlot && fieldSet.length === 1) return;
+      if (opt.omitDotPlot && fieldSet.length === 1) {
+        return;
+      }
       fieldSets.push(fieldSet);
     }
   });
 
+  // FIXME - this d3 style should be refactored
   fieldSets.forEach(function(fieldSet) {
       // always append projection's key to each projection returned, d3 style.
     fieldSet.key = key(fieldSet);

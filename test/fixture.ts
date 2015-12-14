@@ -203,10 +203,10 @@ fixture['OxQxQxQ'] = {
 
 fixture['OxOxQxQx#'] = {
   fields: [
-    {field:1, type:'quantitative', selected: undefined},
-    {field:2, type:'quantitative', selected: undefined},
-    {field:3, type:'ordinal', selected: undefined},
-    {field:4, type:'ordinal', selected: undefined},
+    {field:'1', type:'quantitative', selected: undefined},
+    {field:'2', type:'quantitative', selected: undefined},
+    {field:'3', type:'ordinal', selected: undefined},
+    {field:'4', type:'ordinal', selected: undefined},
     {field:'*', aggregate:'count', selected: undefined}
   ],
   stats: {

@@ -11,7 +11,7 @@ export interface ProjectionOption {
 }
 
 export const DEFAULT_PROJECTION_OPT:ProjectionOption = {
-  omitDotPlot: true,
+  omitDotPlot: false,
   maxCardinalityForAutoAddOrdinal: 50,
   alwaysAddHistogram: true
 };

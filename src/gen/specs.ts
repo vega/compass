@@ -1,7 +1,6 @@
 'use strict';
 
 import * as vlFieldDef from 'vega-lite/src/fielddef';
-import * as vlSchemaUtil from 'vega-lite/src/schema/schemautil';
 import * as util from '../util';
 import {EncodingOption, DEFAULT_ENCODING_OPTION} from '../consts';
 import genEncodings from './encodings';
@@ -12,7 +11,7 @@ import * as rank from '../rank/rank';
 
 export default function genSpecsFromFieldDefs(output, fieldDefs, stats, opt: EncodingOption = {}, nested?) {
   // opt must be augmented before being passed to genEncodings or getMarks
-  opt = vlSchemaUtil.extend(opt, DEFAULT_ENCODING_OPTION);
+  opt = util.extend({}, DEFAULT_ENCODING_OPTION, opt);
   var encodings = genEncodings([], fieldDefs, stats, opt);
 
   if (nested) {

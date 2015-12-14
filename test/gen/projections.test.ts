@@ -40,7 +40,7 @@ describe('cp.gen.projections()', function () {
     var projections = genProjections(fields);
 
     it('should generate correct # of projections', function () {
-      expect(projections.length).to.equal('3');
+      expect(projections.length).to.equal(3);
     });
 
     it('should keep selected field as first items', function () {
@@ -59,7 +59,6 @@ describe('cp.gen.projections()', function () {
 
     it('should generate correct # of projections', function () {
       var projections = genProjections(f.fields, f.stats);
-
       expect(projections.length).to.equal(4);
       expect(projections.filter(function(p){ return p.length === 2;}).length).to.equal(0);
     });

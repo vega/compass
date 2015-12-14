@@ -2,15 +2,10 @@ import {expect} from 'chai';
 import {fixture} from '../fixture';
 import * as vlShorthand from 'vega-lite/src/shorthand';
 import genEncodings from '../../src/gen/encodings';
-import * as consts from '../../src/consts';
+import {DEFAULT_ENCODING_OPTION} from '../../src/consts';
+import {extend} from '../../src/util';
 
 describe('cp.gen.encodings()', function () {
-  var opt;
-
-  beforeEach(function() {
-    opt = consts.DEFAULT_ENCODING_OPTION;
-  });
-
   describe('#', function () {
     var f;
 
@@ -19,7 +14,7 @@ describe('cp.gen.encodings()', function () {
     });
 
     it('should generate one encodings', function() {
-      var encodings = genEncodings([], f.fields, f.stats, opt);
+      var encodings = genEncodings([], f.fields, f.stats);
       expect(encodings.length).to.eql(1);
       expect(encodings[0].x).to.be.ok;
     });
@@ -33,7 +28,7 @@ describe('cp.gen.encodings()', function () {
     var f, encodings, encShorthands;
     beforeEach(function() {
       f = fixture['#xB(Q)'];
-      encodings = genEncodings([], f.fields, f.stats, opt);
+      encodings = genEncodings([], f.fields, f.stats);
       encShorthands = encodings.map(vlShorthand.shortenEncoding);
     });
 
@@ -48,7 +43,7 @@ describe('cp.gen.encodings()', function () {
     var f, encodings, encShorthands;
     beforeEach(function() {
       f = fixture['#xT'];
-      encodings = genEncodings([], f.fields, f.stats, opt);
+      encodings = genEncodings([], f.fields, f.stats);
       encShorthands = encodings.map(vlShorthand.shortenEncoding);
     });
 
@@ -62,7 +57,7 @@ describe('cp.gen.encodings()', function () {
     var f, encodings, encShorthands;
     beforeEach(function() {
       f = fixture['#xYR(T)'];
-      encodings = genEncodings([], f.fields, f.stats, opt);
+      encodings = genEncodings([], f.fields, f.stats);
       encShorthands = encodings.map(vlShorthand.shortenEncoding);
     });
 
@@ -76,7 +71,7 @@ describe('cp.gen.encodings()', function () {
     var f, encodings, encShorthands;
     beforeEach(function() {
       f = fixture['QxT'];
-      encodings = genEncodings([], f.fields, f.stats, opt);
+      encodings = genEncodings([], f.fields, f.stats);
       encShorthands = encodings.map(vlShorthand.shortenEncoding);
     });
     it('should show only vertical bar/plots', function() {
@@ -100,7 +95,7 @@ describe('cp.gen.encodings()', function () {
     });
 
     it('without stats about occlusion, it should not include charts with both O\'s on axes', function() {
-      var encodings = genEncodings([], f.fields, f.stats, opt);
+      var encodings = genEncodings([], f.fields, f.stats);
 
       var filtered = encodings.filter(function(encoding){
         return encoding.x.type === 'ordinal' && encoding.y.type === 'ordinal';
@@ -117,7 +112,7 @@ describe('cp.gen.encodings()', function () {
     });
 
     it('without stats about occlusion, it should include charts with both O\'s on axes', function() {
-      var encodings = genEncodings([], f.fields, f.stats, opt);
+      var encodings = genEncodings([], f.fields, f.stats);
 
       var filtered = encodings.filter(function(encoding){
         return encoding.x && encoding.x.type === 'ordinal' && encoding.y && encoding.y.type === 'ordinal';
@@ -136,7 +131,7 @@ describe('cp.gen.encodings()', function () {
     });
 
     it('should not include charts with O on row/column except with text', function() {
-      var encodings = genEncodings([], fields, stats, opt);
+      var encodings = genEncodings([], fields, stats);
 
       expect(encodings.filter(function(encoding) {
         var rowIsO = encoding.row && encoding.row.type==='ordinal',
@@ -146,7 +141,7 @@ describe('cp.gen.encodings()', function () {
     });
 
     it('should include charts with O on row/column when omit flag is disabled', function() {
-      opt.omitNonTextAggrWithAllDimsOnFacets = false;
+      const opt = extend({}, DEFAULT_ENCODING_OPTION, {omitNonTextAggrWithAllDimsOnFacets: false});
       var encodings = genEncodings([], fields, stats, opt);
       expect(encodings.filter(function(encoding) {
         return (encoding.row && encoding.row.type==='ordinal') ||

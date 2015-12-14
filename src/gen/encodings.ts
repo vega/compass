@@ -2,7 +2,7 @@ import * as vlFieldDef from 'vega-lite/src/fielddef';
 import * as vlEncoding from 'vega-lite/src/encoding';
 import * as util from '../util';
 import * as genMarks from './marks';
-import {EncodingOption} from '../consts';
+import {EncodingOption, DEFAULT_ENCODING_OPTION} from '../consts';
 import {ROW, COLUMN} from 'vega-lite/src/channel';
 import {Type} from 'vega-lite/src/type';
 
@@ -50,14 +50,14 @@ const rules = {
   }
 };
 
-function retinalEncRules(encoding, fieldDef, stats, opt) {
+function retinalEncRules(encoding, fieldDef, stats, opt: EncodingOption) {
   if (opt.omitMultipleRetinalEncodings) {
     if (encoding.color || encoding.size || encoding.shape) return false;
   }
   return true;
 }
 
-function colorRules(encoding, fieldDef, stats, opt) {
+function colorRules(encoding, fieldDef, stats, opt: EncodingOption) {
   // Don't use color if omitMultipleRetinalEncodings is true and we already have other retinal encoding
   if (!retinalEncRules(encoding, fieldDef, stats, opt)) return false;
 
@@ -65,7 +65,7 @@ function colorRules(encoding, fieldDef, stats, opt) {
     vlFieldDef.cardinality(fieldDef, stats) <= opt.maxCardinalityForColor;
 }
 
-function shapeRules(encoding, fieldDef, stats, opt) {
+function shapeRules(encoding, fieldDef, stats, opt: EncodingOption) {
   if (!retinalEncRules(encoding, fieldDef, stats, opt)) return false;
 
   // FIXME simplify as not having order?
@@ -92,7 +92,7 @@ function dimMeaTransposeRule(encoding) {
   return false;
 }
 
-function generalRules(encoding, stats, opt) {
+function generalRules(encoding, stats, opt: EncodingOption) {
   // encoding.text is only used for TEXT TABLE
   if (encoding.text) {
     return genMarks.satisfyRules(encoding, 'text', stats, opt);
@@ -121,7 +121,7 @@ function generalRules(encoding, stats, opt) {
         return false;
       }
 
-      if (opt.omitTranpose) {
+      if (opt.omitTranspose) {
         if ((isDimX && !isDimY) || (!isDimX && isDimY)) { // dim x mea
           if (!dimMeaTransposeRule(encoding)) {
             return false;
@@ -146,7 +146,7 @@ function generalRules(encoding, stats, opt) {
     }
 
     // Dot plot should always be horizontal
-    if (opt.omitTranpose && encoding.y) {
+    if (opt.omitTranspose && encoding.y) {
       return false;
     }
 
@@ -186,7 +186,7 @@ export function isAggrWithAllDimOnFacets(encoding) {
   return hasAggr && !hasOtherO;
 };
 
-export default function genEncodings(encodings, fieldDefs, stats, opt: EncodingOption) {
+export default function genEncodings(encodings, fieldDefs, stats, opt: EncodingOption = DEFAULT_ENCODING_OPTION) {
   // generate a collection vega-lite's encoding
   var tmpEncoding = {};
 
