@@ -1,15 +1,14 @@
 import {expect} from 'chai';
 import {fixture} from '../fixture';
-import {util as vlSchemaUtil} from 'vega-lite/src/schema/schema';
 import * as vlShorthand from 'vega-lite/src/shorthand';
 import genEncodings from '../../src/gen/encodings';
 import * as consts from '../../src/consts';
 
-describe('cp.gen.encs()', function () {
+describe('cp.gen.encodings()', function () {
   var opt;
 
   beforeEach(function() {
-    opt = vlSchemaUtil.extend({}, consts.gen.encodings);
+    opt = consts.DEFAULT_ENCODING_OPTION;
   });
 
   describe('#', function () {

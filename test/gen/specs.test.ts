@@ -33,7 +33,7 @@ describe('cp.gen.encodings()', function () {
 
     it('should generate more encodings without pruning', function () {
       var specs = genSpecs([], fields, stats, {
-        omitTranpose: false,
+        omitTranspose: false,
         omitDotPlot: false
       });
 

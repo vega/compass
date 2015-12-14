@@ -2,8 +2,9 @@ import * as vlFieldDef from 'vega-lite/src/fielddef';
 import * as vlEncoding from 'vega-lite/src/encoding';
 import * as util from '../util';
 import * as genMarks from './marks';
-import {Type} from 'vega-lite/src/type';
+import {EncodingOption} from '../consts';
 import {ROW, COLUMN} from 'vega-lite/src/channel';
+import {Type} from 'vega-lite/src/type';
 
 var isDimension = vlFieldDef.isDimension,
   isMeasure = vlFieldDef.isMeasure;
@@ -185,8 +186,7 @@ export function isAggrWithAllDimOnFacets(encoding) {
   return hasAggr && !hasOtherO;
 };
 
-
-export default function genEncodings(encodings, fieldDefs, stats, opt) {
+export default function genEncodings(encodings, fieldDefs, stats, opt: EncodingOption) {
   // generate a collection vega-lite's encoding
   var tmpEncoding = {};
 

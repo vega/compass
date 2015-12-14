@@ -9,7 +9,7 @@ describe('cp.gen.marks()', function(){
   var opt;
 
   beforeEach(function() {
-    opt = vlSchema.util.extend({}, consts.gen.encodings);
+    opt = consts.DEFAULT_ENCODING_OPTION;
   });
 
   describe('#', function () {

@@ -3,17 +3,16 @@
 import * as vlFieldDef from 'vega-lite/src/fielddef';
 import * as vlSchemaUtil from 'vega-lite/src/schema/schemautil';
 import * as util from '../util';
-
+import {EncodingOption, DEFAULT_ENCODING_OPTION} from '../consts';
 import genEncodings from './encodings';
 import getMarks from './marks';
 import * as rank from '../rank/rank';
-import * as consts from '../consts';
 
 /** Design Encodings for a set of field definition */
 
-export default function genSpecsFromFieldDefs(output, fieldDefs, stats, opt?, nested?) {
+export default function genSpecsFromFieldDefs(output, fieldDefs, stats, opt: EncodingOption = {}, nested?) {
   // opt must be augmented before being passed to genEncodings or getMarks
-  opt = vlSchemaUtil.extend(opt||{}, consts.gen.encodings);
+  opt = vlSchemaUtil.extend(opt, DEFAULT_ENCODING_OPTION);
   var encodings = genEncodings([], fieldDefs, stats, opt);
 
   if (nested) {

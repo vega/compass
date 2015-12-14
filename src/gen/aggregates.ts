@@ -6,53 +6,7 @@ import {Type} from 'vega-lite/src/type';
 import {SchemaField} from '../schema';
 
 import * as util from '../util';
-
-export enum TableType {
-  BOTH = 'both' as any,
-  AGGREGATED = 'aggregated' as any,
-  // TODO rename to raw?
-  DISAGGREGATED = 'disaggregated' as any
-}
-
-export enum QuantitativeDimensionType {
-  AUTO = 'auto' as any,
-  BIN = 'bin' as any,
-  CAST = 'cast' as any,
-  NONE = 'none' as any
-}
-
-export interface AggregationOption {
-  tableTypes?: TableType;
-  /** Use Q as Dimension either by binning or casting */
-  genDimQ?: QuantitativeDimensionType;
-  /** Minimum cardinality of an ordinal variable if we were to bin. */
-  minCardinalityForBin?: number;
-  /** Remove all dot plots. */
-  omitDotPlot?: boolean;
-  /** Omit aggregation with measure(s) only. */
-  omitMeasureOnly?: boolean;
-  /** Omit aggregation with dimension(s) only. */
-  omitDimensionOnly?: boolean;
-  /** Add count when there are dimension(s) only. */
-  addCountForDimensionOnly?: boolean;
-  aggrList?: string[]; // FIXME
-  timeUnitList?: string[]; // FIXME
-  /** generate similar auto transform for quant */
-  consistentAutoQ?: boolean;
-}
-
-const DEFAULT_AGGREGATION_OPTIONS: AggregationOption = {
-  tableTypes: TableType.BOTH,
-  genDimQ: QuantitativeDimensionType.AUTO,
-  minCardinalityForBin: 20,
-  omitDotPlot: false,
-  omitMeasureOnly: false,
-  omitDimensionOnly: true,
-  addCountForDimensionOnly: true,
-  aggrList: [undefined, 'mean'], // FIXME
-  timeUnitList: ['year'], // FIXME
-  consistentAutoQ: true
-};
+import {TableType, QuantitativeDimensionType, AggregationOption, DEFAULT_AGGREGATION_OPTIONS} from '../consts';
 
 var AUTO = '*';
 

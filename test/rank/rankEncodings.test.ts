@@ -21,10 +21,10 @@ var setter = function(x, p, val, noaugment?) {
 
 var D = dimensionScore.consts,
   M = measureScore.consts,
-  opt = vlSchema.util.extend(opt||{}, consts.gen.encodings);
+  opt = consts.DEFAULT_ENCODING_OPTION;
 
 describe('cp.rank.encoding', function () {
-  var marks = consts.gen.encodings.properties.markList.default;
+  var marks = consts.DEFAULT_ENCODING_OPTION.markList;
   var channels = ['x', 'y', 'row', 'column', 'size', 'color', 'shape', 'text', 'detail'];
   var dFixtures = ['O', 'O_15', 'O_30', 'BIN(Q)'],
     mFixtures = ['Q'];

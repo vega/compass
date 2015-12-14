@@ -1,24 +1,9 @@
 import * as vlFieldDef from 'vega-lite/src/fielddef';
 import * as util from '../util';
 import {SchemaField} from '../schema';
+import {ProjectionOption, DEFAULT_PROJECTION_OPT} from '../consts';
 import {TEMPORAL} from 'vega-lite/src/type';
 const isDimension = vlFieldDef.isDimension;
-
-
-export interface ProjectionOption {
-  /** If true, excluce all dot plots. */
-  omitDotPlot?: boolean;
-  /** Max cardinality for an ordinal variable to be considered for auto adding */
-  maxCardinalityForAutoAddOrdinal?: number;
-  // TODO: explain
-  alwaysAddHistogram?: boolean;
-}
-
-const DEFAULT_PROJECTION_OPT:ProjectionOption = {
-  omitDotPlot: true,
-  maxCardinalityForAutoAddOrdinal: 50,
-  alwaysAddHistogram: true
-};
 
 
 // TODO support other mode of projections generation
@@ -49,7 +34,8 @@ export default function projections(fieldDefs: SchemaField[], stats?, opt: Proje
     if (fieldDef.selected) { // selected fields are included in selected
       selected.push(fieldDef);
 
-      if (isDimension(fieldDef) || fieldDef.type === TEMPORAL) {
+      if (isDimension(fieldDef) ||
+         (fieldDef.type === TEMPORAL /* TODO: add && current constraint make it a dimension */)) {
         // If the field can serve as dimension
 
         // FIXME vega-lite's isDimension is designed to work with FieldDef, not SchemaField
