@@ -24,8 +24,8 @@ export default function genEncodings(encodings: Encoding[], fieldDefs: FieldDef[
 
     // Otherwise, assign i-th field
     var fieldDef = fieldDefs[i];
-    for (var j in opt.encodingTypeList) {
-      var channel = opt.encodingTypeList[j],
+    for (var j in opt.channelList) {
+      var channel = opt.channelList[j],
         isDim = isDimension(fieldDef);
 
       const supportedRole = getSupportedRole(channel);
@@ -93,7 +93,7 @@ namespace rule {
 
     function noRule() { return true; }
     function retinalEncRules(encoding: Encoding, fieldDef: FieldDef, stats, opt: SpecOption) {
-      if (opt.omitMultipleRetinalEncodings) {
+      if (opt.omitMultipleNonPositionalChannels) {
         if (encoding.color || encoding.size || encoding.shape) {
           return false;
         }

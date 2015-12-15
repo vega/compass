@@ -59,8 +59,8 @@ export const DEFAULT_AGGREGATION_OPTIONS: AggregationOption = {
   omitMeasureOnly: false,
   omitDimensionOnly: true,
   addCountForDimensionOnly: true,
-  aggrList: [undefined, 'mean'], // FIXME
-  timeUnitList: ['year'], // FIXME
+  aggrList: [undefined, 'mean'], // TODO: update this when we have box plots
+  timeUnitList: ['year'], //
   consistentAutoQ: true
 };
 
@@ -70,15 +70,12 @@ export interface SpecOption {
   /** Allowed marks. */
   markList?: Mark[];
 
-  /** Allowed encoding types. */
-  encodingTypeList?: Channel[];
+  /** Allowed channels. */
+  channelList?: Channel[];
 
-  /** Required encodings for each mark type. */
-  requiredEncodings?: any;
-  /** Supported encoding for each mark type. */
-  supportedEncodings?: any;
-
+  // FIXME(kanitw): revise this when we revise text's encoding in Vega-Lite
   alwaysGenerateTableAsHeatmap?: boolean;
+
   maxGoodCardinalityForFacets?: number;
   /** Maximum cardinality of an ordinal variable to be put on facet (row/column). */
   maxCardinalityForFacets?: number;
@@ -91,19 +88,19 @@ export interface SpecOption {
 
   /** Remove all dot plots */
   omitDotPlot?: boolean;
-  /** Remove all dot plots with >1 encoding */
+  /** Remove all dot plots with shape or color or size since it's better to use both x and y first! */
   omitDotPlotWithExtraEncoding?: boolean;
-  /** Omit trellis plots that do not use X or Y */
+  /** Omit trellis plots that do not use X or Y since it's better to use both x and y first! */
   omitDotPlotWithFacet?: boolean;
   /** Omit one dimension count */
   omitDotPlotWithOnlyCount?: boolean; // FIXME remove
-  /** Omit using multiple retinal variables (size, color, shape) */
-  omitMultipleRetinalEncodings?: boolean;  // FIXME NonPositional
+  /** Omit using multiple non-positional channels (size, color, shape) */
+  omitMultipleNonPositionalChannels?: boolean;  // FIXME NonPositional
   /**
    * Remove all aggregated charts (except text tables) with all dims on facets (row, column)
    * because this would lead to only one mark per facet.
    */
-  omitNonTextAggrWithAllDimsOnFacets?: boolean; // FIXME revise
+  omitNonTextAggrWithAllDimsOnFacets?: boolean; // FIXME revise this should become omitNonTextAggrWithAllDimsOnFacets
   /** Omit plot with both x and y as dimension, which most of the time have occlusion. */
   omitRawWithXYBothDimension?: boolean;
   /** Omit binned fields on shape */
@@ -113,11 +110,11 @@ export interface SpecOption {
   /** Do not use bar\'s size. */
   omitSizeOnBar?: boolean; // FIXME: remove
   /** Do not stack bar chart with average. */
-  omitStackedAverage?: boolean; // FIXME: remove
+  omitStackedAverage?: boolean; // FIXME: change to omit non-sum stacked
   /**
    * Eliminate all transpose by
    * (1) keeping horizontal dot plot only
-   * (2) for OxQ charts, always put O on Y
+   * (2) for OxQ charts, always put O on Y but put time and binned Q on X.
    * (3) show only one DxD, MxM (currently sorted by name)
    */
   omitTranspose?: boolean; // FIXME revise
@@ -125,9 +122,7 @@ export interface SpecOption {
 
 export const DEFAULT_SPEC_OPTION: SpecOption = {
   markList: [Mark.POINT, Mark.BAR, Mark.LINE, Mark.AREA, Mark.TEXT, Mark.TICK],
-  encodingTypeList: [X, Y, ROW, COLUMN, SIZE, COLOR, TEXT, DETAIL],
-  requiredEncodings: undefined, // FIXME
-  supportedEncodings: undefined, // FIXME
+  channelList: [X, Y, ROW, COLUMN, SIZE, COLOR, TEXT, DETAIL],
 
   alwaysGenerateTableAsHeatmap: true,
   maxGoodCardinalityForFacets: 5,
@@ -139,7 +134,7 @@ export const DEFAULT_SPEC_OPTION: SpecOption = {
   omitDotPlotWithExtraEncoding: true,
   omitDotPlotWithFacet: true,
   omitDotPlotWithOnlyCount: false, // TODO: revise if this should be true
-  omitMultipleRetinalEncodings: true,
+  omitMultipleNonPositionalChannels: true, // TODO: revise if we penalize this in ranking
   omitNonTextAggrWithAllDimsOnFacets: true,
   omitRawWithXYBothDimension: true,
   omitShapeWithBin: true,
