@@ -39,6 +39,7 @@ export namespace rule {
 
       // For OxO
       if (xIsDim && yIsDim) {
+        // TODO: revise if we need his
         // shape doesn't work with both x, y as ordinal
         if (encoding.shape) {
           return false;
@@ -102,6 +103,8 @@ export namespace rule {
 
       if (eitherXorYisDimOrNull) {
         var aggregate = encoding.x.aggregate || encoding.y.aggregate;
+
+        // TODO: revise 
         return !(opt.omitStackedAverage && aggregate ==='mean' && encoding.color);
       }
     }
