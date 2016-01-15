@@ -53,6 +53,22 @@ describe('cp.gen.projections()', function () {
     });
   });
 
+  describe('with a set of fields, all unselected', function() {
+    const fields = [1,2,3].map(i => { return {'field': 'f' + i, selected: undefined};} );
+    const projections = genProjections(fields, {}, {additionalVariables: 2});
+
+    it('should generate projections with 2 fields', function() {
+      expect(projections.length).to.equal(6); // P(3,2) = 3
+      const lengthCount = projections.reduce(function(count, p, i) {
+        count[p.length] = (count[p.length] || 0) + 1;
+        return count;
+      }, {});
+      expect(lengthCount).to.eql({
+        1:3, // P(3,1) = 3
+        2:3 // P(3,2) = 3
+      })
+    });
+  });
 
   describe('with a set of fields with count', function () {
     var f = fixture['OxOxQxQx#'];

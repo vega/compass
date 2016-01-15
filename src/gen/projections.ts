@@ -57,8 +57,8 @@ export default function projections(fieldDefs: SchemaField[], stats?, opt: Proje
 
   fieldsToAdd.sort(compareFieldsToAdd(hasSelectedDimension, hasSelectedMeasure, indices));
 
-  // FIXME make 1 a parameter -- for yhoonkim's case, set it to # of variables
-  var setsToAdd = util.chooseKorLess(fieldsToAdd, 1);
+  console.log(opt.additionalVariables);
+  var setsToAdd = util.chooseKorLess(fieldsToAdd, opt.additionalVariables);
 
   setsToAdd.forEach(function(setToAdd) {
     var fieldSet = selected.concat(setToAdd);

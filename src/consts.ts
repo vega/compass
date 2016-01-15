@@ -8,12 +8,14 @@ export interface ProjectionOption {
   maxCardinalityForAutoAddOrdinal?: number;
   // TODO: explain
   alwaysAddHistogram?: boolean;
+  additionalVariables?: number;
 }
 
 export const DEFAULT_PROJECTION_OPT:ProjectionOption = {
   omitDotPlot: false,
   maxCardinalityForAutoAddOrdinal: 50,
-  alwaysAddHistogram: true
+  alwaysAddHistogram: true,
+  additionalVariables: 1
 };
 
 export enum TableType {
