@@ -12,5 +12,9 @@ describe('cp.gen.scales()', function () {
     });
     const output = genScales([], fields, {rescaleQuantitative: [undefined, 'log']});
     expect(output.length).to.equal(4); // only 1 and 2 get rescaled 2x2 = 4
+    expect(output[1][1].scale.type).to.equal('log');
+    expect(output[2][0].scale.type).to.equal('log');
+    expect(output[3][0].scale.type).to.equal('log');
+    expect(output[3][1].scale.type).to.equal('log');
   });
 });
