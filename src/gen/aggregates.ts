@@ -1,23 +1,22 @@
 'use strict';
 
-var vlFieldDef = require('vega-lite/src/fielddef');
-var vlSchemaUtil = require('vega-lite/src/schema/schemautil');
-var vlShorthand = require('vega-lite/src/shorthand');
+import * as vlFieldDef from 'vega-lite/src/fielddef';
+import * as vlShorthand from 'vega-lite/src/shorthand';
+import {Type} from 'vega-lite/src/type';
+import {FieldDef} from 'vega-lite/src/schema/fielddef.schema';
+import {SchemaField} from '../schema';
 
-var consts = require('../consts');
-var Type = consts.Type;
-var util = require('../util');
+import * as util from '../util';
+import {TableType, QuantitativeDimensionType, AggregationOption, DEFAULT_AGGREGATION_OPTIONS} from '../consts';
 
 var AUTO = '*';
 
-module.exports = genAggregates;
+export default function genAggregates(output, fieldDefs: SchemaField[], stats, opt: AggregationOption = {}) {
+  opt = util.extend({}, DEFAULT_AGGREGATION_OPTIONS, opt);
 
-
-function genAggregates(output, fieldDefs, stats, opt) {
-  opt = vlSchemaUtil.extend(opt||{}, consts.gen.aggregates);
-  var tf = new Array(fieldDefs.length);
+  var tf: FieldDef[] = new Array(fieldDefs.length);
   var hasNorO = util.any(fieldDefs, function(f) {
-    return f.type === Type.Nominal || f.type == Type.Ordinal;
+    return f.type === Type.NOMINAL || f.type === Type.ORDINAL;
   });
 
   function emit(fieldSet) {
@@ -36,20 +35,22 @@ function genAggregates(output, fieldDefs, stats, opt) {
           hasDimension = true;
         } else {
           hasMeasure = true;
-          if (!f.aggregate) hasRaw = true;
+          if (!f.aggregate) { hasRaw = true; }
         }
       });
-      if (!hasDimension && !hasRaw && opt.omitMeasureOnly) return;
+      if (!hasDimension && !hasRaw && opt.omitMeasureOnly) {
+        return;
+      }
       if (!hasMeasure) {
         if (opt.addCountForDimensionOnly) {
           tf.push(vlFieldDef.count());
           emit(tf);
           tf.pop();
         }
-        if (opt.omitDimensionOnly) return;
+        if (opt.omitDimensionOnly) { return; }
       }
     }
-    if (opt.omitDotPlot && tf.length === 1) return;
+    if (opt.omitDotPlot && tf.length === 1) { return; }
     emit(tf);
   }
 
@@ -103,17 +104,17 @@ function genAggregates(output, fieldDefs, stats, opt) {
       if ((!opt.consistentAutoQ || util.isin(autoMode, [AUTO, 'bin', 'cast', 'autocast'])) && !hasNorO) {
         var highCardinality = vlFieldDef.cardinality(f, stats) > opt.minCardinalityForBin;
 
-        var isAuto = opt.genDimQ === 'auto',
-          genBin = opt.genDimQ  === 'bin' || (isAuto && highCardinality),
-          genCast = opt.genDimQ === 'cast' || (isAuto && !highCardinality);
+        var isAuto = opt.genDimQ === QuantitativeDimensionType.AUTO,
+          genBin = opt.genDimQ  === QuantitativeDimensionType.BIN || (isAuto && highCardinality),
+          genCast = opt.genDimQ === QuantitativeDimensionType.CAST || (isAuto && !highCardinality);
 
         if (genBin && util.isin(autoMode, [AUTO, 'bin', 'autocast'])) {
           assignBinQ(i, hasAggr, isAuto ? 'autocast' : 'bin');
         }
         if (genCast && util.isin(autoMode, [AUTO, 'cast', 'autocast'])) {
-          tf[i].type = Type.Ordinal;
+          tf[i].type = Type.ORDINAL;
           assignField(i + 1, hasAggr, isAuto ? 'autocast' : 'cast');
-          tf[i].type = Type.Quantitative;
+          tf[i].type = Type.QUANTITATIVE;
         }
       }
     }
@@ -156,17 +157,17 @@ function genAggregates(output, fieldDefs, stats, opt) {
     var f = fieldDefs[i];
     // Otherwise, assign i-th field
     switch (f.type) {
-      //TODO "D", "G"
-      case Type.Quantitative:
+      // TODO: "D", "G"
+      case Type.QUANTITATIVE:
         assignQ(i, hasAggr, autoMode);
         break;
 
-      case Type.Temporal:
+      case Type.TEMPORAL:
         assignT(i, hasAggr, autoMode);
         break;
-      case Type.Ordinal:
+      case Type.ORDINAL:
         /* falls through */
-      case Type.Nominal:
+      case Type.NOMINAL:
         /* falls through */
       default:
         tf[i] = f;
@@ -175,7 +176,9 @@ function genAggregates(output, fieldDefs, stats, opt) {
     }
   }
 
-  var hasAggr = opt.tableTypes === 'aggregated' ? true : opt.tableTypes === 'disaggregated' ? false : null;
+  var hasAggr = opt.tableTypes === TableType.AGGREGATED ? true :
+    opt.tableTypes === TableType.DISAGGREGATED ? false : null;
+
   assignField(0, hasAggr, AUTO);
 
   return output;

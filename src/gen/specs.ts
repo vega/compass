@@ -1,26 +1,24 @@
 'use strict';
 
-var vlFieldDef = require('vega-lite/src/fielddef');
-var vlSchemaUtil = require('vega-lite/src/schema/schemautil');
-var util = require('../util');
-
-var genEncodings = require('./encodings'),
-  getMarks = require('./marks'),
-  rank = require('../rank/rank'),
-  consts = require('../consts');
-
-module.exports = genSpecsFromFieldDefs;
+import * as vlFieldDef from 'vega-lite/src/fielddef';
+import * as util from '../util';
+import {SpecOption, DEFAULT_SPEC_OPTION} from '../consts';
+import genEncodings from './encodings';
+import getMarks from './marks';
+import * as rank from '../rank/rank';
+import {shortenEncoding} from 'vega-lite/src/shorthand';
 
 /** Design Encodings for a set of field definition */
 
-function genSpecsFromFieldDefs(output, fieldDefs, stats, opt, nested) {
+export default function genSpecsFromFieldDefs(output, fieldDefs, stats, opt: SpecOption = {}, nested?): any {
   // opt must be augmented before being passed to genEncodings or getMarks
-  opt = vlSchemaUtil.extend(opt||{}, consts.gen.encodings);
+  opt = util.extend({}, DEFAULT_SPEC_OPTION, opt);
   var encodings = genEncodings([], fieldDefs, stats, opt);
 
   if (nested) {
     return encodings.reduce(function(dict, encoding) {
-      dict[encoding] = genSpecsFromEncodings([], encoding, stats, opt);
+      var encodingShorthand = shortenEncoding(encoding);
+      dict[encodingShorthand] = genSpecsFromEncodings([], encoding, stats, opt);
       return dict;
     }, {});
   } else {
@@ -52,7 +50,7 @@ function genSpecsFromEncodings(output, encoding, stats, opt) {
   return output;
 }
 
-//FIXME this should be refactors
+// FIXME this should be refactors
 function finalTouch(spec, stats, opt) {
   if (spec.mark === 'text' && opt.alwaysGenerateTableAsHeatmap) {
     spec.encoding.color = spec.encoding.text;

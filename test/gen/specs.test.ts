@@ -1,11 +1,6 @@
-'use strict';
-
-/*jshint -W069 */
-
-var expect = require('chai').expect,
-  fixture = require('../fixture');
-
-var genSpecs = require('../../src/gen/specs');
+import {expect} from 'chai';
+import {fixture} from '../fixture';
+import genSpecs from '../../src/gen/specs';
 
 describe('cp.gen.encodings()', function () {
   describe('#', function () {
@@ -33,12 +28,12 @@ describe('cp.gen.encodings()', function () {
       var specs = genSpecs([], fields, stats, {
         omitDotPlot: false
       });
-      expect(specs.length).to.equal(2); //point and tick
+      expect(specs.length).to.equal(2); // point and tick
     });
 
     it('should generate more encodings without pruning', function () {
       var specs = genSpecs([], fields, stats, {
-        omitTranpose: false,
+        omitTranspose: false,
         omitDotPlot: false
       });
 

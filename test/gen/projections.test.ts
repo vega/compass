@@ -1,9 +1,8 @@
 'use strict';
 
-var expect = require('chai').expect,
-  fixture = require('../fixture');
-
-var genProjections = require('../../src/gen/projections');
+import {expect} from 'chai';
+import {fixture} from '../fixture';
+import genProjections from '../../src/gen/projections';
 
 describe('cp.gen.projections()', function () {
   describe('with empty set of fields', function () {
@@ -32,10 +31,10 @@ describe('cp.gen.projections()', function () {
 
   describe('with a set of fields', function () {
     var fields = [
-      {field:1, selected: true},
-      {field:2, selected: true},
-      {field:3, selected: undefined},
-      {field:4, selected: undefined}
+      {field:'1', selected: true},
+      {field:'2', selected: true},
+      {field:'3', selected: undefined},
+      {field:'4', selected: undefined}
     ];
 
     var projections = genProjections(fields);
@@ -45,8 +44,8 @@ describe('cp.gen.projections()', function () {
     });
 
     it('should keep selected field as first items', function () {
-      expect(projections[2][0].field).to.equal(1);
-      expect(projections[2][1].field).to.equal(2);
+      expect(projections[2][0].field).to.equal('1');
+      expect(projections[2][1].field).to.equal('2');
     });
 
     it('should add projection key', function () {
@@ -60,7 +59,6 @@ describe('cp.gen.projections()', function () {
 
     it('should generate correct # of projections', function () {
       var projections = genProjections(f.fields, f.stats);
-
       expect(projections.length).to.equal(4);
       expect(projections.filter(function(p){ return p.length === 2;}).length).to.equal(0);
     });

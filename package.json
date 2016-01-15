@@ -1,6 +1,6 @@
 {
   "name": "viscompass",
-  "version": "0.6.2",
+  "version": "0.7.0",
   "description": "VisCompass: Visualization Recommender",
   "author": {
     "name": "UW Interactive Data Lab",
@@ -16,54 +16,49 @@
     "test": "test"
   },
   "scripts": {
-    "build": "gulp build",
-    "watch": "gulp build watch",
-    "deploy": "npm run lint && npm run test && scripts/deploy.sh",
-    "lint": "gulp jshint",
-    "test": "gulp t"
+    "build": "tsc && browserify src/cp.js -d -s cp | exorcist compass.js.map > compass.js",
+    "postbuild": "uglifyjs compass.js -cm --source-map compass.min.js.map > compass.min.js",
+    "clean": "rm -f compass.* & find src -name '*.js*' -type f -delete & find test -name '*.js*' -type f -delete",
+    "cover": "tsc && istanbul cover node_modules/.bin/_mocha -- --recursive",
+    "deploy": "npm run clean && npm run lint && npm run test && scripts/deploy.sh",
+    "lint": "tslint -c tslint.json src/*.ts test/*.ts src/**/*.ts test/**/*.ts",
+    "watch": "nodemon -x 'npm run build && npm run test:only && npm run lint'",
+    "tsc": "tsc",
+    "test": "tsc && npm run test:only",
+    "test:only": "mocha --recursive --require source-map-support/register"
   },
   "browserify-shim": {},
   "repository": {
     "type": "git",
-    "url": "https://github.com/vega/visrec.git"
+    "url": "https://github.com/vega/compass.git"
   },
   "license": "BSD-3-Clause",
   "bugs": {
-    "url": "https://github.com/vega/visrec/issues"
+    "url": "https://github.com/vega/compass/issues"
   },
   "homepage": "https://github.com/vega/visrec",
   "devDependencies": {
-    "browserify": "^10.2.4",
-    "browserify-shim": "^3.8.9",
-    "chai": "^3.0.0",
-    "gulp": "^3.9.0",
-    "gulp-jshint": "^1.11.2",
-    "gulp-load-plugins": "^1.0.0-rc",
-    "gulp-mocha": "^2.1.2",
-    "gulp-rename": "^1.2.2",
-    "gulp-run": "^1.6.8",
-    "gulp-sourcemaps": "^1.5.2",
-    "gulp-spawn-mocha": "^2.2.1",
-    "gulp-uglify": "^1.2.0",
-    "gulp-util": "^3.0.6",
-    "jshint-stylish": "^2.0.1",
-    "karma": "~0.12.37",
-    "karma-chai": "~0.1.0",
-    "karma-chrome-launcher": "~0.2.0",
-    "karma-mocha": "~0.2.0",
-    "karma-requirejs": "~0.2.2",
-    "karma-safari-launcher": "~0.1.1",
-    "karma-sinon": "~1.0.4",
+    "browser-sync": "^2.10.0",
+    "browserify": "^12.0.1",
+    "browserify-versionify": "^1.0.6",
+    "chai": "^3.4.1",
+    "exorcist": "^0.4.0",
+    "istanbul": "^0.4.1",
     "mocha": "~2.2.5",
-    "require-dir": "^0.3.0",
-    "requirejs": "~2.1.18",
-    "sinon": "~1.15.4",
-    "vinyl-buffer": "^1.0.0",
-    "vinyl-source-stream": "^1.1.0",
-    "watchify": "^3.2.3",
-    "vega-lite": "^0.9.0"
+    "nodemon": "^1.8.1",
+    "source-map-support": "^0.4.0",
+    "tsify": "^0.13.1",
+    "tslint": "^3.1.1",
+    "typescript": "^1.7.3",
+    "uglify-js": "^2.6.1"
   },
   "dependencies": {
-    "clusterfck": "^0.6.0"
+    "clusterfck": "^0.6.0",
+    "vega-lite": "^0.9.2"
+  },
+  "browserify": {
+    "transform": [
+      "browserify-versionify"
+    ]
   }
 }

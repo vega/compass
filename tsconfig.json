@@ -1,0 +1,61 @@
+{
+    "compilerOptions": {
+        "target": "es5",
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "isolatedModules": false,
+        "jsx": "react",
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        "declaration": false,
+        "noImplicitAny": false,
+        "removeComments": true,
+        "noLib": false,
+        "preserveConstEnums": true,
+        "suppressImplicitAnyIndexErrors": true,
+        "sourceMap": true
+    },
+    "filesGlob": [
+        "**/*.ts",
+        "**/*.tsx"
+    ],
+    "exclude": [
+        "node_modules",
+        "bower_components",
+        "data",
+        "_site",
+        "lib"
+    ],
+    "files": [
+        "src/cluster/cluster.ts",
+        "src/cluster/clusterconsts.ts",
+        "src/cluster/distance.ts",
+        "src/consts.ts",
+        "src/cp.ts",
+        "src/gen/aggregates.ts",
+        "src/gen/encodings.ts",
+        "src/gen/gen.ts",
+        "src/gen/marks.ts",
+        "src/gen/projections.ts",
+        "src/gen/specs.ts",
+        "src/rank/rank.ts",
+        "src/rank/rankEncodings.ts",
+        "src/schema.ts",
+        "src/util.ts",
+        "test/cluster/cluster.test.ts",
+        "test/cluster/distance.test.ts",
+        "test/fixture.ts",
+        "test/gen/aggregates.test.ts",
+        "test/gen/encodings.test.ts",
+        "test/gen/marktypes.test.ts",
+        "test/gen/projections.test.ts",
+        "test/gen/specs.test.ts",
+        "test/rank/rankEncodings.test.ts",
+        "typings/chai.d.ts",
+        "typings/clusterfck.d.ts",
+        "typings/mocha.d.ts"
+    ],
+    "atom": {
+        "rewriteTsconfig": true
+    }
+}

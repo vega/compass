@@ -1,18 +1,16 @@
-'use strict';
-
-var expect = require('chai').expect,
-  vl = require('vega-lite'),
-  fixture = require('../fixture');
-
-// var dataB = require("../data/birdstrikes.json");
-var consts = require('../../src/consts');
-var getMarks = require('../../src/gen/marks');
+import {expect} from 'chai';
+import {fixture} from '../fixture';
+import getMarks from '../../src/gen/marks';
+import {DEFAULT_SPEC_OPTION} from '../../src/consts';
+import * as vlShorthand from 'vega-lite/src/shorthand';
+import {BAR, POINT, TEXT} from 'vega-lite/src/mark';
+import {QUANTITATIVE, ORDINAL} from 'vega-lite/src/type';
 
 describe('cp.gen.marks()', function(){
   var opt;
 
   beforeEach(function() {
-    opt = vl.schema.util.extend({}, consts.gen.encodings);
+    opt = DEFAULT_SPEC_OPTION;
   });
 
   describe('#', function () {
@@ -27,14 +25,14 @@ describe('cp.gen.marks()', function(){
         marks = getMarks(encoding, f.stats, opt);
 
       expect(marks.length).to.eql(2);
-      expect(marks).to.eql(['point', 'bar']);
+      expect(marks).to.eql([POINT, BAR]);
     });
   });
 
   describe('1Q', function () {
     var encoding, marks;
     beforeEach(function() {
-      encoding = {"x": {"field": "Cost__Total_$","type": "quantitative"}};
+      encoding = {'x': {'field': 'Cost__Total_$','type': QUANTITATIVE}};
       marks = getMarks(encoding, {}, opt);
     });
     it('should contain tick', function () {
@@ -53,11 +51,11 @@ describe('cp.gen.marks()', function(){
 
   describe('point', function(){
     describe('scatter and bubble plots', function(){
-      //TODO
+      // TODO
     });
 
     describe('dot plot', function(){
-      //TODO
+      // TODO
     });
   });
 
@@ -65,25 +63,25 @@ describe('cp.gen.marks()', function(){
     describe('with stacked average', function () {
       it('should not be generated', function () {
         var encoding = {
-          "color": {"field": "When__Phase_of_flight","type": "ordinal"},
-          "x": {"field": "Cost__Total_$","type": "quantitative","aggregate": "mean"},
-          "y": {"selected": undefined,"field": "Aircraft__Airline_Operator","type": "ordinal"}
+          'color': {'field': 'When__Phase_of_flight','type': ORDINAL},
+          'x': {'field': 'Cost__Total_$','type': QUANTITATIVE,'aggregate': 'mean'},
+          'y': {'selected': undefined,'field': 'Aircraft__Airline_Operator','type': ORDINAL}
         };
 
         var marks = getMarks(encoding, {}, opt);
-        expect(marks.indexOf('bar')).to.equal(-1);
+        expect(marks.indexOf(BAR)).to.equal(-1);
       });
     });
 
     describe('with stacked sum', function () {
       it('should be generated', function () {
         var encoding = {
-          "color": {"field": "When__Phase_of_flight","type": "ordinal"},
-          "x": {"field": "Cost__Total_$","type": "quantitative","aggregate": "sum"},
-          "y": {"field": "Aircraft__Airline_Operator","type": "ordinal"}
+          'color': {'field': 'When__Phase_of_flight','type': ORDINAL},
+          'x': {'field': 'Cost__Total_$','type': QUANTITATIVE,'aggregate': 'sum'},
+          'y': {'field': 'Aircraft__Airline_Operator','type': ORDINAL}
         };
         var marks = getMarks(encoding, {}, opt);
-        expect(marks.indexOf('bar')).to.gt(-1);
+        expect(marks.indexOf(BAR)).to.gt(-1);
       });
     });
   });
@@ -95,30 +93,28 @@ describe('cp.gen.marks()', function(){
   describe('text', function() {
     it('should be generated', function () {
       var shorthand = 'row=1,O|text=mean_2,Q',
-        encoding = vl.shorthand.parseEncoding(shorthand),
+        encoding = vlShorthand.parseEncoding(shorthand),
         marks = getMarks(encoding, {}, opt);
-      expect(marks.indexOf('text')).to.gt(-1);
+      expect(marks.indexOf(TEXT)).to.gt(-1);
     });
 
     it('should not contain size', function() {
       var encoding = {
-        "column": {
-          "field": "Effect__Amount_of_damage",
-          "type": "ordinal",
+        'column': {
+          'field': 'Effect__Amount_of_damage',
+          'type': ORDINAL,
         },
-        "size": {
-          "field": "Cost__Repair","type": "quantitative","aggregate": "mean"
+        'size': {
+          'field': 'Cost__Repair','type': QUANTITATIVE,'aggregate': 'mean'
         },
-        "text": {
-          "field": "Cost__Total_$","type": "quantitative","aggregate": "mean"
+        'text': {
+          'field': 'Cost__Total_$','type': QUANTITATIVE,'aggregate': 'mean'
         }
       };
 
       var marks = getMarks(encoding, {}, opt);
 
-      expect(marks.indexOf('text')).to.equal(-1);
+      expect(marks.indexOf(TEXT)).to.equal(-1);
     });
   });
 });
-
-

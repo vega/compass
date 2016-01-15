@@ -1,13 +1,6 @@
-'use strict';
-
-/*jshint -W069 */
-
-var expect = require('chai').expect;
-
-var //genProjections = require('../../src/gen/projections'),
-  genAggregates = require('../../src/gen/aggregates'),
-  fixture = require('../fixture');
-
+import {expect} from 'chai';
+import genAggregates from '../../src/gen/aggregates';
+import {fixture} from '../fixture';
 
 describe('cp.gen.aggregates()', function () {
 
@@ -22,20 +15,22 @@ describe('cp.gen.aggregates()', function () {
   describe('Q', function () {
     var f = fixture['Q'];
 
-    var tables = genAggregates([], f.fields, f.stats);
+    describe('(No option)', function() {
+      var tables = genAggregates([], f.fields, f.stats);
 
-    it('should output 1 data table that has length 2', function () {
-      expect(tables.filter(function(t) {
-        return t.length === 1;
-      }).length).to.equal(2);
-    });
+      it('should output 1 data table that has length 2', function () {
+        expect(tables.filter(function(t) {
+          return t.length === 1;
+        }).length).to.equal(2);
+      });
 
-    it('should output 3 data tables: Q, A(Q), BIN(Q)x#', function () {
-      expect(tables.length).to.equal(3);
-    });
+      it('should output 3 data tables: Q, A(Q), BIN(Q)x#', function () {
+        expect(tables.length).to.equal(3);
+      });
 
-    it('should append key to each fieldSet', function() {
-      expect(tables[0].key).to.be.ok;
+      it('should append key to each fieldSet', function() {
+        expect(tables[0].key).to.be.ok;
+      });
     });
 
     it('should output Q, mean(Q), bin(Q)x# if omitMeasureOnly', function () {
@@ -67,7 +62,7 @@ describe('cp.gen.aggregates()', function () {
 
   describe('Q_10', function() {
     it('should not be binned', function() {
-      //FIXME write test
+      // FIXME write test
     });
   });
 
@@ -85,30 +80,31 @@ describe('cp.gen.aggregates()', function () {
   describe('QxQ', function () {
     var f = fixture['QxQ'];
 
-    var tables = genAggregates([], f.fields, f.stats, {});
+    describe('(No option)', function() {
+      var tables = genAggregates([], f.fields, f.stats, {});
 
-    it('should output 3 data table', function () {
-      expect(tables.length).to.equal(3);
-    });
-
-    it('should append key to each fieldSet', function() {
-      expect(tables[0].key).to.be.ok;
-    });
-
-    it('not generate mean with bin', function () {
-      var filtered = tables.filter(function(table) {
-        return table[0].aggregate && table[1].bin;
+      it('should output 3 data table', function () {
+        expect(tables.length).to.equal(3);
       });
-      expect(filtered.length).to.equal(0);
-    });
 
-    it('not generate raw with bin', function () {
-      var filtered = tables.filter(function(t) {
-        return !t[0].aggregate && !t[0].bin && t[1].bin;
+      it('should append key to each fieldSet', function() {
+        expect(tables[0].key).to.be.ok;
       });
-      expect(filtered.length).to.equal(0);
-    });
 
+      it('not generate mean with bin', function () {
+        var filtered = tables.filter(function(table) {
+          return table[0].aggregate && table[1].bin;
+        });
+        expect(filtered.length).to.equal(0);
+      });
+
+      it('not generate raw with bin', function () {
+        var filtered = tables.filter(function(t) {
+          return !t[0].aggregate && !t[0].bin && t[1].bin;
+        });
+        expect(filtered.length).to.equal(0);
+      });
+    });
 
     it('should output 3 data table if not omit', function () {
       var tables = genAggregates([], f.fields, f.stats, {
@@ -127,4 +123,3 @@ describe('cp.gen.aggregates()', function () {
     });
   });
 });
-

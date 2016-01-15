@@ -1,17 +1,16 @@
-"use strict";
+/// <reference path="../../typings/clusterfck.d.ts"/>
 
-module.exports = cluster;
+import * as vlShorthand from 'vega-lite/src/shorthand';
+import * as clusterfck from 'clusterfck';
+import * as consts from './clusterconsts';
+import * as util from '../util';
+import * as clDistance from './distance';
 
-var vlShorthand = require('vega-lite/src/shorthand'),
-  clusterfck = require('clusterfck'),
-  consts = require('./clusterconsts'),
-  util = require('../util');
+export const distance = clDistance;
 
-cluster.distance = require('./distance');
-
-function cluster(specs, opt) {
+export default function cluster(specs, opt) {
   // jshint unused:false
-  var dist = cluster.distance.table(specs);
+  var dist = distance.table(specs);
 
   var clusterTrees = clusterfck.hcluster(specs, function(e1, e2) {
     var s1 = vlShorthand.shorten(e1),
@@ -30,11 +29,11 @@ function cluster(specs, opt) {
   }).filter(function(cluster) {  // filter empty cluster
     return cluster.length >0;
   }).sort(function(cluster1, cluster2) {
-    //sort by highest scoring item in each cluster
+    // sort by highest scoring item in each cluster
     return cluster2[0]._info.score - cluster1[0]._info.score;
   });
 
-  clusters.dist = dist; //append dist in the array for debugging
+  clusters.dist = dist; // append dist in the array for debugging
 
   return clusters;
 }
