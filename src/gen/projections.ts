@@ -57,7 +57,6 @@ export default function projections(fieldDefs: SchemaField[], stats?, opt: Proje
 
   fieldsToAdd.sort(compareFieldsToAdd(hasSelectedDimension, hasSelectedMeasure, indices));
 
-  console.log(opt.additionalVariables);
   var setsToAdd = util.chooseKorLess(fieldsToAdd, opt.additionalVariables);
 
   setsToAdd.forEach(function(setToAdd) {
