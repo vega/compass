@@ -64,7 +64,14 @@ export const DEFAULT_AGGREGATION_OPTIONS: AggregationOption = {
   consistentAutoQ: true
 };
 
+export interface ScaleOption {
+  /** List of scale types for rescaling quantitative field */
+  rescaleQuantitative?: string[];
+}
 
+export const DEFAULT_SCALE_OPTION = {
+  rescaleQuantitative: [undefined]
+};
 
 export interface SpecOption {
   /** Allowed marks. */
