@@ -55,7 +55,7 @@ describe('cp.gen.projections()', function () {
 
   describe('with a set of fields, all unselected', function() {
     const fields = [1,2,3].map(i => { return {'field': 'f' + i, selected: undefined};} );
-    const projections = genProjections(fields, {}, {additionalVariables: 2});
+    const projections = genProjections(fields, {}, {maxAdditionalVariables: 2});
 
     it('should generate projections with 2 fields', function() {
       expect(projections.length).to.equal(6); // P(3,2) = 3
