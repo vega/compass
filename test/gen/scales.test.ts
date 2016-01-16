@@ -7,7 +7,7 @@ describe('cp.gen.scales()', function () {
     const fields = [0,1,2,3].map(function(i) {
       return {
         field: 'f' + i,
-        type: i <= 2 ? Type.QUANTITATIVE : Type.ORDINAL // 2xQ, 2xO
+        type: i < 2 ? Type.QUANTITATIVE : Type.ORDINAL // 2xQ, 2xO
       };
     });
     const output = genScales([], fields, {rescaleQuantitative: [undefined, 'log']});
