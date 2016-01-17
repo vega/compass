@@ -24,7 +24,7 @@ export default function genSpecsFromFieldDefs(output, fieldDefs, stats, opt: Spe
   } else {
     return encodings.reduce(function(list, encoding) {
       return genSpecsFromEncodings(list, encoding, stats, opt);
-    }, []);
+    }, output);
   }
 }
 
