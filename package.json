@@ -38,23 +38,23 @@
   },
   "homepage": "https://github.com/vega/visrec",
   "devDependencies": {
-    "browser-sync": "^2.10.0",
-    "browserify": "^12.0.1",
+    "browser-sync": "^2.11.1",
+    "browserify": "^13.0.0",
     "browserify-versionify": "^1.0.6",
     "chai": "^3.4.1",
     "exorcist": "^0.4.0",
-    "istanbul": "^0.4.1",
-    "mocha": "~2.2.5",
+    "istanbul": "^0.4.2",
+    "mocha": "~2.4.4",
     "nodemon": "^1.8.1",
     "source-map-support": "^0.4.0",
-    "tsify": "^0.13.1",
-    "tslint": "^3.1.1",
-    "typescript": "^1.7.3",
+    "tsify": "^0.13.2",
+    "tslint": "^3.3.0",
+    "typescript": "^1.7.5",
     "uglify-js": "^2.6.1"
   },
   "dependencies": {
     "clusterfck": "^0.6.0",
-    "vega-lite": "^0.9.2"
+    "vega-lite": "^0.9.3"
   },
   "browserify": {
     "transform": [
