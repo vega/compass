@@ -5,14 +5,18 @@ import {expect} from 'chai';
 describe('cp.gen.scales()', function () {
   it('should correctly generate fieldSets with scale variation', function() {
     const fields = [0,1,2,3].map(function(i) {
-      return {
+      var field = {
         field: 'f' + i,
-        type: i < 2 ? Type.QUANTITATIVE : Type.ORDINAL // 2xQ, 2xO
+        type: i < 3 ? Type.QUANTITATIVE : Type.ORDINAL // 2xQ, 2xO
       };
+      if (i === 2)
+          field["bin"] = true;
+
+      return field;
     });
     const output = genScales([], fields, {rescaleQuantitative: [undefined, 'log']});
-    expect(output.length).to.equal(4); // only 1 and 2 get rescaled 2x2 = 4
-    
+    expect(output.length).to.equal(4); // only 0 and 1 get rescaled 2x2 = 4
+
     // output[0]'s scale: default, default
     // output[1]'s scale: default, log
     expect(output[1][1].scale.type).to.equal('log');
