@@ -11,8 +11,8 @@ describe('cp.gen.scales()', function () {
       };
     });
     const output = genScales([], fields, {rescaleQuantitative: [undefined, 'log']});
-    expect(output.length).to.equal(4); // only 1 and 2 get rescaled 2x2 = 4
-    
+    expect(output.length).to.equal(4); // only 0 and 1 get rescaled 2x2 = 4
+
     // output[0]'s scale: default, default
     // output[1]'s scale: default, log
     expect(output[1][1].scale.type).to.equal('log');
@@ -22,4 +22,18 @@ describe('cp.gen.scales()', function () {
     expect(output[3][0].scale.type).to.equal('log');
     expect(output[3][1].scale.type).to.equal('log');
   });
+
+  it('should not generate scale variation for bin', function() {
+    const fields = [{
+      field: 'f',
+      type: Type.QUANTITATIVE,
+      bin: true
+    }];
+
+    const output = genScales([], fields, {rescaleQuantitative: [undefined, 'log']});
+    expect(output.length).to.equal(1); // can't be applied log scale.
+
+
+  });
+
 });

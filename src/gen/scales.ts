@@ -13,7 +13,7 @@ export default function genScales(output, fieldDefs: SchemaField[], opt: ScaleOp
       return;
     }
 
-    if (fieldDefs[i].type === Type.QUANTITATIVE && opt.rescaleQuantitative) {
+    if (fieldDefs[i].type === Type.QUANTITATIVE && opt.rescaleQuantitative && !(fieldDefs[i].bin)) {
       // if quantitative and we have rescaleQuantitative, generate different scales
       opt.rescaleQuantitative.forEach(function(scaleType) {
         // clone to prevent side effect on the original data
