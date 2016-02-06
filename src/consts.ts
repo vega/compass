@@ -118,6 +118,8 @@ export interface SpecOption {
   omitShapeWithTimeDimension?: boolean;
   /** Do not use bar\'s size. */
   omitSizeOnBar?: boolean; // FIXME: remove
+  /** Do not use bar with log scale. */
+  omitLengthForLogScale?: boolean;
   /** Do not stack bar chart with average. */
   omitStackedAverage?: boolean; // FIXME: change to omit non-sum stacked
   /**
@@ -149,6 +151,7 @@ export const DEFAULT_SPEC_OPTION: SpecOption = {
   omitShapeWithBin: true,
   omitShapeWithTimeDimension: true,
   omitSizeOnBar: true,
+  omitLengthForLogScale: true,
   omitStackedAverage: true,
   omitTranspose: true,
 };
