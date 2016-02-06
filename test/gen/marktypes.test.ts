@@ -84,8 +84,17 @@ describe('cp.gen.marks()', function(){
         expect(marks.indexOf(BAR)).to.gt(-1);
       });
     });
+    describe('with log scale', function () {
+      it('should not be generated', function () {
+        var encoding = {
+          'x': { 'fiel': 'Cost__Total_$', 'type': QUANTITATIVE, 'scale': { 'type' : 'log' } },
+          'y': { 'field': 'Aircraft__Airline_Operator', 'type': ORDINAL }
+        };
+        var marks = getMarks(encoding, {}, opt);
+        expect(marks.indexOf(BAR)).to.equal(-1);
+      });
+    });
   });
-
   describe('line/area', function () {
     // TODO
   });

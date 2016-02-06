@@ -88,6 +88,14 @@ export namespace rule {
 
     if (opt.omitSizeOnBar && encoding.size !== undefined) return false;
 
+
+    if (opt.omitLogScaleOnBar) {
+      if (encoding.x && encoding.x.scale && encoding.x.scale.type === "log" ) return false;
+      if (encoding.y && encoding.y.scale && encoding.y.scale.type === "log" ) return false;
+    }
+
+
+
     // FIXME actually check if there would be occlusion #90
     // need to aggregate on either x or y
 
@@ -104,7 +112,7 @@ export namespace rule {
       if (eitherXorYisDimOrNull) {
         var aggregate = encoding.x.aggregate || encoding.y.aggregate;
 
-        // TODO: revise 
+        // TODO: revise
         return !(opt.omitStackedAverage && aggregate ==='mean' && encoding.color);
       }
     }
