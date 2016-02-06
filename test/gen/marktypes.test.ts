@@ -3,8 +3,8 @@ import {fixture} from '../fixture';
 import getMarks from '../../src/gen/marks';
 import {DEFAULT_SPEC_OPTION} from '../../src/consts';
 import * as vlShorthand from 'vega-lite/src/shorthand';
-import {BAR, POINT, TEXT} from 'vega-lite/src/mark';
-import {QUANTITATIVE, ORDINAL} from 'vega-lite/src/type';
+import {BAR, POINT, TEXT, AREA} from 'vega-lite/src/mark';
+import {QUANTITATIVE, ORDINAL, TEMPORAL} from 'vega-lite/src/type';
 
 describe('cp.gen.marks()', function(){
   var opt;
@@ -96,6 +96,16 @@ describe('cp.gen.marks()', function(){
     });
   });
   describe('line/area', function () {
+    describe('with log scale', function () {
+      it('should not be generated', function () {
+        var encoding = {
+          'x': { 'field': 'Year', 'type': TEMPORAL },
+          'y': { 'field': 'Weight_in_lbs', 'type': QUANTITATIVE, 'scale': { 'type': 'log' }, 'aggregate': 'sum' }
+          };
+          var marks = getMarks(encoding, {}, opt);
+        expect(marks.indexOf(AREA)).to.equal(-1);
+      });
+    });
     // TODO
   });
 

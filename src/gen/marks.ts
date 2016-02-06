@@ -89,7 +89,7 @@ export namespace rule {
     if (opt.omitSizeOnBar && encoding.size !== undefined) return false;
 
 
-    if (opt.omitLogScaleOnBar) {
+    if (opt.omitLengthForLogScale) {
       if (encoding.x && encoding.x.scale && encoding.x.scale.type === "log" ) return false;
       if (encoding.y && encoding.y.scale && encoding.y.scale.type === "log" ) return false;
     }
@@ -136,6 +136,10 @@ export namespace rule {
     if (!facetsRule(encoding, stats, opt)) return false;
 
     if (!line(encoding, stats, opt)) return false;
+    if (opt.omitLengthForLogScale) {
+      if (encoding.x && encoding.x.scale && encoding.x.scale.type === "log" ) return false;
+      if (encoding.y && encoding.y.scale && encoding.y.scale.type === "log" ) return false;
+    }
 
     return !(opt.omitStackedAverage && encoding.y.aggregate ==='mean' && encoding.color);
   }
