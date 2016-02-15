@@ -166,3 +166,7 @@ export function cross(a,b) {
   }
   return x;
 };
+
+export function rawEqual(a,b) {
+  return JSON.stringify(a) === JSON.stringify(b);
+}

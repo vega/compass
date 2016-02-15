@@ -110,7 +110,14 @@ export namespace rule {
         (!encoding.y || isDimension(encoding.y));
 
       if (eitherXorYisDimOrNull) {
-        var aggregate = encoding.x.aggregate || encoding.y.aggregate;
+        var aggregate;
+
+        if (encoding.x) {
+            aggregate = encoding.x.aggregate;
+        }
+        else {
+            aggregate = encoding.y.aggregate;
+        }
 
         // TODO: revise
         return !(opt.omitStackedAverage && aggregate ==='mean' && encoding.color);

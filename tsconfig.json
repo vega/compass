@@ -42,6 +42,8 @@
         "src/rank/rank.ts",
         "src/rank/rankEncodings.ts",
         "src/schema.ts",
+        "src/transition/def.ts",
+        "src/transition/path.ts",
         "src/util.ts",
         "test/cluster/cluster.test.ts",
         "test/cluster/distance.test.ts",
@@ -53,6 +55,7 @@
         "test/gen/scales.test.ts",
         "test/gen/specs.test.ts",
         "test/rank/rankEncodings.test.ts",
+        "test/transition/path.test.ts",
         "typings/chai.d.ts",
         "typings/clusterfck.d.ts",
         "typings/mocha.d.ts"
