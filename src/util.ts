@@ -167,6 +167,21 @@ export function cross(a,b) {
   return x;
 };
 
+export function find(array, f, obj){
+  for(let i=0; i < array.length; i +=1){
+    if(f(array[i], obj)){
+      return i;
+    }
+  }
+  return -1;
+}
 export function rawEqual(a,b) {
   return JSON.stringify(a) === JSON.stringify(b);
+}
+export function arrayDiff(a,b){
+  return a.filter(function(x){
+    return find(b,function(itemA,itemB){
+      return rawEqual(itemA,itemB);
+    },x) < 0;
+  });
 }

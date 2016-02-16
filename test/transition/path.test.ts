@@ -1,12 +1,15 @@
 import {expect} from 'chai';
 import {fixture} from '../fixture';
+import {Type} from 'vega-lite/src/type';
 import * as consts from '../../src/consts';
 
 import * as def from '../../src/transition/def'
+import * as neighbor from '../../src/transition/neighbor';
 import * as path from '../../src/transition/path';
+import * as util from '../../src/util';
+import {SchemaField} from '../../src/schema';
 
-var startVL =
-{
+var startVL = {
   "data": { "url": "/data/cars.json" },
   "mark": "area",
   "transform": {"filter": "datum.Year > 1970 "},
@@ -34,12 +37,13 @@ var destinationVL = {
     "color": {"type": "ordinal", "field":"Origin"}
   }
 };
-describe.only('cp.transition.path', function () {
+
+describe('cp.transition.path', function () {
   var markTransitions = def.DEFAULT_MARKTYPE_TRANSITIONS;
 
   describe('marktype transition', function () {
     it('should return a marktype transition correctly.', function () {
-      expect(path.marktypePath(startVL, destinationVL)[0].cost).to.eq(markTransitions["AREA_POINT"].cost); //AREA_POINT
+      expect(path.marktypeTransitionSet(startVL, destinationVL)[0].cost).to.eq(markTransitions["AREA_POINT"].cost); //AREA_POINT
     });
   });
 
@@ -57,15 +61,51 @@ describe.only('cp.transition.path', function () {
     });
 
     it('should return all transitions without order.', function(){
-      console.log(path.transformPath(startVL, destinationVL));
-      expect(path.transformPath(startVL, destinationVL).length).to.eq(4);
+      expect(path.transformTransitionSet(startVL, destinationVL).length).to.eq(4);
     });
   });
 
-  // describe('overall transitions', function(){
-  //   it('should return all transitions without order.', function(){
-  //
-  //   })
-  // })
+  describe.only('encoding transition', function(){
+    it('should return all encoding transitions', function () {
+      var source = {
+        "data": {"url": "data/cars.json"},
+        "mark": "point",
+        "encoding": {
+          "x": {"field": "Horsepower", "type": "quantitative"}
+        }
+      };
+      var target1 = util.duplicate(source);
+      target1.encoding.y = {"field": "Origin", "type": "ordinal"};
+      var target2 = util.duplicate(target1);
+      delete target2.encoding.x;
+      target2.encoding.color = {"field": "Horsepower", "type": "quantitative"};
 
+      var result1 = path.encodingTransitionSet(source, target1);
+      var result2 = path.encodingTransitionSet(source, target2);
+      var result3 = path.encodingTransitionSet(startVL, destinationVL);
+
+      expect(result1.distance).to.eq(1);
+      expect(result2.distance).to.eq(2);
+      expect(result3.distance).to.eq(2);
+
+      console.log(result3.prev.map(function(s){ return s.spec.encoding; }));
+    });
+  })
+});
+
+describe('cp.transition.neighbor', function () {
+  it('should return all neighbors linked by encdoeTransition.', function () {
+    var testVL = {
+      "data": {"url": "data/cars.json"},
+      "mark": "tick",
+      "encoding": {
+        "x": {"field": "Horsepower", "type": "quantitative"}
+      }
+    };
+    var remainedFields: SchemaField[] = [ {"field": "Origin", "type": Type.ORDINAL} ];
+    var remainedChannels = ["y"];
+    var result = neighbor.neighbors(testVL, remainedFields, remainedChannels );
+
+    expect(result.length).to.eq(8);
+  });
 });
