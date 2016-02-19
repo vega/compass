@@ -8,54 +8,52 @@ import {SchemaField} from '../schema';
 import * as util from '../util';
 import * as def from './def'
 
-export function neighbors(u, remainedFields, remainedChannels){
+export function neighbors(spec, additionalFields, additionalChannels){
   //check add
   var neighbors = [];
 
-  var inChannels = util.keys(u.encoding);
-  var exChannels = remainedChannels;
+  var inChannels = util.keys(spec.encoding);
+  var exChannels = additionalChannels;
 
 
 
   inChannels.forEach(function(channel){
       //remove
-      var newNeighbor = util.duplicate(u);
+      var newNeighbor = util.duplicate(spec);
       var transition = def.DEFAULT_ENCODING_TRANSITIONS["REMOVE"+"_"+channel.toUpperCase()];
-      var newRemainedFields = util.duplicate(remainedFields);
-      newRemainedFields.push(newNeighbor.encoding[channel]);
-      var newRemainedChannels = util.duplicate(remainedChannels);
-      newRemainedChannels.push(channel);
+      var newAdditionalFields = util.duplicate(additionalFields);
+      newAdditionalFields.push(newNeighbor.encoding[channel]);
+      var newAdditionalChannels = util.duplicate(additionalChannels);
+      newAdditionalChannels.push(channel);
 
       delete newNeighbor.encoding[channel];
       if( validate(newNeighbor) ){
-        neighbors.push({
-          spec: newNeighbor,
-          transition: transition,
-          remainedFields: newRemainedFields,
-          remainedChannels: newRemainedChannels
-         });
+        newNeighbor.transition = transition;
+        newNeighbor.additionalFields = newAdditionalFields;
+        newNeighbor.additionalChannels = newAdditionalChannels;
+
+        neighbors.push(newNeighbor);
       };
 
 
       //modify
-      remainedFields.forEach(function(field, index){
-        newNeighbor = util.duplicate(u);
+      additionalFields.forEach(function(field, index){
+        newNeighbor = util.duplicate(spec);
         transition = def.DEFAULT_ENCODING_TRANSITIONS["MODIFY"+"_"+channel.toUpperCase()];
 
-        newRemainedFields = util.duplicate(remainedFields);
-        newRemainedFields.splice(index,1);
-        newRemainedFields.push(newNeighbor.encoding[channel]);
+        newAdditionalFields = util.duplicate(additionalFields);
+        newAdditionalFields.splice(index,1);
+        newAdditionalFields.push(newNeighbor.encoding[channel]);
 
-        newRemainedChannels = util.duplicate(remainedChannels);
+        newAdditionalChannels = util.duplicate(additionalChannels);
 
         newNeighbor.encoding[channel] = field;
         if( validate(newNeighbor) ){
-          neighbors.push({
-            spec: newNeighbor,
-            transition: transition,
-            remainedFields: newRemainedFields,
-            remainedChannels: newRemainedChannels
-           });
+          newNeighbor.transition = transition;
+          newNeighbor.additionalFields = newAdditionalFields;
+          newNeighbor.additionalChannels = newAdditionalChannels;
+
+          neighbors.push(newNeighbor);
         };
       });
 
@@ -65,13 +63,13 @@ export function neighbors(u, remainedFields, remainedChannels){
           return;
         }
 
-        newNeighbor = util.duplicate(u);
+        newNeighbor = util.duplicate(spec);
         var newNeighborChannels = [channel, anotherChannel].sort( function(a,b){
           return def.CHANNELS_WITH_TRANSITION_ORDER.indexOf(a) -  def.CHANNELS_WITH_TRANSITION_ORDER.indexOf(b);
         }).join("_").toUpperCase();
         transition = def.DEFAULT_ENCODING_TRANSITIONS["SWAP"+"_"+ newNeighborChannels];
-        newRemainedFields = util.duplicate(remainedFields);
-        newRemainedChannels = util.duplicate(remainedChannels);
+        newAdditionalFields = util.duplicate(additionalFields);
+        newAdditionalChannels = util.duplicate(additionalChannels);
 
 
         var tempChannel = util.duplicate(newNeighbor.encoding[channel]);
@@ -79,26 +77,25 @@ export function neighbors(u, remainedFields, remainedChannels){
         newNeighbor.encoding[anotherChannel] = tempChannel;
 
         if( validate(newNeighbor) ){
-          neighbors.push({
-            spec: newNeighbor,
-            transition: transition,
-            remainedFields: newRemainedFields,
-            remainedChannels: newRemainedChannels
-           });
+          newNeighbor.transition = transition;
+          newNeighbor.additionalFields = newAdditionalFields;
+          newNeighbor.additionalChannels = newAdditionalChannels;
+
+          neighbors.push(newNeighbor);
         };
 
       })
 
       //move
       exChannels.forEach(function(exChannel, index){
-        newNeighbor = util.duplicate(u);
+        newNeighbor = util.duplicate(spec);
         var newNeighborChannels = (channel + "_" + exChannel).toUpperCase();
         transition = def.DEFAULT_ENCODING_TRANSITIONS["MOVE_" + newNeighborChannels];
-        newRemainedFields = util.duplicate(remainedFields);
+        newAdditionalFields = util.duplicate(additionalFields);
 
-        newRemainedChannels = util.duplicate(remainedChannels);
-        newRemainedChannels.splice(index,1);
-        newRemainedChannels.push(channel);
+        newAdditionalChannels = util.duplicate(additionalChannels);
+        newAdditionalChannels.splice(index,1);
+        newAdditionalChannels.push(channel);
 
         newNeighbor.encoding[exChannel] = util.duplicate(newNeighbor.encoding[channel]);
         delete newNeighbor.encoding[channel];
@@ -106,35 +103,34 @@ export function neighbors(u, remainedFields, remainedChannels){
 
 
         if( validate(newNeighbor) ){
-          neighbors.push({
-            spec: newNeighbor,
-            transition: transition,
-            remainedFields: newRemainedFields,
-            remainedChannels: newRemainedChannels
-           });
+          newNeighbor.transition = transition;
+          newNeighbor.additionalFields = newAdditionalFields;
+          newNeighbor.additionalChannels = newAdditionalChannels;
+
+          neighbors.push(newNeighbor);
         };
       })
   });
   exChannels.forEach(function(channel, chIndex){
     //add
-    remainedFields.forEach(function(field, index){
-      var newNeighbor = util.duplicate(u);
-      var transition = def.DEFAULT_ENCODING_TRANSITIONS["ADD"+"_"+channel.toUpperCase()];
-      var newRemainedFields = util.duplicate(remainedFields);
-      var newRemainedChannels = util.duplicate(remainedChannels);
 
-      newRemainedFields.splice(index,1);
+    additionalFields.forEach(function(field, index){
+      var newNeighbor = util.duplicate(spec);
+      var transition = def.DEFAULT_ENCODING_TRANSITIONS["ADD"+"_"+channel.toUpperCase()];
+      var newAdditionalFields = util.duplicate(additionalFields);
+      var newAdditionalChannels = util.duplicate(additionalChannels);
+
+      newAdditionalFields.splice(index,1);
       newNeighbor.encoding[channel] = field;
 
-      newRemainedChannels.splice(chIndex,1);
+      newAdditionalChannels.splice(chIndex,1);
 
       if( validate(newNeighbor) ){
-        neighbors.push({
-          spec: newNeighbor,
-          transition: transition,
-          remainedFields: newRemainedFields,
-          remainedChannels: newRemainedChannels
-         });
+        newNeighbor.transition = transition;
+        newNeighbor.additionalFields = newAdditionalFields;
+        newNeighbor.additionalChannels = newAdditionalChannels;
+
+        neighbors.push(newNeighbor);
       };
     });
   });
@@ -154,7 +150,7 @@ export function neighbors(u, remainedFields, remainedChannels){
 }
 
 function validate(spec){
-  //getEncodingMappingError(newNeighbor)
+  //TODO? : should I validate the spec? -> Nope
   return true;
 }
 
@@ -164,13 +160,15 @@ export function sameEncoding(a, b){
   if(aKeys.length !== bKeys.length){
     return false;
   }
-  
+
   var allKeys = util.union(aKeys, bKeys);
   for(var i=0; i < allKeys.length; i+=1){
     let key = allKeys[i];
     if(!(a[key] && b[key])){
       return false;
     }
+    //TODO : now it only check "field".
+    //Transition should support type difference.
     if(a[key].field !== b[key].field){
       return false;
     }

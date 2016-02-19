@@ -169,7 +169,7 @@ export function cross(a,b) {
 
 export function find(array, f, obj){
   for(let i=0; i < array.length; i +=1){
-    if(f(array[i], obj)){
+    if(f(obj) === f(array[i])){
       return i;
     }
   }
@@ -180,8 +180,8 @@ export function rawEqual(a,b) {
 }
 export function arrayDiff(a,b){
   return a.filter(function(x){
-    return find(b,function(itemA,itemB){
-      return rawEqual(itemA,itemB);
+    return find(b,function(item){
+      return JSON.stringify(item);
     },x) < 0;
   });
 }

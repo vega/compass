@@ -9,47 +9,61 @@ import * as util from '../util';
 import * as def from './def'
 import * as nb from './neighbor';
 
-export function TransitionSet (s, d) {
+export function transitionSet (s, d) {
+  var transitions = {
+    marktype: marktypeTransitionSet(s, d),
+    transform: transformTransitionSet(s, d),
+    encoding: encodingTransitionSet(s, d)
+  };
 
-
+  return transitions;
 }
 
 export function marktypeTransitionSet (s, d) {
-  var path = [];
+  var transSet = [];
   if(s.mark === d.mark) {
-    return path;
+    return transSet;
   }
   else {
     var trName = [s.mark.toUpperCase(), d.mark.toUpperCase()].sort().join("_");
-    path.push(def.DEFAULT_MARKTYPE_TRANSITIONS[trName]);
+    transSet.push(def.DEFAULT_MARKTYPE_TRANSITIONS[trName]);
   }
-  return path;
+  return transSet;
 }
 
 export function transformTransitionSet (s, d) {
-  var path = [];
+  var transSet = [];
   var trans;
+  var already;
   if( trans = transformFilter(s, d) ){
-    path.push(trans);
+    transSet.push(trans);
   }
 
   CHANNELS.forEach(function(channel){
-    if( trans = transformBasic(s, d, channel,"scale") ){
-      path.push(trans);
-    }
-    if( trans = transformBasic(s, d, channel,"sort") ){
-      path.push(trans);
-    }
-    if( trans = transformBasic(s, d, channel,"aggregate") ){
-      path.push(trans);
-    }
+    ["scale", "sort", "aggregate", "bin", "settype"].map(function(transformType){
 
-    if( trans = transformSettype(s, d, channel) ){
-      path.push(trans);
-    }
+      if( transformType === "settype"){
+        trans = transformSettype(s, d, channel);
+      }
+      else {
+        trans = transformBasic(s, d, channel, transformType);
+      }
 
-  })
-  return path;
+      if( trans ){
+        already = util.find(transSet,function(item){ return item.name; },trans)
+        if( already >= 0 ){
+          transSet[already].details.push(trans.detail);
+        }
+        else{
+          transSet.push(trans);
+          transSet[transSet.length - 1].details = [];
+          transSet[transSet.length - 1].details.push(trans.detail);
+          delete transSet[transSet.length - 1].detail;
+        }
+      }
+    });
+  });
+  return transSet;
 }
 
 export function transformBasic(s, d, channel, transform){
@@ -63,22 +77,22 @@ export function transformBasic(s, d, channel, transform){
     dHas = true;
   }
 
-  if( sHas && dHas && ( util.rawEqual(s.encoding[channel][transform], d.encoding[channel][transform]))){
+  if( sHas && dHas && ( !util.rawEqual(s.encoding[channel][transform], d.encoding[channel][transform]))){
+
     transistion = util.duplicate(def.DEFAULT_TRANSFORM_TRANSITIONS[transform.toUpperCase()]);
-    transistion.type = "modified"
-    transistion.channel = channel;
+    transistion.detail = {"type": "modified", "channel": channel};
     return transistion;
   }
   else if( sHas && !dHas ) {
     transistion = util.duplicate(def.DEFAULT_TRANSFORM_TRANSITIONS[transform.toUpperCase()]);
-    transistion.type = "removed"
-    transistion.channel = channel;
+    transistion.detail = {"type": "removed", "channel": channel};
+
     return transistion
   }
   else if( !sHas && dHas ) {
     transistion = util.duplicate(def.DEFAULT_TRANSFORM_TRANSITIONS[transform.toUpperCase()]);
-    transistion.type = "added"
-    transistion.channel = channel;
+    transistion.detail = {"type": "added", "channel": channel};
+
     return transistion
   }
 }
@@ -94,19 +108,19 @@ export function transformFilter(s, d){
     vHasFilter = true;
   }
 
-  if( uHasFilter && vHasFilter && ( util.rawEqual(s.transform.filter, d.transform.filter))){
+  if( uHasFilter && vHasFilter && ( !util.rawEqual(s.transform.filter, d.transform.filter))){
     transistion = util.duplicate(def.DEFAULT_TRANSFORM_TRANSITIONS["FILTER"]);
-    transistion.type = "modified"
+    transistion.detail = {"type": "modified"};
     return transistion;
   }
   else if( uHasFilter && !vHasFilter ){
     transistion = util.duplicate(def.DEFAULT_TRANSFORM_TRANSITIONS["FILTER"]);
-    transistion.type = "removed"
+    transistion.detail = {"type": "removed"};
     return transistion;
   }
   else if( !uHasFilter && vHasFilter ){
     transistion = util.duplicate(def.DEFAULT_TRANSFORM_TRANSITIONS["FILTER"]);
-    transistion.type = "added"
+    transistion.detail = {"type": "added"};
     return transistion;
   }
 
@@ -120,8 +134,11 @@ export function transformSettype(s, d, channel){
       && ( d.encoding[channel]["field"] === s.encoding[channel]["field"] )
       && ( d.encoding[channel]["type"] !== s.encoding[channel]["type"] ) ){
     transistion = util.duplicate(def.DEFAULT_TRANSFORM_TRANSITIONS["SETTYPE"]);
-    transistion.type = s.encoding[channel]["type"] + "_" + d.encoding[channel]["type"]
-    transistion.channel = channel;
+    transistion.detail = {
+      "type": s.encoding[channel]["type"] + "_" + d.encoding[channel]["type"],
+      "channel": channel
+    };
+
     return transistion;
   }
 }
@@ -129,17 +146,18 @@ export function transformSettype(s, d, channel){
 export function encodingTransitionSet(s, d){
   var sChannels = util.keys(s.encoding);
   var sFields = sChannels.map(function(key){
-    return s.encoding[key].field;
+    return s.encoding[key];
   });
   var dChannels = util.keys(d.encoding);
   var dFields = dChannels.map(function(key){
-    return d.encoding[key].field;
+    return d.encoding[key];
   });
-  var remainedFields = util.arrayDiff(dFields, sFields).map(function(field){
-    return { "field" : field };
-  });
-  var remainedChannels = util.arrayDiff(dChannels, sChannels);
-  
+
+  var additionalFields = util.arrayDiff(dFields, sFields);
+  var additionalChannels = util.arrayDiff(dChannels, sChannels);
+
+
+
   //Dijkstra's algorithm
   var u;
   function nearestNode(nodes){
@@ -154,68 +172,63 @@ export function encodingTransitionSet(s, d){
     return nodes.splice(argMinD, 1)[0];
   }
   //create node array NextCandidates
-  var nodes = nb.neighbors(s, remainedFields, remainedChannels)
+
+  var nodes = nb.neighbors(s, additionalFields, additionalChannels)
                 .map(function(neighbor){
-    return { spec: neighbor.spec,
-      distance: neighbor.transition.cost,
-      remainedFields: neighbor.remainedFields,
-      remainedChannels: neighbor.remainedChannels,
-      prev: [{spec:s, transition: neighbor.transition }]
-     };
+    neighbor.distance = neighbor.transition.cost,
+    neighbor.prev = [ s ]
+    return neighbor;
   });
 
-  var doneNodes = [ { spec: s,
-    distance: 0,
-    prev: []
-   }];
+  s.distance = 0;
+  s.prev = [];
+  var doneNodes = [ s ];
 
   while(nodes.length > 0){
-
+    // console.log(nodes.length + ", " + doneNodes.length);
     u = nearestNode(nodes);
 
-    if( nb.sameEncoding(u.spec.encoding, d.encoding) ){
+    if( nb.sameEncoding(u.encoding, d.encoding) ){
       break;
     }
 
     var alreadyDone = false;
-    var newNodes = nb.neighbors(u.spec, u.remainedFields, u.remainedChannels);
+    var newNodes = nb.neighbors(u, u.additionalFields, u.additionalChannels);
     newNodes.forEach(function(newNode){
       var node;
       for(let i = 0; i < doneNodes.length; i+=1){
-
-        if(nb.sameEncoding(doneNodes[i].spec.encoding, newNode.spec.encoding)){
-
+        if(nb.sameEncoding(doneNodes[i].encoding, newNode.encoding)){
           return;
         }
       }
 
       for(let i = 0; i < nodes.length; i+=1){
-        if(nb.sameEncoding(nodes[i].spec.encoding, newNode.spec.encoding)){
-
+        if(nb.sameEncoding(nodes[i].encoding, newNode.encoding)){
           node = nodes[i];
           break;
         }
       }
 
       if( node ){
-
         if(node.distance > u.distance + newNode.transition.cost){
           node.distance = u.distance + newNode.transition.cost;
-          node.prev = u.prev.concat([{ spec: u.spec, transition: newNode.transition }]);
+          node.prev = u.prev.concat([u]);
         }
       }
       else {
-        nodes.push({ spec: newNode.spec,
-          distance: u.distance + newNode.transition.cost,
-          remainedFields: newNode.remainedFields,
-          remainedChannels: newNode.remainedChannels,
-          prev: u.prev.concat([{ spec: u.spec, transition: newNode.transition }])
-        });
+        newNode.distance = u.distance + newNode.transition.cost;
+        newNode.prev = u.prev.concat([u]);
+        nodes.push(newNode);
       }
     });
-
+    doneNodes.push(u);
   }
 
-  return u;
+  var result = u.prev.map(function(node){
+    return node.transition;
+  }).filter(function(transition){ return transition; });
+
+  result.push(u.transition);
+  return result;
 
 }
