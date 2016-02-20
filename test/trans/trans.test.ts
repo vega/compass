@@ -63,7 +63,7 @@ describe('cp.trans.trans', function () {
     });
   });
 
-  describe.only('encoding transition', function(){
+  describe('encoding transition', function(){
     it('should return all encoding transitions', function () {
       var source = {
         "data": {"url": "data/cars.json"},

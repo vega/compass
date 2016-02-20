@@ -156,8 +156,6 @@ export function encodingTransitionSet(s, d){
   var additionalFields = util.arrayDiff(dFields, sFields);
   var additionalChannels = util.arrayDiff(dChannels, sChannels);
 
-
-
   //Dijkstra's algorithm
   var u;
   function nearestNode(nodes){
@@ -185,9 +183,9 @@ export function encodingTransitionSet(s, d){
   var doneNodes = [ s ];
 
   while(nodes.length > 0){
+
     // console.log(nodes.length + ", " + doneNodes.length);
     u = nearestNode(nodes);
-
     if( nb.sameEncoding(u.encoding, d.encoding) ){
       break;
     }

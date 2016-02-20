@@ -8,7 +8,7 @@ import {SchemaField} from '../schema';
 import * as util from '../util';
 import * as def from './def'
 
-export function neighbors(spec, additionalFields, additionalChannels){
+export function neighbors(spec, additionalFields : SchemaField[], additionalChannels){
   //check add
   var neighbors = [];
 
@@ -20,7 +20,10 @@ export function neighbors(spec, additionalFields, additionalChannels){
   inChannels.forEach(function(channel){
       //remove
       var newNeighbor = util.duplicate(spec);
-      var transition = def.DEFAULT_ENCODING_TRANSITIONS["REMOVE"+"_"+channel.toUpperCase()];
+      var transitionType = "REMOVE_"+channel.toUpperCase();
+      transitionType += (spec.encoding[channel].field === "*") ? "_COUNT" : "";
+
+      var transition = def.DEFAULT_ENCODING_TRANSITIONS[transitionType];
       var newAdditionalFields = util.duplicate(additionalFields);
       newAdditionalFields.push(newNeighbor.encoding[channel]);
       var newAdditionalChannels = util.duplicate(additionalChannels);
@@ -39,7 +42,14 @@ export function neighbors(spec, additionalFields, additionalChannels){
       //modify
       additionalFields.forEach(function(field, index){
         newNeighbor = util.duplicate(spec);
-        transition = def.DEFAULT_ENCODING_TRANSITIONS["MODIFY"+"_"+channel.toUpperCase()];
+        transitionType = "MODIFY_"+channel.toUpperCase();
+        if (spec.encoding[channel].field === "*" && field.field !== "*" ) {
+          transitionType += "_REMOVE_COUNT";
+        }
+        else if ( spec.encoding[channel].field !== "*" && field.field === "*" ){
+          transitionType += "_ADD_COUNT";
+        }
+        transition = def.DEFAULT_ENCODING_TRANSITIONS[transitionType];
 
         newAdditionalFields = util.duplicate(additionalFields);
         newAdditionalFields.splice(index,1);
@@ -59,15 +69,17 @@ export function neighbors(spec, additionalFields, additionalChannels){
 
       //swap
       inChannels.forEach(function(anotherChannel){
-        if(anotherChannel===channel){
+        if( anotherChannel===channel
+          || ( ["x","y"].indexOf(channel) < 0 || ["x","y"].indexOf(anotherChannel) < 0 )){
           return;
         }
 
         newNeighbor = util.duplicate(spec);
-        var newNeighborChannels = [channel, anotherChannel].sort( function(a,b){
-          return def.CHANNELS_WITH_TRANSITION_ORDER.indexOf(a) -  def.CHANNELS_WITH_TRANSITION_ORDER.indexOf(b);
-        }).join("_").toUpperCase();
-        transition = def.DEFAULT_ENCODING_TRANSITIONS["SWAP"+"_"+ newNeighborChannels];
+        // var newNeighborChannels = [channel, anotherChannel].sort( function(a,b){
+        //   return def.CHANNELS_WITH_TRANSITION_ORDER.indexOf(a) -  def.CHANNELS_WITH_TRANSITION_ORDER.indexOf(b);
+        // }).join("_").toUpperCase();
+        // transition = def.DEFAULT_ENCODING_TRANSITIONS["SWAP"+"_"+ newNeighborChannels];
+        transition = def.DEFAULT_ENCODING_TRANSITIONS["SWAP_X_Y"];
         newAdditionalFields = util.duplicate(additionalFields);
         newAdditionalChannels = util.duplicate(additionalChannels);
 
@@ -75,6 +87,7 @@ export function neighbors(spec, additionalFields, additionalChannels){
         var tempChannel = util.duplicate(newNeighbor.encoding[channel]);
         newNeighbor.encoding[channel] = newNeighbor.encoding[anotherChannel];
         newNeighbor.encoding[anotherChannel] = tempChannel;
+        
 
         if( validate(newNeighbor) ){
           newNeighbor.transition = transition;
@@ -116,7 +129,9 @@ export function neighbors(spec, additionalFields, additionalChannels){
 
     additionalFields.forEach(function(field, index){
       var newNeighbor = util.duplicate(spec);
-      var transition = def.DEFAULT_ENCODING_TRANSITIONS["ADD"+"_"+channel.toUpperCase()];
+      var transitionType = "ADD_"+channel.toUpperCase();
+      transitionType += (field.field === "*") ? "_COUNT" : "";
+      var transition = def.DEFAULT_ENCODING_TRANSITIONS[transitionType];
       var newAdditionalFields = util.duplicate(additionalFields);
       var newAdditionalChannels = util.duplicate(additionalChannels);
 
