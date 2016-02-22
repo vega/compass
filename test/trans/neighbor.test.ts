@@ -9,36 +9,7 @@ import * as path from '../../src/trans/trans';
 import * as util from '../../src/util';
 import {SchemaField} from '../../src/schema';
 
-var startVL = {
-  "data": { "url": "/data/cars.json" },
-  "mark": "area",
-  "transform": {"filter": "datum.Year > 1970 "},
-  "encoding": {
-    "x": { "type": "temporal", "field": "Year", "timeUnit": "year" },
-    "y": { "type": "quantitative",
-           "field": "*",
-            "aggregate": "count",
-            "scale": false
-      },
-    "color": { "type": "nominal", "field": "Origin" }
-  }
-};
-
-var destinationVL = {
-  "data": { "url": "/data/cars.json" },
-  "mark": "point",
-  "encoding": {
-    "x": { "type": "quantitative", "field": "Horsepower" },
-    "y": {
-      "type": "quantitative",
-      "field": "Acceleration",
-      "scale": {"type": "log"}
-    },
-    "color": {"type": "ordinal", "field":"Origin"}
-  }
-};
-
-describe.only('cp.trans.neighbor', function () {
+describe('cp.trans.neighbor', function () {
   it('should return all neighbors linked by encdoeTransition.', function () {
     var testVL = {
       "data": {"url": "data/cars.json"},
@@ -66,9 +37,9 @@ describe.only('cp.trans.neighbor', function () {
     var additionalChannels = ["y"];
     var result = neighbor.neighbors(testVL, additionalFields, additionalChannels );
 
-    expect(result[0].transition).to.eq(def.DEFAULT_ENCODING_TRANSITIONS["REMOVE_X_COUNT"]);
-    expect(result[1].transition).to.eq(def.DEFAULT_ENCODING_TRANSITIONS["MODIFY_X"]);
-    expect(result[3].transition).to.eq(def.DEFAULT_ENCODING_TRANSITIONS["ADD_Y_COUNT"]);
+    expect(result[0].transition).to.eq(def.ENCODING_TRANSITIONS["REMOVE_X_COUNT"]);
+    expect(result[1].transition).to.eq(def.ENCODING_TRANSITIONS["MODIFY_X"]);
+    expect(result[3].transition).to.eq(def.ENCODING_TRANSITIONS["ADD_Y_COUNT"]);
   });
   it('should return only a neighbor with SWAP_X_Y transitions', function () {
     var testVL = {

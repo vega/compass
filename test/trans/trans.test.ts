@@ -41,14 +41,14 @@ describe('cp.trans.trans', function () {
   describe('marktype transition', function () {
     it('should return a marktype transition correctly.', function () {
       expect(trans.marktypeTransitionSet(startVL, destinationVL)[0].cost)
-           .to.eq(def.DEFAULT_MARKTYPE_TRANSITIONS["AREA_POINT"].cost); //AREA_POINT
+           .to.eq(def.MARKTYPE_TRANSITIONS["AREA_POINT"].cost); //AREA_POINT
     });
   });
 
   describe('transform transition', function () {
     it('should return SCALE,AGGREGATE, and SORT transitions correctly.', function () {
-      expect(trans.transformBasic(startVL, destinationVL, "y", "scale").cost).to.eq(def.DEFAULT_TRANSFORM_TRANSITIONS["SCALE"].cost);
-      expect(trans.transformBasic(startVL, destinationVL, "y", "aggregate").cost).to.eq(def.DEFAULT_TRANSFORM_TRANSITIONS["AGGREGATE"].cost);
+      expect(trans.transformBasic(startVL, destinationVL, "y", "scale").cost).to.eq(def.TRANSFORM_TRANSITIONS["SCALE"].cost);
+      expect(trans.transformBasic(startVL, destinationVL, "y", "aggregate").cost).to.eq(def.TRANSFORM_TRANSITIONS["AGGREGATE"].cost);
       expect(trans.transformBasic(startVL, destinationVL, "y", "sort")).to.eq(undefined);
     });
     it('should return FILTER transition correctly.', function () {
@@ -114,10 +114,10 @@ describe('cp.trans.trans', function () {
     });
   })
 
-  describe('whole transition', function (){
+  describe.only('whole transition', function (){
     it('should return all transitions correctly.', function () {
       var result = trans.transitionSet(startVL, destinationVL);
-      expect(result.marktype[0].cost).to.eq(0.5);
+      expect(result.marktype[0].cost).to.eq(def.MARKTYPE_TRANSITIONS["AREA_POINT"].cost);
       expect(result.transform.length).to.eq(4);
       expect(result.encoding.length).to.eq(2);
 

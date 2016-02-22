@@ -26,7 +26,7 @@ export function marktypeTransitionSet (s, d) {
   }
   else {
     var trName = [s.mark.toUpperCase(), d.mark.toUpperCase()].sort().join("_");
-    transSet.push(def.DEFAULT_MARKTYPE_TRANSITIONS[trName]);
+    transSet.push(util.duplicate(def.MARKTYPE_TRANSITIONS[trName]));
   }
   return transSet;
 }
@@ -79,18 +79,18 @@ export function transformBasic(s, d, channel, transform){
 
   if( sHas && dHas && ( !util.rawEqual(s.encoding[channel][transform], d.encoding[channel][transform]))){
 
-    transistion = util.duplicate(def.DEFAULT_TRANSFORM_TRANSITIONS[transform.toUpperCase()]);
+    transistion = util.duplicate(def.TRANSFORM_TRANSITIONS[transform.toUpperCase()]);
     transistion.detail = {"type": "modified", "channel": channel};
     return transistion;
   }
   else if( sHas && !dHas ) {
-    transistion = util.duplicate(def.DEFAULT_TRANSFORM_TRANSITIONS[transform.toUpperCase()]);
+    transistion = util.duplicate(def.TRANSFORM_TRANSITIONS[transform.toUpperCase()]);
     transistion.detail = {"type": "removed", "channel": channel};
 
     return transistion
   }
   else if( !sHas && dHas ) {
-    transistion = util.duplicate(def.DEFAULT_TRANSFORM_TRANSITIONS[transform.toUpperCase()]);
+    transistion = util.duplicate(def.TRANSFORM_TRANSITIONS[transform.toUpperCase()]);
     transistion.detail = {"type": "added", "channel": channel};
 
     return transistion
@@ -109,17 +109,17 @@ export function transformFilter(s, d){
   }
 
   if( uHasFilter && vHasFilter && ( !util.rawEqual(s.transform.filter, d.transform.filter))){
-    transistion = util.duplicate(def.DEFAULT_TRANSFORM_TRANSITIONS["FILTER"]);
+    transistion = util.duplicate(def.TRANSFORM_TRANSITIONS["FILTER"]);
     transistion.detail = {"type": "modified"};
     return transistion;
   }
   else if( uHasFilter && !vHasFilter ){
-    transistion = util.duplicate(def.DEFAULT_TRANSFORM_TRANSITIONS["FILTER"]);
+    transistion = util.duplicate(def.TRANSFORM_TRANSITIONS["FILTER"]);
     transistion.detail = {"type": "removed"};
     return transistion;
   }
   else if( !uHasFilter && vHasFilter ){
-    transistion = util.duplicate(def.DEFAULT_TRANSFORM_TRANSITIONS["FILTER"]);
+    transistion = util.duplicate(def.TRANSFORM_TRANSITIONS["FILTER"]);
     transistion.detail = {"type": "added"};
     return transistion;
   }
@@ -133,7 +133,7 @@ export function transformSettype(s, d, channel){
   if( s.encoding[channel] && d.encoding[channel]
       && ( d.encoding[channel]["field"] === s.encoding[channel]["field"] )
       && ( d.encoding[channel]["type"] !== s.encoding[channel]["type"] ) ){
-    transistion = util.duplicate(def.DEFAULT_TRANSFORM_TRANSITIONS["SETTYPE"]);
+    transistion = util.duplicate(def.TRANSFORM_TRANSITIONS["SETTYPE"]);
     transistion.detail = {
       "type": s.encoding[channel]["type"] + "_" + d.encoding[channel]["type"],
       "channel": channel
