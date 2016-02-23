@@ -178,10 +178,12 @@ export function find(array, f, obj){
 export function rawEqual(a,b) {
   return JSON.stringify(a) === JSON.stringify(b);
 }
-export function arrayDiff(a,b){
+export function arrayDiff(a,b, f?){
   return a.filter(function(x){
-    return find(b,function(item){
-      return JSON.stringify(item);
-    },x) < 0;
+    if (!f) {
+      return find(b, JSON.stringify, x) < 0 ;
+    }
+    else
+      return find(b,f,x) < 0;
   });
 }

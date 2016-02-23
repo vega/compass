@@ -64,6 +64,9 @@ describe('cp.trans.trans', function () {
   });
 
   describe('encoding transition', function(){
+    it('should return empty array if start is equal to dest.', function(){
+      expect(trans.transformTransitionSet(startVL, startVL).length).to.eq(0);
+    });
     it('should return all encoding transitions', function () {
       var source = {
         "data": {"url": "data/cars.json"},
@@ -86,35 +89,42 @@ describe('cp.trans.trans', function () {
       expect(result2.length).to.eq(2);
       expect(result3.length).to.eq(2);
 
-      // var origin = {
-      //     "data": {"url": "data/cars.json"},
-      //     "mark": "bar",
-      //     "encoding": {
-      //       "column": {"field": "Cylinders","type": "ordinal"},
-      //       "x": {
-      //         "field": "Origin", "type": "nominal",
-      //         "axis": {"labels": false, "title": "", "tickSize": 0}
-      //       },
-      //       "y": {"aggregate": "mean", "field": "Acceleration", "type": "quantitative"},
-      //     }
-      //   };
-      //
-      // var destination = {
-      //   "data": {"url": "data/cars.json"},
-      //   "mark": "point",
-      //   "encoding": {
-      //     "x": {"bin": true, "field": "Displacement", "type": "quantitative"},
-      //     "y": {"bin": true, "field": "Miles_per_Gallon", "type": "quantitative"},
-      //     "size": {"aggregate": "count", "field": "*", "type": "quantitative"}
-      //   }
-      // };
-      // var result4 = trans.encodingTransitionSet(origin, destination);
-      // console.log(result4);
-      // expect(result4.length).to.eq(4);
+      var destination = {
+        "description": "A scatterplot showing horsepower and miles per gallons for various cars.",
+        "data": {"url": "data/cars.json"},
+        "mark": "point",
+        "encoding": {
+          "x": {"type": "quantitative","field": "Acceleration"},
+          "y": {"type": "quantitative","field": "Horsepower"}
+        }
+      };
+
+
+      var origin = {
+        "description": "A scatterplot showing horsepower and miles per gallons for various cars.",
+        "data": {"url": "data/cars.json"},
+        "mark": "point",
+        "encoding": {
+          "x": {
+            "type": "quantitative",
+            "field": "Acceleration",
+            "bin": true
+          },
+          "y": {
+            "type": "quantitative",
+            "field": "*",
+            "scale": {"type": "log"},
+            "aggregate": "count"
+          }
+        }
+      };
+      var result4 = trans.encodingTransitionSet(origin, destination);
+
+      expect(result4.length).to.eq(1);
     });
   })
 
-  describe.only('whole transition', function (){
+  describe('whole transition', function (){
     it('should return all transitions correctly.', function () {
       var result = trans.transitionSet(startVL, destinationVL);
       expect(result.marktype[0].cost).to.eq(def.MARKTYPE_TRANSITIONS["AREA_POINT"].cost);

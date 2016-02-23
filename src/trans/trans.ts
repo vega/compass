@@ -9,6 +9,25 @@ import * as util from '../util';
 import * as def from './def'
 import * as nb from './neighbor';
 
+export function transitionCost (s, d) {
+  var transitions = transitionSet(s,d);
+  var cost = 0;
+  cost = transitions.marktype.reduce(function(prev, transition){
+    prev += transition.cost;
+    return prev;
+  }, cost);
+  cost = transitions.transform.reduce(function(prev, transition){
+    prev += transition.cost;
+    return prev;
+  }, cost);
+  cost = transitions.encoding.reduce(function(prev, transition){
+    prev += transition.cost;
+    return prev;
+  }, cost);
+
+  return cost;
+}
+
 export function transitionSet (s, d) {
   var transitions = {
     marktype: marktypeTransitionSet(s, d),
@@ -16,6 +35,21 @@ export function transitionSet (s, d) {
     encoding: encodingTransitionSet(s, d)
   };
 
+  var cost = 0;
+  cost = transitions.marktype.reduce(function(prev, transition){
+    prev += transition.cost;
+    return prev;
+  }, cost);
+  cost = transitions.transform.reduce(function(prev, transition){
+    prev += transition.cost;
+    return prev;
+  }, cost);
+  cost = transitions.encoding.reduce(function(prev, transition){
+    prev += transition.cost;
+    return prev;
+  }, cost);
+
+  transitions["cost"] = cost;
   return transitions;
 }
 
@@ -144,6 +178,10 @@ export function transformSettype(s, d, channel){
 }
 
 export function encodingTransitionSet(s, d){
+  if (nb.sameEncoding(s.encoding,d.encoding)) {
+    return [];
+  }
+
   var sChannels = util.keys(s.encoding);
   var sFields = sChannels.map(function(key){
     return s.encoding[key];
@@ -153,9 +191,10 @@ export function encodingTransitionSet(s, d){
     return d.encoding[key];
   });
 
-  var additionalFields = util.arrayDiff(dFields, sFields);
+  var additionalFields = util.arrayDiff(dFields, sFields, function(field){ return field.field + "_" + field.type; });
   var additionalChannels = util.arrayDiff(dChannels, sChannels);
-
+  // console.log(additionalFields);
+  // console.log(additionalChannels);
   //Dijkstra's algorithm
   var u;
   function nearestNode(nodes){
@@ -167,6 +206,7 @@ export function encodingTransitionSet(s, d){
         argMinD = index;
       }
     });
+
     return nodes.splice(argMinD, 1)[0];
   }
   //create node array NextCandidates
@@ -222,6 +262,10 @@ export function encodingTransitionSet(s, d){
     doneNodes.push(u);
   }
 
+  if (!nb.sameEncoding(u.encoding, d.encoding) && nodes.length === 0) {
+    return [ { name: "UNREACHABLE", cost: 999 } ];
+  }
+  
   var result = u.prev.map(function(node){
     return node.transition;
   }).filter(function(transition){ return transition; });

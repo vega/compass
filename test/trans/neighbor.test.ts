@@ -56,8 +56,34 @@ describe('cp.trans.neighbor', function () {
     var additionalChannels = [];
     var result = neighbor.neighbors(testVL, additionalFields, additionalChannels );
 
-    expect(result[2].transition).to.eq(def.DEFAULT_ENCODING_TRANSITIONS["SWAP_X_Y"]);
+    expect(result[2].transition).to.eq(def.ENCODING_TRANSITIONS["SWAP_X_Y"]);
     expect(result.length).to.eq(4);
+
+  });
+  it.only('should return neighbors regardless redundant additionalFields', function () {
+    var testVL = {
+      "encoding": {
+        "x": {
+          "type": "quantitative",
+          "field": "Acceleration",
+          "bin": true
+        },
+        "y": {
+          "type": "quantitative",
+          "field": "*",
+          "scale": {"type": "log"},
+          "aggregate": "count"
+        }
+      }
+    };
+    var additionalFields: SchemaField[] = [
+      {"field": "Acceleration", "type": Type.QUANTITATIVE},
+      {"field": "Horsepower", "type": Type.QUANTITATIVE} ];
+    var additionalChannels = [];
+    var result = neighbor.neighbors(testVL, additionalFields, additionalChannels );
+
+
+    expect(result.length).to.eq(7);
 
   });
 });

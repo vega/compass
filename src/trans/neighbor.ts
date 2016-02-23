@@ -41,8 +41,10 @@ export function neighbors(spec, additionalFields : SchemaField[], additionalChan
 
       //modify
       additionalFields.forEach(function(field, index){
+
         newNeighbor = util.duplicate(spec);
         transitionType = "MODIFY_"+channel.toUpperCase();
+
         if (spec.encoding[channel].field === "*" && field.field !== "*" ) {
           transitionType += "_REMOVE_COUNT";
         }
@@ -154,7 +156,7 @@ export function neighbors(spec, additionalFields : SchemaField[], additionalChan
 
   for( var i = 0; i < neighbors.length; i+=1 ) {
     for( var j = i+1; j < neighbors.length; j+=1 ) {
-      if(neighbors[i].transition === neighbors[j].transition){
+      if(sameEncoding(neighbors[i].encoding, neighbors[j].encoding)){
         neighbors.splice(j,1);
         j -= 1;
       }
