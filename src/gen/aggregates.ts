@@ -3,7 +3,8 @@
 import * as vlFieldDef from 'vega-lite/src/fielddef';
 import * as vlShorthand from 'vega-lite/src/shorthand';
 import {Type} from 'vega-lite/src/type';
-import {FieldDef} from 'vega-lite/src/schema/fielddef.schema';
+import {FieldDef} from 'vega-lite/src/fielddef';
+import {AggregateOp} from 'vega-lite/src/aggregate';
 import {SchemaField} from '../schema';
 
 import * as util from '../util';
@@ -82,7 +83,7 @@ export default function genAggregates(output, fieldDefs: SchemaField[], stats, o
 
     tf[i] = {field: f.field, type: f.type};
 
-    if (f.aggregate === 'count') { // if count is included in the selected fields
+    if (f.aggregate === AggregateOp.COUNT) { // if count is included in the selected fields
       if (canHaveAggr) {
         tf[i].aggregate = f.aggregate;
         assignField(i + 1, true, autoMode);

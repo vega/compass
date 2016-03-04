@@ -1,4 +1,4 @@
-import {FieldDef} from 'vega-lite/src/schema/fielddef.schema';
+import {FieldDef} from 'vega-lite/src/fielddef';
 
 export interface SchemaField extends FieldDef {
   selected?: boolean;

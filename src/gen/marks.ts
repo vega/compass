@@ -4,7 +4,7 @@ import {getEncodingMappingError} from 'vega-lite/src/validate';
 import {SpecOption} from '../consts';
 
 import {Type} from 'vega-lite/src/type';
-import {Encoding} from 'vega-lite/src/schema/encoding.schema';
+import {Encoding} from 'vega-lite/src/encoding';
 
 import * as util from '../util';
 
