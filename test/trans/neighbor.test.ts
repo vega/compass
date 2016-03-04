@@ -60,7 +60,7 @@ describe('cp.trans.neighbor', function () {
     expect(result.length).to.eq(4);
 
   });
-  it.only('should return neighbors regardless redundant additionalFields', function () {
+  it('should return neighbors regardless redundant additionalFields', function () {
     var testVL = {
       "encoding": {
         "x": {
