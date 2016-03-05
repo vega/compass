@@ -5,6 +5,8 @@ import {SpecOption} from '../consts';
 
 import {Type} from 'vega-lite/src/type';
 import {Encoding} from 'vega-lite/src/encoding';
+import {ScaleType} from 'vega-lite/src/scale';
+import {AggregateOp} from 'vega-lite/src/aggregate';
 
 import * as util from '../util';
 
@@ -88,8 +90,8 @@ export namespace rule {
 
 
     if (opt.omitLengthForLogScale) {
-      if (encoding.x && encoding.x.scale && encoding.x.scale.type === "log" ) return false;
-      if (encoding.y && encoding.y.scale && encoding.y.scale.type === "log" ) return false;
+      if (encoding.x && encoding.x.scale && encoding.x.scale.type === ScaleType.LOG ) return false;
+      if (encoding.y && encoding.y.scale && encoding.y.scale.type === ScaleType.LOG ) return false;
     }
 
 
@@ -111,7 +113,7 @@ export namespace rule {
         var aggregate = encoding.x.aggregate || encoding.y.aggregate;
 
         // TODO: revise
-        return !(opt.omitStackedAverage && aggregate ==='mean' && encoding.color);
+        return !(opt.omitStackedAverage && aggregate === AggregateOp.MEAN && encoding.color);
       }
     }
 
@@ -135,11 +137,11 @@ export namespace rule {
 
     if (!line(encoding, stats, opt)) return false;
     if (opt.omitLengthForLogScale) {
-      if (encoding.x && encoding.x.scale && encoding.x.scale.type === "log" ) return false;
-      if (encoding.y && encoding.y.scale && encoding.y.scale.type === "log" ) return false;
+      if (encoding.x && encoding.x.scale && encoding.x.scale.type === ScaleType.LOG ) return false;
+      if (encoding.y && encoding.y.scale && encoding.y.scale.type === ScaleType.LOG ) return false;
     }
 
-    return !(opt.omitStackedAverage && encoding.y.aggregate ==='mean' && encoding.color);
+    return !(opt.omitStackedAverage && encoding.y.aggregate === AggregateOp.MEAN && encoding.color);
   }
 
   export function text(encoding: Encoding, stats, opt: SpecOption) {
