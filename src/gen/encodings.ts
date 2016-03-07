@@ -3,10 +3,11 @@ import {isAggregate} from 'vega-lite/src/encoding';
 import {keys, duplicate} from '../util';
 import {rule as marksRule} from './marks';
 import {SpecOption, DEFAULT_SPEC_OPTION} from '../consts';
-import {ROW, COLUMN, getSupportedRole} from 'vega-lite/src/channel';
+import {AggregateOp} from 'vega-lite/src/aggregate';
+import {ROW, COLUMN, getSupportedRole, Channel} from 'vega-lite/src/channel';
 import {Type} from 'vega-lite/src/type';
-import {Encoding} from 'vega-lite/src/schema/encoding.schema';
-import {FieldDef} from 'vega-lite/src/schema/fielddef.schema';
+import {Encoding} from 'vega-lite/src/encoding';
+import {FieldDef} from 'vega-lite/src/fielddef';
 
 export default function genEncodings(encodings: Encoding[], fieldDefs: FieldDef[], stats, opt: SpecOption = DEFAULT_SPEC_OPTION) {
   // generate a collection vega-lite's encoding
@@ -120,10 +121,10 @@ namespace rule {
 
     if (opt.omitDotPlotWithOnlyCount) {
       // one dimension "count"
-      if (encoding.x && encoding.x.aggregate === 'count' && !encoding.y) {
+      if (encoding.x && encoding.x.aggregate === AggregateOp.COUNT && !encoding.y) {
         return false;
       }
-      if (encoding.y && encoding.y.aggregate === 'count' && !encoding.x) {
+      if (encoding.y && encoding.y.aggregate === AggregateOp.COUNT && !encoding.x) {
         return false;
       }
     }
@@ -132,7 +133,8 @@ namespace rule {
 
   function isAggrWithAllDimOnFacets(encoding) {
     var hasAggr = false, hasOtherO = false;
-    for (var channel in encoding) {
+    for (var c in encoding) {
+      const channel: Channel = c as any;
       var fieldDef = encoding[channel];
       if (fieldDef.aggregate) {
         hasAggr = true;

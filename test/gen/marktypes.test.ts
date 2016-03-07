@@ -5,6 +5,9 @@ import {DEFAULT_SPEC_OPTION} from '../../src/consts';
 import * as vlShorthand from 'vega-lite/src/shorthand';
 import {BAR, POINT, TEXT, AREA} from 'vega-lite/src/mark';
 import {QUANTITATIVE, ORDINAL, TEMPORAL} from 'vega-lite/src/type';
+import {Encoding} from 'vega-lite/src/encoding';
+import {ScaleType} from 'vega-lite/src/scale';
+import {AggregateOp} from 'vega-lite/src/aggregate';
 
 describe('cp.gen.marks()', function(){
   var opt;
@@ -64,7 +67,7 @@ describe('cp.gen.marks()', function(){
       it('should not be generated', function () {
         var encoding = {
           'color': {'field': 'When__Phase_of_flight','type': ORDINAL},
-          'x': {'field': 'Cost__Total_$','type': QUANTITATIVE,'aggregate': 'mean'},
+          'x': {'field': 'Cost__Total_$','type': QUANTITATIVE,'aggregate': AggregateOp.MEAN},
           'y': {'selected': undefined,'field': 'Aircraft__Airline_Operator','type': ORDINAL}
         };
 
@@ -77,7 +80,7 @@ describe('cp.gen.marks()', function(){
       it('should be generated', function () {
         var encoding = {
           'color': {'field': 'When__Phase_of_flight','type': ORDINAL},
-          'x': {'field': 'Cost__Total_$','type': QUANTITATIVE,'aggregate': 'sum'},
+          'x': {'field': 'Cost__Total_$','type': QUANTITATIVE,'aggregate': AggregateOp.SUM},
           'y': {'field': 'Aircraft__Airline_Operator','type': ORDINAL}
         };
         var marks = getMarks(encoding, {}, opt);
@@ -87,7 +90,7 @@ describe('cp.gen.marks()', function(){
     describe('with log scale', function () {
       it('should not be generated', function () {
         var encoding = {
-          'x': { 'fiel': 'Cost__Total_$', 'type': QUANTITATIVE, 'scale': { 'type' : 'log' } },
+          'x': { 'fiel': 'Cost__Total_$', 'type': QUANTITATIVE, 'scale': { 'type' : ScaleType.LOG } },
           'y': { 'field': 'Aircraft__Airline_Operator', 'type': ORDINAL }
         };
         var marks = getMarks(encoding, {}, opt);
@@ -100,7 +103,7 @@ describe('cp.gen.marks()', function(){
       it('should not be generated', function () {
         var encoding = {
           'x': { 'field': 'Year', 'type': TEMPORAL },
-          'y': { 'field': 'Weight_in_lbs', 'type': QUANTITATIVE, 'scale': { 'type': 'log' }, 'aggregate': 'sum' }
+          'y': { 'field': 'Weight_in_lbs', 'type': QUANTITATIVE, 'scale': { 'type': ScaleType.LOG }, 'aggregate':  AggregateOp.SUM }
           };
           var marks = getMarks(encoding, {}, opt);
         expect(marks.indexOf(AREA)).to.equal(-1);
@@ -124,10 +127,10 @@ describe('cp.gen.marks()', function(){
           'type': ORDINAL,
         },
         'size': {
-          'field': 'Cost__Repair','type': QUANTITATIVE,'aggregate': 'mean'
+          'field': 'Cost__Repair','type': QUANTITATIVE,'aggregate': AggregateOp.MEAN
         },
         'text': {
-          'field': 'Cost__Total_$','type': QUANTITATIVE,'aggregate': 'mean'
+          'field': 'Cost__Total_$','type': QUANTITATIVE,'aggregate': AggregateOp.MEAN
         }
       };
 
