@@ -54,7 +54,7 @@
   },
   "dependencies": {
     "clusterfck": "^0.6.0",
-    "vega-lite": "^0.9.3"
+    "vega-lite": "^1.0.8"
   },
   "browserify": {
     "transform": [
