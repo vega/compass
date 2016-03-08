@@ -7,7 +7,8 @@ import * as def from '../../src/trans/def'
 import * as neighbor from '../../src/trans/neighbor';
 import * as path from '../../src/trans/trans';
 import * as util from '../../src/util';
-import {SchemaField} from '../../src/schema';
+import {FieldDef} from 'vega-lite/src/fielddef';
+import {AggregateOp} from 'vega-lite/src/aggregate';
 
 describe('cp.trans.neighbor', function () {
   it('should return all neighbors linked by encdoeTransition.', function () {
@@ -18,9 +19,9 @@ describe('cp.trans.neighbor', function () {
         "x": {"field": "Horsepower", "type": "quantitative"}
       }
     };
-    var additionalFields: SchemaField[] = [ {"field": "Origin", "type": Type.ORDINAL} ];
+    var additionalFields: FieldDef[] = [ {"field": "Origin", "type": Type.ORDINAL} ];
     var additionalChannels = ["y"];
-    var result = neighbor.neighbors(testVL, additionalFields, additionalChannels );
+    var result = neighbor.neighbors(testVL, additionalFields, additionalChannels, def.DEFAULT_ENCODING_TRANSITIONS );
 
     expect(result.length).to.eq(4);
   });
@@ -33,13 +34,13 @@ describe('cp.trans.neighbor', function () {
         "x": {"field": "*", "type": "quantitative", "aggregate":"count" }
       }
     };
-    var additionalFields: SchemaField[] = [ {"field": "*", "type": Type.QUANTITATIVE, "aggregate":"count" } ];
+    var additionalFields: FieldDef[] = [ {"field": "*", "type": Type.QUANTITATIVE, "aggregate":AggregateOp.COUNT } ];
     var additionalChannels = ["y"];
-    var result = neighbor.neighbors(testVL, additionalFields, additionalChannels );
+    var result = neighbor.neighbors(testVL, additionalFields, additionalChannels, def.DEFAULT_ENCODING_TRANSITIONS );
 
-    expect(result[0].transition).to.eq(def.ENCODING_TRANSITIONS["REMOVE_X_COUNT"]);
-    expect(result[1].transition).to.eq(def.ENCODING_TRANSITIONS["MODIFY_X"]);
-    expect(result[3].transition).to.eq(def.ENCODING_TRANSITIONS["ADD_Y_COUNT"]);
+    expect(result[0].transition).to.eq(def.DEFAULT_ENCODING_TRANSITIONS["REMOVE_X_COUNT"]);
+    expect(result[1].transition).to.eq(def.DEFAULT_ENCODING_TRANSITIONS["MODIFY_X"]);
+    expect(result[3].transition).to.eq(def.DEFAULT_ENCODING_TRANSITIONS["ADD_Y_COUNT"]);
   });
   it('should return only a neighbor with SWAP_X_Y transitions', function () {
     var testVL = {
@@ -52,11 +53,11 @@ describe('cp.trans.neighbor', function () {
       "y": {"scale": 'hey', "aggregate": "mean", "field": "Acceleration", "type": "quantitative"},
     }
   };
-    var additionalFields: SchemaField[] = [ ];
+    var additionalFields: FieldDef[] = [ ];
     var additionalChannels = [];
-    var result = neighbor.neighbors(testVL, additionalFields, additionalChannels );
+    var result = neighbor.neighbors(testVL, additionalFields, additionalChannels, def.DEFAULT_ENCODING_TRANSITIONS );
 
-    expect(result[2].transition).to.eq(def.ENCODING_TRANSITIONS["SWAP_X_Y"]);
+    expect(result[2].transition).to.eq(def.DEFAULT_ENCODING_TRANSITIONS["SWAP_X_Y"]);
     expect(result.length).to.eq(4);
 
   });
@@ -76,11 +77,11 @@ describe('cp.trans.neighbor', function () {
         }
       }
     };
-    var additionalFields: SchemaField[] = [
+    var additionalFields: FieldDef[] = [
       {"field": "Acceleration", "type": Type.QUANTITATIVE},
       {"field": "Horsepower", "type": Type.QUANTITATIVE} ];
     var additionalChannels = [];
-    var result = neighbor.neighbors(testVL, additionalFields, additionalChannels );
+    var result = neighbor.neighbors(testVL, additionalFields, additionalChannels, def.DEFAULT_ENCODING_TRANSITIONS );
 
 
     expect(result.length).to.eq(7);

@@ -62,6 +62,7 @@ export namespace rule {
       // dot plot shouldn't have other encoding
       if (opt.omitDotPlotWithExtraEncoding && util.keys(encoding).length > 1) return false;
 
+
     }
     return true;
   }

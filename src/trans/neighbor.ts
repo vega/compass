@@ -1,17 +1,16 @@
 import {Mark} from 'vega-lite/src/mark';
 import {Type} from 'vega-lite/src/type';
-import {Encoding} from 'vega-lite/src/schema/encoding.schema';
 import {CHANNELS} from 'vega-lite/src/channel';
 import {getEncodingMappingError} from 'vega-lite/src/validate';
-import {SchemaField} from '../schema';
-
 import * as util from '../util';
 import * as def from './def'
+import {Encoding} from 'vega-lite/src/encoding';
+import {FieldDef} from 'vega-lite/src/fielddef';
 
-export function neighbors(spec, additionalFields : SchemaField[], additionalChannels){
+export function neighbors(spec, additionalFields : FieldDef[], additionalChannels, importedEncodingTransitions){
   //check add
   var neighbors = [];
-
+  var encodingTransitions = importedEncodingTransitions || def.DEFAULT_ENCODING_TRANSITIONS;
   var inChannels = util.keys(spec.encoding);
   var exChannels = additionalChannels;
 
@@ -23,7 +22,7 @@ export function neighbors(spec, additionalFields : SchemaField[], additionalChan
       var transitionType = "REMOVE_"+channel.toUpperCase();
       transitionType += (spec.encoding[channel].field === "*") ? "_COUNT" : "";
 
-      var transition = def.ENCODING_TRANSITIONS[transitionType];
+      var transition = encodingTransitions[transitionType];
       var newAdditionalFields = util.duplicate(additionalFields);
       newAdditionalFields.push(newNeighbor.encoding[channel]);
       var newAdditionalChannels = util.duplicate(additionalChannels);
@@ -51,7 +50,7 @@ export function neighbors(spec, additionalFields : SchemaField[], additionalChan
         else if ( spec.encoding[channel].field !== "*" && field.field === "*" ){
           transitionType += "_ADD_COUNT";
         }
-        transition = def.ENCODING_TRANSITIONS[transitionType];
+        transition = encodingTransitions[transitionType];
 
         newAdditionalFields = util.duplicate(additionalFields);
         newAdditionalFields.splice(index,1);
@@ -80,8 +79,8 @@ export function neighbors(spec, additionalFields : SchemaField[], additionalChan
         // var newNeighborChannels = [channel, anotherChannel].sort( function(a,b){
         //   return def.CHANNELS_WITH_TRANSITION_ORDER.indexOf(a) -  def.CHANNELS_WITH_TRANSITION_ORDER.indexOf(b);
         // }).join("_").toUpperCase();
-        // transition = def.ENCODING_TRANSITIONS["SWAP"+"_"+ newNeighborChannels];
-        transition = def.ENCODING_TRANSITIONS["SWAP_X_Y"];
+        // transition = encodingTransitions["SWAP"+"_"+ newNeighborChannels];
+        transition = encodingTransitions["SWAP_X_Y"];
         newAdditionalFields = util.duplicate(additionalFields);
         newAdditionalChannels = util.duplicate(additionalChannels);
 
@@ -105,7 +104,7 @@ export function neighbors(spec, additionalFields : SchemaField[], additionalChan
       exChannels.forEach(function(exChannel, index){
         newNeighbor = util.duplicate(spec);
         var newNeighborChannels = (channel + "_" + exChannel).toUpperCase();
-        transition = def.ENCODING_TRANSITIONS["MOVE_" + newNeighborChannels];
+        transition = encodingTransitions["MOVE_" + newNeighborChannels];
         newAdditionalFields = util.duplicate(additionalFields);
 
         newAdditionalChannels = util.duplicate(additionalChannels);
@@ -133,7 +132,7 @@ export function neighbors(spec, additionalFields : SchemaField[], additionalChan
       var newNeighbor = util.duplicate(spec);
       var transitionType = "ADD_"+channel.toUpperCase();
       transitionType += (field.field === "*") ? "_COUNT" : "";
-      var transition = def.ENCODING_TRANSITIONS[transitionType];
+      var transition = encodingTransitions[transitionType];
       var newAdditionalFields = util.duplicate(additionalFields);
       var newAdditionalChannels = util.duplicate(additionalChannels);
 
