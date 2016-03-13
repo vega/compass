@@ -154,7 +154,8 @@ export const DEFAULT_ENCODING_TRANSITIONS = {
   MOVE_COLUMN_Y: { name: 'MOVE_COLUMN_Y', cost: 1},
   MOVE_COLUMN_X: { name: 'MOVE_COLUMN_X', cost: 1},
   SWAP_X_Y: { name: 'SWAP_X_Y', cost: 1},
-  SWAP_ROW_COLUMN: { name: 'SWAP_ROW_COLUMN', cost: 1}
+  SWAP_ROW_COLUMN: { name: 'SWAP_ROW_COLUMN', cost: 1},
+  ceiling: { cost: 3, alternatingCost: 3 }
 };
 
 

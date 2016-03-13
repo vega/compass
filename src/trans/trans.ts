@@ -261,6 +261,10 @@ export function encodingTransitionSet(s, d, importedEncodingTransitions){
       break;
     }
 
+    if(u.distance >= importedEncodingTransitions.ceiling.cost){
+      return [ {name: 'OVER_THE_CEILING', cost: importedEncodingTransitions.ceiling.alternatingCost} ];
+    }
+
     var alreadyDone = false;
     var newNodes = nb.neighbors(u, u.additionalFields, u.additionalChannels, importedEncodingTransitions);
     newNodes.forEach(function(newNode){

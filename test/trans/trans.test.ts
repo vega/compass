@@ -129,11 +129,38 @@ describe('cp.trans.trans', function () {
 
       expect(result4.length).to.eq(1);
     });
+    it('should return TOO_FAR if the sum of encoding transitions exceed TOO_FARs cost', function(){
+      this.timeout(10000);
+      var startVL = {
+        "data": {"url": "data/cars.json"},
+        "mark": "line",
+        "encoding": {
+          "x": {"field": "Year", "type": "temporal", "timeUnit":"year"},
+          "y": {"field": "Miles_per_Gallon", "type": "quantitative", "aggregate":"mean"},
+          "column" : {"field": "Cylinders", "type": "ordinal"}
+        }
+      };
+      var destinationVL = {
+        "data": {"url": "data/cars.json"},
+        "mark": "point",
+        "encoding": {
+          "x": {"field": "Horsepower", "type": "quantitative", "aggregate":"mean"},
+          "y": {"field": "Weight_in_lbs", "type": "quantitative", "aggregate":"mean"},
+          "color": {"field": "Year", "type": "temporal", "timeUnit":"year"},
+          "size": {"field": "*", "type":"quantitative", "aggregate":"count"}
+        }
+      };
+
+      expect(trans.encodingTransitionSet(startVL, destinationVL, def.DEFAULT_ENCODING_TRANSITIONS)[0].name)
+        .to.eq("OVER_THE_CEILING");
+    })
   })
 
   describe('whole transition', function (){
     it('should return all transitions correctly.', function () {
+
       var result = trans.transitionSet(startVL, destinationVL, def.TRANSITIONS );
+
       expect(result.marktype[0].cost).to.eq(def.DEFAULT_MARKTYPE_TRANSITIONS["AREA_POINT"].cost);
       expect(result.transform.length).to.eq(4);
       expect(result.encoding.length).to.eq(2);
