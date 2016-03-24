@@ -222,7 +222,8 @@ export function encodingTransitionSet(s, d, importedEncodingTransitions){
     return d.encoding[key];
   });
 
-  var additionalFields = util.arrayDiff(dFields, sFields, function(field){ return field.field + "_" + field.type; });
+  // var additionalFields = util.arrayDiff(dFields, sFields, function(field){ return field.field + "_" + field.type; });
+  var additionalFields = util.unionObjectArray(dFields, sFields, function(field){ return field.field + "_" + field.type; });
   var additionalChannels = util.arrayDiff(dChannels, sChannels);
   // console.log(additionalFields);
   // console.log(additionalChannels);

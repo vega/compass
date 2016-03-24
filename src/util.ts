@@ -187,3 +187,6 @@ export function arrayDiff(a,b, f?){
       return find(b,f,x) < 0;
   });
 }
+export function unionObjectArray(a,b,f){
+  return arrayDiff(a,b,f).concat(b);
+}

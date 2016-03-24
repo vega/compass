@@ -92,6 +92,7 @@ describe('cp.trans.trans', function () {
       var result2 = trans.encodingTransitionSet(source, target2, def.DEFAULT_ENCODING_TRANSITIONS);
       var result3 = trans.encodingTransitionSet(startVL, destinationVL, def.DEFAULT_ENCODING_TRANSITIONS);
 
+
       expect(result1.length).to.eq(1);
       expect(result2.length).to.eq(2);
       expect(result3.length).to.eq(2);
@@ -129,7 +130,7 @@ describe('cp.trans.trans', function () {
 
       expect(result4.length).to.eq(1);
     });
-    it('should return TOO_FAR if the sum of encoding transitions exceed TOO_FARs cost', function(){
+    it('should return OVER_THE_CEILING if the sum of encoding transitions exceed OVER_THE_CEILING\'s cost', function(){
       this.timeout(10000);
       var startVL = {
         "data": {"url": "data/cars.json"},
@@ -146,7 +147,6 @@ describe('cp.trans.trans', function () {
         "encoding": {
           "x": {"field": "Horsepower", "type": "quantitative", "aggregate":"mean"},
           "y": {"field": "Weight_in_lbs", "type": "quantitative", "aggregate":"mean"},
-          "color": {"field": "Year", "type": "temporal", "timeUnit":"year"},
           "size": {"field": "*", "type":"quantitative", "aggregate":"count"}
         }
       };
@@ -154,6 +154,33 @@ describe('cp.trans.trans', function () {
       expect(trans.encodingTransitionSet(startVL, destinationVL, def.DEFAULT_ENCODING_TRANSITIONS)[0].name)
         .to.eq("OVER_THE_CEILING");
     })
+    it.only('should return the correct answer for redundant encodings', function(){
+
+      var source = {
+        "encoding": {
+          "x": {
+            "field": "Major_Genre",
+            "type": "nominal",
+            "sort": {"op":"mean","field":"Profit", "order":"descending"}
+          },
+          "y": {
+            "field": "Profit",
+            "aggregate":"mean",
+            "type":"quantitative"
+          }
+        }
+      };
+      var target = util.duplicate(source);
+      target.encoding.size = {
+        "field":"Profit",
+        "aggregate":"stdev",
+        "type":"quantitative"
+      }
+      var result1 = trans.encodingTransitionSet(source, target, def.DEFAULT_ENCODING_TRANSITIONS);
+
+      expect(result1.length).to.eq(1);
+    });
+
   })
 
   describe('whole transition', function (){
