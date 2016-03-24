@@ -166,3 +166,27 @@ export function cross(a,b) {
   }
   return x;
 };
+
+export function find(array, f, obj){
+  for(let i=0; i < array.length; i +=1){
+    if(f(obj) === f(array[i])){
+      return i;
+    }
+  }
+  return -1;
+}
+export function rawEqual(a,b) {
+  return JSON.stringify(a) === JSON.stringify(b);
+}
+export function arrayDiff(a,b, f?){
+  return a.filter(function(x){
+    if (!f) {
+      return find(b, JSON.stringify, x) < 0 ;
+    }
+    else
+      return find(b,f,x) < 0;
+  });
+}
+export function unionObjectArray(a,b,f){
+  return arrayDiff(a,b,f).concat(b);
+}

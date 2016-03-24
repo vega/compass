@@ -88,7 +88,7 @@ namespace rule {
       if (opt.omitShapeWithTimeDimension && fieldDef.timeUnit && fieldDef.type === Type.TEMPORAL) {
         return false;
       }
-
+      
       return cardinality(fieldDef, stats) <= opt.maxCardinalityForShape;
     }
 
