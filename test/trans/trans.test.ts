@@ -1,6 +1,7 @@
 import {expect} from 'chai';
 import {fixture} from '../fixture';
 import {Type} from 'vega-lite/src/type';
+
 import * as consts from '../../src/consts';
 
 import * as def from '../../src/trans/def'
@@ -59,6 +60,7 @@ describe('cp.trans.trans', function () {
 
     });
     it('should return FILTER transition correctly.', function () {
+
       expect(trans.transformFilter(startVL, destinationVL, def.DEFAULT_TRANSFORM_TRANSITIONS).name).to.eq("FILTER");
     });
     it('should return SETTYPE transition correctly.', function () {
@@ -68,6 +70,10 @@ describe('cp.trans.trans', function () {
     it('should return all transitions without order.', function(){
       expect(trans.transformTransitionSet(startVL, destinationVL, def.DEFAULT_TRANSFORM_TRANSITIONS).length).to.eq(4);
     });
+
+
+
+
   });
 
   describe('encoding transition', function(){
@@ -154,7 +160,7 @@ describe('cp.trans.trans', function () {
       expect(trans.encodingTransitionSet(startVL, destinationVL, def.DEFAULT_ENCODING_TRANSITIONS)[0].name)
         .to.eq("OVER_THE_CEILING");
     })
-    it.only('should return the correct answer for redundant encodings', function(){
+    it('should return the correct answer for redundant encodings', function(){
 
       var source = {
         "encoding": {
