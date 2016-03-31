@@ -39,7 +39,7 @@
   "homepage": "https://github.com/vega/visrec",
   "devDependencies": {
     "browser-sync": "^2.11.1",
-    "browserify": "^13.0.0",
+    "browserify": "^12.0.0",
     "browserify-versionify": "^1.0.6",
     "chai": "^3.4.1",
     "exorcist": "^0.4.0",
@@ -54,7 +54,8 @@
   },
   "dependencies": {
     "clusterfck": "^0.6.0",
-    "vega-lite": "^1.0.8"
+    "vega-lite": "^1.0.8",
+    "vega-expression": "^1.2.0"
   },
   "browserify": {
     "transform": [

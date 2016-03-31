@@ -80,6 +80,7 @@ export function traverse(node, arr) {
   return arr;
 };
 
+
 export function extend(obj, b, ...rest) {
   for (var x, name, i=1, len=arguments.length; i<len; ++i) {
     x = arguments[i];

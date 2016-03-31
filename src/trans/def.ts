@@ -45,7 +45,15 @@ export const DEFAULT_TRANSFORM_TRANSITIONS ={
   SORT: { name: 'SORT', cost: 1},
   BIN: { name: 'BIN', cost: 1},
   AGGREGATE: { name: 'AGGREGATE', cost: 1},
-  FILTER: { name: 'FILTER', cost: 1},
+  ADD_FILTER: { name: 'ADD_FILTER', cost: 1},
+  REMOVE_FILTER: { name: 'REMOVE_FILTER', cost: 1},
+  ADD_SPECIFY_FILTER: { name: 'ADD_SPECIFY_FILTER', cost: 1},
+  REMOVE_SPECIFY_FILTER: { name: 'REMOVE_SPECIFY_FILTER', cost: 1},
+  ADD_RANGE_FILTER: { name: 'ADD_RANGE_FILTER', cost: 1},
+  REMOVE_RANGE_FILTER: { name: 'REMOVE_RANGE_FILTER', cost: 1},
+  ADD_OTHER_FILTER: { name: 'ADD_OTHER_FILTER', cost: 1},
+  REMOVE_OTHER_FILTER: { name: 'REMOVE_OTHER_FILTER', cost: 1},
+
   SETTYPE: { name: 'SETTYPE', cost: 1}
 };
 
@@ -54,7 +62,13 @@ export const DEFAULT_TRANSFORM_TRANSITION_LIST = [
   "SORT",
   "BIN",
   "AGGREGATE",
-  "FILTER",
+  "ADD_FILTER",
+  "REMOVE_FILTER",
+  "MODIFY_FILTER",
+  "ADD_SPECIFY_FILTER",
+  "REMOVE_SPECIFY_FILTER",
+  "ADD_RANGE_FILTER",
+  "REMOVE_RANGE_FILTER",
   "SETTYPE"
 ];
 export const CHANNELS_WITH_TRANSITION_ORDER = [

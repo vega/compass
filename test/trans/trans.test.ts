@@ -2,6 +2,7 @@ import {expect} from 'chai';
 import {fixture} from '../fixture';
 import {Type} from 'vega-lite/src/type';
 
+
 import * as consts from '../../src/consts';
 
 import * as def from '../../src/trans/def'
@@ -59,10 +60,23 @@ describe('cp.trans.trans', function () {
       expect(real).to.eq(undefined);
 
     });
-    it('should return FILTER transition correctly.', function () {
-
-      expect(trans.transformFilter(startVL, destinationVL, def.DEFAULT_TRANSFORM_TRANSITIONS).name).to.eq("FILTER");
+    it('should return ADD_FILTER / REMOVE_FILTER transition correctly.', function () {
+      expect(trans.transformFilter(startVL, destinationVL, def.DEFAULT_TRANSFORM_TRANSITIONS).length).to.eq(1);
+      expect(trans.transformFilter(startVL, destinationVL, def.DEFAULT_TRANSFORM_TRANSITIONS)[0].name).to.eq("REMOVE_FILTER");
+      expect(trans.transformFilter(destinationVL, startVL, def.DEFAULT_TRANSFORM_TRANSITIONS).length).to.eq(1);
+      expect(trans.transformFilter(destinationVL, startVL, def.DEFAULT_TRANSFORM_TRANSITIONS)[0].name).to.eq("ADD_FILTER");
     });
+
+    it('should return FILTER DETAIL transition correctly.', function () {
+
+      var startVL = { "transform": {"filter" : "datum.Running_Time_min > 0 && datum.Running_Time_min > 0" } };
+      var destinationVL = { "transform": {"filter" : "datum.Running_Time_min === 0" }  };
+      expect(trans.transformFilter(startVL, destinationVL, def.DEFAULT_TRANSFORM_TRANSITIONS).length).to.eq(2);
+      expect(trans.transformFilter(startVL, destinationVL, def.DEFAULT_TRANSFORM_TRANSITIONS)[0].name).to.eq("ADD_SPECIFY_FILTER");
+      expect(trans.transformFilter(startVL, destinationVL, def.DEFAULT_TRANSFORM_TRANSITIONS)[1].name).to.eq("REMOVE_RANGE_FILTER");
+
+    });
+
     it('should return SETTYPE transition correctly.', function () {
       expect(trans.transformSettype(startVL, destinationVL, "color" , def.DEFAULT_TRANSFORM_TRANSITIONS ).name).to.eq("SETTYPE");
     });
@@ -193,7 +207,7 @@ describe('cp.trans.trans', function () {
     it('should return all transitions correctly.', function () {
 
       var result = trans.transitionSet(startVL, destinationVL, def.TRANSITIONS );
-
+      console.log(result.transform);
       expect(result.marktype[0].cost).to.eq(def.DEFAULT_MARKTYPE_TRANSITIONS["AREA_POINT"].cost);
       expect(result.transform.length).to.eq(4);
       expect(result.encoding.length).to.eq(2);

@@ -3,6 +3,7 @@
 import {Mark} from 'vega-lite/src/mark';
 import {Type} from 'vega-lite/src/type';
 import {CHANNELS} from 'vega-lite/src/channel';
+var expr = require('vega-expression'); // TODO : (YH) make typescript definition
 
 import * as util from '../util';
 import * as def from './def'
@@ -74,11 +75,13 @@ export function transformTransitionSet (s, d, importedTransformTransitions?, tra
   var transSet = [];
   var trans;
   var already;
-  if( transformTransitions["FILTER"] ){
-    if(trans = transformFilter(s, d, transformTransitions) ){
-      transSet.push(trans);
-    }
+
+  if(trans = transformFilter(s, d, transformTransitions) ){
+    
+    transSet = transSet.concat(trans);
+
   }
+
 
   CHANNELS.forEach(function(channel){
     ["SCALE", "SORT", "AGGREGATE", "BIN", "SETTYPE"].map(function(transformType){
@@ -163,33 +166,76 @@ export function transformBasic(s, d, channel, transform, transformTransitions, t
 }
 
 export function transformFilter(s, d, transformTransitions){
-  var uHasFilter = false;
-  var vHasFilter = false;
-  var transistion;
+  var sFilters, dFilters;
+  var transitions =[];
   if( s.transform && s.transform.filter ){
-    uHasFilter = true;
+    sFilters = filters(s.transform.filter);
   }
   if( d.transform && d.transform.filter ){
-    vHasFilter = true;
+    dFilters = filters(d.transform.filter);
   }
 
-  if( uHasFilter && vHasFilter && ( !util.rawEqual(s.transform.filter, d.transform.filter))){
-    transistion = util.duplicate(transformTransitions["FILTER"]);
-    transistion.detail = {"type": "modified"};
-    return transistion;
+
+  if( sFilters && dFilters && ( !util.rawEqual(s.transform.filter, d.transform.filter))){
+    ["SPECIFY", "RANGE"].map(function(item){
+      if(sFilters[item] - dFilters[item] > 0){
+        transitions.push(util.duplicate(transformTransitions["REMOVE_"+item+"_FILTER"]));
+      }
+      else if (sFilters[item] - dFilters[item] < 0) {
+        transitions.push(util.duplicate(transformTransitions["ADD_"+item+"_FILTER"]));
+      }
+    });
+    if(transitions.length === 0){
+      transitions.push(util.duplicate(transformTransitions["MODIFY_FILTER"]));
+    }
   }
-  else if( uHasFilter && !vHasFilter ){
-    transistion = util.duplicate(transformTransitions["FILTER"]);
-    transistion.detail = {"type": "removed"};
-    return transistion;
+  else if( sFilters && !dFilters ){
+
+    transitions.push(util.duplicate(transformTransitions["REMOVE_FILTER"]));
+
   }
-  else if( !uHasFilter && vHasFilter ){
-    transistion = util.duplicate(transformTransitions["FILTER"]);
-    transistion.detail = {"type": "added"};
-    return transistion;
+  else if( !sFilters && dFilters ){
+    transitions.push(util.duplicate(transformTransitions["ADD_FILTER"]));
   }
 
+  return transitions;
 }
+
+export function filters(expression){
+  var parser = expr["parse"];
+  var expressionTree = parser(expression);
+  var filters = { "SPECIFY":0, "RANGE":0, "OTHER":0 };
+
+  var temp = traverseExpressionTree(expressionTree.body[0].expression,[],0)
+
+  temp.map(function(expression){
+    if (expression.type === "BinaryExpression") {
+      if (["==","===","!==","!="].indexOf(expression.operator) >= 0) {
+        filters.SPECIFY += 1;
+      }
+      else if ([">","<",">=","<="].indexOf(expression.operator) >= 0) {
+        filters.RANGE += 1;
+      }
+      else
+        filters.OTHER += 1;
+    }
+  });
+
+  return filters;
+
+  function traverseExpressionTree(tree, arr, depth) {
+    if (tree.operator !== undefined) {
+      arr = traverseExpressionTree(tree.left, arr, depth + 1);
+      arr = traverseExpressionTree(tree.right, arr, depth + 1);
+
+      tree.depth = depth;
+      arr.push(tree);
+    }
+
+    return arr;
+  }
+}
+
 
 export function transformSettype(s, d, channel, transformTransitions){
   var sHas = false

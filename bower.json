@@ -29,6 +29,6 @@
     "tests"
   ],
   "dependencies": {
-    "vega-lite": "^0.9.0"
+    "vega-lite": "^1.0.8"
   }
 }

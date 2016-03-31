@@ -60,7 +60,8 @@
         "test/trans/trans.test.ts",
         "typings/chai.d.ts",
         "typings/clusterfck.d.ts",
-        "typings/mocha.d.ts"
+        "typings/mocha.d.ts",
+        "typings/require.d.ts"
     ],
     "atom": {
         "rewriteTsconfig": true
