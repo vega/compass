@@ -77,7 +77,7 @@ export function transformTransitionSet (s, d, importedTransformTransitions?, tra
   var already;
 
   if(trans = transformFilter(s, d, transformTransitions) ){
-    
+
     transSet = transSet.concat(trans);
 
   }
@@ -166,8 +166,7 @@ export function transformBasic(s, d, channel, transform, transformTransitions, t
 }
 
 export function transformFilter(s, d, transformTransitions){
-  var sFilters, dFilters;
-  var transitions =[];
+  var sFilters = [], dFilters = [];
   if( s.transform && s.transform.filter ){
     sFilters = filters(s.transform.filter);
   }
@@ -176,58 +175,63 @@ export function transformFilter(s, d, transformTransitions){
   }
 
 
-  if( sFilters && dFilters && ( !util.rawEqual(s.transform.filter, d.transform.filter))){
-    ["SPECIFY", "RANGE"].map(function(item){
-      if(sFilters[item] - dFilters[item] > 0){
-        transitions.push(util.duplicate(transformTransitions["REMOVE_"+item+"_FILTER"]));
+  if( sFilters.length === 0 && dFilters.length === 0 && !util.rawEqual(s.transform.filter, d.transform.filter)){
+    return;
+  }
+  else if(sFilters.length > dFilters.length && util.arrayDiff(dFilters, sFilters).length === 0){
+    return util.duplicate(transformTransitions["REMOVE_FILTER"]);
+  }
+  else if(sFilters.length < dFilters.length && util.arrayDiff(sFilters, dFilters).length === 0){
+    return util.duplicate(transformTransitions["ADD_FILTER"]);
+  }
+  else if (sFilters.length !== dFilters.length) {
+    return util.duplicate(transformTransitions["MODIFY_FILTER"]);
+  }
+  else{
+    var transitionName = "", level = 0;
+    for (let i = 0; i < sFilters.length; i++) {
+      if( !util.rawEqual(sFilters[i].field, dFilters[i].field) ){
+        transitionName = "MODIFY_FILTER";
+        break;
       }
-      else if (sFilters[item] - dFilters[item] < 0) {
-        transitions.push(util.duplicate(transformTransitions["ADD_"+item+"_FILTER"]));
+      else if(sFilters[i].op !== dFilters[i].op || !util.rawEqual(sFilters[i].value, dFilters[i].value) ){
+        transitionName = "MODIFY_FILTER_ARITHMETIC";
       }
-    });
-    if(transitions.length === 0){
-      transitions.push(util.duplicate(transformTransitions["MODIFY_FILTER"]));
+    }
+
+    if (transitionName) {
+      return util.duplicate(transformTransitions[transitionName]);
     }
   }
-  else if( sFilters && !dFilters ){
-
-    transitions.push(util.duplicate(transformTransitions["REMOVE_FILTER"]));
-
-  }
-  else if( !sFilters && dFilters ){
-    transitions.push(util.duplicate(transformTransitions["ADD_FILTER"]));
-  }
-
-  return transitions;
 }
 
 export function filters(expression){
   var parser = expr["parse"];
   var expressionTree = parser(expression);
-  var filters = { "SPECIFY":0, "RANGE":0, "OTHER":0 };
 
-  var temp = traverseExpressionTree(expressionTree.body[0].expression,[],0)
 
-  temp.map(function(expression){
-    if (expression.type === "BinaryExpression") {
-      if (["==","===","!==","!="].indexOf(expression.operator) >= 0) {
-        filters.SPECIFY += 1;
-      }
-      else if ([">","<",">=","<="].indexOf(expression.operator) >= 0) {
-        filters.RANGE += 1;
-      }
-      else
-        filters.OTHER += 1;
+  return binaryExprsFromExprTree(expressionTree.body[0].expression, [], 0).map(function(bExpr){
+            return { "field": bExpr.left, "op": bExpr.operator, "value": bExpr.right }
+          }).sort(function(a,b){
+            if(JSON.stringify(a.field) === JSON.stringify(b.field)){
+              if(JSON.stringify(a.op) === JSON.stringify(b.op)){
+                  return JSON.stringify(a.value).localeCompare(JSON.stringify(b.value))
+              }
+              else {
+                return JSON.stringify(a.op).localeCompare(JSON.stringify(b.op))
+              }
+            }
+            else {
+              return JSON.stringify(a.field).localeCompare(JSON.stringify(b.field))
+            }
+          });
+
+  function binaryExprsFromExprTree(tree, arr, depth) {
+    if (tree.operator === '||' || tree.operator === '&&') {
+      arr = binaryExprsFromExprTree(tree.left, arr, depth + 1);
+      arr = binaryExprsFromExprTree(tree.right, arr, depth + 1);
     }
-  });
-
-  return filters;
-
-  function traverseExpressionTree(tree, arr, depth) {
-    if (tree.operator !== undefined) {
-      arr = traverseExpressionTree(tree.left, arr, depth + 1);
-      arr = traverseExpressionTree(tree.right, arr, depth + 1);
-
+    else if(['==','===','!==','!=','<','<=','>','>='].indexOf(tree.operator) >= 0){
       tree.depth = depth;
       arr.push(tree);
     }
