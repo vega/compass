@@ -32,10 +32,14 @@ export function transitionSet (s, d, importedTransitionCosts?, transOptions?) {
   var importedMarktypeTransitions = importedTransitionCosts ? importedTransitionCosts.marktypeTransitions : def.DEFAULT_MARKTYPE_TRANSITIONS;
   var importedTransformTransitions = importedTransitionCosts ? importedTransitionCosts.transformTransitions : def.DEFAULT_TRANSFORM_TRANSITIONS;
   var importedEncodingTransitions = importedTransitionCosts ? importedTransitionCosts.encodingTransitions : def.DEFAULT_ENCODING_TRANSITIONS;
+  var importedFilterTransitions = importedTransitionCosts ? importedTransitionCosts.filterTransitions : def.DEFAULT_FILTER_TRANSITIONS;
+
   var transitions = {
     marktype: marktypeTransitionSet(s, d, importedMarktypeTransitions),
     transform: transformTransitionSet(s, d, importedTransformTransitions, transOptions),
+    filter: filterTransitionSet(s,d, importedFilterTransitions),
     encoding: encodingTransitionSet(s, d, importedEncodingTransitions)
+
   };
 
   var cost = 0;
@@ -71,16 +75,11 @@ export function marktypeTransitionSet (s, d, importedMarktypeTransitions? ) {
 
 export function transformTransitionSet (s, d, importedTransformTransitions?, transOptions? ) {
 
-  var transformTransitions = importedTransformTransitions || transformTransitions;
+  var transformTransitions = importedTransformTransitions || def.DEFAULT_TRANSFORM_TRANSITIONS ;
   var transSet = [];
   var trans;
   var already;
 
-  if(trans = transformFilter(s, d, transformTransitions) ){
-
-    transSet = transSet.concat(trans);
-
-  }
 
 
   CHANNELS.forEach(function(channel){
@@ -165,44 +164,50 @@ export function transformBasic(s, d, channel, transform, transformTransitions, t
   }
 }
 
-export function transformFilter(s, d, transformTransitions){
+export function filterTransitionSet(s, d, importedFilterTransitions?){
+  var filterTransitions = importedFilterTransitions || def.DEFAULT_FILTER_TRANSITIONS ;
   var sFilters = [], dFilters = [];
+  var transitions = [];
+
   if( s.transform && s.transform.filter ){
     sFilters = filters(s.transform.filter);
   }
   if( d.transform && d.transform.filter ){
     dFilters = filters(d.transform.filter);
   }
+  var dOnly = util.arrayDiff(dFilters, sFilters);
+  var sOnly = util.arrayDiff(sFilters, dFilters);
 
 
-  if( sFilters.length === 0 && dFilters.length === 0 && !util.rawEqual(s.transform.filter, d.transform.filter)){
-    return;
+  if( sFilters.length === 0 && dFilters.length === 0 ){
+    return transitions;
   }
-  else if(sFilters.length > dFilters.length && util.arrayDiff(dFilters, sFilters).length === 0){
-    return util.duplicate(transformTransitions["REMOVE_FILTER"]);
-  }
-  else if(sFilters.length < dFilters.length && util.arrayDiff(sFilters, dFilters).length === 0){
-    return util.duplicate(transformTransitions["ADD_FILTER"]);
-  }
-  else if (sFilters.length !== dFilters.length) {
-    return util.duplicate(transformTransitions["MODIFY_FILTER"]);
-  }
-  else{
-    var transitionName = "", level = 0;
-    for (let i = 0; i < sFilters.length; i++) {
-      if( !util.rawEqual(sFilters[i].field, dFilters[i].field) ){
-        transitionName = "MODIFY_FILTER";
+
+  var isFind = false;
+  for (let i = 0; i < dOnly.length; i++) {
+    for (let j = 0; j < sOnly.length; j++) {
+      if (util.rawEqual(dOnly[i].field, sOnly[j].field)) {
+        transitions.push(util.duplicate(filterTransitions["MODIFY_FILTER"]));
+        dOnly.splice(i,1);
+        sOnly.splice(j,1);
+        isFind = true;
         break;
       }
-      else if(sFilters[i].op !== dFilters[i].op || !util.rawEqual(sFilters[i].value, dFilters[i].value) ){
-        transitionName = "MODIFY_FILTER_ARITHMETIC";
-      }
     }
-
-    if (transitionName) {
-      return util.duplicate(transformTransitions[transitionName]);
+    if (isFind) {
+      isFind = false;
+      i--;
+      continue;
     }
   }
+
+  for (let i = 0; i < dOnly.length; i++) {
+    transitions.push(util.duplicate(filterTransitions["ADD_FILTER"]));
+  }
+  for (let i = 0; i < sOnly.length; i++) {
+    transitions.push(util.duplicate(filterTransitions["REMOVE_FILTER"]));
+  }
+  return transitions
 }
 
 export function filters(expression){
@@ -212,18 +217,6 @@ export function filters(expression){
 
   return binaryExprsFromExprTree(expressionTree.body[0].expression, [], 0).map(function(bExpr){
             return { "field": bExpr.left, "op": bExpr.operator, "value": bExpr.right }
-          }).sort(function(a,b){
-            if(JSON.stringify(a.field) === JSON.stringify(b.field)){
-              if(JSON.stringify(a.op) === JSON.stringify(b.op)){
-                  return JSON.stringify(a.value).localeCompare(JSON.stringify(b.value))
-              }
-              else {
-                return JSON.stringify(a.op).localeCompare(JSON.stringify(b.op))
-              }
-            }
-            else {
-              return JSON.stringify(a.field).localeCompare(JSON.stringify(b.field))
-            }
           });
 
   function binaryExprsFromExprTree(tree, arr, depth) {

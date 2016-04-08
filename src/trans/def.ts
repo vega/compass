@@ -45,10 +45,6 @@ export const DEFAULT_TRANSFORM_TRANSITIONS ={
   SORT: { name: 'SORT', cost: 1},
   BIN: { name: 'BIN', cost: 1},
   AGGREGATE: { name: 'AGGREGATE', cost: 1},
-  ADD_FILTER: { name: 'ADD_FILTER', cost: 1},
-  REMOVE_FILTER: { name: 'REMOVE_FILTER', cost: 1},
-  MODIFY_FILTER: { name: 'MODIFY_FILTER', cost: 1},
-  MODIFY_FILTER_ARITHMETIC: { name: 'MODIFY_FILTER_ARITHMETIC', cost: 1},
   SETTYPE: { name: 'SETTYPE', cost: 1}
 };
 
@@ -57,12 +53,22 @@ export const DEFAULT_TRANSFORM_TRANSITION_LIST = [
   "SORT",
   "BIN",
   "AGGREGATE",
-  "ADD_FILTER",
-  "REMOVE_FILTER",
-  "MODIFY_FILTER",
-  "MODIFY_FILTER_ARITHMETIC",
   "SETTYPE"
 ];
+
+export const DEFAULT_FILTER_TRANSITIONS ={
+  ADD_FILTER: { name: 'ADD_FILTER', cost: 1},
+  REMOVE_FILTER: { name: 'REMOVE_FILTER', cost: 1},
+  MODIFY_FILTER: { name: 'MODIFY_FILTER', cost: 1}
+};
+
+export const DEFAULT_FILTER_TRANSITION_LIST = [
+  "ADD_FILTER",
+  "REMOVE_FILTER",
+  "MODIFY_FILTER"
+];
+
+
 export const CHANNELS_WITH_TRANSITION_ORDER = [
   "x", "y", "color", "shape", "size", "row", "column", "text"
   // , "detail"
