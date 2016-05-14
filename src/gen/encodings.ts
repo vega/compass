@@ -37,7 +37,7 @@ export default function genEncodings(encodings: Encoding[], fieldDefs: FieldDef[
         !(channel in tmpEncoding) &&
         // channel support the assigned role
         ((isDim && supportedRole.dimension) || (!isDim && supportedRole.measure)) &&
-        // the field satisties the channel's rule
+        // the field satisfies the channel's rule
         rule.channel[channel](tmpEncoding, fieldDef, stats, opt)
       ) {
         tmpEncoding[channel] = fieldDef;
@@ -81,13 +81,15 @@ namespace rule {
         return false;
       }
 
-      // TODO: revise if this should mainly be on ranking
+      // TODO: remove this because we can only bin quantitative, and we don't support quantitative for shape anyway
       if (opt.omitShapeWithBin && fieldDef.bin && fieldDef.type === Type.QUANTITATIVE) {
         return false;
       }
       if (opt.omitShapeWithTimeDimension && fieldDef.timeUnit && fieldDef.type === Type.TEMPORAL) {
         return false;
       }
+
+      // TODO: omit shape with ordinal
 
       return cardinality(fieldDef, stats) <= opt.maxCardinalityForShape;
     }

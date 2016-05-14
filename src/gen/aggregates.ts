@@ -39,10 +39,12 @@ export default function genAggregates(output, fieldDefs: SchemaField[], stats, o
           if (!f.aggregate) { hasRaw = true; }
         }
       });
+      // Constraint: Omit Aggregate Plot with measure only
       if (!hasDimension && !hasRaw && opt.omitMeasureOnly) {
         return;
       }
       if (!hasMeasure) {
+        // Special Option: Add count for dimension only
         if (opt.addCountForDimensionOnly) {
           tf.push(vlFieldDef.count());
           emit(tf);
@@ -103,6 +105,7 @@ export default function genAggregates(output, fieldDefs: SchemaField[], stats, o
       });
 
       if ((!opt.consistentAutoQ || util.isin(autoMode, [AUTO, 'bin', 'cast', 'autocast'])) && !hasNorO) {
+        // Constraint: Bin a field only if its cardinality is above certain threshold
         var highCardinality = vlFieldDef.cardinality(f, stats) > opt.minCardinalityForBin;
 
         var isAuto = opt.genDimQ === QuantitativeDimensionType.AUTO,
@@ -136,8 +139,10 @@ export default function genAggregates(output, fieldDefs: SchemaField[], stats, o
       assignTimeUnitT(i, hasAggr, autoMode, f._timeUnit);
     } else {
       opt.timeUnitList.forEach(function(timeUnit) {
+        // TODO: add option
         if (timeUnit === undefined) {
-          if (!hasAggr) { // can't aggregate over raw time
+          // Constraint: we should not aggregate over raw time
+          if (!hasAggr) {
             assignField(i+1, false, autoMode);
           }
         } else {
