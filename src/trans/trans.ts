@@ -32,12 +32,11 @@ export function transitionSet (s, d, importedTransitionCosts?, transOptions?) {
   var importedMarktypeTransitions = importedTransitionCosts ? importedTransitionCosts.marktypeTransitions : def.DEFAULT_MARKTYPE_TRANSITIONS;
   var importedTransformTransitions = importedTransitionCosts ? importedTransitionCosts.transformTransitions : def.DEFAULT_TRANSFORM_TRANSITIONS;
   var importedEncodingTransitions = importedTransitionCosts ? importedTransitionCosts.encodingTransitions : def.DEFAULT_ENCODING_TRANSITIONS;
-  var importedFilterTransitions = importedTransitionCosts ? importedTransitionCosts.filterTransitions : def.DEFAULT_FILTER_TRANSITIONS;
+  
 
   var transitions = {
     marktype: marktypeTransitionSet(s, d, importedMarktypeTransitions),
     transform: transformTransitionSet(s, d, importedTransformTransitions, transOptions),
-    filter: filterTransitionSet(s,d, importedFilterTransitions),
     encoding: encodingTransitionSet(s, d, importedEncodingTransitions)
 
   };
@@ -55,6 +54,7 @@ export function transitionSet (s, d, importedTransitionCosts?, transOptions?) {
     prev += transition.cost;
     return prev;
   }, cost);
+  
 
   transitions["cost"] = cost;
   return transitions;
@@ -108,6 +108,14 @@ export function transformTransitionSet (s, d, importedTransformTransitions?, tra
       }
     });
   });
+  
+  var filterTransitions = { 
+                            "MODIFY_FILTER": transformTransitions["MODIFY_FILTER"],
+                            "ADD_FILTER" : transformTransitions["ADD_FILTER"], 
+                            "REMOVE_FILTER" : transformTransitions["REMOVE_FILTER"]
+                          };
+  transSet = transSet.concat(filterTransitionSet(s,d, filterTransitions));
+  
   return transSet;
 }
 
@@ -164,8 +172,7 @@ export function transformBasic(s, d, channel, transform, transformTransitions, t
   }
 }
 
-export function filterTransitionSet(s, d, importedFilterTransitions?){
-  var filterTransitions = importedFilterTransitions || def.DEFAULT_FILTER_TRANSITIONS ;
+export function filterTransitionSet(s, d, filterTransitions){
   var sFilters = [], dFilters = [];
   var transitions = [];
 

@@ -66,15 +66,20 @@ describe('cp.trans.trans', function () {
     });
 
     it('should return all transitions without order.', function(){
-      expect(trans.transformTransitionSet(startVL, destinationVL, def.DEFAULT_TRANSFORM_TRANSITIONS).length).to.eq(3);
+      expect(trans.transformTransitionSet(startVL, destinationVL, def.DEFAULT_TRANSFORM_TRANSITIONS).length).to.eq(4);
     });
-  });
-
-  describe('filter transition', function(){
+    
+    
+    var filterTransitions = { 
+                            "MODIFY_FILTER": def.DEFAULT_TRANSFORM_TRANSITIONS["MODIFY_FILTER"],
+                            "ADD_FILTER" : def.DEFAULT_TRANSFORM_TRANSITIONS["ADD_FILTER"], 
+                            "REMOVE_FILTER" : def.DEFAULT_TRANSFORM_TRANSITIONS["REMOVE_FILTER"]
+                          };
+                          
     it('should return ADD_FILTER / REMOVE_FILTER transition correctly.', function () {
       var startVL = { "transform": {"filter" : "datum.A == 0 && datum.B == 100 && datum.C == 3  " } };
       var destinationVL = { "transform": {"filter" : "datum.A == 0 && datum.B == 100 && datum.D == 4" }  };
-      var sd = trans.filterTransitionSet(startVL, destinationVL, def.DEFAULT_FILTER_TRANSITIONS);
+      var sd = trans.filterTransitionSet(startVL, destinationVL, filterTransitions);
 
       expect(sd.length).to.eq(2);
       expect(sd[0].name).to.eq("ADD_FILTER");
@@ -85,16 +90,16 @@ describe('cp.trans.trans', function () {
       var startVL = { "transform": {"filter" : "datum.Running_Time_min > 0" } };
       var destinationVL = { "transform": {"filter" : "datum.Running_Time_min == 100" }  };
 
-      // expect(trans.filterTransitionSet(startVL, destinationVL, def.DEFAULT_FILTER_TRANSITIONS)[0].name).to.eq("MODIFY_FILTER");
+      // expect(trans.filterTransitionSet(startVL, destinationVL, filterTransitions)[0].name).to.eq("MODIFY_FILTER");
 
       destinationVL = { "transform": {"filter" : "datum.Running_Time_min == 100 && datum.Rotten_Tomato_Rating == 100" }  };
-      var sd = trans.filterTransitionSet(startVL, destinationVL, def.DEFAULT_FILTER_TRANSITIONS);
+      var sd = trans.filterTransitionSet(startVL, destinationVL, filterTransitions);
       expect(sd[0].name).to.eq("MODIFY_FILTER");
       expect(sd[1].name).to.eq("ADD_FILTER");
 
       startVL = { "transform": {"filter" : "datum.A == 0 && datum.B == 100" } };
       destinationVL = { "transform": {"filter" : "datum.A != 0 && datum.D == 100" }  };
-      sd = trans.filterTransitionSet(startVL, destinationVL, def.DEFAULT_FILTER_TRANSITIONS);
+      sd = trans.filterTransitionSet(startVL, destinationVL, filterTransitions);
 
       expect(sd[0].name).to.eq("MODIFY_FILTER");
       expect(sd[1].name).to.eq("ADD_FILTER");
@@ -105,19 +110,17 @@ describe('cp.trans.trans', function () {
     it('should return FILTER ARITHMETIC transition correctly.', function () {
       var startVL = { "transform": {"filter" : "datum.Running_Time_min > 0" } };
       var destinationVL = { "transform": {"filter" : "datum.Running_Time_min > 10" }  };
-      expect(trans.filterTransitionSet(startVL, destinationVL, def.DEFAULT_FILTER_TRANSITIONS)[0].name).to.eq("MODIFY_FILTER");
+      expect(trans.filterTransitionSet(startVL, destinationVL, filterTransitions)[0].name).to.eq("MODIFY_FILTER");
 
       startVL = { "transform": {"filter" : "datum.A == 0 && datum.B == 100 && datum.S !== 1" } };
       destinationVL = { "transform": {"filter" : "datum.A == 0 && datum.S !== 1 && datum.B == 100" }  };
-      expect(trans.filterTransitionSet(startVL, destinationVL, def.DEFAULT_FILTER_TRANSITIONS).length).to.eq(0);
+      expect(trans.filterTransitionSet(startVL, destinationVL, filterTransitions).length).to.eq(0);
 
       startVL = { "transform": {"filter" : "datum.Running_Time_min > 0" } };
       destinationVL = { "transform": {"filter" : "datum.Running_Time_min == 0" }  };
-      expect(trans.filterTransitionSet(startVL, destinationVL, def.DEFAULT_FILTER_TRANSITIONS)[0].name).to.eq("MODIFY_FILTER");
+      expect(trans.filterTransitionSet(startVL, destinationVL, filterTransitions)[0].name).to.eq("MODIFY_FILTER");
     });
-
-  })
-
+  });
   describe('encoding transition', function(){
     it('should return empty array if start is equal to dest.', function(){
       expect(trans.encodingTransitionSet(startVL, startVL, def.DEFAULT_ENCODING_TRANSITIONS).length).to.eq(0);
@@ -235,11 +238,11 @@ describe('cp.trans.trans', function () {
     it('should return all transitions correctly.', function () {
 
       var result = trans.transitionSet(startVL, destinationVL, def.TRANSITIONS );
-
+      console.log(result);
       expect(result.marktype[0].cost).to.eq(def.DEFAULT_MARKTYPE_TRANSITIONS["AREA_POINT"].cost);
-      expect(result.transform.length).to.eq(3);
+      expect(result.transform.length).to.eq(4);
       expect(result.encoding.length).to.eq(2);
-      expect(result.filter.length).to.eq(1);
+      
 
     });
   });
