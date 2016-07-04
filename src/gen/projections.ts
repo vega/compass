@@ -45,6 +45,7 @@ export default function projections(fieldDefs: SchemaField[], stats?, opt: Proje
         hasSelectedMeasure = true;
       }
     } else if (fieldDef.selected !== false && !vlFieldDef.isCount(fieldDef)) {
+      // Constraint: Do not add high cardinality O/N
       if (vlFieldDef.isDimension(fieldDef) &&
           !opt.maxCardinalityForAutoAddOrdinal &&
           vlFieldDef.cardinality(fieldDef, stats, 15) > opt.maxCardinalityForAutoAddOrdinal
