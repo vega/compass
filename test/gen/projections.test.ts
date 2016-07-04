@@ -66,7 +66,7 @@ describe('cp.gen.projections()', function () {
       expect(lengthCount).to.eql({
         1:3, // P(3,1) = 3
         2:3 // P(3,2) = 3
-      })
+      });
     });
   });
 

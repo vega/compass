@@ -41,8 +41,8 @@ export function get(extendedSpec1, extendedSpec2) {
   });
 
   // do not group stacked chart with similar non-stacked chart!
-  var isStack1 = vlSpec.isStack(extendedSpec1),
-    isStack2 = vlSpec.isStack(extendedSpec2);
+  var isStack1 = vlSpec.isStacked(extendedSpec1),
+    isStack2 = vlSpec.isStacked(extendedSpec2);
 
   if (isStack1 || isStack2) {
     if (isStack1 && isStack2) {

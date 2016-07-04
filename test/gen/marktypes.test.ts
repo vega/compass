@@ -5,7 +5,6 @@ import {DEFAULT_SPEC_OPTION} from '../../src/consts';
 import * as vlShorthand from 'vega-lite/src/shorthand';
 import {BAR, POINT, TEXT, AREA} from 'vega-lite/src/mark';
 import {QUANTITATIVE, ORDINAL, TEMPORAL} from 'vega-lite/src/type';
-import {Encoding} from 'vega-lite/src/encoding';
 import {ScaleType} from 'vega-lite/src/scale';
 import {AggregateOp} from 'vega-lite/src/aggregate';
 
