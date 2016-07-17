@@ -32,7 +32,7 @@ export function transitionSet (s, d, importedTransitionCosts?, transOptions?) {
   var importedMarktypeTransitions = importedTransitionCosts ? importedTransitionCosts.marktypeTransitions : def.DEFAULT_MARKTYPE_TRANSITIONS;
   var importedTransformTransitions = importedTransitionCosts ? importedTransitionCosts.transformTransitions : def.DEFAULT_TRANSFORM_TRANSITIONS;
   var importedEncodingTransitions = importedTransitionCosts ? importedTransitionCosts.encodingTransitions : def.DEFAULT_ENCODING_TRANSITIONS;
-  
+
 
   var transitions = {
     marktype: marktypeTransitionSet(s, d, importedMarktypeTransitions),
@@ -54,7 +54,7 @@ export function transitionSet (s, d, importedTransitionCosts?, transOptions?) {
     prev += transition.cost;
     return prev;
   }, cost);
-  
+
 
   transitions["cost"] = cost;
   return transitions;
@@ -108,14 +108,14 @@ export function transformTransitionSet (s, d, importedTransformTransitions?, tra
       }
     });
   });
-  
-  var filterTransitions = { 
+
+  var filterTransitions = {
                             "MODIFY_FILTER": transformTransitions["MODIFY_FILTER"],
-                            "ADD_FILTER" : transformTransitions["ADD_FILTER"], 
+                            "ADD_FILTER" : transformTransitions["ADD_FILTER"],
                             "REMOVE_FILTER" : transformTransitions["REMOVE_FILTER"]
                           };
   transSet = transSet.concat(filterTransitionSet(s,d, filterTransitions));
-  
+
   return transSet;
 }
 
@@ -194,7 +194,16 @@ export function filterTransitionSet(s, d, filterTransitions){
   for (let i = 0; i < dOnly.length; i++) {
     for (let j = 0; j < sOnly.length; j++) {
       if (util.rawEqual(dOnly[i].field, sOnly[j].field)) {
-        transitions.push(util.duplicate(filterTransitions["MODIFY_FILTER"]));
+        let newTr = util.duplicate(filterTransitions["MODIFY_FILTER"]);
+        newTr.detail = {};
+        if (sOnly[j].op !== dOnly[j].op) {
+          newTr.detail.op = sOnly[j].op + ', '+ dOnly[j].op;
+        }
+        if (sOnly[j].value !== dOnly[j].value) {
+          newTr.detail.value = sOnly[j].value + ', '+ dOnly[j].value;
+        }
+
+        transitions.push(newTr);
         dOnly.splice(i,1);
         sOnly.splice(j,1);
         isFind = true;
@@ -209,10 +218,14 @@ export function filterTransitionSet(s, d, filterTransitions){
   }
 
   for (let i = 0; i < dOnly.length; i++) {
-    transitions.push(util.duplicate(filterTransitions["ADD_FILTER"]));
+    let newTr = util.duplicate(filterTransitions["ADD_FILTER"]);
+    newTr.detail = util.duplicate(dOnly[i]);
+    transitions.push(newTr);
   }
   for (let i = 0; i < sOnly.length; i++) {
-    transitions.push(util.duplicate(filterTransitions["REMOVE_FILTER"]));
+    let newTr = util.duplicate(filterTransitions["REMOVE_FILTER"]);
+    newTr.detail = util.duplicate(sOnly[i]);
+    transitions.push(newTr);
   }
   return transitions
 }
@@ -223,7 +236,7 @@ export function filters(expression){
 
 
   return binaryExprsFromExprTree(expressionTree.body[0].expression, [], 0).map(function(bExpr){
-            return { "field": bExpr.left, "op": bExpr.operator, "value": bExpr.right }
+            return { "field": bExpr.left.property.name, "op": bExpr.operator, "value": bExpr.right.raw }
           });
 
   function binaryExprsFromExprTree(tree, arr, depth) {
@@ -242,8 +255,6 @@ export function filters(expression){
 
 
 export function transformSettype(s, d, channel, transformTransitions){
-  var sHas = false
-  var dHas = false;
   var transistion;
   if( s.encoding[channel] && d.encoding[channel]
       && ( d.encoding[channel]["field"] === s.encoding[channel]["field"] )
@@ -316,7 +327,7 @@ export function encodingTransitionSet(s, d, importedEncodingTransitions){
       return [ {name: 'OVER_THE_CEILING', cost: importedEncodingTransitions.ceiling.alternatingCost} ];
     }
 
-    var alreadyDone = false;
+
     var newNodes = nb.neighbors(u, u.additionalFields, u.additionalChannels, importedEncodingTransitions);
     newNodes.forEach(function(newNode){
       var node;

@@ -1,12 +1,12 @@
 import * as cpConsts from './consts';
-import cpCluster from './cluster/cluster'; // FIXME
+// import cpCluster from './cluster/cluster'; // FIXME
 import * as cpGen from './gen/gen';
 import * as cpRank from './rank/rank';
 import * as cpUtil from './util';
 import * as cpTrans from './trans/trans'
 
 export const consts = cpConsts;
-export const cluster = cpCluster;
+// export const cluster = cpCluster;
 export const gen = cpGen;
 export const rank = cpRank;
 export const util = cpUtil;

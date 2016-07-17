@@ -39,7 +39,7 @@ var destinationVL = {
   }
 };
 
-describe('cp.trans.trans', function () {
+describe.only('cp.trans.trans', function () {
   describe('marktype transition', function () {
     it('should return a marktype transition correctly.', function () {
       expect(trans.marktypeTransitionSet(startVL, destinationVL)[0].cost)
@@ -68,42 +68,60 @@ describe('cp.trans.trans', function () {
     it('should return all transitions without order.', function(){
       expect(trans.transformTransitionSet(startVL, destinationVL, def.DEFAULT_TRANSFORM_TRANSITIONS).length).to.eq(4);
     });
-    
-    
-    var filterTransitions = { 
+
+
+    var filterTransitions = {
                             "MODIFY_FILTER": def.DEFAULT_TRANSFORM_TRANSITIONS["MODIFY_FILTER"],
-                            "ADD_FILTER" : def.DEFAULT_TRANSFORM_TRANSITIONS["ADD_FILTER"], 
+                            "ADD_FILTER" : def.DEFAULT_TRANSFORM_TRANSITIONS["ADD_FILTER"],
                             "REMOVE_FILTER" : def.DEFAULT_TRANSFORM_TRANSITIONS["REMOVE_FILTER"]
                           };
-                          
+
     it('should return ADD_FILTER / REMOVE_FILTER transition correctly.', function () {
       var startVL = { "transform": {"filter" : "datum.A == 0 && datum.B == 100 && datum.C == 3  " } };
       var destinationVL = { "transform": {"filter" : "datum.A == 0 && datum.B == 100 && datum.D == 4" }  };
       var sd = trans.filterTransitionSet(startVL, destinationVL, filterTransitions);
 
       expect(sd.length).to.eq(2);
+      console.log(sd[0].detail.field.toString());
       expect(sd[0].name).to.eq("ADD_FILTER");
+      expect(sd[0].detail.field).to.eq("D");
+      expect(sd[0].detail.op).to.eq("==");
+      expect(sd[0].detail.value).to.eq("4");
       expect(sd[1].name).to.eq("REMOVE_FILTER");
+      expect(sd[1].detail.field).to.eq("C");
+      expect(sd[1].detail.op).to.eq("==");
+      expect(sd[1].detail.value).to.eq("3");
     });
 
     it('should return MODIFY_FILTER  transition correctly.', function () {
       var startVL = { "transform": {"filter" : "datum.Running_Time_min > 0" } };
-      var destinationVL = { "transform": {"filter" : "datum.Running_Time_min == 100" }  };
-
-      // expect(trans.filterTransitionSet(startVL, destinationVL, filterTransitions)[0].name).to.eq("MODIFY_FILTER");
-
-      destinationVL = { "transform": {"filter" : "datum.Running_Time_min == 100 && datum.Rotten_Tomato_Rating == 100" }  };
+      var destinationVL = { "transform": {"filter" : "datum.Running_Time_min == 100 && datum.Rotten_Tomato_Rating == 100" }  };
       var sd = trans.filterTransitionSet(startVL, destinationVL, filterTransitions);
       expect(sd[0].name).to.eq("MODIFY_FILTER");
+      expect(sd[0].detail.op).to.eq(">, ==");
+      expect(sd[0].detail.value).to.eq("0, 100");
       expect(sd[1].name).to.eq("ADD_FILTER");
+      expect(sd[1].detail.field).to.eq("Rotten_Tomato_Rating");
+      expect(sd[1].detail.op).to.eq("==");
+      expect(sd[1].detail.value).to.eq("100");
 
       startVL = { "transform": {"filter" : "datum.A == 0 && datum.B == 100" } };
       destinationVL = { "transform": {"filter" : "datum.A != 0 && datum.D == 100" }  };
       sd = trans.filterTransitionSet(startVL, destinationVL, filterTransitions);
 
       expect(sd[0].name).to.eq("MODIFY_FILTER");
+      expect(sd[0].detail.op).to.eq("==, !=");
+      expect(sd[0].detail.value).to.eq(undefined);
+
       expect(sd[1].name).to.eq("ADD_FILTER");
+      expect(sd[1].detail.field).to.eq("D");
+      expect(sd[1].detail.op).to.eq("==");
+      expect(sd[1].detail.value).to.eq("100");
+
       expect(sd[2].name).to.eq("REMOVE_FILTER");
+      expect(sd[2].detail.field).to.eq("B");
+      expect(sd[2].detail.op).to.eq("==");
+      expect(sd[2].detail.value).to.eq("100");
     });
 
 
@@ -242,7 +260,7 @@ describe('cp.trans.trans', function () {
       expect(result.marktype[0].cost).to.eq(def.DEFAULT_MARKTYPE_TRANSITIONS["AREA_POINT"].cost);
       expect(result.transform.length).to.eq(4);
       expect(result.encoding.length).to.eq(2);
-      
+
 
     });
   });
