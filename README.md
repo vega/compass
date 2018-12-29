@@ -8,7 +8,7 @@
 query, Compass produces ranked group of visualization described using
 [Vega-Lite](http://github.com/vega/vega-lite).
 
-Compass is NO LONGER in an active development.  Details about replacement project: CompassQL are coming soon.
+Compass is NO LONGER in an active development.  Please use https://github.com/vega/compassql
 
 ## Development Guide
 
